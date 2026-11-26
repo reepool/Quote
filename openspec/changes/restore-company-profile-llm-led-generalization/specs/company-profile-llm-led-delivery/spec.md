@@ -31,6 +31,12 @@ The HTTP adapter MUST accept explicit first_read, review_batch and single-stock 
 - **THEN** identical requests reuse their task, conflicts are rejected, shared writer/control scopes execute serially, policy changes cannot refresh allowances, and interruptions are reported without reopening model budgets
 - **AND** useful existing profiles, original errors and source/model attribution remain; public failures never expose credentials, raw rejected content or arbitrary files
 
+#### Scenario: An exhausted closed window has an explicitly authorized successor
+- **WHEN** a trusted operator explicitly activates a separately authorized finite successor with the exact expected predecessor policy hash, the same output owner and an unused distinct checkpoint
+- **THEN** activation MUST require the predecessor allowance to be exhausted, all accepted tasks terminal and no live execution owner, preserve the prior policy/ledger/receipts unchanged, and bind the successor through an explicit immutable predecessor reference using the existing root locks
+- **AND** activation MUST NOT construct a model, submit work, reset old counters, delete old locks/started markers, edit private credentials or grant an implicit future window; repeated activation of the same transition is idempotent and conflicting or incomplete transitions cannot permit two active windows
+- **AND** old task status/result URLs MUST remain readable under the original owning policy/allowance, old request IDs MUST still reuse or conflict according to their original fingerprint, and only new requests may consume the new allowance through the original TaskService; superseded workers MUST NOT dispatch predecessor work
+
 ### Requirement: The existing job command accepts an explicit bounded workpaper plan
 The CLI and scheduled-task adapter MUST forward an explicitly supplied execution plan file to the company-profile application adapter. The adapter MUST reuse the existing configuration, gateway, budget, workpaper identity and published task owner for first_read, review_batch or enrich. It MUST require explicit authorized scope, stock/report versions, configured profile identities and finite limits before model construction; it MUST reject unknown plan fields, profile drift and out-of-scope report requests. Constructed model dependencies MUST remain local to this explicit invocation, without changing shared configuration, default routes or production schedules. It MUST NOT implement another extraction/review loop.
 

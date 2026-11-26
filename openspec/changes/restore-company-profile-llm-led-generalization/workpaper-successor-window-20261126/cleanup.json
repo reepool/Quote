@@ -1,0 +1,31 @@
+{
+  "task": "6.FQ",
+  "state": "all_owned_development_artifacts_removed_after_verification",
+  "previous_6FP_owned_A_B_roots_absent": true,
+  "B": {
+    "root": "data/QuoteBak/company-profile-6fq-b-Bxxrw3Lx",
+    "absent": true,
+    "removed_files": 1249,
+    "removed_logical_bytes": 15207728,
+    "removed_apparent_tree_bytes_including_directories": 18066385,
+    "reason": "Controlled fixture databases,exports,junit,caches and logs;all test processes exited;compact B receipt retained"
+  },
+  "A": {
+    "root": "data/QuoteBak/company-profile-6fq-a-5oAnLvJ2",
+    "absent": true,
+    "removed_files": 46,
+    "removed_logical_bytes": 11439055,
+    "contents": "Complete expected39 copy,baseline hashes,independent two-window fixture DBs and outputs,verification/staging helpers and patches"
+  },
+  "total_removed_files": 1295,
+  "total_removed_logical_bytes": 26646783,
+  "retained_once": [
+    "Compact B code/test receipts and A independent two-window HTTP proof",
+    "Before/after real-service original task and39 full-profile/protected403-file hashes",
+    "Current actual6.FP policy,task ledger,wire/source/failure/usage and private environment unchanged"
+  ],
+  "review": {"blocking_findings_remaining": 0, "nonblocking_scope_expansions": 0},
+  "validation": {"B_distinct_tests_passed": 27, "A_independent_two_window_HTTP": "passed", "supplier_calls": 0, "new_live_window": false, "private_env_unchanged": true, "protected_original_files_unchanged": 403, "all39_complete_profiles_equal": true, "openspec_strict": "passed", "correctness_ruff_and_isolated_diff": "passed"},
+  "git_isolation": {"owned_staged_paths": 16, "original_dirty_paths_preserved": 20, "only_owned_blocks_in_dirty_documents": 4, "credential_scan": "passed"},
+  "recovery": "Disposable A/B fixture copies and helpers can be rebuilt from versioned tests,original preserved business sources/results and compact audit decisions."
+}

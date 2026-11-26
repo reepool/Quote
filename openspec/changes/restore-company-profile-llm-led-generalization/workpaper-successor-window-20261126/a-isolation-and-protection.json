@@ -1,0 +1,39 @@
+{
+  "baseline_head": "2b2e09f87d2312e72079629de1da868dfa48622a",
+  "initial_dirty_paths": 20,
+  "residual_unstaged_paths": [
+    "docs/development/common_llm_gateway_architecture.md",
+    "docs/development/company_profile_acceptance_program.md",
+    "docs/development/company_profile_delivery_plan.md",
+    "docs/development/pdf_engine_evaluation_local_corpus_20260825.json",
+    "openspec/changes/narrow-reconciliation-candidate-construction/design.md",
+    "openspec/changes/narrow-reconciliation-candidate-construction/proposal.md",
+    "openspec/changes/narrow-reconciliation-candidate-construction/specs/financial-readiness-query-performance/spec.md",
+    "openspec/changes/narrow-reconciliation-candidate-construction/tasks.md",
+    "openspec/changes/prepare-company-profile-s1-s2-bounded-acceptance/design.md",
+    "openspec/changes/prepare-company-profile-s1-s2-bounded-acceptance/proposal.md",
+    "openspec/changes/prepare-company-profile-s1-s2-bounded-acceptance/tasks.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/design.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/proposal.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md",
+    "research/company_profile/core_evidence_selection.py",
+    "research/company_profile/core_skeleton.py",
+    "tests/unit/test_research/test_company_profile_core_skeleton.py",
+    "tests/unit/test_research/test_company_profile_owned_page_facts.py"
+  ],
+  "parallel_changes_not_staged": {},
+  "parallel_committed_initial_paths": [],
+  "only_owned_blocks_in_dirty_documents": [
+    "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md",
+    "openspec/changes/restore-company-profile-llm-led-generalization/design.md",
+    "docs/development/company_profile_delivery_plan.md"
+  ],
+  "protected_original_files": 403,
+  "protected_original_drift": [],
+  "private_env_unchanged": true,
+  "credential_scan": "passed",
+  "live_successor_or_model_calls": 0
+}

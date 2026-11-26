@@ -1,0 +1,19 @@
+{
+  "original_HTTP_router_and_task_owner": true,
+  "reader_dependency_override": false,
+  "two_windows_nonempty": true,
+  "first_pending_source_draft_preserved": true,
+  "second_enrichment_contains_new_factor": true,
+  "historical_task_status_and_result_HTTP": 200,
+  "historical_owning_policy_and_allowance_correct": true,
+  "old_ID_replay_under_enrich_only_new_policy": "same task;no new quota or transport",
+  "cross_window_conflict_HTTP": 409,
+  "stale_owner_rejected": true,
+  "activation_and_reentry_model_construction_or_calls": 0,
+  "old_checkpoint_files_unchanged": 9,
+  "scripted_wire_calls": 5,
+  "supplier_calls": 0,
+  "origin": "controlled_fixture",
+  "new_window_used": 1,
+  "semantic_accuracy_claim": "not_assessed"
+}

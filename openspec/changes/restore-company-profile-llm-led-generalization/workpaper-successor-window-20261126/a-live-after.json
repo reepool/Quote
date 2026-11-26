@@ -1,0 +1,29 @@
+{
+  "stage": "after",
+  "actual_service": "192.168.188.66:8000",
+  "task_HTTP": 200,
+  "task_id": "profile-http-f2f27d6402ad6806e257b3e1c99719e2",
+  "task_state": "completed",
+  "policy_sha256": "50095f498ecf14a5d63644f82440e8e34c357cbc5ce7444e9262e1cf5a0d3588",
+  "allowance": {
+    "max_submissions": 1,
+    "accepted_submissions": 1,
+    "remaining_submissions": 0,
+    "per_task": {
+      "seconds": 6000.0,
+      "tokens": 1000000,
+      "physical_requests": 10
+    },
+    "aggregate_ceiling": {
+      "seconds": 6000.0,
+      "tokens": 1000000,
+      "physical_requests": 10
+    }
+  },
+  "protected403_files_unchanged": true,
+  "private_env_unchanged": true,
+  "new_live_policy_or_model_requests": 0,
+  "all39_complete_profiles_equal": true,
+  "visible_facts": 1091,
+  "visible_metrics": 1669
+}

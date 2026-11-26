@@ -1,0 +1,97 @@
+{
+  "task": "6.FQ",
+  "role": "B",
+  "status": "implemented_and_verified_pending_A",
+  "kind": "offline_engineering_controlled_fixture",
+  "baseline_head": "2b2e09f87d2312e72079629de1da868dfa48622a",
+  "write_set": {
+    "research/company_profile/http_tasks.py": "784461fb4e1fd142faf55f47e38d320e20b453878e42c1bb0a289d94bb5bc440",
+    "tests/unit/test_research/test_company_profile_successor_window.py": "2238417f8da3e694841408a5ed6aa7584acecb582be27d504c06b2a0ded3e114"
+  },
+  "implementation": [
+    "Explicit activate_successor_window and same-module operator CLI; authorized bounded policy, exact canonical predecessor hash, same output, independent unused checkpoint, exhausted terminal predecessor, no live execution/owner.",
+    "Durable hash-bound transition intent reserves one successor. Successor checkpoint pin precedes the atomic output pin commit. Only identical explicit activation may resume; constructors do not finish partial activation. Partial staging files and lost commit acknowledgement are covered.",
+    "Historical policy snapshots, checkpoint pins and ledger hashes form an explicit predecessor chain; historical DBs are opened read-only. Status/result use the owning policy allowance and the current original research reader.",
+    "Historical request identity is checked before the successor ledger: same fingerprint reuses, changed content returns 409, broken history returns 503 without accepting a new task. Submit and dispatch check current activation; superseded workers do not send or rewrite the old ledger."
+  ],
+  "operator_example_not_executed_on_live": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m research.company_profile.http_tasks activate --previous-policy <old-policy.json> --policy <authorized-successor-policy.json> --expected-previous-sha256 <old-policy.sha256>",
+  "hash_semantics": "Expected predecessor hash is the canonical policy.sha256 already exposed by status/pin. Transition receipts additionally bind both policy source paths and their exact byte SHA256. CLI invocation does not grant authorization or modify environment/service configuration.",
+  "verification": {
+    "unique_direct_tests_passed": 27,
+    "runs": [
+      {"scope": "test_company_profile_successor_window.py", "passed": 21, "failed": 0, "seconds": 92.44, "note": "Final implementation including partial-staging and lost-acknowledgement recovery; two-window allowance assertions subsequently strengthened and separately rerun."},
+      {"scope": "test_company_profile_successor_window.py -k two_windows", "passed": 1, "deselected": 20, "failed": 0, "seconds": 61.79, "note": "Authoritative final two-window receipt below; unequal submission ceilings and per-task budgets."},
+      {"scope": "test_company_profile_http_tasks.py", "passed": 6, "failed": 0, "seconds": 82.98, "note": "Original HTTP/TaskService/writer, scope/limit, restart, shutdown, attribution and lifespan regression on final implementation."}
+    ],
+    "command_prefix": "source scripts/quote_dev_env.sh\n/home/python/miniconda3/envs/Quote/bin/python -m pytest",
+    "temporary_arguments": "--basetemp=data/QuoteBak/company-profile-6fq-b-Bxxrw3Lx/<run>-pytest -o cache_dir=data/QuoteBak/company-profile-6fq-b-Bxxrw3Lx/<run>-cache --junitxml=data/QuoteBak/company-profile-6fq-b-Bxxrw3Lx/<run>-junit.xml",
+    "execution_environment": "Approved local execution for offline ASGI cross-thread wakeups; ScriptedTransport only, no bound sockets or supplier traffic. Three earlier sandbox HTTP attempts were interrupted before task acceptance because the event loop did not wake from thread completion; not business/model failures. Boundary-only sandbox run: 17 passed. Earlier combined run: 24 passed; superseded by final targeted receipts.",
+    "static": "ruff check --select E9,F63,F7,F82 on both files passed; AST parse passed; git diff --check passed.",
+    "boundaries": ["unspent", "queued", "running", "active owner", "active execution lock", "wrong expected hash", "source/pin drift", "used checkpoint", "cross-root", "planned policy", "conflicting successor", "partial writes at all commit steps", "lost commit acknowledgement", "multi-hop history", "missing/corrupt transition", "changed historical ledger", "stale worker", "ordinary constructor drift"]
+  },
+  "authoritative_two_window_receipt": {
+    "origin": "controlled_fixture",
+    "supplier_requests": 0,
+    "activation_model_requests": 0,
+    "scripted_requests": 5,
+    "scripted_ledger_tokens": 115007,
+    "cost_status": "unknown_fixture_only_not_real_usage",
+    "count_scope": "One authoritative positive test only; other test reruns also used mocks and are not included in these five scripted requests.",
+    "first": {
+      "task_id": "profile-http-544d1e5ac8025c6bc9977b2c88fd8081",
+      "request_id": "first-window",
+      "state": "completed",
+      "policy_sha256": "170391a2a0831d8e9d53c122ceeb3e807275f0c1eb8bb1b9c6e8491d6c21a863",
+      "database_sha256": "7b2e119f131631a5a12ebd35f66d4eaab3072c7a7a72acf6eddb0b3a425970ea",
+      "work_id": "bp-work-78626bbd789ac5ef6689423c",
+      "record_sha256": "2cbfad422efb6794d210ba957f8234c56474bb0a7c2352545034968c24621f20",
+      "nonempty_facts": 2,
+      "scripted_requests": 2,
+      "scripted_ledger_tokens": 40070,
+      "allowance": {"max_submissions": 1, "accepted": 1, "remaining": 0, "per_task_tokens": 1000000}
+    },
+    "second": {
+      "task_id": "profile-http-b52fd52843cd4b91eab4e5a8a8b9e2c4",
+      "request_id": "second-window",
+      "state": "completed",
+      "policy_sha256": "5522f0771aa3ea78586a416e2f3914cebd80e967da1040f9832b1d54251ffb58",
+      "database_sha256": "fdd65335b1ee025c7ff3e080706e1e88544f1d5c8c804840d36b5f5dbf6c69a7",
+      "work_id": "bp-work-b3710e8b74e24d665a5380f3",
+      "record_sha256": "7f3ca057be52673ae7e2638bca9c4914be8f0dab4441d76d62aa3ca28b2c1ec7",
+      "nonempty_facts": 3,
+      "scripted_requests": 3,
+      "scripted_ledger_tokens": 74937,
+      "allowance": {"max_submissions": 2, "accepted": 1, "remaining": 1, "per_task_tokens": 750000, "aggregate_ceiling_tokens": 1500000}
+    },
+    "transition_sha256": "59a2eb29e13cc53e539cdd5a5ae4cfb1e8861074d79327dce1e3cc81ddb3450c",
+    "assertions": "Nonempty original first read and explicit enrich through HTTP -> TaskService -> writer; both origins controlled_fixture; old/current result equals fresh original reader; old allowance remains 1/1/0 despite new allowance 2/1/1; same old request leaves new ledger empty; conflicting old content 409; restart/read/retry/activation sends zero additional requests; predecessor files remain byte-identical."
+  },
+  "review": {
+    "method": "Finite self-review of the narrow diff and acceptance paths; no model-based review command invoked.",
+    "blocking_found_and_fixed": "Process interruption during atomic staging could leave an unrecognized checkpoint scratch file and prevent explicit resume. Fixed with deterministic staging owned by the recorded transition and a partial-file recovery test. Lost-acknowledgement and inactive-worker immutability are also asserted.",
+    "remaining_blocking_findings": 0,
+    "nonblocking_expansion": "None implemented. No quota platform, new HTTP management API, schema or alternative execution owner."
+  },
+  "protection": {
+    "protected_files": 403,
+    "protected_hash_mismatches": [],
+    "env_unchanged": true,
+    "existing_dirty_baseline": 20,
+    "existing_dirty_matching_A_frozen_hash": 17,
+    "A_managed_paths_differing_from_A_frozen_hash_B_never_wrote": ["docs/development/company_profile_delivery_plan.md", "openspec/changes/restore-company-profile-llm-led-generalization/design.md", "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md"],
+    "live_model_network_service_activation_restart": "All zero by B. Live policy/.env/39-root/6.FP checkpoint not written. Complete 39-profile and real-service independent regression belong to A.",
+    "git_stage_commit_push": "None; explicitly prohibited for B. Existing staged set remained empty and unrelated existing/untracked content was preserved."
+  },
+  "cleanup": {
+    "owned_root": "data/QuoteBak/company-profile-6fq-b-Bxxrw3Lx",
+    "preflight": "No prior 6.FP B root present; only A's 6.FQ root found and retained. Unknown/parallel artifacts untouched.",
+    "status": "removed_after_receipt_and_source_hash_check",
+    "removed_files": 1249,
+    "removed_file_bytes": 15207728,
+    "removed_apparent_tree_bytes_including_directories": 18066385,
+    "processes": "All B test processes confirmed exited before removal; the first stuck zero-acceptance sandbox pytest required SIGTERM after SIGINT did not exit.",
+    "retention": "Only this compact B receipt; fixture DBs, duplicate outputs, caches and junit files removed. A root, unknown and parallel artifacts retained. No A management files written."
+  },
+  "limitations": ["Engineering fixture success establishes no real model quality or provider cost result.", "A independently verifies actual HTTP/service and the complete 39-stock expectations; B performed only hashes and offline original-owner fixtures.", "No new live successor or paid window activated. Historical failures/usage and formal quality scores remain unchanged."],
+  "efficiency": {"B_active_minutes_estimate": 50, "handoff_wait_minutes": 0, "note": "Estimate; includes implementation, narrow review and local verification. Three sandbox HTTP attempts yielded zero accepted tasks; no new business run or budget consumed."}
+}

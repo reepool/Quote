@@ -1,5 +1,9 @@
 ## Context
 
+### 6.FQ explicit successors preserve closed-window history
+
+The existing finite HTTP task owner gains one operator-only activation for a separately authorized successor after the predecessor is exhausted and terminal. Existing root locks, exact predecessor hash and a fresh checkpoint protect the transition; historical policies/ledgers/wires stay immutable. New services resolve historical tasks and request identities through the explicit predecessor references, report the owning policy allowance and never dispatch historical work. Activation alone sends no models and does not edit the caller's environment. The current live6.FP window remains exhausted and unchanged in this zero-supplier-call card; controlled two-window original-owner validation does not establish semantic quality. See the6.FQ card for the narrow write set and cleanup.
+
 ### 6.FP hash-bound local reads and one live enrichment window
 
 Reuse strictly decoded records in the existing read owner only under exact root, current original file content hash and validation policy; each invocation observes changed/removed files and revalidates changed bytes. Invalid-source isolation and export input-change checks remain. This is a narrow response to the measured live read delay, not a second store or general cache platform. Ordinary reads/plans remain local and cannot send models. Version the shared review instructions so the reviewer checks fact-level subject/period/scope independently of individual metrics; an invalid fact scope is not cured by withholding only its metrics. The bounded live HTTP action is one Wangfujing scale/revenue question, through the existing finite policy/TaskService and original writer, with original39 content and restrictions frozen. See the6.FP card for exact source, budget, deployment and stop conditions.

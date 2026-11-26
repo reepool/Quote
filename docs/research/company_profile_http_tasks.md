@@ -123,7 +123,29 @@ export QUOTE_COMPANY_PROFILE_TASK_TOKEN='<dedicated-research-credential>'
 
 策略hash及output/checkpoint配对在两个root首次安装时固定。同范围改policy_id、模型、报告、预算、
 次数或配对root会503，不刷新已占额度；修改环境策略文件不会替换已安装服务。
-新策略窗口须先停止旧worker并由操作者显式重新规划，不能删除账本、锁或标记恢复额度。
+后继窗口必须由操作者按下节显式接续，不能删除账本、锁或标记恢复旧额度。
+
+## 已用尽窗口的正规接续（6.FQ）
+
+仅在前窗名额已耗尽、所有已受理任务均为终态且无活跃owner/执行时，操作者可为**另获明确授权**的有限窗口接续同一画像目录。新策略应使用同一个output_root、未使用的独立checkpoint_root及自己的股票/报告/动作/模型/累计预算；策略文件中的authorized不是额外付费或外传授权。
+
+使用原任务模块的operator入口：
+
+```bash
+source /home/python/Quote/scripts/quote_dev_env.sh
+/home/python/miniconda3/envs/Quote/bin/python -m research.company_profile.http_tasks activate \
+  --previous-policy /absolute/previous-http-policy.json \
+  --policy /absolute/explicitly-authorized-next-policy.json \
+  --expected-previous-sha256 "前窗状态中的policy_sha256"
+```
+
+命令不调用模型，不改私有.env或重启服务。成功后由操作者把服务端`QUOTE_COMPANY_PROFILE_TASK_POLICY`指向这份新策略，再按获准操作窗口加载服务；原凭据无需在命令或URL里传递。普通构造/配置漂移继续拒绝，不能用直接改policy_id代替接续。
+
+前窗策略、任务DB、原计划/来源/用量/失败仍保留，后窗使用独立有限账。加载后，旧task_id的状态和结果仍可读，返回所属原窗口的策略hash及额度；相同旧request_id/相同内容继续复用旧任务，不消耗新名额，不同内容409。新请求才使用后窗名额，普通画像/计划读取不发模型。
+
+重复同一激活命令幂等；如果激活中断，必须用相同前后文件/hash显式重试完成，不能依靠构造服务、换后继文件或删除标记补完。冲突、未耗尽、在途、复用checkpoint或损坏历史链会拒绝，不能把无法查清的旧请求当作新调用重发。
+
+当前实际服务仍是已完成的6.FP单次王府井窗口、剩余0；本轮6.FQ只验证接续工程能力，未安装新live策略、未增加模型额度或调用。下一次真实补读仍须明确股票、报告、问题及有限预算。
 
 ## 明确提交与读取
 
