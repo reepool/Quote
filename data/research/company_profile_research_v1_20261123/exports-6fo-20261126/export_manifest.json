@@ -1,0 +1,295 @@
+{
+  "schema_version": "company_profile_common_core_export.v1",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "profile_state": "found",
+  "delivered": 39,
+  "restricted_delivered": 0,
+  "profiles": [
+    {
+      "instrument_id": "000006.SZ",
+      "report_period": "2025-12-31",
+      "file": "000006.SZ_2025-12-31.json"
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "report_period": "2025-12-31",
+      "file": "000039.SZ_2025-12-31.json"
+    },
+    {
+      "instrument_id": "000049.SZ",
+      "report_period": "2025-12-31",
+      "file": "000049.SZ_2025-12-31.json"
+    },
+    {
+      "instrument_id": "000099.SZ",
+      "report_period": "2025-12-31",
+      "file": "000099.SZ_2025-12-31.json"
+    },
+    {
+      "instrument_id": "000156.SZ",
+      "report_period": "2025-12-31",
+      "file": "000156.SZ_2025-12-31.json"
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "report_period": "2025-12-31",
+      "file": "000338.SZ_2025-12-31.json"
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "report_period": "2025-12-31",
+      "file": "000526.SZ_2025-12-31.json"
+    },
+    {
+      "instrument_id": "000651.SZ",
+      "report_period": "2025-12-31",
+      "file": "000651.SZ_2025-12-31.json"
+    },
+    {
+      "instrument_id": "000652.SZ",
+      "report_period": "2025-12-31",
+      "file": "000652.SZ_2025-12-31.json"
+    },
+    {
+      "instrument_id": "300012.SZ",
+      "report_period": "2025-12-31",
+      "file": "300012.SZ_2025-12-31.json"
+    },
+    {
+      "instrument_id": "300015.SZ",
+      "report_period": "2025-12-31",
+      "file": "300015.SZ_2025-12-31.json"
+    },
+    {
+      "instrument_id": "300124.SZ",
+      "report_period": "2025-12-31",
+      "file": "300124.SZ_2025-12-31.json"
+    },
+    {
+      "instrument_id": "600015.SH",
+      "report_period": "2025-12-31",
+      "file": "600015.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "600153.SH",
+      "report_period": "2025-12-31",
+      "file": "600153.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "600177.SH",
+      "report_period": "2025-12-31",
+      "file": "600177.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "600316.SH",
+      "report_period": "2025-12-31",
+      "file": "600316.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "600348.SH",
+      "report_period": "2025-12-31",
+      "file": "600348.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "600350.SH",
+      "report_period": "2025-12-31",
+      "file": "600350.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "600390.SH",
+      "report_period": "2025-12-31",
+      "file": "600390.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "600690.SH",
+      "report_period": "2025-12-31",
+      "file": "600690.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "600704.SH",
+      "report_period": "2025-12-31",
+      "file": "600704.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "600754.SH",
+      "report_period": "2025-12-31",
+      "file": "600754.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "600859.SH",
+      "report_period": "2025-12-31",
+      "file": "600859.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "600887.SH",
+      "report_period": "2025-12-31",
+      "file": "600887.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "600893.SH",
+      "report_period": "2025-12-31",
+      "file": "600893.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "600900.SH",
+      "report_period": "2025-12-31",
+      "file": "600900.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "600901.SH",
+      "report_period": "2025-12-31",
+      "file": "600901.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "601006.SH",
+      "report_period": "2025-12-31",
+      "file": "601006.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "601166.SH",
+      "report_period": "2025-12-31",
+      "file": "601166.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "601328.SH",
+      "report_period": "2025-12-31",
+      "file": "601328.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "601377.SH",
+      "report_period": "2025-12-31",
+      "file": "601377.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "601628.SH",
+      "report_period": "2025-12-31",
+      "file": "601628.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "601668.SH",
+      "report_period": "2025-12-31",
+      "file": "601668.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "601872.SH",
+      "report_period": "2025-12-31",
+      "file": "601872.SH_2025-12-31.json"
+    },
+    {
+      "instrument_id": "920003.BJ",
+      "report_period": "2025-12-31",
+      "file": "920003.BJ_2025-12-31.json"
+    },
+    {
+      "instrument_id": "920006.BJ",
+      "report_period": "2025-12-31",
+      "file": "920006.BJ_2025-12-31.json"
+    },
+    {
+      "instrument_id": "920007.BJ",
+      "report_period": "2025-12-31",
+      "file": "920007.BJ_2025-12-31.json"
+    },
+    {
+      "instrument_id": "920014.BJ",
+      "report_period": "2025-12-31",
+      "file": "920014.BJ_2025-12-31.json"
+    },
+    {
+      "instrument_id": "920017.BJ",
+      "report_period": "2025-12-31",
+      "file": "920017.BJ_2025-12-31.json"
+    }
+  ],
+  "restricted_views": [],
+  "files": [
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000006.SZ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000006.SZ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000039.SZ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000039.SZ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000049.SZ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000049.SZ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000099.SZ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000099.SZ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000156.SZ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000156.SZ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000338.SZ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000338.SZ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000526.SZ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000526.SZ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000651.SZ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000651.SZ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000652.SZ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/000652.SZ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/300012.SZ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/300012.SZ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/300015.SZ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/300015.SZ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/300124.SZ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/300124.SZ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600015.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600015.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600153.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600153.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600177.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600177.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600316.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600316.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600348.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600348.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600350.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600350.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600390.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600390.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600690.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600690.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600704.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600704.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600754.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600754.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600859.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600859.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600887.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600887.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600893.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600893.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600900.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600900.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600901.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/600901.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/601006.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/601006.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/601166.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/601166.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/601328.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/601328.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/601377.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/601377.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/601628.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/601628.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/601668.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/601668.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/601872.SH_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/601872.SH_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/920003.BJ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/920003.BJ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/920006.BJ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/920006.BJ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/920007.BJ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/920007.BJ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/920014.BJ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/920014.BJ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/920017.BJ_2025-12-31.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/920017.BJ_2025-12-31.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/research_profiles.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/annual_profiles.json",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/annual_profiles.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/profiles.csv",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/profiles.md",
+    "/home/python/Quote/data/research/company_profile_research_v1_20261123/exports-6fo-20261126/export_manifest.json"
+  ],
+  "legacy_export_used": false
+}

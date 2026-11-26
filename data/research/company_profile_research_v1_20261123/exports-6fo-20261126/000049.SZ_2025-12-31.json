@@ -1,0 +1,4052 @@
+{
+  "schema_version": "company_profile_common_core_profile.v3",
+  "production_authorization": "not_authorized",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "work_id": "bp-work-6442086a7536bee9f1ec5bc8",
+  "instrument_id": "000049.SZ",
+  "report": {
+    "instrument_id": "000049.SZ",
+    "report_id": "asset_7ae78f972cf60e746bd29ae8f2b7f2af",
+    "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-22T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "freshness": {
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-22T16:00:00+00:00",
+    "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+    "knowledge_time": "2026-04-22T16:00:00+00:00"
+  },
+  "core_complete": false,
+  "dimensions": [
+    {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    {
+      "dimension_id": "products_services",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    }
+  ],
+  "accepted_facts": [],
+  "gaps": [],
+  "evidence_gap_codes": [],
+  "commodity_exposure": {
+    "assessment": {
+      "schema_version": "company_profile_commodity_exposure.v1",
+      "production_authorization": "not_authorized",
+      "report": {
+        "instrument_id": "000049.SZ",
+        "report_id": "asset_7ae78f972cf60e746bd29ae8f2b7f2af",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "assessment_status": "not_assessed",
+      "checked_evidence_ids": [],
+      "exposures": []
+    },
+    "reported_period": "2025-12-31",
+    "knowledge_time": "2026-04-22T16:00:00+00:00",
+    "consumer_authorization": {
+      "dcf": false,
+      "trading": false,
+      "price_sensitivity": false
+    }
+  },
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "llm_generated",
+    "report": {
+      "instrument_id": "000049.SZ",
+      "report_id": "asset_7ae78f972cf60e746bd29ae8f2b7f2af",
+      "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-22T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0019",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的主要业务"
+          ],
+          "start_page": 10,
+          "end_page": 10,
+          "rationale": "优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。"
+        },
+        {
+          "section_id": "section-0035",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "start_page": 12,
+          "end_page": 16,
+          "rationale": "优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。"
+        },
+        {
+          "section_id": "section-0050",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "公司主要销售客户情况"
+          ],
+          "start_page": 16,
+          "end_page": 16,
+          "rationale": "优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。"
+        },
+        {
+          "section_id": "section-0051",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "公司主要供应商情况"
+          ],
+          "start_page": 16,
+          "end_page": 18,
+          "rationale": "优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。"
+        },
+        {
+          "section_id": "section-0089",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "九、主要控股参股公司分析"
+          ],
+          "start_page": 24,
+          "end_page": 24,
+          "rationale": "优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。"
+        },
+        {
+          "section_id": "section-0091",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "封装集成业务"
+          ],
+          "start_page": 24,
+          "end_page": 25,
+          "rationale": "优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。"
+        },
+        {
+          "section_id": "section-0816",
+          "section_path": [
+            "第八节 财务报告",
+            "是否存在逾期尚未支付中小企业款项的情况",
+            "(二) 合并利润表项目注释",
+            "1. 营业收入/营业成本"
+          ],
+          "start_page": 116,
+          "end_page": 117,
+          "rationale": "优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。"
+        }
+      ],
+      "unread_or_deferred": [
+        "section-0025行业情况：属行业背景，非公司层面经营解释，暂不选",
+        "section-0029核心竞争力分析：偏泛化竞争优势，经营信息密度低于主营业务分析",
+        "section-0094未来发展展望：计划性内容，仅在需要风险与计划限定信息时补充",
+        "section-0326财务报告全文及会计政策：范围过大，仅定向使用收入附注section-0816"
+      ],
+      "selection_rationale": "优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。",
+      "stop_reason": "已覆盖业务与产品用途、经营模式、收入与成本构成、客户与供应商、主要子公司及收入附注等公司层面经营解释所需信息，剩余为行业背景、治理、会计政策与财务报告全文，超出本次经营阅读范围，可在此停止。",
+      "transcription_version": "shared-pdf-pypdf-layout.v1"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F01",
+            "text": "公司围绕锂电池产业链布局，立足电源管理系统及封装集成业务，并开拓SIP先进封装和储能电芯等战略新兴业务。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F02",
+            "text": "公司主要子公司中，惠州市蓝微电子有限公司从事中小型锂电池电源管理及系统业务，广东德赛矽镨技术有限公司从事系统级封装（SIP）业务，湖南德赛电池有限公司从事储能电芯业务。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0011",
+              "source-0012",
+              "source-0013"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取各业务板块在合并层面的完整资产与利润拆分，仅见部分主要子公司数据。"
+        ]
+      },
+      "products_services": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F03",
+            "text": "公司锂电池产品主要应用于智能手机、笔记本和平板电脑、智能穿戴设备、电动工具、智能家居和出行产品、储能产品等领域。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F04",
+            "text": "公司产品以非标定制化产品为主，储能电芯产品为标准化产品。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取各产品类别的具体技术规格与型号明细。"
+        ]
+      },
+      "revenue_model": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F05",
+            "text": "公司采取直接销售模式，由终端客户直接向公司下单或由终端客户指定的代工厂向公司下单，主要围绕行业排名前列的核心客户开展业务。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F06",
+            "text": "公司经营方式以“以销定产、以产定采”为主，根据客户订单及需求制定生产计划并组织生产。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "scale_and_mix": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F07",
+            "text": "2025年度公司实现合并营业收入223.99亿元，同比增长7.38%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入",
+                "raw_value": "223.99亿元",
+                "value": "223.99",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入同比增长率",
+                "raw_value": "7.38%",
+                "value": "7.38",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F08",
+            "text": "按产品划分，智能手机类营业收入75.91亿元，占营业收入比重33.89%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "智能手机类营业收入",
+                "raw_value": "7,591,429,166.32",
+                "value": "7591429166.32",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "智能手机类营业收入占营业收入比重",
+                "raw_value": "33.89%",
+                "value": "33.89",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "程序显示说明：F08正文75.91亿元为智能手机类营业收入7,591,429,166.32元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "F09",
+            "text": "按产品划分，智能穿戴类营业收入33.77亿元，占营业收入比重15.08%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "智能穿戴类营业收入",
+                "raw_value": "3,377,038,240.44",
+                "value": "3377038240.44",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "智能穿戴类营业收入占营业收入比重",
+                "raw_value": "15.08%",
+                "value": "15.08",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "程序显示说明：F09正文33.77亿元为智能穿戴类营业收入3,377,038,240.44元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "F10",
+            "text": "按产品划分，电动工具、智能家居和出行类营业收入34.50亿元，占营业收入比重15.40%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "电动工具、智能家居和出行类营业收入",
+                "raw_value": "3,449,742,533.42",
+                "value": "3449742533.42",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "电动工具、智能家居和出行类营业收入占营业收入比重",
+                "raw_value": "15.40%",
+                "value": "15.40",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "程序显示说明：F10正文34.50亿元为电动工具、智能家居和出行类营业收入3,449,742,533.42元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "F11",
+            "text": "按产品划分，笔记本电脑和平板电脑类营业收入29.45亿元，占营业收入比重13.15%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "笔记本电脑和平板电脑类营业收入",
+                "raw_value": "2,945,195,310.25",
+                "value": "2945195310.25",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "笔记本电脑和平板电脑类营业收入占营业收入比重",
+                "raw_value": "13.15%",
+                "value": "13.15",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "程序显示说明：F11正文29.45亿元为笔记本电脑和平板电脑类营业收入2,945,195,310.25元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "F12",
+            "text": "按产品划分，储能产品类营业收入28.29亿元，占营业收入比重12.63%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "储能产品类营业收入",
+                "raw_value": "2,828,593,460.56",
+                "value": "2828593460.56",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "储能产品类营业收入占营业收入比重",
+                "raw_value": "12.63%",
+                "value": "12.63",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "程序显示说明：F12正文28.29亿元为储能产品类营业收入2,828,593,460.56元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "F13",
+            "text": "按产品划分，其他类营业收入22.07亿元，占营业收入比重9.85%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "其他类营业收入",
+                "raw_value": "2,207,428,591.95",
+                "value": "2207428591.95",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他类营业收入占营业收入比重",
+                "raw_value": "9.85%",
+                "value": "9.85",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "程序显示说明：F13正文22.07亿元为其他类营业收入2,207,428,591.95元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "F14",
+            "text": "按地区划分，境内营业收入70.90亿元，占营业收入比重31.65%；境外营业收入153.10亿元，占营业收入比重68.35%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "境内营业收入",
+                "raw_value": "7,089,709,091.54",
+                "value": "7089709091.54",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "境内营业收入占营业收入比重",
+                "raw_value": "31.65%",
+                "value": "31.65",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "境外营业收入",
+                "raw_value": "15,309,718,211.40",
+                "value": "15309718211.40",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "境外营业收入占营业收入比重",
+                "raw_value": "68.35%",
+                "value": "68.35",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "程序显示说明：F14正文70.90亿元为境内营业收入7,089,709,091.54元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F14正文153.10亿元为境外营业收入15,309,718,211.40元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          }
+        ],
+        "limitations": [
+          "未获取各产品类别的销量与单价拆分。"
+        ]
+      },
+      "operations_and_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F15",
+            "text": "公司采购的原材料主要包括锂离子电芯、BMS、电子元器件、PCB（印制电路板）、正负极材料、隔膜、电解液和各种辅料，主要采取“以产定采”的采购模式，并存在由客户指定供应商的情况。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F16",
+            "text": "公司营业成本中直接材料占比87.18%，直接人工占比3.52%，其他成本占比9.30%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "直接材料占营业成本比重",
+                "raw_value": "87.18%",
+                "value": "87.18",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "直接人工占营业成本比重",
+                "raw_value": "3.52%",
+                "value": "3.52",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他成本占营业成本比重",
+                "raw_value": "9.30%",
+                "value": "9.30",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F17",
+            "text": "公司拥有完善的质量管控体系，生产自动化水平处于行业先进水平。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取主要原材料的采购金额与供应商名称明细。"
+        ]
+      },
+      "customers_channels_markets": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F20",
+            "text": "公司采取直接销售模式，由终端客户直接向公司下单或由终端客户指定的代工厂向公司下单。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取客户名称及具体销售区域明细。",
+          "事实F18已隔离，未作为结论采用：narrative number is absent from cited source: 126.48亿元",
+          "事实F19已隔离，未作为结论采用：narrative number is absent from cited source: 90.24亿元"
+        ]
+      },
+      "operating_drivers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F21",
+            "text": "2025年研发投入达10.31亿元，同比增长14.63%，研发投入占营业收入的比例为4.60%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "研发投入",
+                "raw_value": "10.31亿元",
+                "value": "10.31",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "研发投入同比增长率",
+                "raw_value": "14.63%",
+                "value": "14.63",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "研发投入占营业收入比例",
+                "raw_value": "4.60%",
+                "value": "4.60",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F22",
+            "text": "储能业务全年实现销售收入28.29亿元，同比增长49.89%；SIP业务全年实现销售收入30.42亿元（含内部销售），同比增长13.88%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "储能业务销售收入",
+                "raw_value": "28.29亿元",
+                "value": "28.29",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "储能业务销售收入同比增长率",
+                "raw_value": "49.89%",
+                "value": "49.89",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "SIP业务销售收入（含内部销售）",
+                "raw_value": "30.42亿元",
+                "value": "30.42",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "SIP业务销售收入同比增长率",
+                "raw_value": "13.88%",
+                "value": "13.88",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F23",
+            "text": "储能业务从侧重规模扩张转向聚焦效益提升，储能电芯产能利用率提升，亏损有所下降。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取各业务板块的毛利率与利润贡献拆分。"
+        ]
+      },
+      "material_changes": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F24",
+            "text": "报告期内合并范围增加4户、减少3户，新增蓝微新源（香港）有限公司、智元科技（越南）有限公司、惠州市储源科技有限公司、南通市惠海科技有限责任公司，减少德勤（威海）电力技术有限公司、德亚（山东）电力技术有限公司、德亚（冠县）电力技术有限公司。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005",
+              "source-0006"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F25",
+            "text": "公司持续加速越南制造基地建设，子公司在越南云中工业园购置厂房并逐步投入使用，同时开启内黄工业园二期厂房建设；智能硬件装配业务实现海外量产落地，SIP业务越南制造基地顺利量产，越南本地制造产值超20亿元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "越南本地制造产值",
+                "raw_value": "超20亿元",
+                "value": "20",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "greater_than",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取合并范围变动对收入与利润的具体影响金额。"
+        ]
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        "physical_pages": [
+          10
+        ],
+        "source_spans": [
+          {
+            "page": 10,
+            "start": 134,
+            "end": 867,
+            "quote": "一、报告期内公司从事的主要业务\n\n   1、公司主要业务、主要产品及其用途\n\n    公司主要围绕锂电池产业链进行业务布局，立足电源管理系统及封装集成业务，正大力开拓新\n业务，发展     SIP 先进封装和储能电芯等战略新兴业务，持续优化产业布局。智能手机、笔记本和平\n板电脑、智能穿戴设备、电动工具、智能家居和出行产品、储能产品是公司锂电池产品的主要应用\n领域。\n\n   2、公司主要经营模式\n\n    公司拥有成熟的采购、生产和销售体系，采取“以销定产、以产定采”为主的经营方式。报告\n期内，公司主要经营模式未发生重大变化。\n\n   （1）采购模式\n\n    公司采购的原材料主要包括锂离子电芯、BMS、电子元器件、PCB（印制电路板）、正负极材\n料、隔膜、电解液和各种辅料。主要采取“以产定采”的采购模式，采购部门根据生产计划部门下\n达的采购计划进行采购。公司建立了完整的供应链管理体系，与众多的原材料厂商建立了长期稳定\n的合作关系，公司存在由客户指定供应商的情况。\n\n   （2）生产模式\n\n    公司生产的产品主要为非标定制化产品，采用“以销定产”的生产模式，根据客户订单及需求\n制定生产计划并组织生产。储能电芯产品为标准化产品，公司综合评估客户需求与产能利用情况，\n制定生产计划并组织生产。公司拥有完善的质量管控体系，生产自动化水平处于行业先进水平。\n\n   （3）销售模式\n\n    公司主要围绕行业排名前列的核心客户开展业务，采取直接销售模式，由终端客户直接向公司\n下单或由终端客户指定的代工厂向公司下单。经过多年的发展，公司积累了大量的优质客户资源，\n与主要客户建立了长期稳定的合作关系，积极广泛地参与客户产品项目的前期研发设计并实现销售。\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        "physical_pages": [
+          12
+        ],
+        "source_spans": [
+          {
+            "page": 12,
+            "start": 1218,
+            "end": 1406,
+            "quote": "四、主营业务分析\n\n1、概述\n\n    2025年度，公司实现合并营业收入               223.99亿元，同比增长        7.38%；实现归属于上市公司股东的\n净利润   2.92亿元，同比下降        29.23%。报告期内，公司主要经营情况如下：\n\n                                            12"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        "physical_pages": [
+          13
+        ],
+        "source_spans": [
+          {
+            "page": 13,
+            "start": 0,
+            "end": 1568,
+            "quote": "                                                深圳市德赛电池科技股份有限公司           2025年年度报告全文\n\n\n    （1）坚定地加大研发投入，以创新驱动发展\n\n    公司坚持以技术创新驱动发展，积极应对日趋激烈的市场竞争环境。近五年来，公司研发投入\n保持稳定增长，2025        年研发投入达       10.31 亿元，同比增长        14.63%，研发投入占营业收入的比例为\n4.60%。报告期内，各子公司围绕主业持续开展核心关键技术攻关，深度参与客户产品前期设计验证，\n紧跟行业发展趋势，持续提升技术能力与产品适用性，巩固与核心客户的长期合作。在储能电芯产\n品研发方面，开发兼顾容量、过流温升、大倍率循环特性的                            UPS 高功率电芯，推出主动安全电芯及\n系统，研发先进的温压一体传感器，实现电芯内部气压与温度实时监测，全面提升储能系统安全水\n平；SIP  先进封装工艺研发方面，成功导入固晶、焊线、溅镀、植球四个关键工序，掌握晶圆级的减\n薄和划片工艺，为新业务的开拓和承接打下了坚实的技术基础。\n\n    （2）新兴业务占比不断提升，持续优化业务结构\n\n    近几年，公司在持续深耕传统优势业务的同时，不断推动战略新兴业务的发展，持续提升新兴\n业务占比，推动整体业务结构优化。报告期内，储能业务从侧重规模扩张转向聚焦效益提升，着力\n改善经营质量，储能电芯产能利用率提升，亏损有所下降，储能业务全年实现销售收入                                        28.29亿元，\n同比增长    49.89%；SIP  业务聚焦核心客户，以高品质交付为基础，深化与客户的合作，不断拓展新\n业务品类，显著提升业务粘性，推动销售收入持续增长，全年实现销售收入                                    30.42 亿元（含内部销\n售），同比增长       13.88%。\n\n    （3）海外制造持续加码，优化产能布局\n\n    在国际贸易政策不确定性增加、贸易保护主义抬头的背景下，公司持续加速越南制造基地的建\n设进程，以构建多元化的产能布局，响应客户海外产能需求，针对不同区域的差异化关税，动态调\n整生产资源配置。报告期内，公司子公司在越南云中工业园购置厂房并逐步投入使用，同时开启内\n黄工业园二期厂房建设，持续扩大产能。智能硬件装配业务实现海外量产落地，SIP                                     业务越南制造基\n地顺利量产且持续导入新项目，越南本地制造产值超                        20 亿元。\n\n    （4）深化精益智造管理，推动降本增效\n\n    以建设数字化工厂为目标，以精益制造为基础，公司各控股子公司通过提升柔性自动化能力、\n改造  MES  生产信息化管理系统、全过程数据采集、关键质量特性监控与自动预警等措施，实现产品\n工艺数据的制造过程主动防错控制，打造可视、可控、可追溯的智能化制造管理平台。在精益制造\n体系的基础上，进一步融合自动化设备、智能管理系统与实时数据分析，推动生产各环节高效协同、\n精准管控，有效降低人力投入成本与各类资源损耗。同时，以                             AI大数据技术为驱动，持续优化制造\n效率与产品质量，全面提升公司智能制造水平与数字化运营能力，助力企业实现高质量、低成本、\n高效率发展。\n\n\n\n\n\n\n\n                                           13"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        "physical_pages": [
+          14
+        ],
+        "source_spans": [
+          {
+            "page": 14,
+            "start": 0,
+            "end": 4888,
+            "quote": "                                                                                                   深圳市德赛电池科技股份有限公司                                     2025    年年度报告全文\n\n\n2、收入与成本\n\n（1）         营业收入构成\n\n\n                                                                                                                                                                      单位：元\n                                                     2025    年                                                    2024    年\n                                                                  占营业收入比                                                      占营业收入比                           同比增减\n                                          金额                              重                            金额                              重\n\n营业收入合计                             22,399,427,302.94                           100%            20,859,251,590.68                            100%                          7.38%\n\n分行业\n工业                                 22,399,427,302.94                       100.00%             20,859,251,590.68                        100.00%                           7.38%\n分产品\n智能手机类                               7,591,429,166.32                         33.89%              7,973,220,260.49                         38.22%                         -4.79%\n\n智能穿戴类                               3,377,038,240.44                         15.08%              2,581,691,960.48                         12.38%                        30.81%\n电动工具、智能                             3,449,742,533.42                         15.40%              3,393,449,229.43                         16.27%                          1.66%\n家居和出行类\n笔记本电脑和平                             2,945,195,310.25                         13.15%              2,871,016,674.31                         13.76%                          2.58%\n板电脑类\n储能产品类                               2,828,593,460.56                         12.63%              1,887,169,790.12                           9.05%                       49.89%\n\n其他                                  2,207,428,591.95                          9.85%              2,152,703,675.85                         10.32%                          2.54%\n分地区\n境内                                  7,089,709,091.54                         31.65%              6,829,939,788.99                         32.74%                          3.80%\n境外                                 15,309,718,211.40                         68.35%            14,029,311,801.69                          67.26%                          9.13%\n\n分销售模式\n自销                                 22,399,427,302.94                       100.00%             20,859,251,590.68                        100.00%                           7.38%\n\n\n（2）       占公司营业收入或营业利润                              10%以上的行业、产品、地区、销售模式的情况\n\n\n适用        □不适用\n                                                                                                                                                                      单位：元\n                                   营业收入                            营业成本                     毛利率             营业收入比上                   营业成本比上                   毛利率比上年\n                                                                                                              年同期增减                    年同期增减                      同期增减\n分行业\n工业                            22,399,427,302.94              20,379,412,302.96                 9.02%                    7.38%                    9.01%                   -1.36%\n分产品\n智能手机类                           7,591,429,166.32               7,000,383,953.10                7.79%                   -4.79%                   -2.56%                   -2.10%\n\n智能穿戴类                           3,377,038,240.44               2,894,397,335.43              14.29%                   30.81%                   22.42%                     5.87%\n电动工具、智能                         3,449,742,533.42               2,985,482,541.05              13.46%                     1.66%                    3.20%                   -1.29%\n家居和出行类\n笔记本电脑和平                         2,945,195,310.25               2,742,873,717.03                6.87%                    2.58%                    3.00%                   -0.38%\n板电脑类\n储能产品类                           2,828,593,460.56               2,870,166,866.93              -1.47%                   49.89%                   56.52%                    -4.30%\n\n其他                              2,207,428,591.95               1,886,107,889.42              14.56%                     2.54%                    7.37%                   -3.84%\n分地区\n境内                              7,089,709,091.54               6,574,728,693.72                7.26%                    3.80%                    5.74%                   -1.70%\n                                                                                          14"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 0,
+            "end": 2931,
+            "quote": "                                                                            深圳市德赛电池科技股份有限公司                         2025  年年度报告全文\n\n\n境外                     15,309,718,211.40       13,804,683,609.24        9.83%               9.13%             10.64%             -1.23%\n分销售模式\n自销                     22,399,427,302.94       20,379,412,302.96        9.02%               7.38%              9.01%             -1.36%\n\n公司主营业务数据统计口径在报告期发生调整的情况下，公司最近                                               1 年按报告期末口径调整后的主营业务数据\n□适用      不适用\n\n\n（3）    公司实物销售收入是否大于劳务收入\n\n\n是    □否\n\n    行业分类                      项目                      单位                    2025  年                2024  年                同比增减\n                             销售量                      万个                        54,481.35              48,554.63                 12.21%\n   工业制造业                     生产量                      万个                        54,702.30              48,772.31                 12.16%\n\n                             库存量                      万个                         1,680.54               1,459.59                 15.14%\n\n相关数据同比发生变动                30%以上的原因说明\n□适用      不适用\n\n\n（4）    公司已签订的重大销售合同、重大采购合同截至本报告期的履行情况\n\n\n□适用      不适用\n\n\n（5）    营业成本构成\n\n\n行业分类\n\n                                                                                                                               单位：元\n\n                                                    2025  年                                   2024  年\n  行业分类                项目                                       占营业成本                                      占营业成             同比增减\n                                             金额                    比重                    金额                本比重\n\n                   直接材料                 17,766,464,113.15            87.18%        16,521,494,610.59         88.37%               7.54%\n工业制造业              直接人工                    717,559,867.68             3.52%           677,255,729.35          3.62%               5.95%\n                   其他成本                  1,895,388,322.13             9.30%         1,496,344,719.60          8.00%              26.67%\n\n\n（6）    报告期内合并范围是否发生变动\n\n\n是    □否\n\n本期纳入合并财务报表范围的主体较上期相比，增加                                                4 户，减少         3 户，具体包括：\n\n\n                                         公司名称                                                                  变更原因\n\n  蓝微新源（香港）有限公司                                                                                投资设立\n\n  智元科技（越南）有限公司                                                                                投资设立\n\n  惠州市储源科技有限公司                                                                                 投资设立\n\n  南通市惠海科技有限责任公司                                                                               投资设立\n\n  德勤（威海）电力技术有限公司                                                                              注销\n\n                                                                     15"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        "physical_pages": [
+          16
+        ],
+        "source_spans": [
+          {
+            "page": 16,
+            "start": 0,
+            "end": 522,
+            "quote": "                                                                            深圳市德赛电池科技股份有限公司                         2025 年年度报告全文\n\n\n                                        公司名称                                                                   变更原因\n\n  德亚（山东）电力技术有限公司                                                                              转让\n\n  德亚（冠县）电力技术有限公司                                                                              转让\n\n\n（7）    公司报告期内业务、产品或服务发生重大变化或调整有关情况\n\n\n□适用      不适用\n\n\n（8）    主要销售客户和主要供应商情况\n\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "公司主要销售客户情况"
+        ],
+        "physical_pages": [
+          16
+        ],
+        "source_spans": [
+          {
+            "page": 16,
+            "start": 522,
+            "end": 1921,
+            "quote": "公司主要销售客户情况\n\n前五名客户合计销售金额（元）                                                                                                       12,648,259,725.07\n前五名客户合计销售金额占年度销售总额比例                                                                                                             56.47%\n前五名客户销售额中关联方销售额占年度销售总额比例                                                                                                          0.00%\n\n公司前     5 大客户资料\n\n             序号                              客户名称                             销售额（元）                         占年度销售总额比例\n               1                               第一名                                 9,024,478,784.86                              40.29%\n               2                               第二名                                   969,331,530.42                               4.33%\n               3                               第三名                                   922,093,573.84                               4.12%\n\n               4                               第四名                                   907,949,690.37                               4.05%\n               5                               第五名                                   824,406,145.58                               3.68%\n             合计                                   --                              12,648,259,725.07                              56.47%\n\n主要客户其他情况说明\n□适用      不适用\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "公司主要供应商情况"
+        ],
+        "physical_pages": [
+          16
+        ],
+        "source_spans": [
+          {
+            "page": 16,
+            "start": 1921,
+            "end": 3463,
+            "quote": "公司主要供应商情况\n前五名供应商合计采购金额（元）                                                                                                       8,866,296,088.52\n前五名供应商合计采购金额占年度采购总额比例                                                                                                            48.55%\n前五名供应商采购额中关联方采购额占年度采购总额比例                                                                                                         0.00%\n公司前     5 名供应商资料\n             序号                             供应商名称                             采购额（元）                         占年度采购总额比例\n               1                               第一名                                 5,574,590,236.44                              30.53%\n               2                               第二名                                 1,190,561,159.60                               6.52%\n               3                               第三名                                   705,436,447.46                               3.86%\n\n               4                               第四名                                   703,595,915.90                               3.85%\n               5                               第五名                                   692,112,329.12                               3.79%\n             合计                                   --                               8,866,296,088.52                              48.55%\n\n主要供应商其他情况说明\n□适用      不适用\n报告期内公司贸易业务收入占营业收入比例超过                                  10%\n□适用      不适用\n\n\n                                                                    16"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "公司主要供应商情况"
+        ],
+        "physical_pages": [
+          17
+        ],
+        "source_spans": [
+          {
+            "page": 17,
+            "start": 0,
+            "end": 3401,
+            "quote": "                                                                深圳市德赛电池科技股份有限公司                  2025 年年度报告全文\n\n\n3、费用\n\n\n                                                                                                           单位：元\n                              2025 年                  2024 年            同比增减                  重大变动说明\n销售费用                          158,190,420.93          140,875,826.20        12.29%\n管理费用                          381,669,838.08          374,748,152.92         1.85%\n\n财务费用                            95,872,523.63          54,514,846.49        75.86%    主要系汇兑收益同比减少\n研发费用                         1,030,741,518.21         899,178,663.18        14.63%\n\n4、研发投入\n\n\n适用    □不适用\n\n主要研发项目名称                          项目目的                    项目进展             拟达到的目标               预计对公司未来发展\n                                                                                                      的影响\n                      推广能量密度高，抗压能力强、采                                 提升产品竞争力和制程\n智能手表钢壳电池              用先进电池管理和封装技术的钢壳                     量产阶段        工艺水平\n                      电池的产业化应用\n                      通过创新设计与先进工艺研发高端\n高端  AR  眼镜电池          AR  眼镜专用电池，实现产品更                    量产阶段        提升产品竞争力\n                      轻、更薄，提升产品佩戴舒适性与\n                      空间利用率。                                                                   巩固和提升市场份额\n智能吸尘器电源管              产业化应用                               研发阶段        提高产品性能，提升产\n理系统技术研发                                                               品竞争力\nE-bike电动车锂电                                                           提高产品性能，提升产\n池高性能保护技术              产业化应用                               试产阶段        品竞争力\n研发\n314Ah 高性价比储           为客户提供高性价比高安全新产品                     量产阶段        提升产品竞争力\n能电芯产品开发\n                      从根本上解决储能系统的热失控风\n高安全储能电芯技              险，确保其在全生命周期内安全、                     量产阶段        掌握关键技术，提升产               构建差异化竞争优\n术开发                   可靠、可预测地运行，从而支撑储                                 品竞争力                     势，提升市场份额\n                      能产业的大规模商业化发展。\n高安全、宽温域、                                                              掌握关键技术，推广产               通过技术创新扩大市\n高能量密度固态电              产业化应用                               样品阶段        品应用                      场份额，提升品牌知\n池项目研究                                                                                          名度和影响力\n功率型锂离子电池              产业化应用                               试产阶段        掌握关键技术，推广产\n技术开发                                                                  品应用                      开拓新市场，提升品\n高性能钠离子电芯              开发一款具有优异低温性能和高功                     试产阶段        掌握领先技术，丰富产               牌影响力\n技术开发                  率输出的钠离子电池                                       品矩阵\n新型高压微户储系                                                              开发新产品，丰富产品\n统及终端应用技术              产业化应用                               试产阶段        矩阵\n研发                                                                                             开拓新市场，提升公\n基于内嵌雷达与蓝                                                              掌握新技术，拓展智能               司市场竞争力与盈利\n牙技术的智能物联              产业化应用                               研发阶段        家居应用场景                   能力\n模组应用研发\nSIP工艺的                产业化应用                               量产阶段        掌握关键技术，推广产\nMOSFET   堆叠技术                                                         品应用\n\n                                                          17"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0010",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "公司主要供应商情况"
+        ],
+        "physical_pages": [
+          18
+        ],
+        "source_spans": [
+          {
+            "page": 18,
+            "start": 0,
+            "end": 892,
+            "quote": "                                                                     深圳市德赛电池科技股份有限公司                     2025 年年度报告全文\n\n\n主要研发项目名称                             项目目的                      项目进展              拟达到的目标                预计对公司未来发展\n                                                                                                              的影响\n的研发\n新型高可靠性微小                                                                    开发新产品，丰富产品\n化电池保护板封装               产业化应用                                  研发阶段          矩阵\n技术的研发\n                       构建主动安全预警模型，实现电芯                                                                 强化公司在储能安全\n主动安全算法模型               异常风险提前识别，打造行业独家                        研发阶段          掌握关键技术，推广产                 领域的核心竞争力，\n                       核心技术，形成可配套支持储能全                                      品应用                        助力储能业务拓展\n                       场景的解决方案\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0011",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "九、主要控股参股公司分析"
+        ],
+        "physical_pages": [
+          24
+        ],
+        "source_spans": [
+          {
+            "page": 24,
+            "start": 850,
+            "end": 1350,
+            "quote": "九、主要控股参股公司分析\n\n\n适用    □不适用\n主要子公司及对公司净利润影响达                    10%以上的参股公司情况\n\n                                                                                                             单位：万元\n\n公司名称           公司         主要业务           注册资本           总资产           净资产          营业收入           营业利润          净利润\n               类型\n惠州市蓝                   中小型锂电池\n微电子有         子公司       电源管理及系             28,000.00    335,747.12   201,608.45      521,790.03    18,748.19    18,634.25\n限公司                    "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0012",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "封装集成业务"
+        ],
+        "physical_pages": [
+          24
+        ],
+        "source_spans": [
+          {
+            "page": 24,
+            "start": 1409,
+            "end": 1727,
+            "quote": "封装集成业务             70,000.00    746,702.94   331,123.55    1,430,224.66    25,455.55    26,007.53\n限公司\n广东德赛         子公司       系统级封装              14,000.00    296,226.04     26,533.93     329,152.22     5,807.35      6,719.06\n矽镨技术                   （SIP）业务\n\n                                                            24"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0013",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "封装集成业务"
+        ],
+        "physical_pages": [
+          25
+        ],
+        "source_spans": [
+          {
+            "page": 25,
+            "start": 0,
+            "end": 318,
+            "quote": "                                                     深圳市德赛电池科技股份有限公司             2025 年年度报告全文\n\n\n公司名称        公司       主要业务        注册资本        总资产        净资产        营业收入        营业利润       净利润\n            类型\n有限公司\n湖南德赛\n电池有限       子公司     储能电芯业务         50,000.00 258,458.50 -41,204.81   106,635.83-35,364.72 -29,272.94\n公司\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0014",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "section_path": [
+          "第八节 财务报告",
+          "是否存在逾期尚未支付中小企业款项的情况",
+          "(二) 合并利润表项目注释",
+          "1. 营业收入/营业成本"
+        ],
+        "physical_pages": [
+          116
+        ],
+        "source_spans": [
+          {
+            "page": 116,
+            "start": 706,
+            "end": 3918,
+            "quote": "1.   营业收入/营业成本\n\n      (1)    明细情况\n\n                                                             本期数                                                                    上年同期数\n          项      目\n                                            收入                                   成本                                   收入                                   成本\n\n主营业务                                  21,969,175,590.72                    20,084,986,000.36                     20,596,594,141.54                    18,516,282,942.81\n\n其他业务                                      430,251,712.22                        294,426,302.60                       262,657,449.14                       178,812,116.73\n\n          合      计                    22,399,427,302.94                    20,379,412,302.96                     20,859,251,590.68                    18,695,095,059.54\n\n其中：与客户之间\n的合同产生的收入                              22,399,427,302.94                    20,379,412,302.96                     20,859,251,590.68                    18,695,095,059.54\n及成本\n      (2)    收入分解信息\n\n      1)    与客户之间的合同产生的收入按商品或服务类型分解\n\n                                                           本期数                                                                     上年同期数\n         项      目\n                                           收入                                   成本                                   收入                                   成本\n\n 智能手机类                                  7,591,429,166.32                     7,000,383,953.10                    7,973,220,260.49                      7,184,296,702.16\n\n 智能穿戴类                                  3,377,038,240.44                     2,894,397,335.43                    2,581,691,960.48                      2,364,388,674.03\n\n 电动工具、智能                                3,449,742,533.42                     2,985,482,541.05                    3,393,449,229.43                      2,893,029,028.38\n 家居和出行类\n 笔记本电脑和平                                2,945,195,310.25                     2,742,873,717.03                    2,871,016,674.31                      2,662,957,429.38\n 板电脑类\n\n 储能产品类                                  2,828,593,460.56                     2,870,166,866.93                    1,887,169,790.12                      1,833,733,672.07\n\n 其他                                     2,207,428,591.95                     1,886,107,889.42                    2,152,703,675.85                      1,756,689,553.52\n\n         合      计                     22,399,427,302.94                    20,379,412,302.96                     20,859,251,590.68                   18,695,095,059.54\n\n      2)    与客户之间的合同产生的收入按经营地区分解\n\n                                                             本期数                                                                  上年同期数\n           项      目\n                                             收入                                  成本                                   收入                                  成本\n\n 境内                                      7,089,709,091.54                     6,574,728,693.72                    6,829,939,788.99                     6,217,729,418.58\n\n\n                                                                                     116"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0015",
+        "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+        "section_path": [
+          "第八节 财务报告",
+          "是否存在逾期尚未支付中小企业款项的情况",
+          "(二) 合并利润表项目注释",
+          "1. 营业收入/营业成本"
+        ],
+        "physical_pages": [
+          117
+        ],
+        "source_spans": [
+          {
+            "page": 117,
+            "start": 0,
+            "end": 858,
+            "quote": "                                                                                   深圳市德赛电池科技股份有限公司                                2025   年年度报告全文\n\n\n                                                      本期数                                                           上年同期数\n        项       目\n                                       收入                               成本                               收入                               成本\n\n境外                                 15,309,718,211.40                13,804,683,609.24               14,029,311,801.69                12,477,365,640.96\n\n        合       计                  22,399,427,302.94                20,379,412,302.96               20,859,251,590.68                18,695,095,059.54\n\n     3)  在本期确认的包括在合同负债期初账面价值中的收入为                                                               5,030,282.06        元。\n\n     "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "limitations": [],
+    "supply_chain": {
+      "position": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F26",
+            "text": "公司立足电源管理系统及封装集成业务，并发展SIP先进封装和储能电芯等业务，处于锂电池产业链的制造与封装集成环节。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "upstream_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F27",
+            "text": "公司采购的原材料主要包括锂离子电芯、BMS、电子元器件、PCB（印制电路板）、正负极材料、隔膜、电解液和各种辅料。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取供应商名称及具体原材料采购金额明细。",
+          "可选事实F28未纳入：narrative number is absent from cited source: 88.66亿元"
+        ]
+      },
+      "downstream_customers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F29",
+            "text": "公司锂电池产品主要应用于智能手机、笔记本和平板电脑、智能穿戴设备、电动工具、智能家居和出行产品、储能产品等领域。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取具体客户名称及终端品牌明细。"
+        ]
+      }
+    },
+    "generation": {
+      "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+      "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+      "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+      "selection": {
+        "purpose": "select_profile_sections",
+        "request_id": "bp-work-6442086a7536bee9f1ec5bc8:workpaper:sections",
+        "request_hash": "d11a00c7d2cf32807bb8f06c0c66225479f28635878a8a0abf02d260f1818b0d",
+        "response_hash": "f15fe4510026e2f0f503e46a68124390765e47e98c1672546b704c1ea99fc1c0",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 19624,
+          "output_tokens": 390,
+          "total_tokens": 20014
+        },
+        "scope_kind": "report_heading_index",
+        "heading_count": 727,
+        "section_ids": [
+          "section-0001",
+          "section-0002",
+          "section-0003",
+          "section-0004",
+          "section-0005",
+          "section-0006",
+          "section-0007",
+          "section-0008",
+          "section-0009",
+          "section-0010",
+          "section-0011",
+          "section-0012",
+          "section-0013",
+          "section-0014",
+          "section-0015",
+          "section-0016",
+          "section-0017",
+          "section-0018",
+          "section-0019",
+          "section-0020",
+          "section-0021",
+          "section-0025",
+          "section-0026",
+          "section-0027",
+          "section-0028",
+          "section-0029",
+          "section-0030",
+          "section-0031",
+          "section-0032",
+          "section-0033",
+          "section-0034",
+          "section-0035",
+          "section-0036",
+          "section-0041",
+          "section-0050",
+          "section-0051",
+          "section-0052",
+          "section-0053",
+          "section-0054",
+          "section-0055",
+          "section-0056",
+          "section-0057",
+          "section-0058",
+          "section-0059",
+          "section-0060",
+          "section-0061",
+          "section-0062",
+          "section-0063",
+          "section-0064",
+          "section-0065",
+          "section-0066",
+          "section-0067",
+          "section-0068",
+          "section-0069",
+          "section-0070",
+          "section-0071",
+          "section-0072",
+          "section-0075",
+          "section-0076",
+          "section-0077",
+          "section-0078",
+          "section-0079",
+          "section-0080",
+          "section-0081",
+          "section-0082",
+          "section-0083",
+          "section-0084",
+          "section-0085",
+          "section-0086",
+          "section-0087",
+          "section-0088",
+          "section-0089",
+          "section-0090",
+          "section-0091",
+          "section-0092",
+          "section-0093",
+          "section-0094",
+          "section-0095",
+          "section-0096",
+          "section-0097",
+          "section-0098",
+          "section-0099",
+          "section-0100",
+          "section-0101",
+          "section-0102",
+          "section-0103",
+          "section-0104",
+          "section-0105",
+          "section-0106",
+          "section-0107",
+          "section-0108",
+          "section-0109",
+          "section-0110",
+          "section-0111",
+          "section-0112",
+          "section-0113",
+          "section-0114",
+          "section-0115",
+          "section-0116",
+          "section-0117",
+          "section-0118",
+          "section-0119",
+          "section-0120",
+          "section-0121",
+          "section-0122",
+          "section-0123",
+          "section-0124",
+          "section-0125",
+          "section-0126",
+          "section-0127",
+          "section-0128",
+          "section-0129",
+          "section-0130",
+          "section-0131",
+          "section-0141",
+          "section-0145",
+          "section-0146",
+          "section-0147",
+          "section-0148",
+          "section-0149",
+          "section-0150",
+          "section-0151",
+          "section-0152",
+          "section-0153",
+          "section-0154",
+          "section-0155",
+          "section-0156",
+          "section-0157",
+          "section-0158",
+          "section-0159",
+          "section-0160",
+          "section-0161",
+          "section-0162",
+          "section-0163",
+          "section-0164",
+          "section-0165",
+          "section-0166",
+          "section-0167",
+          "section-0168",
+          "section-0169",
+          "section-0170",
+          "section-0171",
+          "section-0172",
+          "section-0173",
+          "section-0174",
+          "section-0175",
+          "section-0176",
+          "section-0177",
+          "section-0178",
+          "section-0179",
+          "section-0180",
+          "section-0181",
+          "section-0182",
+          "section-0183",
+          "section-0184",
+          "section-0185",
+          "section-0186",
+          "section-0187",
+          "section-0188",
+          "section-0189",
+          "section-0190",
+          "section-0191",
+          "section-0192",
+          "section-0193",
+          "section-0194",
+          "section-0195",
+          "section-0196",
+          "section-0197",
+          "section-0198",
+          "section-0199",
+          "section-0200",
+          "section-0201",
+          "section-0202",
+          "section-0203",
+          "section-0204",
+          "section-0205",
+          "section-0206",
+          "section-0207",
+          "section-0208",
+          "section-0209",
+          "section-0210",
+          "section-0211",
+          "section-0212",
+          "section-0213",
+          "section-0214",
+          "section-0215",
+          "section-0216",
+          "section-0217",
+          "section-0218",
+          "section-0219",
+          "section-0220",
+          "section-0221",
+          "section-0222",
+          "section-0223",
+          "section-0224",
+          "section-0225",
+          "section-0226",
+          "section-0227",
+          "section-0228",
+          "section-0229",
+          "section-0230",
+          "section-0231",
+          "section-0232",
+          "section-0233",
+          "section-0234",
+          "section-0235",
+          "section-0236",
+          "section-0237",
+          "section-0238",
+          "section-0239",
+          "section-0240",
+          "section-0241",
+          "section-0242",
+          "section-0243",
+          "section-0244",
+          "section-0245",
+          "section-0246",
+          "section-0247",
+          "section-0248",
+          "section-0249",
+          "section-0250",
+          "section-0251",
+          "section-0252",
+          "section-0253",
+          "section-0254",
+          "section-0255",
+          "section-0256",
+          "section-0257",
+          "section-0258",
+          "section-0259",
+          "section-0260",
+          "section-0261",
+          "section-0262",
+          "section-0263",
+          "section-0264",
+          "section-0265",
+          "section-0266",
+          "section-0267",
+          "section-0268",
+          "section-0269",
+          "section-0270",
+          "section-0271",
+          "section-0272",
+          "section-0273",
+          "section-0277",
+          "section-0278",
+          "section-0279",
+          "section-0280",
+          "section-0283",
+          "section-0284",
+          "section-0285",
+          "section-0286",
+          "section-0287",
+          "section-0288",
+          "section-0289",
+          "section-0290",
+          "section-0291",
+          "section-0292",
+          "section-0293",
+          "section-0294",
+          "section-0295",
+          "section-0296",
+          "section-0297",
+          "section-0298",
+          "section-0299",
+          "section-0300",
+          "section-0301",
+          "section-0302",
+          "section-0303",
+          "section-0304",
+          "section-0305",
+          "section-0306",
+          "section-0307",
+          "section-0308",
+          "section-0309",
+          "section-0310",
+          "section-0311",
+          "section-0312",
+          "section-0313",
+          "section-0314",
+          "section-0315",
+          "section-0316",
+          "section-0317",
+          "section-0318",
+          "section-0319",
+          "section-0320",
+          "section-0321",
+          "section-0322",
+          "section-0323",
+          "section-0324",
+          "section-0325",
+          "section-0326",
+          "section-0327",
+          "section-0328",
+          "section-0329",
+          "section-0330",
+          "section-0331",
+          "section-0332",
+          "section-0333",
+          "section-0341",
+          "section-0342",
+          "section-0343",
+          "section-0352",
+          "section-0353",
+          "section-0354",
+          "section-0355",
+          "section-0356",
+          "section-0357",
+          "section-0358",
+          "section-0359",
+          "section-0360",
+          "section-0361",
+          "section-0362",
+          "section-0363",
+          "section-0364",
+          "section-0365",
+          "section-0366",
+          "section-0367",
+          "section-0368",
+          "section-0369",
+          "section-0370",
+          "section-0371",
+          "section-0372",
+          "section-0373",
+          "section-0374",
+          "section-0375",
+          "section-0376",
+          "section-0377",
+          "section-0378",
+          "section-0379",
+          "section-0380",
+          "section-0381",
+          "section-0382",
+          "section-0383",
+          "section-0384",
+          "section-0385",
+          "section-0386",
+          "section-0387",
+          "section-0388",
+          "section-0389",
+          "section-0390",
+          "section-0391",
+          "section-0392",
+          "section-0393",
+          "section-0394",
+          "section-0395",
+          "section-0396",
+          "section-0397",
+          "section-0398",
+          "section-0399",
+          "section-0400",
+          "section-0401",
+          "section-0402",
+          "section-0403",
+          "section-0404",
+          "section-0405",
+          "section-0406",
+          "section-0407",
+          "section-0408",
+          "section-0409",
+          "section-0410",
+          "section-0411",
+          "section-0412",
+          "section-0413",
+          "section-0414",
+          "section-0415",
+          "section-0416",
+          "section-0417",
+          "section-0418",
+          "section-0419",
+          "section-0420",
+          "section-0421",
+          "section-0422",
+          "section-0423",
+          "section-0424",
+          "section-0425",
+          "section-0426",
+          "section-0427",
+          "section-0428",
+          "section-0429",
+          "section-0430",
+          "section-0431",
+          "section-0432",
+          "section-0433",
+          "section-0434",
+          "section-0435",
+          "section-0436",
+          "section-0437",
+          "section-0438",
+          "section-0439",
+          "section-0440",
+          "section-0441",
+          "section-0442",
+          "section-0443",
+          "section-0444",
+          "section-0445",
+          "section-0446",
+          "section-0447",
+          "section-0448",
+          "section-0449",
+          "section-0450",
+          "section-0451",
+          "section-0452",
+          "section-0453",
+          "section-0454",
+          "section-0455",
+          "section-0456",
+          "section-0457",
+          "section-0458",
+          "section-0459",
+          "section-0460",
+          "section-0461",
+          "section-0462",
+          "section-0463",
+          "section-0464",
+          "section-0465",
+          "section-0466",
+          "section-0467",
+          "section-0468",
+          "section-0469",
+          "section-0470",
+          "section-0471",
+          "section-0472",
+          "section-0473",
+          "section-0474",
+          "section-0475",
+          "section-0476",
+          "section-0477",
+          "section-0478",
+          "section-0479",
+          "section-0480",
+          "section-0481",
+          "section-0482",
+          "section-0483",
+          "section-0484",
+          "section-0485",
+          "section-0486",
+          "section-0487",
+          "section-0488",
+          "section-0489",
+          "section-0490",
+          "section-0491",
+          "section-0492",
+          "section-0493",
+          "section-0494",
+          "section-0495",
+          "section-0496",
+          "section-0497",
+          "section-0498",
+          "section-0499",
+          "section-0500",
+          "section-0501",
+          "section-0502",
+          "section-0503",
+          "section-0504",
+          "section-0505",
+          "section-0506",
+          "section-0507",
+          "section-0508",
+          "section-0509",
+          "section-0510",
+          "section-0511",
+          "section-0512",
+          "section-0513",
+          "section-0514",
+          "section-0515",
+          "section-0516",
+          "section-0517",
+          "section-0518",
+          "section-0519",
+          "section-0520",
+          "section-0521",
+          "section-0522",
+          "section-0523",
+          "section-0524",
+          "section-0525",
+          "section-0526",
+          "section-0527",
+          "section-0528",
+          "section-0529",
+          "section-0530",
+          "section-0531",
+          "section-0532",
+          "section-0533",
+          "section-0534",
+          "section-0535",
+          "section-0536",
+          "section-0537",
+          "section-0538",
+          "section-0539",
+          "section-0540",
+          "section-0541",
+          "section-0542",
+          "section-0543",
+          "section-0544",
+          "section-0545",
+          "section-0552",
+          "section-0553",
+          "section-0554",
+          "section-0555",
+          "section-0561",
+          "section-0562",
+          "section-0563",
+          "section-0564",
+          "section-0565",
+          "section-0566",
+          "section-0574",
+          "section-0579",
+          "section-0580",
+          "section-0584",
+          "section-0585",
+          "section-0586",
+          "section-0587",
+          "section-0588",
+          "section-0589",
+          "section-0590",
+          "section-0591",
+          "section-0592",
+          "section-0593",
+          "section-0594",
+          "section-0597",
+          "section-0598",
+          "section-0599",
+          "section-0600",
+          "section-0604",
+          "section-0605",
+          "section-0609",
+          "section-0610",
+          "section-0611",
+          "section-0616",
+          "section-0621",
+          "section-0622",
+          "section-0623",
+          "section-0624",
+          "section-0625",
+          "section-0626",
+          "section-0630",
+          "section-0631",
+          "section-0632",
+          "section-0633",
+          "section-0636",
+          "section-0642",
+          "section-0643",
+          "section-0644",
+          "section-0645",
+          "section-0646",
+          "section-0647",
+          "section-0650",
+          "section-0653",
+          "section-0654",
+          "section-0655",
+          "section-0656",
+          "section-0657",
+          "section-0658",
+          "section-0659",
+          "section-0663",
+          "section-0664",
+          "section-0674",
+          "section-0679",
+          "section-0680",
+          "section-0681",
+          "section-0682",
+          "section-0683",
+          "section-0684",
+          "section-0685",
+          "section-0686",
+          "section-0687",
+          "section-0688",
+          "section-0689",
+          "section-0690",
+          "section-0693",
+          "section-0694",
+          "section-0695",
+          "section-0696",
+          "section-0697",
+          "section-0698",
+          "section-0699",
+          "section-0700",
+          "section-0701",
+          "section-0705",
+          "section-0708",
+          "section-0711",
+          "section-0714",
+          "section-0715",
+          "section-0716",
+          "section-0717",
+          "section-0718",
+          "section-0719",
+          "section-0720",
+          "section-0721",
+          "section-0722",
+          "section-0723",
+          "section-0724",
+          "section-0729",
+          "section-0735",
+          "section-0740",
+          "section-0743",
+          "section-0749",
+          "section-0752",
+          "section-0758",
+          "section-0759",
+          "section-0762",
+          "section-0763",
+          "section-0764",
+          "section-0768",
+          "section-0771",
+          "section-0772",
+          "section-0775",
+          "section-0778",
+          "section-0784",
+          "section-0785",
+          "section-0788",
+          "section-0789",
+          "section-0790",
+          "section-0791",
+          "section-0795",
+          "section-0796",
+          "section-0797",
+          "section-0801",
+          "section-0802",
+          "section-0803",
+          "section-0804",
+          "section-0805",
+          "section-0806",
+          "section-0807",
+          "section-0808",
+          "section-0809",
+          "section-0810",
+          "section-0811",
+          "section-0814",
+          "section-0815",
+          "section-0816",
+          "section-0819",
+          "section-0820",
+          "section-0821",
+          "section-0822",
+          "section-0823",
+          "section-0824",
+          "section-0825",
+          "section-0826",
+          "section-0827",
+          "section-0828",
+          "section-0829",
+          "section-0830",
+          "section-0831",
+          "section-0832",
+          "section-0835",
+          "section-0836",
+          "section-0837",
+          "section-0839",
+          "section-0846",
+          "section-0850",
+          "section-0853",
+          "section-0854",
+          "section-0855",
+          "section-0858",
+          "section-0861",
+          "section-0862",
+          "section-0863",
+          "section-0864",
+          "section-0865",
+          "section-0866",
+          "section-0867",
+          "section-0868",
+          "section-0869",
+          "section-0870",
+          "section-0871",
+          "section-0872",
+          "section-0873",
+          "section-0874",
+          "section-0875",
+          "section-0876",
+          "section-0877",
+          "section-0878",
+          "section-0879",
+          "section-0880",
+          "section-0881",
+          "section-0884",
+          "section-0885",
+          "section-0886",
+          "section-0887",
+          "section-0888",
+          "section-0889",
+          "section-0890",
+          "section-0892",
+          "section-0894",
+          "section-0895",
+          "section-0896",
+          "section-0897",
+          "section-0898",
+          "section-0899",
+          "section-0900",
+          "section-0901",
+          "section-0902",
+          "section-0903",
+          "section-0904",
+          "section-0905",
+          "section-0906",
+          "section-0907",
+          "section-0908",
+          "section-0911",
+          "section-0914",
+          "section-0915",
+          "section-0916",
+          "section-0917",
+          "section-0918",
+          "section-0919",
+          "section-0920",
+          "section-0921",
+          "section-0922",
+          "section-0923",
+          "section-0924",
+          "section-0925",
+          "section-0926",
+          "section-0927",
+          "section-0928",
+          "section-0929",
+          "section-0933",
+          "section-0934",
+          "section-0937",
+          "section-0938",
+          "section-0939",
+          "section-0940",
+          "section-0941",
+          "section-0942",
+          "section-0943",
+          "section-0946"
+        ],
+        "physical_pages": []
+      },
+      "extraction": {
+        "purpose": "extract_profile_workpaper",
+        "request_id": "bp-work-6442086a7536bee9f1ec5bc8:workpaper:extract",
+        "request_hash": "c786f448ad5aabbee35c97cb57b2620bebc2d1b0d42f2a281625263dafbe7916",
+        "response_hash": "d7e2851ad2a18694cddb0882f8a2b6214e27a05a06bc451561eac5b3105562bb",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 11626,
+          "output_tokens": 4207,
+          "total_tokens": 15833
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0019",
+          "section-0035",
+          "section-0050",
+          "section-0051",
+          "section-0089",
+          "section-0091",
+          "section-0816"
+        ],
+        "physical_pages": [
+          10,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          24,
+          25,
+          116,
+          117
+        ]
+      }
+    },
+    "quality_review": null,
+    "standardization_notes": [
+      "程序显示说明：F08正文75.91亿元为智能手机类营业收入7,591,429,166.32元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+      "程序显示说明：F09正文33.77亿元为智能穿戴类营业收入3,377,038,240.44元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+      "程序显示说明：F10正文34.50亿元为电动工具、智能家居和出行类营业收入3,449,742,533.42元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+      "程序显示说明：F11正文29.45亿元为笔记本电脑和平板电脑类营业收入2,945,195,310.25元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+      "程序显示说明：F12正文28.29亿元为储能产品类营业收入2,828,593,460.56元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+      "程序显示说明：F13正文22.07亿元为其他类营业收入2,207,428,591.95元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+      "程序显示说明：F14正文70.90亿元为境内营业收入7,089,709,091.54元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+      "程序显示说明：F14正文153.10亿元为境外营业收入15,309,718,211.40元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+      "事实F18已隔离，未作为结论采用：narrative number is absent from cited source: 126.48亿元",
+      "事实F19已隔离，未作为结论采用：narrative number is absent from cited source: 90.24亿元",
+      "可选事实F28未纳入：narrative number is absent from cited source: 88.66亿元"
+    ]
+  },
+  "workpaper_raw_for_audit": true,
+  "workpaper_delivery": {
+    "policy_version": "company_profile_research_delivery.v1",
+    "research_only": true,
+    "formal_acceptance": "not_assessed",
+    "production_authorization": "not_authorized",
+    "information_gaps": [
+      {
+        "element": "business_structure",
+        "status": "observed",
+        "reasons": [
+          "未获取各业务板块在合并层面的完整资产与利润拆分，仅见部分主要子公司数据。"
+        ]
+      },
+      {
+        "element": "products_services",
+        "status": "observed",
+        "reasons": [
+          "未获取各产品类别的具体技术规格与型号明细。"
+        ]
+      },
+      {
+        "element": "scale_and_mix",
+        "status": "observed",
+        "reasons": [
+          "未获取各产品类别的销量与单价拆分。"
+        ]
+      },
+      {
+        "element": "operations_and_inputs",
+        "status": "observed",
+        "reasons": [
+          "未获取主要原材料的采购金额与供应商名称明细。"
+        ]
+      },
+      {
+        "element": "customers_channels_markets",
+        "status": "observed",
+        "reasons": [
+          "未获取客户名称及具体销售区域明细。",
+          "事实F18已隔离，未作为结论采用：narrative number is absent from cited source: 126.48亿元",
+          "事实F19已隔离，未作为结论采用：narrative number is absent from cited source: 90.24亿元"
+        ]
+      },
+      {
+        "element": "operating_drivers",
+        "status": "observed",
+        "reasons": [
+          "未获取各业务板块的毛利率与利润贡献拆分。"
+        ]
+      },
+      {
+        "element": "material_changes",
+        "status": "observed",
+        "reasons": [
+          "未获取合并范围变动对收入与利润的具体影响金额。"
+        ]
+      },
+      {
+        "element": "upstream_inputs",
+        "status": "observed",
+        "reasons": [
+          "未获取供应商名称及具体原材料采购金额明细。",
+          "可选事实F28未纳入：narrative number is absent from cited source: 88.66亿元"
+        ]
+      },
+      {
+        "element": "downstream_customers",
+        "status": "observed",
+        "reasons": [
+          "未获取具体客户名称及终端品牌明细。"
+        ]
+      }
+    ],
+    "suggested_acquisitions": [],
+    "counts": {
+      "reviewed": 0,
+      "pending": 18,
+      "limited": 8,
+      "source_only": 0,
+      "withheld": 0,
+      "duplicate": 0
+    },
+    "labels": {
+      "reviewed": "已核（研究用途，非正式接受）",
+      "pending": "待核（无其他限用）",
+      "limited": "保真限用",
+      "source_only": "仅源参考／解释",
+      "withheld": "已隔离",
+      "duplicate": "重复未再展示"
+    },
+    "pending_review_count": 26,
+    "facts": [
+      {
+        "fact_id": "F01",
+        "element": "business_structure",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F01",
+          "text": "公司围绕锂电池产业链布局，立足电源管理系统及封装集成业务，并开拓SIP先进封装和储能电芯等战略新兴业务。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F02",
+        "element": "business_structure",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0011",
+          "source-0012",
+          "source-0013"
+        ],
+        "fact": {
+          "fact_id": "F02",
+          "text": "公司主要子公司中，惠州市蓝微电子有限公司从事中小型锂电池电源管理及系统业务，广东德赛矽镨技术有限公司从事系统级封装（SIP）业务，湖南德赛电池有限公司从事储能电芯业务。",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0011",
+            "source-0012",
+            "source-0013"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F03",
+        "element": "products_services",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F03",
+          "text": "公司锂电池产品主要应用于智能手机、笔记本和平板电脑、智能穿戴设备、电动工具、智能家居和出行产品、储能产品等领域。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F04",
+        "element": "products_services",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F04",
+          "text": "公司产品以非标定制化产品为主，储能电芯产品为标准化产品。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F05",
+        "element": "revenue_model",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F05",
+          "text": "公司采取直接销售模式，由终端客户直接向公司下单或由终端客户指定的代工厂向公司下单，主要围绕行业排名前列的核心客户开展业务。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F06",
+        "element": "revenue_model",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F06",
+          "text": "公司经营方式以“以销定产、以产定采”为主，根据客户订单及需求制定生产计划并组织生产。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F07",
+        "element": "scale_and_mix",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "fact": {
+          "fact_id": "F07",
+          "text": "2025年度公司实现合并营业收入223.99亿元，同比增长7.38%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [
+            {
+              "name": "营业收入",
+              "raw_value": "223.99亿元",
+              "value": "223.99",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业收入同比增长率",
+              "raw_value": "7.38%",
+              "value": "7.38",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F08",
+        "element": "scale_and_mix",
+        "state": "limited",
+        "label": "保真限用／待核",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。",
+          "程序显示说明：F08正文75.91亿元为智能手机类营业收入7,591,429,166.32元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        ],
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "fact": {
+          "fact_id": "F08",
+          "text": "按产品划分，智能手机类营业收入75.91亿元，占营业收入比重33.89%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "智能手机类营业收入",
+              "raw_value": "7,591,429,166.32",
+              "value": "7591429166.32",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "智能手机类营业收入占营业收入比重",
+              "raw_value": "33.89%",
+              "value": "33.89",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "程序显示说明：F08正文75.91亿元为智能手机类营业收入7,591,429,166.32元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        }
+      },
+      {
+        "fact_id": "F09",
+        "element": "scale_and_mix",
+        "state": "limited",
+        "label": "保真限用／待核",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。",
+          "程序显示说明：F09正文33.77亿元为智能穿戴类营业收入3,377,038,240.44元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        ],
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "fact": {
+          "fact_id": "F09",
+          "text": "按产品划分，智能穿戴类营业收入33.77亿元，占营业收入比重15.08%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "智能穿戴类营业收入",
+              "raw_value": "3,377,038,240.44",
+              "value": "3377038240.44",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "智能穿戴类营业收入占营业收入比重",
+              "raw_value": "15.08%",
+              "value": "15.08",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "程序显示说明：F09正文33.77亿元为智能穿戴类营业收入3,377,038,240.44元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        }
+      },
+      {
+        "fact_id": "F10",
+        "element": "scale_and_mix",
+        "state": "limited",
+        "label": "保真限用／待核",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。",
+          "程序显示说明：F10正文34.50亿元为电动工具、智能家居和出行类营业收入3,449,742,533.42元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        ],
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "fact": {
+          "fact_id": "F10",
+          "text": "按产品划分，电动工具、智能家居和出行类营业收入34.50亿元，占营业收入比重15.40%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "电动工具、智能家居和出行类营业收入",
+              "raw_value": "3,449,742,533.42",
+              "value": "3449742533.42",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "电动工具、智能家居和出行类营业收入占营业收入比重",
+              "raw_value": "15.40%",
+              "value": "15.40",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "程序显示说明：F10正文34.50亿元为电动工具、智能家居和出行类营业收入3,449,742,533.42元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        }
+      },
+      {
+        "fact_id": "F11",
+        "element": "scale_and_mix",
+        "state": "limited",
+        "label": "保真限用／待核",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。",
+          "程序显示说明：F11正文29.45亿元为笔记本电脑和平板电脑类营业收入2,945,195,310.25元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        ],
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "fact": {
+          "fact_id": "F11",
+          "text": "按产品划分，笔记本电脑和平板电脑类营业收入29.45亿元，占营业收入比重13.15%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "笔记本电脑和平板电脑类营业收入",
+              "raw_value": "2,945,195,310.25",
+              "value": "2945195310.25",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "笔记本电脑和平板电脑类营业收入占营业收入比重",
+              "raw_value": "13.15%",
+              "value": "13.15",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "程序显示说明：F11正文29.45亿元为笔记本电脑和平板电脑类营业收入2,945,195,310.25元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        }
+      },
+      {
+        "fact_id": "F12",
+        "element": "scale_and_mix",
+        "state": "limited",
+        "label": "保真限用／待核",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。",
+          "程序显示说明：F12正文28.29亿元为储能产品类营业收入2,828,593,460.56元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        ],
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "fact": {
+          "fact_id": "F12",
+          "text": "按产品划分，储能产品类营业收入28.29亿元，占营业收入比重12.63%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "储能产品类营业收入",
+              "raw_value": "2,828,593,460.56",
+              "value": "2828593460.56",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "储能产品类营业收入占营业收入比重",
+              "raw_value": "12.63%",
+              "value": "12.63",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "程序显示说明：F12正文28.29亿元为储能产品类营业收入2,828,593,460.56元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        }
+      },
+      {
+        "fact_id": "F13",
+        "element": "scale_and_mix",
+        "state": "limited",
+        "label": "保真限用／待核",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。",
+          "程序显示说明：F13正文22.07亿元为其他类营业收入2,207,428,591.95元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        ],
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "fact": {
+          "fact_id": "F13",
+          "text": "按产品划分，其他类营业收入22.07亿元，占营业收入比重9.85%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "其他类营业收入",
+              "raw_value": "2,207,428,591.95",
+              "value": "2207428591.95",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他类营业收入占营业收入比重",
+              "raw_value": "9.85%",
+              "value": "9.85",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "程序显示说明：F13正文22.07亿元为其他类营业收入2,207,428,591.95元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        }
+      },
+      {
+        "fact_id": "F14",
+        "element": "scale_and_mix",
+        "state": "limited",
+        "label": "保真限用／待核",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。",
+          "程序显示说明：F14正文70.90亿元为境内营业收入7,089,709,091.54元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F14正文153.10亿元为境外营业收入15,309,718,211.40元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        ],
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "fact": {
+          "fact_id": "F14",
+          "text": "按地区划分，境内营业收入70.90亿元，占营业收入比重31.65%；境外营业收入153.10亿元，占营业收入比重68.35%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "境内营业收入",
+              "raw_value": "7,089,709,091.54",
+              "value": "7089709091.54",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "境内营业收入占营业收入比重",
+              "raw_value": "31.65%",
+              "value": "31.65",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "境外营业收入",
+              "raw_value": "15,309,718,211.40",
+              "value": "15309718211.40",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "境外营业收入占营业收入比重",
+              "raw_value": "68.35%",
+              "value": "68.35",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "程序显示说明：F14正文70.90亿元为境内营业收入7,089,709,091.54元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F14正文153.10亿元为境外营业收入15,309,718,211.40元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        }
+      },
+      {
+        "fact_id": "F15",
+        "element": "operations_and_inputs",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F15",
+          "text": "公司采购的原材料主要包括锂离子电芯、BMS、电子元器件、PCB（印制电路板）、正负极材料、隔膜、电解液和各种辅料，主要采取“以产定采”的采购模式，并存在由客户指定供应商的情况。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F16",
+        "element": "operations_and_inputs",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "fact": {
+          "fact_id": "F16",
+          "text": "公司营业成本中直接材料占比87.18%，直接人工占比3.52%，其他成本占比9.30%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "metrics": [
+            {
+              "name": "直接材料占营业成本比重",
+              "raw_value": "87.18%",
+              "value": "87.18",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "直接人工占营业成本比重",
+              "raw_value": "3.52%",
+              "value": "3.52",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他成本占营业成本比重",
+              "raw_value": "9.30%",
+              "value": "9.30",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F17",
+        "element": "operations_and_inputs",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F17",
+          "text": "公司拥有完善的质量管控体系，生产自动化水平处于行业先进水平。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F20",
+        "element": "customers_channels_markets",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F20",
+          "text": "公司采取直接销售模式，由终端客户直接向公司下单或由终端客户指定的代工厂向公司下单。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F21",
+        "element": "operating_drivers",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "fact": {
+          "fact_id": "F21",
+          "text": "2025年研发投入达10.31亿元，同比增长14.63%，研发投入占营业收入的比例为4.60%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [
+            {
+              "name": "研发投入",
+              "raw_value": "10.31亿元",
+              "value": "10.31",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "研发投入同比增长率",
+              "raw_value": "14.63%",
+              "value": "14.63",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "研发投入占营业收入比例",
+              "raw_value": "4.60%",
+              "value": "4.60",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F22",
+        "element": "operating_drivers",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "fact": {
+          "fact_id": "F22",
+          "text": "储能业务全年实现销售收入28.29亿元，同比增长49.89%；SIP业务全年实现销售收入30.42亿元（含内部销售），同比增长13.88%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [
+            {
+              "name": "储能业务销售收入",
+              "raw_value": "28.29亿元",
+              "value": "28.29",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "储能业务销售收入同比增长率",
+              "raw_value": "49.89%",
+              "value": "49.89",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "SIP业务销售收入（含内部销售）",
+              "raw_value": "30.42亿元",
+              "value": "30.42",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "SIP业务销售收入同比增长率",
+              "raw_value": "13.88%",
+              "value": "13.88",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F23",
+        "element": "operating_drivers",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "fact": {
+          "fact_id": "F23",
+          "text": "储能业务从侧重规模扩张转向聚焦效益提升，储能电芯产能利用率提升，亏损有所下降。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F24",
+        "element": "material_changes",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0005",
+          "source-0006"
+        ],
+        "fact": {
+          "fact_id": "F24",
+          "text": "报告期内合并范围增加4户、减少3户，新增蓝微新源（香港）有限公司、智元科技（越南）有限公司、惠州市储源科技有限公司、南通市惠海科技有限责任公司，减少德勤（威海）电力技术有限公司、德亚（山东）电力技术有限公司、德亚（冠县）电力技术有限公司。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005",
+            "source-0006"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F25",
+        "element": "material_changes",
+        "state": "limited",
+        "label": "保真限用／待核",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。",
+          "保留原文主体、数值或近似限定，不作为确定值使用。"
+        ],
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "fact": {
+          "fact_id": "F25",
+          "text": "公司持续加速越南制造基地建设，子公司在越南云中工业园购置厂房并逐步投入使用，同时开启内黄工业园二期厂房建设；智能硬件装配业务实现海外量产落地，SIP业务越南制造基地顺利量产，越南本地制造产值超20亿元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [
+            {
+              "name": "越南本地制造产值",
+              "raw_value": "超20亿元",
+              "value": "20",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "greater_than",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F26",
+        "element": "position",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F26",
+          "text": "公司立足电源管理系统及封装集成业务，并发展SIP先进封装和储能电芯等业务，处于锂电池产业链的制造与封装集成环节。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F27",
+        "element": "upstream_inputs",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F27",
+          "text": "公司采购的原材料主要包括锂离子电芯、BMS、电子元器件、PCB（印制电路板）、正负极材料、隔膜、电解液和各种辅料。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F29",
+        "element": "downstream_customers",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F29",
+          "text": "公司锂电池产品主要应用于智能手机、笔记本和平板电脑、智能穿戴设备、电动工具、智能家居和出行产品、储能产品等领域。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      }
+    ]
+  },
+  "workpaper_markdown": "# 000049.SZ｜2025-12-31 公司画像底稿\n\n真实模型底稿（待核，不代表正式公司可用）\n\n来源版本：`b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b`。发布时点：2026-04-22T16:00:00+00:00。\n\n研究分级不等于正式可信发布；以下普通正文不含隔离、仅源参考或重复对象。原底稿及后文复核记录保留审计。\n\n已核（研究用途，非正式接受） 0；待核（无其他限用） 18；保真限用 8；仅源参考／解释 0；已隔离 0；重复未再展示 0\n待核合计（含限用中的待核）：26。\n\n## 业务结构\n\n- 【待核（无其他限用）】公司围绕锂电池产业链布局，立足电源管理系统及封装集成业务，并开拓SIP先进封装和储能电芯等战略新兴业务。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】公司主要子公司中，惠州市蓝微电子有限公司从事中小型锂电池电源管理及系统业务，广东德赛矽镨技术有限公司从事系统级封装（SIP）业务，湖南德赛电池有限公司从事储能电芯业务。（[source-0011](#source-0011)、[source-0012](#source-0012)、[source-0013](#source-0013)）\n  - 使用限制：尚未源复核。\n- 限制：未获取各业务板块在合并层面的完整资产与利润拆分，仅见部分主要子公司数据。\n\n## 产品、服务及用途\n\n- 【待核（无其他限用）】公司锂电池产品主要应用于智能手机、笔记本和平板电脑、智能穿戴设备、电动工具、智能家居和出行产品、储能产品等领域。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】公司产品以非标定制化产品为主，储能电芯产品为标准化产品。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 限制：未获取各产品类别的具体技术规格与型号明细。\n\n## 怎么赚钱\n\n- 【待核（无其他限用）】公司采取直接销售模式，由终端客户直接向公司下单或由终端客户指定的代工厂向公司下单，主要围绕行业排名前列的核心客户开展业务。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】公司经营方式以“以销定产、以产定采”为主，根据客户订单及需求制定生产计划并组织生产。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n\n## 规模与业务权重\n\n- 【待核（无其他限用）】2025年度公司实现合并营业收入223.99亿元，同比增长7.38%。（[source-0002](#source-0002)）\n  - 使用限制：尚未源复核。\n  - 营业收入：223.99亿元；2025年度，consolidated_group。\n  - 营业收入同比增长率：7.38%；2025年度，consolidated_group。\n- 【保真限用／待核】【不确定：程序显示说明：F08正文75.91亿元为智能手机类营业收入7,591,429,166.32元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。】按产品划分，智能手机类营业收入75.91亿元，占营业收入比重33.89%。（[source-0004](#source-0004)）\n  - 使用限制：尚未源复核。；程序显示说明：F08正文75.91亿元为智能手机类营业收入7,591,429,166.32元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n  - 智能手机类营业收入：7,591,429,166.32 元；2025年度，business_segment。\n  - 智能手机类营业收入占营业收入比重：33.89%；2025年度，business_segment。\n- 【保真限用／待核】【不确定：程序显示说明：F09正文33.77亿元为智能穿戴类营业收入3,377,038,240.44元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。】按产品划分，智能穿戴类营业收入33.77亿元，占营业收入比重15.08%。（[source-0004](#source-0004)）\n  - 使用限制：尚未源复核。；程序显示说明：F09正文33.77亿元为智能穿戴类营业收入3,377,038,240.44元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n  - 智能穿戴类营业收入：3,377,038,240.44 元；2025年度，business_segment。\n  - 智能穿戴类营业收入占营业收入比重：15.08%；2025年度，business_segment。\n- 【保真限用／待核】【不确定：程序显示说明：F10正文34.50亿元为电动工具、智能家居和出行类营业收入3,449,742,533.42元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。】按产品划分，电动工具、智能家居和出行类营业收入34.50亿元，占营业收入比重15.40%。（[source-0004](#source-0004)）\n  - 使用限制：尚未源复核。；程序显示说明：F10正文34.50亿元为电动工具、智能家居和出行类营业收入3,449,742,533.42元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n  - 电动工具、智能家居和出行类营业收入：3,449,742,533.42 元；2025年度，business_segment。\n  - 电动工具、智能家居和出行类营业收入占营业收入比重：15.40%；2025年度，business_segment。\n- 【保真限用／待核】【不确定：程序显示说明：F11正文29.45亿元为笔记本电脑和平板电脑类营业收入2,945,195,310.25元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。】按产品划分，笔记本电脑和平板电脑类营业收入29.45亿元，占营业收入比重13.15%。（[source-0004](#source-0004)）\n  - 使用限制：尚未源复核。；程序显示说明：F11正文29.45亿元为笔记本电脑和平板电脑类营业收入2,945,195,310.25元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n  - 笔记本电脑和平板电脑类营业收入：2,945,195,310.25 元；2025年度，business_segment。\n  - 笔记本电脑和平板电脑类营业收入占营业收入比重：13.15%；2025年度，business_segment。\n- 【保真限用／待核】【不确定：程序显示说明：F12正文28.29亿元为储能产品类营业收入2,828,593,460.56元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。】按产品划分，储能产品类营业收入28.29亿元，占营业收入比重12.63%。（[source-0004](#source-0004)）\n  - 使用限制：尚未源复核。；程序显示说明：F12正文28.29亿元为储能产品类营业收入2,828,593,460.56元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n  - 储能产品类营业收入：2,828,593,460.56 元；2025年度，business_segment。\n  - 储能产品类营业收入占营业收入比重：12.63%；2025年度，business_segment。\n- 【保真限用／待核】【不确定：程序显示说明：F13正文22.07亿元为其他类营业收入2,207,428,591.95元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。】按产品划分，其他类营业收入22.07亿元，占营业收入比重9.85%。（[source-0004](#source-0004)）\n  - 使用限制：尚未源复核。；程序显示说明：F13正文22.07亿元为其他类营业收入2,207,428,591.95元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n  - 其他类营业收入：2,207,428,591.95 元；2025年度，business_segment。\n  - 其他类营业收入占营业收入比重：9.85%；2025年度，business_segment。\n- 【保真限用／待核】【不确定：程序显示说明：F14正文70.90亿元为境内营业收入7,089,709,091.54元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F14正文153.10亿元为境外营业收入15,309,718,211.40元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。】按地区划分，境内营业收入70.90亿元，占营业收入比重31.65%；境外营业收入153.10亿元，占营业收入比重68.35%。（[source-0004](#source-0004)）\n  - 使用限制：尚未源复核。；程序显示说明：F14正文70.90亿元为境内营业收入7,089,709,091.54元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：F14正文153.10亿元为境外营业收入15,309,718,211.40元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n  - 境内营业收入：7,089,709,091.54 元；2025年度，consolidated_group。\n  - 境内营业收入占营业收入比重：31.65%；2025年度，consolidated_group。\n  - 境外营业收入：15,309,718,211.40 元；2025年度，consolidated_group。\n  - 境外营业收入占营业收入比重：68.35%；2025年度，consolidated_group。\n- 限制：未获取各产品类别的销量与单价拆分。\n\n## 经营方式与关键投入\n\n- 【待核（无其他限用）】公司采购的原材料主要包括锂离子电芯、BMS、电子元器件、PCB（印制电路板）、正负极材料、隔膜、电解液和各种辅料，主要采取“以产定采”的采购模式，并存在由客户指定供应商的情况。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】公司营业成本中直接材料占比87.18%，直接人工占比3.52%，其他成本占比9.30%。（[source-0005](#source-0005)）\n  - 使用限制：尚未源复核。\n  - 直接材料占营业成本比重：87.18%；2025年度，consolidated_group。\n  - 直接人工占营业成本比重：3.52%；2025年度，consolidated_group。\n  - 其他成本占营业成本比重：9.30%；2025年度，consolidated_group。\n- 【待核（无其他限用）】公司拥有完善的质量管控体系，生产自动化水平处于行业先进水平。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 限制：未获取主要原材料的采购金额与供应商名称明细。\n\n## 客户、渠道与市场\n\n- 【待核（无其他限用）】公司采取直接销售模式，由终端客户直接向公司下单或由终端客户指定的代工厂向公司下单。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 限制：未获取客户名称及具体销售区域明细。\n- 限制：事实F18已隔离，未作为结论采用：narrative number is absent from cited source: 126.48亿元\n- 限制：事实F19已隔离，未作为结论采用：narrative number is absent from cited source: 90.24亿元\n\n## 关键经营影响因素\n\n- 【待核（无其他限用）】2025年研发投入达10.31亿元，同比增长14.63%，研发投入占营业收入的比例为4.60%。（[source-0003](#source-0003)）\n  - 使用限制：尚未源复核。\n  - 研发投入：10.31亿元；2025年度，consolidated_group。\n  - 研发投入同比增长率：14.63%；2025年度，consolidated_group。\n  - 研发投入占营业收入比例：4.60%；2025年度，consolidated_group。\n- 【待核（无其他限用）】储能业务全年实现销售收入28.29亿元，同比增长49.89%；SIP业务全年实现销售收入30.42亿元（含内部销售），同比增长13.88%。（[source-0003](#source-0003)）\n  - 使用限制：尚未源复核。\n  - 储能业务销售收入：28.29亿元；2025年度，consolidated_group。\n  - 储能业务销售收入同比增长率：49.89%；2025年度，consolidated_group。\n  - SIP业务销售收入（含内部销售）：30.42亿元；2025年度，consolidated_group。\n  - SIP业务销售收入同比增长率：13.88%；2025年度，consolidated_group。\n- 【待核（无其他限用）】储能业务从侧重规模扩张转向聚焦效益提升，储能电芯产能利用率提升，亏损有所下降。（[source-0003](#source-0003)）\n  - 使用限制：尚未源复核。\n- 限制：未获取各业务板块的毛利率与利润贡献拆分。\n\n## 近期重要变化\n\n- 【待核（无其他限用）】报告期内合并范围增加4户、减少3户，新增蓝微新源（香港）有限公司、智元科技（越南）有限公司、惠州市储源科技有限公司、南通市惠海科技有限责任公司，减少德勤（威海）电力技术有限公司、德亚（山东）电力技术有限公司、德亚（冠县）电力技术有限公司。（[source-0005](#source-0005)、[source-0006](#source-0006)）\n  - 使用限制：尚未源复核。\n- 【保真限用／待核】公司持续加速越南制造基地建设，子公司在越南云中工业园购置厂房并逐步投入使用，同时开启内黄工业园二期厂房建设；智能硬件装配业务实现海外量产落地，SIP业务越南制造基地顺利量产，越南本地制造产值超20亿元。（[source-0003](#source-0003)）\n  - 使用限制：尚未源复核。；保留原文主体、数值或近似限定，不作为确定值使用。\n  - 越南本地制造产值：超20亿元（下限，非精确值）；2025年度，consolidated_group。\n- 限制：未获取合并范围变动对收入与利润的具体影响金额。\n\n## 供应链信息（可选加分项）\n\n未获取到的信息不影响基础画像交付；以下内容仍待核。\n\n### 公司所处环节\n\n- 【待核（无其他限用）】公司立足电源管理系统及封装集成业务，并发展SIP先进封装和储能电芯等业务，处于锂电池产业链的制造与封装集成环节。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n\n### 上游原材料与资源\n\n- 【待核（无其他限用）】公司采购的原材料主要包括锂离子电芯、BMS、电子元器件、PCB（印制电路板）、正负极材料、隔膜、电解液和各种辅料。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 限制：未获取供应商名称及具体原材料采购金额明细。\n- 限制：可选事实F28未纳入：narrative number is absent from cited source: 88.66亿元\n\n### 下游用途与客户领域\n\n- 【待核（无其他限用）】公司锂电池产品主要应用于智能手机、笔记本和平板电脑、智能穿戴设备、电动工具、智能家居和出行产品、储能产品等领域。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 限制：未获取具体客户名称及终端品牌明细。\n\n## 阅读范围与取舍\n\n优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。\n\n- 第三节 管理层讨论与分析 / 一、报告期内公司从事的主要业务，物理页10—10：优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。\n- 第三节 管理层讨论与分析 / 四、主营业务分析，物理页12—16：优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。\n- 第三节 管理层讨论与分析 / 公司主要销售客户情况，物理页16—16：优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。\n- 第三节 管理层讨论与分析 / 公司主要供应商情况，物理页16—18：优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。\n- 第三节 管理层讨论与分析 / 九、主要控股参股公司分析，物理页24—24：优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。\n- 第三节 管理层讨论与分析 / 封装集成业务，物理页24—25：优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。\n- 第八节 财务报告 / 是否存在逾期尚未支付中小企业款项的情况 / (二) 合并利润表项目注释 / 1. 营业收入/营业成本，物理页116—117：优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。\n\n停止理由：已覆盖业务与产品用途、经营模式、收入与成本构成、客户与供应商、主要子公司及收入附注等公司层面经营解释所需信息，剩余为行业背景、治理、会计政策与财务报告全文，超出本次经营阅读范围，可在此停止。\n\n- 未读/后置：section-0025行业情况：属行业背景，非公司层面经营解释，暂不选\n- 未读/后置：section-0029核心竞争力分析：偏泛化竞争优势，经营信息密度低于主营业务分析\n- 未读/后置：section-0094未来发展展望：计划性内容，仅在需要风险与计划限定信息时补充\n- 未读/后置：section-0326财务报告全文及会计政策：范围过大，仅定向使用收入附注section-0816\n\n## 模型处理记录\n\n- 选章：deepseek-flash（deepseek:deepseek-flash，semantic_extraction__deepseek），报告标题索引（727个候选章节）；输入/输出/合计 19624/390/20014；finish=stop；requested_reasoning=high。\n- 正文抽取：deepseek-flash（deepseek:deepseek-flash，semantic_extraction__deepseek），章节 section-0019, section-0035, section-0050, section-0051, section-0089, section-0091, section-0816；物理页 10,12,13,14,15,16,17,18,24,25,116,117；输入/输出/合计 11626/4207/15833；finish=stop；requested_reasoning=high。\n- 提示版本：`company_profile_workpaper.2026-11-19.independent-assertions.v21`；预处理：`toc_sections_native_layout.v7.ordered-section-remap`。\n\n## 程序处理说明\n\n- 程序显示说明：F08正文75.91亿元为智能手机类营业收入7,591,429,166.32元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n- 程序显示说明：F09正文33.77亿元为智能穿戴类营业收入3,377,038,240.44元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n- 程序显示说明：F10正文34.50亿元为电动工具、智能家居和出行类营业收入3,449,742,533.42元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n- 程序显示说明：F11正文29.45亿元为笔记本电脑和平板电脑类营业收入2,945,195,310.25元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n- 程序显示说明：F12正文28.29亿元为储能产品类营业收入2,828,593,460.56元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n- 程序显示说明：F13正文22.07亿元为其他类营业收入2,207,428,591.95元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n- 程序显示说明：F14正文70.90亿元为境内营业收入7,089,709,091.54元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n- 程序显示说明：F14正文153.10亿元为境外营业收入15,309,718,211.40元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n- 事实F18已隔离，未作为结论采用：narrative number is absent from cited source: 126.48亿元\n- 事实F19已隔离，未作为结论采用：narrative number is absent from cited source: 90.24亿元\n- 可选事实F28未纳入：narrative number is absent from cited source: 88.66亿元\n\n## 来源\n\n### source-0001\n\n第三节 管理层讨论与分析 / 一、报告期内公司从事的主要业务\n\n物理页10，字符134—867：\n\n> 一、报告期内公司从事的主要业务 1、公司主要业务、主要产品及其用途 公司主要围绕锂电池产业链进行业务布局，立足电源管理系统及封装集成业务，正大力开拓新 业务，发展 SIP 先进封装和储能电芯等战略新兴业务，持续优化产业布局。智能手机、笔记本和平 板电脑、智能穿戴设备、电动工具、智能家居和出行产品、储能产品是公司锂电池产品的主要应用 领域。 2、公司主要经营模式 公司拥有成熟的采购、生产和销售体系，采取“以销定产、以产定采”为主的经营方式。报告 期内，公司主要经营模式未发生重大变化。 （1）采购模式 公司采购的原材料主要包括锂离子电芯、BMS、电子元器件、PCB（印制电路板）、正负极材 料、隔膜、电解液和各种辅料。主要采取“以产定采”的采购模式，采购部门根据生产计划部门下 达的采购计划进行采购。公司建立了完整的供应链管理体系，与众多的原材料厂商建立了长期稳定 的合作关系，公司存在由客户指定供应商的情况。 （2）生产模式 公司生产的产品主要为非标定制化产品，采用“以销定产”的生产模式，根据客户订单及需求 制定生产计划并组织生产。储能电芯产品为标准化产品，公司综合评估客户需求与产能利用情况， 制定生产计划并组织生产。公司拥有完善的质量管控体系，生产自动化水平处于行业先进水平。 （3）销售模式 公司主要围绕行业排名前列的核心客户开展业务，采取直接销售模式，由终端客户直接向公司 下单或由终端客户指定的代工厂向公司下单。经过多年的发展，公司积累了大量的优质客户资源， 与主要客户建立了长期稳定的合作关系，积极广泛地参与客户产品项目的前期研发设计并实现销售。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0002\n\n第三节 管理层讨论与分析 / 四、主营业务分析\n\n物理页12，字符1218—1406：\n\n> 四、主营业务分析 1、概述 2025年度，公司实现合并营业收入 223.99亿元，同比增长 7.38%；实现归属于上市公司股东的 净利润 2.92亿元，同比下降 29.23%。报告期内，公司主要经营情况如下： 12\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0003\n\n第三节 管理层讨论与分析 / 四、主营业务分析\n\n物理页13，字符0—1568：\n\n> 深圳市德赛电池科技股份有限公司 2025年年度报告全文 （1）坚定地加大研发投入，以创新驱动发展 公司坚持以技术创新驱动发展，积极应对日趋激烈的市场竞争环境。近五年来，公司研发投入 保持稳定增长，2025 年研发投入达 10.31 亿元，同比增长 14.63%，研发投入占营业收入的比例为 4.60%。报告期内，各子公司围绕主业持续开展核心关键技术攻关，深度参与客户产品前期设计验证， 紧跟行业发展趋势，持续提升技术能力与产品适用性，巩固与核心客户的长期合作。在储能电芯产 品研发方面，开发兼顾容量、过流温升、大倍率循环特性的 UPS 高功率电芯，推出主动安全电芯及 系统，研发先进的温压一体传感器，实现电芯内部气压与温度实时监测，全面提升储能系统安全水 平；SIP 先进封装工艺研发方面，成功导入固晶、焊线、溅镀、植球四个关键工序，掌握晶圆级的减 薄和划片工艺，为新业务的开拓和承接打下了坚实的技术基础。 （2）新兴业务占比不断提升，持续优化业务结构 近几年，公司在持续深耕传统优势业务的同时，不断推动战略新兴业务的发展，持续提升新兴 业务占比，推动整体业务结构优化。报告期内，储能业务从侧重规模扩张转向聚焦效益提升，着力 改善经营质量，储能电芯产能利用率提升，亏损有所下降，储能业务全年实现销售收入 28.29亿元， 同比增长 49.89%；SIP 业务聚焦核心客户，以高品质交付为基础，深化与客户的合作，不断拓展新 业务品类，显著提升业务粘性，推动销售收入持续增长，全年实现销售收入 30.42 亿元（含内部销 售），同比增长 13.88%。 （3）海外制造持续加码，优化产能布局 在国际贸易政策不确定性增加、贸易保护主义抬头的背景下，公司持续加速越南制造基地的建 设进程，以构建多元化的产能布局，响应客户海外产能需求，针对不同区域的差异化关税，动态调 整生产资源配置。报告期内，公司子公司在越南云中工业园购置厂房并逐步投入使用，同时开启内 黄工业园二期厂房建设，持续扩大产能。智能硬件装配业务实现海外量产落地，SIP 业务越南制造基 地顺利量产且持续导入新项目，越南本地制造产值超 20 亿元。 （4）深化精益智造管理，推动降本增效 以建设数字化工厂为目标，以精益制造为基础，公司各控股子公司通过提升柔性自动化能力、 改造 MES 生产信息化管理系统、全过程数据采集、关键质量特性监控与自动预警等措施，实现产品 工艺数据的制造过程主动防错控制，打造可视、可控、可追溯的智能化制造管理平台。在精益制造 体系的基础上，进一步融合自动化设备、智能管理系统与实时数据分析，推动生产各环节高效协同、 精准管控，有效降低人力投入成本与各类资源损耗。同时，以 AI大数据技术为驱动，持续优化制造 效率与产品质量，全面提升公司智能制造水平与数字化运营能力，助力企业实现高质量、低成本、 高效率发展。 13\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0004\n\n第三节 管理层讨论与分析 / 四、主营业务分析\n\n物理页14，字符0—4888：\n\n> 深圳市德赛电池科技股份有限公司 2025 年年度报告全文 2、收入与成本 （1） 营业收入构成 单位：元 2025 年 2024 年 占营业收入比 占营业收入比 同比增减 金额 重 金额 重 营业收入合计 22,399,427,302.94 100% 20,859,251,590.68 100% 7.38% 分行业 工业 22,399,427,302.94 100.00% 20,859,251,590.68 100.00% 7.38% 分产品 智能手机类 7,591,429,166.32 33.89% 7,973,220,260.49 38.22% -4.79% 智能穿戴类 3,377,038,240.44 15.08% 2,581,691,960.48 12.38% 30.81% 电动工具、智能 3,449,742,533.42 15.40% 3,393,449,229.43 16.27% 1.66% 家居和出行类 笔记本电脑和平 2,945,195,310.25 13.15% 2,871,016,674.31 13.76% 2.58% 板电脑类 储能产品类 2,828,593,460.56 12.63% 1,887,169,790.12 9.05% 49.89% 其他 2,207,428,591.95 9.85% 2,152,703,675.85 10.32% 2.54% 分地区 境内 7,089,709,091.54 31.65% 6,829,939,788.99 32.74% 3.80% 境外 15,309,718,211.40 68.35% 14,029,311,801.69 67.26% 9.13% 分销售模式 自销 22,399,427,302.94 100.00% 20,859,251,590.68 100.00% 7.38% （2） 占公司营业收入或营业利润 10%以上的行业、产品、地区、销售模式的情况 适用 □不适用 单位：元 营业收入 营业成本 毛利率 营业收入比上 营业成本比上 毛利率比上年 年同期增减 年同期增减 同期增减 分行业 工业 22,399,427,302.94 20,379,412,302.96 9.02% 7.38% 9.01% -1.36% 分产品 智能手机类 7,591,429,166.32 7,000,383,953.10 7.79% -4.79% -2.56% -2.10% 智能穿戴类 3,377,038,240.44 2,894,397,335.43 14.29% 30.81% 22.42% 5.87% 电动工具、智能 3,449,742,533.42 2,985,482,541.05 13.46% 1.66% 3.20% -1.29% 家居和出行类 笔记本电脑和平 2,945,195,310.25 2,742,873,717.03 6.87% 2.58% 3.00% -0.38% 板电脑类 储能产品类 2,828,593,460.56 2,870,166,866.93 -1.47% 49.89% 56.52% -4.30% 其他 2,207,428,591.95 1,886,107,889.42 14.56% 2.54% 7.37% -3.84% 分地区 境内 7,089,709,091.54 6,574,728,693.72 7.26% 3.80% 5.74% -1.70% 14\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0005\n\n第三节 管理层讨论与分析 / 四、主营业务分析\n\n物理页15，字符0—2931：\n\n> 深圳市德赛电池科技股份有限公司 2025 年年度报告全文 境外 15,309,718,211.40 13,804,683,609.24 9.83% 9.13% 10.64% -1.23% 分销售模式 自销 22,399,427,302.94 20,379,412,302.96 9.02% 7.38% 9.01% -1.36% 公司主营业务数据统计口径在报告期发生调整的情况下，公司最近 1 年按报告期末口径调整后的主营业务数据 □适用 不适用 （3） 公司实物销售收入是否大于劳务收入 是 □否 行业分类 项目 单位 2025 年 2024 年 同比增减 销售量 万个 54,481.35 48,554.63 12.21% 工业制造业 生产量 万个 54,702.30 48,772.31 12.16% 库存量 万个 1,680.54 1,459.59 15.14% 相关数据同比发生变动 30%以上的原因说明 □适用 不适用 （4） 公司已签订的重大销售合同、重大采购合同截至本报告期的履行情况 □适用 不适用 （5） 营业成本构成 行业分类 单位：元 2025 年 2024 年 行业分类 项目 占营业成本 占营业成 同比增减 金额 比重 金额 本比重 直接材料 17,766,464,113.15 87.18% 16,521,494,610.59 88.37% 7.54% 工业制造业 直接人工 717,559,867.68 3.52% 677,255,729.35 3.62% 5.95% 其他成本 1,895,388,322.13 9.30% 1,496,344,719.60 8.00% 26.67% （6） 报告期内合并范围是否发生变动 是 □否 本期纳入合并财务报表范围的主体较上期相比，增加 4 户，减少 3 户，具体包括： 公司名称 变更原因 蓝微新源（香港）有限公司 投资设立 智元科技（越南）有限公司 投资设立 惠州市储源科技有限公司 投资设立 南通市惠海科技有限责任公司 投资设立 德勤（威海）电力技术有限公司 注销 15\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0006\n\n第三节 管理层讨论与分析 / 四、主营业务分析\n\n物理页16，字符0—522：\n\n> 深圳市德赛电池科技股份有限公司 2025 年年度报告全文 公司名称 变更原因 德亚（山东）电力技术有限公司 转让 德亚（冠县）电力技术有限公司 转让 （7） 公司报告期内业务、产品或服务发生重大变化或调整有关情况 □适用 不适用 （8） 主要销售客户和主要供应商情况\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0007\n\n第三节 管理层讨论与分析 / 公司主要销售客户情况\n\n物理页16，字符522—1921：\n\n> 公司主要销售客户情况 前五名客户合计销售金额（元） 12,648,259,725.07 前五名客户合计销售金额占年度销售总额比例 56.47% 前五名客户销售额中关联方销售额占年度销售总额比例 0.00% 公司前 5 大客户资料 序号 客户名称 销售额（元） 占年度销售总额比例 1 第一名 9,024,478,784.86 40.29% 2 第二名 969,331,530.42 4.33% 3 第三名 922,093,573.84 4.12% 4 第四名 907,949,690.37 4.05% 5 第五名 824,406,145.58 3.68% 合计 -- 12,648,259,725.07 56.47% 主要客户其他情况说明 □适用 不适用\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0008\n\n第三节 管理层讨论与分析 / 公司主要供应商情况\n\n物理页16，字符1921—3463：\n\n> 公司主要供应商情况 前五名供应商合计采购金额（元） 8,866,296,088.52 前五名供应商合计采购金额占年度采购总额比例 48.55% 前五名供应商采购额中关联方采购额占年度采购总额比例 0.00% 公司前 5 名供应商资料 序号 供应商名称 采购额（元） 占年度采购总额比例 1 第一名 5,574,590,236.44 30.53% 2 第二名 1,190,561,159.60 6.52% 3 第三名 705,436,447.46 3.86% 4 第四名 703,595,915.90 3.85% 5 第五名 692,112,329.12 3.79% 合计 -- 8,866,296,088.52 48.55% 主要供应商其他情况说明 □适用 不适用 报告期内公司贸易业务收入占营业收入比例超过 10% □适用 不适用 16\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0009\n\n第三节 管理层讨论与分析 / 公司主要供应商情况\n\n物理页17，字符0—3401：\n\n> 深圳市德赛电池科技股份有限公司 2025 年年度报告全文 3、费用 单位：元 2025 年 2024 年 同比增减 重大变动说明 销售费用 158,190,420.93 140,875,826.20 12.29% 管理费用 381,669,838.08 374,748,152.92 1.85% 财务费用 95,872,523.63 54,514,846.49 75.86% 主要系汇兑收益同比减少 研发费用 1,030,741,518.21 899,178,663.18 14.63% 4、研发投入 适用 □不适用 主要研发项目名称 项目目的 项目进展 拟达到的目标 预计对公司未来发展 的影响 推广能量密度高，抗压能力强、采 提升产品竞争力和制程 智能手表钢壳电池 用先进电池管理和封装技术的钢壳 量产阶段 工艺水平 电池的产业化应用 通过创新设计与先进工艺研发高端 高端 AR 眼镜电池 AR 眼镜专用电池，实现产品更 量产阶段 提升产品竞争力 轻、更薄，提升产品佩戴舒适性与 空间利用率。 巩固和提升市场份额 智能吸尘器电源管 产业化应用 研发阶段 提高产品性能，提升产 理系统技术研发 品竞争力 E-bike电动车锂电 提高产品性能，提升产 池高性能保护技术 产业化应用 试产阶段 品竞争力 研发 314Ah 高性价比储 为客户提供高性价比高安全新产品 量产阶段 提升产品竞争力 能电芯产品开发 从根本上解决储能系统的热失控风 高安全储能电芯技 险，确保其在全生命周期内安全、 量产阶段 掌握关键技术，提升产 构建差异化竞争优 术开发 可靠、可预测地运行，从而支撑储 品竞争力 势，提升市场份额 能产业的大规模商业化发展。 高安全、宽温域、 掌握关键技术，推广产 通过技术创新扩大市 高能量密度固态电 产业化应用 样品阶段 品应用 场份额，提升品牌知 池项目研究 名度和影响力 功率型锂离子电池 产业化应用 试产阶段 掌握关键技术，推广产 技术开发 品应用 开拓新市场，提升品 高性能钠离子电芯 开发一款具有优异低温性能和高功 试产阶段 掌握领先技术，丰富产 牌影响力 技术开发 率输出的钠离子电池 品矩阵 新型高压微户储系 开发新产品，丰富产品 统及终端应用技术 产业化应用 试产阶段 矩阵 研发 开拓新市场，提升公 基于内嵌雷达与蓝 掌握新技术，拓展智能 司市场竞争力与盈利 牙技术的智能物联 产业化应用 研发阶段 家居应用场景 能力 模组应用研发 SIP工艺的 产业化应用 量产阶段 掌握关键技术，推广产 MOSFET 堆叠技术 品应用 17\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0010\n\n第三节 管理层讨论与分析 / 公司主要供应商情况\n\n物理页18，字符0—892：\n\n> 深圳市德赛电池科技股份有限公司 2025 年年度报告全文 主要研发项目名称 项目目的 项目进展 拟达到的目标 预计对公司未来发展 的影响 的研发 新型高可靠性微小 开发新产品，丰富产品 化电池保护板封装 产业化应用 研发阶段 矩阵 技术的研发 构建主动安全预警模型，实现电芯 强化公司在储能安全 主动安全算法模型 异常风险提前识别，打造行业独家 研发阶段 掌握关键技术，推广产 领域的核心竞争力， 核心技术，形成可配套支持储能全 品应用 助力储能业务拓展 场景的解决方案\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0011\n\n第三节 管理层讨论与分析 / 九、主要控股参股公司分析\n\n物理页24，字符850—1350：\n\n> 九、主要控股参股公司分析 适用 □不适用 主要子公司及对公司净利润影响达 10%以上的参股公司情况 单位：万元 公司名称 公司 主要业务 注册资本 总资产 净资产 营业收入 营业利润 净利润 类型 惠州市蓝 中小型锂电池 微电子有 子公司 电源管理及系 28,000.00 335,747.12 201,608.45 521,790.03 18,748.19 18,634.25 限公司\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0012\n\n第三节 管理层讨论与分析 / 封装集成业务\n\n物理页24，字符1409—1727：\n\n> 封装集成业务 70,000.00 746,702.94 331,123.55 1,430,224.66 25,455.55 26,007.53 限公司 广东德赛 子公司 系统级封装 14,000.00 296,226.04 26,533.93 329,152.22 5,807.35 6,719.06 矽镨技术 （SIP）业务 24\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0013\n\n第三节 管理层讨论与分析 / 封装集成业务\n\n物理页25，字符0—318：\n\n> 深圳市德赛电池科技股份有限公司 2025 年年度报告全文 公司名称 公司 主要业务 注册资本 总资产 净资产 营业收入 营业利润 净利润 类型 有限公司 湖南德赛 电池有限 子公司 储能电芯业务 50,000.00 258,458.50 -41,204.81 106,635.83-35,364.72 -29,272.94 公司\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0014\n\n第八节 财务报告 / 是否存在逾期尚未支付中小企业款项的情况 / (二) 合并利润表项目注释 / 1. 营业收入/营业成本\n\n物理页116，字符706—3918：\n\n> 1. 营业收入/营业成本 (1) 明细情况 本期数 上年同期数 项 目 收入 成本 收入 成本 主营业务 21,969,175,590.72 20,084,986,000.36 20,596,594,141.54 18,516,282,942.81 其他业务 430,251,712.22 294,426,302.60 262,657,449.14 178,812,116.73 合 计 22,399,427,302.94 20,379,412,302.96 20,859,251,590.68 18,695,095,059.54 其中：与客户之间 的合同产生的收入 22,399,427,302.94 20,379,412,302.96 20,859,251,590.68 18,695,095,059.54 及成本 (2) 收入分解信息 1) 与客户之间的合同产生的收入按商品或服务类型分解 本期数 上年同期数 项 目 收入 成本 收入 成本 智能手机类 7,591,429,166.32 7,000,383,953.10 7,973,220,260.49 7,184,296,702.16 智能穿戴类 3,377,038,240.44 2,894,397,335.43 2,581,691,960.48 2,364,388,674.03 电动工具、智能 3,449,742,533.42 2,985,482,541.05 3,393,449,229.43 2,893,029,028.38 家居和出行类 笔记本电脑和平 2,945,195,310.25 2,742,873,717.03 2,871,016,674.31 2,662,957,429.38 板电脑类 储能产品类 2,828,593,460.56 2,870,166,866.93 1,887,169,790.12 1,833,733,672.07 其他 2,207,428,591.95 1,886,107,889.42 2,152,703,675.85 1,756,689,553.52 合 计 22,399,427,302.94 20,379,412,302.96 20,859,251,590.68 18,695,095,059.54 2) 与客户之间的合同产生的收入按经营地区分解 本期数 上年同期数 项 目 收入 成本 收入 成本 境内 7,089,709,091.54 6,574,728,693.72 6,829,939,788.99 6,217,729,418.58 116\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0015\n\n第八节 财务报告 / 是否存在逾期尚未支付中小企业款项的情况 / (二) 合并利润表项目注释 / 1. 营业收入/营业成本\n\n物理页117，字符0—858：\n\n> 深圳市德赛电池科技股份有限公司 2025 年年度报告全文 本期数 上年同期数 项 目 收入 成本 收入 成本 境外 15,309,718,211.40 13,804,683,609.24 14,029,311,801.69 12,477,365,640.96 合 计 22,399,427,302.94 20,379,412,302.96 20,859,251,590.68 18,695,095,059.54 3) 在本期确认的包括在合同负债期初账面价值中的收入为 5,030,282.06 元。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n",
+  "workpaper_status": "pending_verification",
+  "workpaper_receipts": [
+    {
+      "request_id": "bp-work-6442086a7536bee9f1ec5bc8:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "d11a00c7d2cf32807bb8f06c0c66225479f28635878a8a0abf02d260f1818b0d",
+      "response_hash": "f15fe4510026e2f0f503e46a68124390765e47e98c1672546b704c1ea99fc1c0",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0019\",\"section-0021\",\"section-0035\",\"section-0041\",\"section-0050\",\"section-0051\",\"section-0089\",\"section-0091\",\"section-0816\"],\"rationale\":\"优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。\",\"deferred\":[\"section-0025行业情况：属行业背景，非公司层面经营解释，暂不选\",\"section-0029核心竞争力分析：偏泛化竞争优势，经营信息密度低于主营业务分析\",\"section-0094未来发展展望：计划性内容，仅在需要风险与计划限定信息时补充\",\"section-0326财务报告全文及会计政策：范围过大，仅定向使用收入附注section-0816\"],\"stop_reason\":\"已覆盖业务与产品用途、经营模式、收入与成本构成、客户与供应商、主要子公司及收入附注等公司层面经营解释所需信息，剩余为行业背景、治理、会计政策与财务报告全文，超出本次经营阅读范围，可在此停止。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0019",
+          "section-0021",
+          "section-0035",
+          "section-0041",
+          "section-0050",
+          "section-0051",
+          "section-0089",
+          "section-0091",
+          "section-0816"
+        ],
+        "rationale": "优先选取能完整解释公司业务结构、产品用途、经营模式、收入构成与规模的核心经营子节：section-0019（主要业务与产品用途）及其经营模式子节section-0021说明做什么与怎么经营；section-0035主营业务分析及section-0041收入与成本提供公司层面营业收入、成本与主要业务权重，是货币化与收入结构的关键来源；section-0050客户情况与section-0051供应商情况补充客户渠道与供应链输入；section-0089主要控股参股公司分析与section-0091封装集成业务说明业务板块构成；section-0816营业收入/营业成本附注提供收入确认与分产品/分地区明细，弥补正文收入构成缺口。未选纯行业背景、核心竞争力泛化条目及治理、财务报告全文，避免与经营讨论重叠或过度扩读。",
+        "deferred": [
+          "section-0025行业情况：属行业背景，非公司层面经营解释，暂不选",
+          "section-0029核心竞争力分析：偏泛化竞争优势，经营信息密度低于主营业务分析",
+          "section-0094未来发展展望：计划性内容，仅在需要风险与计划限定信息时补充",
+          "section-0326财务报告全文及会计政策：范围过大，仅定向使用收入附注section-0816"
+        ],
+        "stop_reason": "已覆盖业务与产品用途、经营模式、收入与成本构成、客户与供应商、主要子公司及收入附注等公司层面经营解释所需信息，剩余为行业背景、治理、会计政策与财务报告全文，超出本次经营阅读范围，可在此停止。"
+      },
+      "usage": {
+        "input_tokens": 19624,
+        "output_tokens": 390,
+        "total_tokens": 20014
+      }
+    },
+    {
+      "request_id": "bp-work-6442086a7536bee9f1ec5bc8:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "c786f448ad5aabbee35c97cb57b2620bebc2d1b0d42f2a281625263dafbe7916",
+      "response_hash": "d7e2851ad2a18694cddb0882f8a2b6214e27a05a06bc451561eac5b3105562bb",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+      "contract_status": "accepted",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司围绕锂电池产业链布局，立足电源管理系统及封装集成业务，并开拓SIP先进封装和储能电芯等战略新兴业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F02\",\"text\":\"公司主要子公司中，惠州市蓝微电子有限公司从事中小型锂电池电源管理及系统业务，广东德赛矽镨技术有限公司从事系统级封装（SIP）业务，湖南德赛电池有限公司从事储能电芯业务。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\",\"source-0012\",\"source-0013\"]}],\"limitations\":[\"未获取各业务板块在合并层面的完整资产与利润拆分，仅见部分主要子公司数据。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F03\",\"text\":\"公司锂电池产品主要应用于智能手机、笔记本和平板电脑、智能穿戴设备、电动工具、智能家居和出行产品、储能产品等领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F04\",\"text\":\"公司产品以非标定制化产品为主，储能电芯产品为标准化产品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"未获取各产品类别的具体技术规格与型号明细。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F05\",\"text\":\"公司采取直接销售模式，由终端客户直接向公司下单或由终端客户指定的代工厂向公司下单，主要围绕行业排名前列的核心客户开展业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F06\",\"text\":\"公司经营方式以“以销定产、以产定采”为主，根据客户订单及需求制定生产计划并组织生产。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F07\",\"text\":\"2025年度公司实现合并营业收入223.99亿元，同比增长7.38%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"223.99亿元\",\"value\":\"223.99\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比增长率\",\"raw_value\":\"7.38%\",\"value\":\"7.38\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F08\",\"text\":\"按产品划分，智能手机类营业收入75.91亿元，占营业收入比重33.89%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"智能手机类营业收入\",\"raw_value\":\"7,591,429,166.32\",\"value\":\"7591429166.32\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"智能手机类营业收入占营业收入比重\",\"raw_value\":\"33.89%\",\"value\":\"33.89\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F09\",\"text\":\"按产品划分，智能穿戴类营业收入33.77亿元，占营业收入比重15.08%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"智能穿戴类营业收入\",\"raw_value\":\"3,377,038,240.44\",\"value\":\"3377038240.44\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"智能穿戴类营业收入占营业收入比重\",\"raw_value\":\"15.08%\",\"value\":\"15.08\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F10\",\"text\":\"按产品划分，电动工具、智能家居和出行类营业收入34.50亿元，占营业收入比重15.40%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"电动工具、智能家居和出行类营业收入\",\"raw_value\":\"3,449,742,533.42\",\"value\":\"3449742533.42\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"电动工具、智能家居和出行类营业收入占营业收入比重\",\"raw_value\":\"15.40%\",\"value\":\"15.40\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F11\",\"text\":\"按产品划分，笔记本电脑和平板电脑类营业收入29.45亿元，占营业收入比重13.15%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"笔记本电脑和平板电脑类营业收入\",\"raw_value\":\"2,945,195,310.25\",\"value\":\"2945195310.25\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"笔记本电脑和平板电脑类营业收入占营业收入比重\",\"raw_value\":\"13.15%\",\"value\":\"13.15\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F12\",\"text\":\"按产品划分，储能产品类营业收入28.29亿元，占营业收入比重12.63%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"储能产品类营业收入\",\"raw_value\":\"2,828,593,460.56\",\"value\":\"2828593460.56\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"储能产品类营业收入占营业收入比重\",\"raw_value\":\"12.63%\",\"value\":\"12.63\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F13\",\"text\":\"按产品划分，其他类营业收入22.07亿元，占营业收入比重9.85%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"其他类营业收入\",\"raw_value\":\"2,207,428,591.95\",\"value\":\"2207428591.95\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他类营业收入占营业收入比重\",\"raw_value\":\"9.85%\",\"value\":\"9.85\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F14\",\"text\":\"按地区划分，境内营业收入70.90亿元，占营业收入比重31.65%；境外营业收入153.10亿元，占营业收入比重68.35%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"境内营业收入\",\"raw_value\":\"7,089,709,091.54\",\"value\":\"7089709091.54\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"境内营业收入占营业收入比重\",\"raw_value\":\"31.65%\",\"value\":\"31.65\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"境外营业收入\",\"raw_value\":\"15,309,718,211.40\",\"value\":\"15309718211.40\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"境外营业收入占营业收入比重\",\"raw_value\":\"68.35%\",\"value\":\"68.35\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取各产品类别的销量与单价拆分。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F15\",\"text\":\"公司采购的原材料主要包括锂离子电芯、BMS、电子元器件、PCB（印制电路板）、正负极材料、隔膜、电解液和各种辅料，主要采取“以产定采”的采购模式，并存在由客户指定供应商的情况。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F16\",\"text\":\"公司营业成本中直接材料占比87.18%，直接人工占比3.52%，其他成本占比9.30%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"直接材料占营业成本比重\",\"raw_value\":\"87.18%\",\"value\":\"87.18\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"直接人工占营业成本比重\",\"raw_value\":\"3.52%\",\"value\":\"3.52\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他成本占营业成本比重\",\"raw_value\":\"9.30%\",\"value\":\"9.30\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F17\",\"text\":\"公司拥有完善的质量管控体系，生产自动化水平处于行业先进水平。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"未获取主要原材料的采购金额与供应商名称明细。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F18\",\"text\":\"前五名客户合计销售金额126.48亿元，占年度销售总额比例56.47%，其中关联方销售额占比0.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"前五名客户合计销售金额\",\"raw_value\":\"12,648,259,725.07\",\"value\":\"12648259725.07\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户合计销售金额占年度销售总额比例\",\"raw_value\":\"56.47%\",\"value\":\"56.47\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F19\",\"text\":\"第一大客户销售额90.24亿元，占年度销售总额比例40.29%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"第一大客户销售额\",\"raw_value\":\"9,024,478,784.86\",\"value\":\"9024478784.86\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"第一大客户销售额占年度销售总额比例\",\"raw_value\":\"40.29%\",\"value\":\"40.29\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F20\",\"text\":\"公司采取直接销售模式，由终端客户直接向公司下单或由终端客户指定的代工厂向公司下单。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"未获取客户名称及具体销售区域明细。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F21\",\"text\":\"2025年研发投入达10.31亿元，同比增长14.63%，研发投入占营业收入的比例为4.60%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"研发投入\",\"raw_value\":\"10.31亿元\",\"value\":\"10.31\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发投入同比增长率\",\"raw_value\":\"14.63%\",\"value\":\"14.63\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"研发投入占营业收入比例\",\"raw_value\":\"4.60%\",\"value\":\"4.60\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F22\",\"text\":\"储能业务全年实现销售收入28.29亿元，同比增长49.89%；SIP业务全年实现销售收入30.42亿元（含内部销售），同比增长13.88%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"储能业务销售收入\",\"raw_value\":\"28.29亿元\",\"value\":\"28.29\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"储能业务销售收入同比增长率\",\"raw_value\":\"49.89%\",\"value\":\"49.89\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"SIP业务销售收入（含内部销售）\",\"raw_value\":\"30.42亿元\",\"value\":\"30.42\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"SIP业务销售收入同比增长率\",\"raw_value\":\"13.88%\",\"value\":\"13.88\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F23\",\"text\":\"储能业务从侧重规模扩张转向聚焦效益提升，储能电芯产能利用率提升，亏损有所下降。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}],\"limitations\":[\"未获取各业务板块的毛利率与利润贡献拆分。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F24\",\"text\":\"报告期内合并范围增加4户、减少3户，新增蓝微新源（香港）有限公司、智元科技（越南）有限公司、惠州市储源科技有限公司、南通市惠海科技有限责任公司，减少德勤（威海）电力技术有限公司、德亚（山东）电力技术有限公司、德亚（冠县）电力技术有限公司。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0006\"]},{\"fact_id\":\"F25\",\"text\":\"公司持续加速越南制造基地建设，子公司在越南云中工业园购置厂房并逐步投入使用，同时开启内黄工业园二期厂房建设；智能硬件装配业务实现海外量产落地，SIP业务越南制造基地顺利量产，越南本地制造产值超20亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"越南本地制造产值\",\"raw_value\":\"超20亿元\",\"value\":\"20\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"greater_than\"}]}],\"limitations\":[\"未获取合并范围变动对收入与利润的具体影响金额。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F26\",\"text\":\"公司立足电源管理系统及封装集成业务，并发展SIP先进封装和储能电芯等业务，处于锂电池产业链的制造与封装集成环节。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F27\",\"text\":\"公司采购的原材料主要包括锂离子电芯、BMS、电子元器件、PCB（印制电路板）、正负极材料、隔膜、电解液和各种辅料。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F28\",\"text\":\"前五名供应商合计采购金额88.66亿元，占年度采购总额比例48.55%，其中关联方采购额占比0.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"前五名供应商合计采购金额\",\"raw_value\":\"8,866,296,088.52\",\"value\":\"8866296088.52\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商合计采购金额占年度采购总额比例\",\"raw_value\":\"48.55%\",\"value\":\"48.55\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取供应商名称及具体原材料采购金额明细。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F29\",\"text\":\"公司锂电池产品主要应用于智能手机、笔记本和平板电脑、智能穿戴设备、电动工具、智能家居和出行产品、储能产品等领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"未获取具体客户名称及终端品牌明细。\"]}}}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F01",
+                "text": "公司围绕锂电池产业链布局，立足电源管理系统及封装集成业务，并开拓SIP先进封装和储能电芯等战略新兴业务。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F02",
+                "text": "公司主要子公司中，惠州市蓝微电子有限公司从事中小型锂电池电源管理及系统业务，广东德赛矽镨技术有限公司从事系统级封装（SIP）业务，湖南德赛电池有限公司从事储能电芯业务。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011",
+                  "source-0012",
+                  "source-0013"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取各业务板块在合并层面的完整资产与利润拆分，仅见部分主要子公司数据。"
+            ]
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F03",
+                "text": "公司锂电池产品主要应用于智能手机、笔记本和平板电脑、智能穿戴设备、电动工具、智能家居和出行产品、储能产品等领域。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F04",
+                "text": "公司产品以非标定制化产品为主，储能电芯产品为标准化产品。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取各产品类别的具体技术规格与型号明细。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F05",
+                "text": "公司采取直接销售模式，由终端客户直接向公司下单或由终端客户指定的代工厂向公司下单，主要围绕行业排名前列的核心客户开展业务。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F06",
+                "text": "公司经营方式以“以销定产、以产定采”为主，根据客户订单及需求制定生产计划并组织生产。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F07",
+                "text": "2025年度公司实现合并营业收入223.99亿元，同比增长7.38%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "223.99亿元",
+                    "value": "223.99",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "营业收入同比增长率",
+                    "raw_value": "7.38%",
+                    "value": "7.38",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F08",
+                "text": "按产品划分，智能手机类营业收入75.91亿元，占营业收入比重33.89%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "智能手机类营业收入",
+                    "raw_value": "7,591,429,166.32",
+                    "value": "7591429166.32",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "智能手机类营业收入占营业收入比重",
+                    "raw_value": "33.89%",
+                    "value": "33.89",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F09",
+                "text": "按产品划分，智能穿戴类营业收入33.77亿元，占营业收入比重15.08%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "智能穿戴类营业收入",
+                    "raw_value": "3,377,038,240.44",
+                    "value": "3377038240.44",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "智能穿戴类营业收入占营业收入比重",
+                    "raw_value": "15.08%",
+                    "value": "15.08",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F10",
+                "text": "按产品划分，电动工具、智能家居和出行类营业收入34.50亿元，占营业收入比重15.40%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "电动工具、智能家居和出行类营业收入",
+                    "raw_value": "3,449,742,533.42",
+                    "value": "3449742533.42",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "电动工具、智能家居和出行类营业收入占营业收入比重",
+                    "raw_value": "15.40%",
+                    "value": "15.40",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F11",
+                "text": "按产品划分，笔记本电脑和平板电脑类营业收入29.45亿元，占营业收入比重13.15%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "笔记本电脑和平板电脑类营业收入",
+                    "raw_value": "2,945,195,310.25",
+                    "value": "2945195310.25",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "笔记本电脑和平板电脑类营业收入占营业收入比重",
+                    "raw_value": "13.15%",
+                    "value": "13.15",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F12",
+                "text": "按产品划分，储能产品类营业收入28.29亿元，占营业收入比重12.63%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "储能产品类营业收入",
+                    "raw_value": "2,828,593,460.56",
+                    "value": "2828593460.56",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "储能产品类营业收入占营业收入比重",
+                    "raw_value": "12.63%",
+                    "value": "12.63",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F13",
+                "text": "按产品划分，其他类营业收入22.07亿元，占营业收入比重9.85%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "其他类营业收入",
+                    "raw_value": "2,207,428,591.95",
+                    "value": "2207428591.95",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "其他类营业收入占营业收入比重",
+                    "raw_value": "9.85%",
+                    "value": "9.85",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F14",
+                "text": "按地区划分，境内营业收入70.90亿元，占营业收入比重31.65%；境外营业收入153.10亿元，占营业收入比重68.35%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "境内营业收入",
+                    "raw_value": "7,089,709,091.54",
+                    "value": "7089709091.54",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "境内营业收入占营业收入比重",
+                    "raw_value": "31.65%",
+                    "value": "31.65",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "境外营业收入",
+                    "raw_value": "15,309,718,211.40",
+                    "value": "15309718211.40",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "境外营业收入占营业收入比重",
+                    "raw_value": "68.35%",
+                    "value": "68.35",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取各产品类别的销量与单价拆分。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F15",
+                "text": "公司采购的原材料主要包括锂离子电芯、BMS、电子元器件、PCB（印制电路板）、正负极材料、隔膜、电解液和各种辅料，主要采取“以产定采”的采购模式，并存在由客户指定供应商的情况。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F16",
+                "text": "公司营业成本中直接材料占比87.18%，直接人工占比3.52%，其他成本占比9.30%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": [
+                  {
+                    "name": "直接材料占营业成本比重",
+                    "raw_value": "87.18%",
+                    "value": "87.18",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "直接人工占营业成本比重",
+                    "raw_value": "3.52%",
+                    "value": "3.52",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "其他成本占营业成本比重",
+                    "raw_value": "9.30%",
+                    "value": "9.30",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F17",
+                "text": "公司拥有完善的质量管控体系，生产自动化水平处于行业先进水平。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取主要原材料的采购金额与供应商名称明细。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F18",
+                "text": "前五名客户合计销售金额126.48亿元，占年度销售总额比例56.47%，其中关联方销售额占比0.00%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名客户合计销售金额",
+                    "raw_value": "12,648,259,725.07",
+                    "value": "12648259725.07",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "前五名客户合计销售金额占年度销售总额比例",
+                    "raw_value": "56.47%",
+                    "value": "56.47",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F19",
+                "text": "第一大客户销售额90.24亿元，占年度销售总额比例40.29%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "第一大客户销售额",
+                    "raw_value": "9,024,478,784.86",
+                    "value": "9024478784.86",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "第一大客户销售额占年度销售总额比例",
+                    "raw_value": "40.29%",
+                    "value": "40.29",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F20",
+                "text": "公司采取直接销售模式，由终端客户直接向公司下单或由终端客户指定的代工厂向公司下单。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取客户名称及具体销售区域明细。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F21",
+                "text": "2025年研发投入达10.31亿元，同比增长14.63%，研发投入占营业收入的比例为4.60%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": [
+                  {
+                    "name": "研发投入",
+                    "raw_value": "10.31亿元",
+                    "value": "10.31",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "研发投入同比增长率",
+                    "raw_value": "14.63%",
+                    "value": "14.63",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "研发投入占营业收入比例",
+                    "raw_value": "4.60%",
+                    "value": "4.60",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F22",
+                "text": "储能业务全年实现销售收入28.29亿元，同比增长49.89%；SIP业务全年实现销售收入30.42亿元（含内部销售），同比增长13.88%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": [
+                  {
+                    "name": "储能业务销售收入",
+                    "raw_value": "28.29亿元",
+                    "value": "28.29",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "储能业务销售收入同比增长率",
+                    "raw_value": "49.89%",
+                    "value": "49.89",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "SIP业务销售收入（含内部销售）",
+                    "raw_value": "30.42亿元",
+                    "value": "30.42",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "SIP业务销售收入同比增长率",
+                    "raw_value": "13.88%",
+                    "value": "13.88",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F23",
+                "text": "储能业务从侧重规模扩张转向聚焦效益提升，储能电芯产能利用率提升，亏损有所下降。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取各业务板块的毛利率与利润贡献拆分。"
+            ]
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F24",
+                "text": "报告期内合并范围增加4户、减少3户，新增蓝微新源（香港）有限公司、智元科技（越南）有限公司、惠州市储源科技有限公司、南通市惠海科技有限责任公司，减少德勤（威海）电力技术有限公司、德亚（山东）电力技术有限公司、德亚（冠县）电力技术有限公司。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005",
+                  "source-0006"
+                ]
+              },
+              {
+                "fact_id": "F25",
+                "text": "公司持续加速越南制造基地建设，子公司在越南云中工业园购置厂房并逐步投入使用，同时开启内黄工业园二期厂房建设；智能硬件装配业务实现海外量产落地，SIP业务越南制造基地顺利量产，越南本地制造产值超20亿元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": [
+                  {
+                    "name": "越南本地制造产值",
+                    "raw_value": "超20亿元",
+                    "value": "20",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "greater_than"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取合并范围变动对收入与利润的具体影响金额。"
+            ]
+          }
+        },
+        "supply_chain": {
+          "position": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F26",
+                "text": "公司立足电源管理系统及封装集成业务，并发展SIP先进封装和储能电芯等业务，处于锂电池产业链的制造与封装集成环节。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "upstream_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F27",
+                "text": "公司采购的原材料主要包括锂离子电芯、BMS、电子元器件、PCB（印制电路板）、正负极材料、隔膜、电解液和各种辅料。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F28",
+                "text": "前五名供应商合计采购金额88.66亿元，占年度采购总额比例48.55%，其中关联方采购额占比0.00%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名供应商合计采购金额",
+                    "raw_value": "8,866,296,088.52",
+                    "value": "8866296088.52",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "前五名供应商合计采购金额占年度采购总额比例",
+                    "raw_value": "48.55%",
+                    "value": "48.55",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取供应商名称及具体原材料采购金额明细。"
+            ]
+          },
+          "downstream_customers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F29",
+                "text": "公司锂电池产品主要应用于智能手机、笔记本和平板电脑、智能穿戴设备、电动工具、智能家居和出行产品、储能产品等领域。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取具体客户名称及终端品牌明细。"
+            ]
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 11626,
+        "output_tokens": 4207,
+        "total_tokens": 15833
+      }
+    }
+  ],
+  "workpaper_summary": {
+    "origin": "llm_generated",
+    "business_description": "公司围绕锂电池产业链布局，立足电源管理系统及封装集成业务，并开拓SIP先进封装和储能电芯等战略新兴业务。\n公司主要子公司中，惠州市蓝微电子有限公司从事中小型锂电池电源管理及系统业务，广东德赛矽镨技术有限公司从事系统级封装（SIP）业务，湖南德赛电池有限公司从事储能电芯业务。",
+    "fact_count": 26,
+    "metric_count": 29,
+    "element_fact_counts": {
+      "business_structure": 2,
+      "products_services": 2,
+      "revenue_model": 2,
+      "scale_and_mix": 8,
+      "operations_and_inputs": 3,
+      "customers_channels_markets": 1,
+      "operating_drivers": 3,
+      "material_changes": 2,
+      "position": 1,
+      "upstream_inputs": 1,
+      "downstream_customers": 1
+    },
+    "review_status": null,
+    "open_finding_count": null,
+    "extraction_model": "deepseek-flash",
+    "review_model": null,
+    "delivery_counts": {
+      "reviewed": 0,
+      "pending": 18,
+      "limited": 8,
+      "source_only": 0,
+      "withheld": 0,
+      "duplicate": 0
+    },
+    "delivery_pending_review_count": 26,
+    "delivery_reviewed_count": 0,
+    "delivery_pending_count": 18,
+    "delivery_limited_count": 8,
+    "delivery_source_only_count": 0,
+    "delivery_withheld_count": 0,
+    "delivery_duplicate_count": 0
+  }
+}

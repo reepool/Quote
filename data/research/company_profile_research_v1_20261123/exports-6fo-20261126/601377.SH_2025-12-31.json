@@ -1,0 +1,3536 @@
+{
+  "schema_version": "company_profile_common_core_profile.v3",
+  "production_authorization": "not_authorized",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "work_id": "bp-work-75219f282a5b80afada802ac",
+  "instrument_id": "601377.SH",
+  "report": {
+    "instrument_id": "601377.SH",
+    "report_id": "asset_71692a381a374812c1d1909e7fb3b36f",
+    "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-27T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "freshness": {
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-27T16:00:00+00:00",
+    "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+    "knowledge_time": "2026-03-27T16:00:00+00:00"
+  },
+  "core_complete": false,
+  "dimensions": [
+    {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    {
+      "dimension_id": "products_services",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    }
+  ],
+  "accepted_facts": [],
+  "gaps": [],
+  "evidence_gap_codes": [],
+  "commodity_exposure": {
+    "assessment": {
+      "schema_version": "company_profile_commodity_exposure.v1",
+      "production_authorization": "not_authorized",
+      "report": {
+        "instrument_id": "601377.SH",
+        "report_id": "asset_71692a381a374812c1d1909e7fb3b36f",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "assessment_status": "not_assessed",
+      "checked_evidence_ids": [],
+      "exposures": []
+    },
+    "reported_period": "2025-12-31",
+    "knowledge_time": "2026-03-27T16:00:00+00:00",
+    "consumer_authorization": {
+      "dcf": false,
+      "trading": false,
+      "price_sensitivity": false
+    }
+  },
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "llm_generated",
+    "report": {
+      "instrument_id": "601377.SH",
+      "report_id": "asset_71692a381a374812c1d1909e7fb3b36f",
+      "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-27T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0062",
+          "section_path": [
+            "第九节 证券公司信息披露 ----------------------------------------249",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 34,
+          "end_page": 34,
+          "rationale": "本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。"
+        },
+        {
+          "section_id": "section-0064",
+          "section_path": [
+            "第九节 证券公司信息披露 ----------------------------------------249",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 35,
+          "end_page": 45,
+          "rationale": "本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。"
+        },
+        {
+          "section_id": "section-0092",
+          "section_path": [
+            "第九节 证券公司信息披露 ----------------------------------------249",
+            "五、报告期内主要经营情况"
+          ],
+          "start_page": 46,
+          "end_page": 48,
+          "rationale": "本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。"
+        },
+        {
+          "section_id": "section-0096",
+          "section_path": [
+            "第九节 证券公司信息披露 ----------------------------------------249",
+            "主营业务分行业情况"
+          ],
+          "start_page": 48,
+          "end_page": 48,
+          "rationale": "本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。"
+        },
+        {
+          "section_id": "section-0097",
+          "section_path": [
+            "第九节 证券公司信息披露 ----------------------------------------249",
+            "主营业务分地区情况"
+          ],
+          "start_page": 48,
+          "end_page": 49,
+          "rationale": "本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。"
+        },
+        {
+          "section_id": "section-0750",
+          "section_path": [
+            "第九节 证券公司信息披露 ----------------------------------------249",
+            "八、分部报告"
+          ],
+          "start_page": 221,
+          "end_page": 222,
+          "rationale": "本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。"
+        }
+      ],
+      "unread_or_deferred": [
+        "section-0065至section-0084各业务明细子节：其内容已被section-0064整体覆盖，避免父子重复选取",
+        "section-0702手续费及佣金净收入、section-0704利息净收入等会计科目附注：仅在板块收入无法安全归属时定向补充，本次以分部报告与主营业务表为主，暂不展开",
+        "section-0063行业情况、section-0085核心竞争力：属行业背景与泛化竞争力，非本次收入权重定向目标，暂不选"
+      ],
+      "selection_rationale": "本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。",
+      "stop_reason": "已覆盖业务概述、经营讨论、收入成本分析、分行业/分地区收入构成及分部报告，可回答四大业务收入与权重问题；剩余为会计科目附注与行业背景，超出定向补充范围，停止。",
+      "transcription_version": "shared-pdf-pypdf-layout.structured-notes.v1"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对业务结构要素重新提取。"
+        ]
+      },
+      "products_services": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对产品与服务要素重新提取。"
+        ]
+      },
+      "revenue_model": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "RM-001",
+            "text": "2025年集团实现营业收入118.41亿元，同比增长21.03%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0012",
+              "source-0013"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入",
+                "raw_value": "118.41",
+                "value": "118.41",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入同比增长率",
+                "raw_value": "21.03",
+                "value": "21.03",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "RM-002",
+            "text": "主营业务分行业情况表列示证券及期货经纪业务营业收入377,812.12万元，营业成本234,797.31万元，毛利率37.85%，营业收入比上年增减21.37%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014",
+              "source-0015"
+            ],
+            "metrics": [
+              {
+                "name": "证券及期货经纪业务营业收入",
+                "raw_value": "377,812.12",
+                "value": "377812.12",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "证券及期货经纪业务营业成本",
+                "raw_value": "234,797.31",
+                "value": "234797.31",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "证券及期货经纪业务毛利率",
+                "raw_value": "37.85",
+                "value": "37.85",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "证券及期货经纪业务营业收入比上年增减",
+                "raw_value": "21.37",
+                "value": "21.37",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "RM-003",
+            "text": "主营业务分行业情况表列示资产管理业务营业收入319,408.12万元，营业成本99,295.94万元，毛利率68.91%，营业收入比上年增减25.04%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014",
+              "source-0015"
+            ],
+            "metrics": [
+              {
+                "name": "资产管理业务营业收入",
+                "raw_value": "319,408.12",
+                "value": "319408.12",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "资产管理业务营业成本",
+                "raw_value": "99,295.94",
+                "value": "99295.94",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "资产管理业务毛利率",
+                "raw_value": "68.91",
+                "value": "68.91",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "资产管理业务营业收入比上年增减",
+                "raw_value": "25.04",
+                "value": "25.04",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "RM-004",
+            "text": "主营业务分行业情况表列示机构服务业务营业收入157,695.89万元，营业成本118,513.51万元，毛利率24.85%，营业收入比上年增减58.67%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014",
+              "source-0015"
+            ],
+            "metrics": [
+              {
+                "name": "机构服务业务营业收入",
+                "raw_value": "157,695.89",
+                "value": "157695.89",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "机构服务业务营业成本",
+                "raw_value": "118,513.51",
+                "value": "118513.51",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "机构服务业务毛利率",
+                "raw_value": "24.85",
+                "value": "24.85",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "机构服务业务营业收入比上年增减",
+                "raw_value": "58.67",
+                "value": "58.67",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "RM-005",
+            "text": "主营业务分行业情况表列示自营投资业务营业收入321,443.92万元，营业成本138,054.78万元，毛利率57.05%，营业收入比上年增减2.98%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014",
+              "source-0015"
+            ],
+            "metrics": [
+              {
+                "name": "自营投资业务营业收入",
+                "raw_value": "321,443.92",
+                "value": "321443.92",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "自营投资业务营业成本",
+                "raw_value": "138,054.78",
+                "value": "138054.78",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "自营投资业务毛利率",
+                "raw_value": "57.05",
+                "value": "57.05",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "自营投资业务营业收入比上年增减",
+                "raw_value": "2.98",
+                "value": "2.98",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "RM-006",
+            "text": "主营业务分行业情况表列示海外业务营业收入47,705.97万元，营业成本32,473.61万元，毛利率31.93%，营业收入比上年增减-1.02%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014",
+              "source-0015"
+            ],
+            "metrics": [
+              {
+                "name": "海外业务营业收入",
+                "raw_value": "47,705.97",
+                "value": "47705.97",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海外业务营业成本",
+                "raw_value": "32,473.61",
+                "value": "32473.61",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海外业务毛利率",
+                "raw_value": "31.93",
+                "value": "31.93",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海外业务营业收入比上年增减",
+                "raw_value": "-1.02",
+                "value": "-1.02",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "RM-007",
+            "text": "主营业务分行业情况说明中，2025年集团证券及期货经纪业务实现收入37.78亿元，资产管理业务31.94亿元，机构服务业务15.77亿元，自营投资业务32.14亿元，海外业务4.77亿元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0017"
+            ],
+            "metrics": [
+              {
+                "name": "证券及期货经纪业务收入（说明段）",
+                "raw_value": "37.78",
+                "value": "37.78",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "资产管理业务收入（说明段）",
+                "raw_value": "31.94",
+                "value": "31.94",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "机构服务业务收入（说明段）",
+                "raw_value": "15.77",
+                "value": "15.77",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "自营投资业务收入（说明段）",
+                "raw_value": "32.14",
+                "value": "32.14",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海外业务收入（说明段）",
+                "raw_value": "4.77",
+                "value": "4.77",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "RM-008",
+            "text": "利润表科目变动分析显示，手续费及佣金净收入63.71亿元，同比增长20.83%；利息净收入15.85亿元，同比增长11.75%；投资收益38.61亿元，同比增长69.46%。上述为会计科目口径，不等同于业务板块收入。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0013"
+            ],
+            "metrics": [
+              {
+                "name": "手续费及佣金净收入",
+                "raw_value": "63.71",
+                "value": "63.71",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "手续费及佣金净收入同比增长率",
+                "raw_value": "20.83",
+                "value": "20.83",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "利息净收入",
+                "raw_value": "15.85",
+                "value": "15.85",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "利息净收入同比增长率",
+                "raw_value": "11.75",
+                "value": "11.75",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "投资收益",
+                "raw_value": "38.61",
+                "value": "38.61",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "投资收益同比增长率",
+                "raw_value": "69.46",
+                "value": "69.46",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "分部报告章节仅提供分部名称与划分依据，未提供分部收入金额表，故无法用分部报告交叉验证各板块收入与内部抵消。",
+          "主营业务分行业表未列示合计行与内部抵消行，各板块收入合计与集团营业收入118.41亿元之间的差异及抵消关系未在所选章节披露，未计算占比。",
+          "管理层讨论中的业务板块收入（亿元口径）与分行业表（万元口径）数值一致，但分行业表未明确标注为合并口径，板块口径以原文为准。"
+        ]
+      },
+      "scale_and_mix": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对规模与结构要素单独提取；相关收入数据见收入模式要素。"
+        ]
+      },
+      "operations_and_inputs": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对运营与投入要素重新提取。"
+        ]
+      },
+      "customers_channels_markets": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对客户与渠道要素重新提取。"
+        ]
+      },
+      "operating_drivers": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对经营驱动要素重新提取。"
+        ]
+      },
+      "material_changes": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对重大变化要素重新提取。"
+        ]
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          34
+        ],
+        "source_spans": [
+          {
+            "page": 34,
+            "start": 0,
+            "end": 1578,
+            "quote": "一、报告期内公司从事的业务情况\n\n\n    公司致力于“建设有温度的一流证券金融集团”，为境内外各类客户提供全方位的综合金融服务。按照客户\n群体及业务属性的不同，公司所从事的主要业务分为四大板块，分别是财富管理业务、机构服务业务、自营投资\n业务、海外业务。\n\n    财富管理业务包括证券及期货经纪业务和资产管理业务。其中，证券及期货经纪业务是指通过线下和线上相\n结合的方式提供包括代理客户买卖股票、基金、债券、期货及期权等交易服务、金融产品销售、基金投顾、融资                                                           第\n融券、股票质押式回购、股权激励行权融资等多元化服务；资产管理业务包括为客户提供各类证券资产管理、基                                                           第\n金资产管理、私募股权基金管理等服务。                                                                                          第\n                                                                                                            第\n    机构服务业务包括研究与机构服务业务和投资银行业务。其中，研究与机构服务业务包括为各类机构客户提                                                         第\n                                                                                                            第\n供证券研究与销售交易服务、资产托管与基金服务、机构交易服务等业务；投资银行业务主要包括股权融资、债                                                           第\n权融资、财务顾问、中小微企业融资、区域股权市场服务等业务。                                                                               第\n                                                                                                            第\n                                                                                                            第\n    自营投资业务是在价值投资、稳健经营的前提下，从事股票、债券、衍生品、股权、另类等多品种自有资金                                                         第\n投资交易业务。\n\n    海外业务主要是通过全资子公司兴证（香港）金融控股有限公司开展环球证券及期货经纪、机构销售与研\n究、企业融资、自营投资、资产管理、私人财富管理等业务。\n\n    公司主要围绕上述主营业务展业，通过提供综合金融产品和服务获取各类手续费及佣金收入、利息收入及投\n资收益等。\n\n    报告期内公司新增重要非主营业务的说明\n\n    □适用 √不适用\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          35
+        ],
+        "source_spans": [
+          {
+            "page": 35,
+            "start": 547,
+            "end": 1785,
+            "quote": "三、经营情况讨论与分析\n第\n第\n第        过去一年，集团上下以习近平新时代中国特色社会主义思想为指导，深入学习贯彻党的二十届四中全会精\n第\n第    神、习近平总书记在闽金融论述与实践精神以及在福建考察时的重要讲话精神，认真贯彻落实省委省政府工作部\n     署与要求，奋勇争先、再上台阶，持续深化拓展“三争”行动。下半年以来，在“建设有温度的一流证券金融集\n     团”的愿景和“向上向善”核心价值观指引下，党建、改革、创新、质效、文化、规则“六个引领”给公司带来\n     强大的活力、动力和凝聚力，公司综合实力、抗风险能力和经营业绩稳步提升，高质量发展取得良好成效。围绕\n     做深普惠金融和数字金融大文章，深化财富管理业务买方转型，打造“知己理财”财富品牌，“懂你更为你”理\n     念获得市场高度认可，新开户市占率、客户规模及兴业证券APP（优理宝）月活跃用户数均创历史新高，代销金\n     融产品业务排名行业前列；公募基金管理投资业绩保持行业领先，主动权益类基金近三年收益率在大型权益基金\n     公司中位列第一，管理规模突破历史新高，养老基金Y份额保有规模位居行业前三，产品布局持续完善，成功发\n     行行业首只沪深300质量ETF、首只跨市场沪港深300指数增强基金和首批新型浮动费率基金；券商资管公募牌照\n     战略价值加速释放，初步形成覆盖不同风险偏好的公募产品线布局，持续夯实固收业务基本盘，满足居民多元化\n     资产管理需求。围绕做实科技金融和绿色金融大文章，股权融资业务完成同宇新材、山大电力等新质生产力领域\n     多家企业股权融资，担任独立财务顾问助力综艺股份重大资产重组、中金公司吸收合并东兴和信达；债权融资业\n     务科创债和绿色债券承销规模显著提升，成功发行市场首单农贸市场基础设施公募REITs、首单跨境电商产业园\n     机构间REITs及首单分布式清洁能源资产机构间REITs；一级股权投资业务科技与绿色领域业务布局不断强化，培\n     育支持“专精特新”企业创新发展，行业影响力持续增强。机构综合服务能力巩固提升，研究业务创收创誉水平\n     稳定在行业第一梯队，综合研究转型取得积极成效，在产业研究、智库服务及绿色金融等领域深化拓展，围绕金\n     融“五篇大文章”持续输出高质量投研成果；资产托管与基金服务保持竞争优势，期末存续托管私募证券投资基\n     金产品数量行业排名第六位。自有资金多元化投资策略纵深推进，投资管理能力长期稳定在业内前列。公司积极\n     践行金融工作政治性和人民性，在文化建设、社会责任领域亦获高度认可，连续三年蝉联行业文化建设实践评估\n     最高评级，党建工作、投资者教育、慈善工作等领域荣获多项国家级、省部级荣誉。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n     ●2025           年度报告 ●     034"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          36
+        ],
+        "source_spans": [
+          {
+            "page": 36,
+            "start": 0,
+            "end": 2676,
+            "quote": "（一）财富管理业务\n\n     1.     证券及期货经纪业务\n\n     市场环境\n\n     报告期内，证券市场在政策呵护和流动性改善的双重支撑下迎来明确拐点，随着以险资为主的中长期资金增\n 配权益市场、投资者信心修复带来新开户数量增长和客户银证转账的净流入，推动市场成交显著放量；期货市场\n 交投受益于品类创新和大宗商品波动率增大维持高活跃度，市场赚钱效应提升进一步增强居民财富管理需求。\n 根据沪深交易所、中国证券业协会等机构统计数据，2025年沪深两市累计股基成交额998.15万亿元，同比增长                                                            第\n                                                                                                                  第\n 70.4%；截至2025年末，市场融资融券余额2.54万亿元，较去年末上升36.3%。根据中国期货业协会统计数据，                                                        第\n 以单边计算，2025年期货市场累计成交量90.74亿手，同比增长17.4%；累计成交额766.25万亿元，同比增长                                                        第\n                                                                                                                  第\n 23.7%。                                                                                                           第\n                                                                                                                  第\n     经营举措及业绩                                                                                                      第\n                                                                                                                  第\n     在证券经纪业务领域，公司秉承以客户为中心的理念，坚定推行买方投顾转型，持续提升服务质量。报告期                                                              第\n                                                                                                                  第\n 内，公司发布“知己理财”财富管理品牌，推出以客户利益为中心的买方投顾服务体系，围绕交易与配置两大客\n 户场景，构建“知已享投”“知己优投”“知己智投”三大产品体系，精准匹配客户资产配置、专业投资、智能\n 交易三大核心需求，“懂你更为你”理念获得市场高度认可。以“知己享投”为抓手，创新“9+4+N”多元资产\n 配置框架，为投资者提供全方位、多层次的资产配置解决方案，以“知己优投”为引领，围绕“总部投、分支\n 顾”定位，推动专业能力精准下沉，投顾服务效能持续增强，以“知己智投”为驱动，围绕“让每笔交易更聪\n 明”的目标，深化量化投研与策略工具，打造覆盖投前、投中、投后的智能交易全流程服务体系。公司数智化服\n 务能力不断提升，集约化服务效能充分释放，新开户市占率、客户规模、兴业证券APP（优理宝）月活跃用户数\n 均创历史新高。根据沪深交易所公布数据，2025年公司股票基金交易总金额13.74万亿元，同比增长81.4%，母\n 公司实现代理买卖证券业务净收入(含席位)24.47亿元，同比增长42.5%。\n\n     在金融产品销售业务领域，以多元配置为导向，持续丰富产品供给，升级买方投顾服务体系；针对客户个性\n 化需求，加强产品定制化能力，满足客户多样化的财富配置需求。报告期，产品保有结构持续优化，母公司实现\n 代理销售金融产品净收入3.66亿元，同比增长17%。\n\n     在融资融券业务领域，公司持续强化总分协同，优化迭代业务模式，为高净值客户、机构客户提供差异化、\n 综合化服务，推动业务发展。截至2025年末，公司融资融券期末余额417.30亿元，较上年末增长31%。\n\n     在股票质押回购业务领域，公司秉持金融服务实体经济的宗旨，积极发挥专业优势，同步强化全面风险管\n 理。截至2025年末，公司股票质押业务规模8.71亿元，较上年末增长12%，其中公司自有资金融出规模7.26亿\n 元，较上年末增长15%，平均履约保障比例为425%。\n\n     在期货经纪业务领域，集团全资子公司兴证期货始终坚持以机构经纪为核心业务方向，通过构建“投资、研\n 究、交易、风险管理”四大核心能力，形成以经纪业务为基础，期货资管和风险管理业务为两翼，做市、自营及\n 国际业务为未来战略布局的“一体两翼三布局”的业务模式。报告期内，依托集团协同优势，客户数量及资产规\n 模稳步增长；深化产业客户服务，有效运用期货衍生品工具服务实体经济高质量发展，“保险+期货”商业项目\n 实现突破和业务模式进阶。截至2025年末，兴证期货期末客户权益285.84亿元。\n\n\n\n\n\n\n                                                                                   035     ●2025           年度报告 ●"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          37
+        ],
+        "source_spans": [
+          {
+            "page": 37,
+            "start": 0,
+            "end": 1523,
+            "quote": "         未来展望\n\n         公司将继续践行金融工作的政治性与人民性，坚守客户需求导向，加快买方模式转型，打造具有兴证特色的\n     金融产品和服务体系。聚焦多元资产配置与买方服务转型，通过层次化的服务设计实现客户全覆盖，持续深化\n     “知己理财”品牌内涵，围绕交易与配置两大核心客户场景，不断升级“知己享投”“知己优投”“知己智投”\n     三大服务体系；线上线下一体化多措并举做大客群塔基，强化AI赋能引擎，打造一支以“专业、专心、专属”为\n     服务内核的投顾队伍，切实满足居民日益增长的多元化财富管理需求，提升满意度与获得感。\n\n第        2.     资产管理业务\n第\n第       （1）券商资产管理业务\n第\n第        市场环境\n第\n第        报告期内，券商资管在监管与市场的多重因素驱动下呈现出“总量趋稳、结构优化、特色凸显”的新态势。\n第\n第    根据中国证券投资基金业协会数据统计，截至2025年末，券商私募资管规模达到5.8万亿元，较年初增长6%，产\n第    品结构不断优化，以集合资管为代表的主动管理产品规模占比持续提升，超过单一资管规模占比，体现了行业主\n第\n     动管理转型的成效；固收类产品规模依然是券商资管的基本盘，同时权益市场全面回暖带动股票和混合类产品规\n     模显著增长。\n\n         经营举措及业绩\n\n         报告期内，集团全资子公司兴证资管通过优化组织架构、重塑产品矩阵、完善人才梯队，推动业务向主动\n     管理和高附加值业务转型；持续深耕“固收+”策略，夯实固收业务基本盘，依托现金管理、固收纯债等系列产\n     品不断拓展机构业务合作边界；积极响应国家战略部署，设立多只战略配售专项资管计划支持专精特新企业发\n     展，绿色金融产品规模创历史新高。截至2025年末，兴证资管受托资产管理资金总额1,272亿元，较上年末增长\n     26%。\n\n         未来展望\n\n         兴证资管将持续深化“固收+”战略，着力强化投资研究、科技赋能、渠道建设与合规风控能力，依托公募\n     基金牌照，前瞻布局公私募产品线，为客户打造有弹性、有特色的“固收+”产品；加速数字化转型，打造差异\n     化核心竞争力，提升运营效率与客户体验；同时积极践行社会责任，重点布局绿色金融、普惠金融和科技创新等\n     领域。\n\n        （2）公募基金管理业务\n\n         市场环境\n\n         2025年，公募行业在政策改革深化与市场环境演变的双重作用下，实现了规模扩张与高质量发展的良性共\n     振。监管政策层面，公募销售新规正式落地标志着行业三阶段费改全面收官，投资者持有成本实现有效下降，同\n     时《推动公募基金高质量发展行动方案》围绕考核制度、收费机制和薪酬体系重塑行业生态，引导基金公司回归\n     本源，确立了以投资者利益为核心的经营导向，夯实了行业长期发展的根基。市场环境层面，在宏观利率中枢下\n     行与权益市场估值修复的背景下，居民资产配置需求发生结构性调整，叠加结构性行情下权益基金赚钱效应逐步\n     显现，公募基金凭借制度规范优势与投研管理能力，有效承接了居民储蓄向投资转化的资金需求，推动行业规\n     模持续稳健增长。根据中国证券投资基金业协会数据统计，截至2025年末公募基金资产管理规模合计37.71万亿\n     元，较上年末增长15%。\n\n\n\n\n\n\n\n     ●2025           年度报告 ●     036"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          38
+        ],
+        "source_spans": [
+          {
+            "page": 38,
+            "start": 0,
+            "end": 2428,
+            "quote": "    经营举措及业绩\n\n    报告期内，集团控股子公司兴全基金始终恪守“基金持有人利益最大化”原则，通过良好的主动管理能力为\n客户创造长期价值回报。产品业绩稳居行业前列，截至2025年末，根据国泰海通证券数据，兴全基金旗下主动\n型权益类基金、主动型固收类基金过往三年加权平均收益率分别在权益类大型公司、固定收益类中型公司中位列\n第一和第二；业务创新实现新突破，成功发行行业首只沪深300质量ETF，场内业务生态建设取得实质性进展，\n完成行业首只跨市场沪港深300指数增强基金和首批新型浮动费率基金发行，基金投顾策略获2025基金投顾创新\n案例金牛奖；积极做好养老金融大文章，养老基金Y份额保有规模位居行业前三；跨境投研能力持续深化，报告                                                              第\n期内新加坡子公司正式获批，QDII业务额度扩容。截至2025年末，兴全基金公募基金规模达到7,490.57亿元，较                                                      第\n上年末增长15%。                                                                                                      第\n                                                                                                               第\n    未来展望                                                                                                       第\n                                                                                                               第\n    在全球经济不确定性增加、国内资本市场深化改革的背景下，兴全基金将围绕高质量发展主线夯实竞争力，                                                            第\n                                                                                                               第\n以长周期视角培育新动能、完善体系化能力建设。通过深化“数字驱动、智慧赋能”的科技服务体系，加强人才                                                              第\n机制与合规风控建设，厚植“责任”文化，深耕养老金融生态，并依托海外子公司推进“内外协同”，提升国际                                                              第\n                                                                                                               第\n化水平。在行业深度变革中，兴全基金将更好发挥公募基金支持实体经济作用，践行公募基金的社会责任，以专\n业能力统筹规模与质量，坚定走高质量可持续发展之路，为更广大的居民财富保值增值与资本市场健康发展贡献\n专业力量。\n\n   （3）私募股权基金管理业务\n\n    市场环境\n\n    报告期内，私募股权基金行业在政策驱动和产业变革催化下整体运行平稳，呈现募资端逐步企稳、投资结构\n持续优化、退出渠道更加多元的发展态势。银行、险资等长期资金扩容推动募资端实现触底维稳，与此同时，监\n管政策积极推动社保基金、保险资金、产业资本参与私募股权投资，大力培育壮大耐心资本、长期资本，进一步\n拓宽了资金来源；投资端延续聚焦硬科技的趋势，人工智能、半导体、生物医药、新材料等战略新兴产业成为投\n资热点，投资活跃度较上年有所回升；退出机制持续突破，A股IPO发行家数和规模同比增长，港股IPO市场显著\n回暖，科创板“1+6”新政重启未盈利企业适用科创板第五套标准上市，为战略新兴行业企业拓宽上市通道，新\n“国九条”“并购六条”等政策为并购退出打开空间，S基金机制持续优化，多元化退出体系进一步完善。\n\n    经营举措及业绩\n\n    集团通过全资子公司兴证资本开展私募股权基金管理业务。兴证资本聚焦科技智能、医疗健康、碳中和及先\n进制造四大重点行业，强化科技和绿色领域布局，发挥新质生产力引擎作用服务实体经济。报告期内，兴证资本\n持续推进产品创设工作，完成多只基金工商设立和基金扩募；投资能力获市场高度认可，多个已投项目完成IPO\n发行或获得受理；行业影响力持续提升，荣获投中“2024年度中国最佳私募股权投资机构TOP100”“2024年度\n中国最佳券商私募基金子公司TOP10”“2025年度最佳国资投资机构TOP100”和清科“2025年中国股权投资市\n场机构有限合伙人TOP50”等业内重量级奖项。\n\n\n\n\n\n\n\n\n\n\n                                                                                037     ●2025           年度报告 ●"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          39
+        ],
+        "source_spans": [
+          {
+            "page": 39,
+            "start": 0,
+            "end": 1405,
+            "quote": "         未来展望\n\n         兴证资本将持续深化与政府机构、企业等出资方的战略合作，紧贴客户需求创新业务模式与服务方式；围绕\n     国家壮大战略性新兴产业、培育未来产业的发展方向，聚焦科技金融与绿色金融核心命题，深度挖掘优质项目资\n     源，切实发挥私募股权投资基金服务实体经济的重要功能。\n\n    （二）机构服务业务\n\n第        1.     研究与机构服务\n第       （1）研究服务业务\n第\n第        市场环境\n第\n第        随着《公开募集证券投资基金证券交易费用管理规定》全面实施，研究业务迎来新的发展窗口期，一方面交\n第\n第    易费率下行对于研究业务带来客观压力，另一方面随着交易佣金使用的日益规范也为研究业务创造更健康的发展\n第\n第    空间。2025年随着证券市场的回暖，公募基金的规模随之迎来修复性增长，市场热度的提升带来行业佣金收入\n第    改善。长期来看，随着无风险利率的下行和居民储蓄资产的逐步溢出，未来公募基金有望成为承接居民财富保值\n\n     增值的重要载体，研究服务业务依然具备较大发展潜力。因此行业仍需加强投研能力建设、提升研究深度与服务\n     质量强化自身竞争力，推动研究与机构服务业务长期健康发展。\n\n         经营举措及业绩\n\n         报告期内，公司研究业务蝉联证券时报最佳分析师评选最佳研究团队第三名，连续十届荣膺前五，研究实力\n     稳居行业第一梯队，分仓佣金收入市场竞争力优势稳固。综合研究转型取得积极进展，持续赋能财富管理战略转\n     型，依托重大事件点评机制协同发声，护航打造“知己理财”品牌，“投行+研究”模式助力多家优质企业登陆\n     资本市场。围绕金融“五篇大文章”，积极承接监管机构和政策部门的研究需求，多项课题获中国证券业协会、\n     福建省金融学会优秀课题，经济与金融研究院获聘社会价值实验室副理事长成员单位，与联合国开发计划署、国\n     务院发展研究中心联合开展“银发经济与养老金融”研究，联合举办银发经济论坛并发布成果，在ESG、绿色金\n     融及养老金融领域的品牌影响力进一步提升。积极赋能区域经济发展，为福建省重要专题座谈会建言献策，深度\n     融入地方决策与产业布局；为省内多地政府、国有企业及大型民营企业提供资本运作与专项研究服务，以专业金\n     融实践助力金融强省建设。\n\n         未来展望\n\n         公司将积极拥抱行业机遇，坚守深度研究立身之本，坚持扎实稳健、富于前瞻的兴证研究特色，持续强化深\n     度研究、专题研究及产业链研究能力，通过体系化建设巩固强化研究服务领先优势。深化“研究+”协同赋能模\n     式创新，发挥二级市场研究优势，以“投研+投行+投资”模式锻造集团重点优势行业竞争力，布局前瞻产业，\n     打造全面赋能集团发展的智慧中枢，加快实现研究综合效益转化提质增效。同时，积极服务国家战略，围绕金融\n     “五篇大文章”，聚焦高层级智库服务，加强与权威机构合作，打造行业标杆研究品牌，助力“十五五”良好开\n     局，更好地服务经济社会高质量发展。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n     ●2025           年度报告 ●     038"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          40
+        ],
+        "source_spans": [
+          {
+            "page": 40,
+            "start": 0,
+            "end": 2359,
+            "quote": "   （2）资产托管与基金服务业务\n\n    市场环境\n\n    报告期内，《私募证券投资基金运作指引》等监管政策全面深化落地，行业加速出清中小私募机构，优质私\n募客群价值凸显。市场环境回暖亦带动私募产品发行企稳回升，在此背景下，证券公司加速构建机构客户服务生\n态圈，着力提升全业务链综合服务能力，在深耕传统私募领域的同时，加快拓展与公募及其他持牌金融机构的多\n元化合作，行业竞争焦点正向全业务链综合服务能力比拼升级。\n    经营举措及业绩                                                                                                 第\n                                                                                                            第\n                                                                                                            第\n    公司依托集团综合化经营平台优势，以客户需求为导向，整合串联资产托管与基金服务、产品销售、机构经                                                         第\n纪、投资研究及衍生品等主经纪商业务，打通“资金-交易-资产”服务链条，为专业投资机构提供全场景一站式                                                          第\n服务。报告期内，私募证券基金托管业务保持竞争优势，新增托管私募产品数市场份额稳步提升，期末存续服务                                                           第\n                                                                                                            第\n私募产品数量行业排名第6位；公募基金托管业务加速突破，托管规模在券商同业中位列前十，产品结构持续优                                                           第\n                                                                                                            第\n化，合作公募管理人质量显著提升；其他持牌金融机构业务合作深化，新增托管产品数量与规模增长明显，产品                                                           第\n数同比增长128%，月日均规模同比增长146%；业务自动化率、风控覆盖率、品牌影响力保持行业领先水平。                                                         第\n\n\n    未来展望\n\n    公司将坚定不移以客户需求为核心，锚定行业发展趋势，双线并行推进业务高质量发展，一方面加速推进资\n方服务生态体系迭代升级，加快打造具有兴证特色的差异化服务品牌和资方服务平台，全面提升面向专业机构投\n资者的综合金融服务能力；另一方面全面融入集团大财富管理发展战略，依托数据赋能精准匹配居民财富管理需\n求，打通专业机构产品与大众财富配置的服务桥梁。\n\n   （3）机构交易服务业务\n\n    市场环境\n\n    报告期内，场外衍生品与做市业务在“需求旺盛”与“监管强化”并行的背景下持续发展，业务的功能性定\n位更加清晰。场外衍生品业务随着监管加强对业务底层资产、资金流向和杠杆水平的穿透式管理，合规与风控要\n求进一步强化，与此同时，其精准服务实体经济、助力金融“五篇大文章”的核心价值更为凸显。做市业务则持\n续发挥市场“稳定器”功能，在科创债、ETF等金融工具以及北交所、科创板等市场的活跃度提升，有效增强了\n市场流动性与韧性。\n\n    经营举措及业绩\n\n    公司坚持以客需服务为导向开展场外衍生品业务，持续提升产品设计、交易定价及风险管理能力，进一步丰\n富产品结构和策略体系，基于更加多元的资产配置与风险管理工具为机构客户提供一站式衍生品交易服务，同时\n践行金融服务实体经济，落地挂钩绿色和科创类标的的场外衍生品，以金融创新引导资金配置低碳资产、服务新\n质生产力发展。做市业务获批成为上交所基金主做市商，取得沪深交易所期权一般做市商资格，做市规模实现跨\n越式增长，报告期内，有序推进基金做市服务体系化建设，参与首批科创债ETF做市交易，为公募基金客户提供\n智能化、策略化、专业化的高质量做市服务；持续为超长期特别国债、科创债提供做市报价服务，债券做市数量\n位列沪深两市一般做市第一，在深交所信用债一般做市中荣获2025年度优秀做市商评价；服务多层次资本市场\n建设，开展科创板和北交所做市业务，做市能力位居行业前列。\n\n\n\n\n\n                                                                               039     ●2025           年度报告 ●"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          41
+        ],
+        "source_spans": [
+          {
+            "page": 41,
+            "start": 0,
+            "end": 1455,
+            "quote": "         未来展望\n\n         公司将以金融“五篇大文章”为指引，持续完善“柜台市场业务、场外衍生品业务与做市业务”三位一体的\n     对客交易服务体系，巩固提升差异化竞争优势。场外衍生品业务着力提升交易定价与风险对冲能力，深化多资\n     产、多结构产品布局，通过打造立体化的衍生产品服务矩阵，拓宽中长期资金入市渠道；做市业务继续锻造多资\n     产、跨市场的做市交易能力，强化系统支撑与策略创新，有效提升市场流动性。\n\n         2.     投资银行业务\n第       （1）股权融资业务\n第\n第\n第        市场环境\n第\n第        报告期内，股权融资市场呈现政策托底与市场修复并存的态势，一方面，宏观经济回暖和产业升级需求推动\n第    企业融资需求增长，与此同时资本市场改革红利加速释放，随着科创板 “1+6”改革重启未盈利企业上市通道、\n第\n第    创业板第三套标准启用等政策相继推出，资本市场制度改革带动股权融资市场活跃度显著修复；另一方面，国\n第    有大行注资计划成为2025年股权融资市场的最大增长动能，推动股权融资规模迎来跨越式增长。根据Wind数据\n第\n     统计，报告期内A股市场股权融资总规模（不含资产类）约9,416亿元，同比增长274%，融资家数305家，同比\n     增长8%。其中，IPO上市116家，同比增长16%，融资规模1318亿元，同比增长96%；市场新增新三板挂牌332\n     家，其中创新层151家。\n\n         经营举措及业绩\n\n         在股权融资业务领域，公司紧密围绕国家战略，以服务实体经济发展为初心使命，以建设一流投行为目标，\n     高质量书写五篇大文章，助力新质生产力发展。业务开拓上做实区域，做深行业，深挖存量，拓展增量，助力\n     “科技、资本、产业”的良性循环。报告期内共完成境内股权主承销项目6单，家数排名行业第15位，其中完成\n     创业板IPO项目2单，创业板IPO家数排名行业第5位；完成A股重大资产重组项目1单，并担任中金公司吸收合并\n     东兴和信达的独立财务顾问。公司加强对创新型中小企业的资本赋能，构建立体化服务矩阵，完成新三板定增4\n     单，融资规模行业排名第5位，期末持续督导新三板项目数120家，其中创新层督导55家，行业排名第10位。统\n     筹推进大投行业务一体化发展，强化人员培训提升、业务流程梳理和项目储备开发，提升跨境融资综合服务水\n     平。公司股权融资业务表现屡获业界认可，报告期内荣获“2025新财富杂志本土最佳投行”“2025新财富杂志\n     最佳践行ESG投行”“2025中国证券业社会责任投行君鼎奖”等荣誉。\n\n         未来展望\n\n         公司将充分发挥投行功能性，将业务发展深度嵌入国家战略布局，以新质生产力为核心、产业整合为抓手、\n     区域深耕为基础、多元创新为引擎，向产业投行转型；聚焦人工智能、高端制造、绿色科技等战略赛道，顺应产\n     业从“高速扩张”到“存量优化”的转型趋势，为企业提供“并购重组+融资支持+合规风控”全链条服务，并扎\n     实推进投行业务一体化发展，通过资源整合为客户提供更加集约高效的股权融资服务。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n     ●2025           年度报告 ●     040"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          42
+        ],
+        "source_spans": [
+          {
+            "page": 42,
+            "start": 0,
+            "end": 2386,
+            "quote": "   （2）债权融资业务\n\n    市场环境\n\n    2025年，低利率背景下企业融资成本下降，叠加监管层专项债、科创债等定向政策工具支持，债权融资市\n场保持稳健发展。全国信用债（不含同业存单）发行规模22.23万亿元，同比增长9%；公司债发行规模5.89万亿\n元，同比增长20%；证监会主管资产支持证券发行规模1.46万亿元，同比增长17%。\n\n    经营举措及业绩                                                                                                    第\n\n    在债权融资业务领域，公司坚持业务创新，深化集团协同，强化业务功能发挥，不断提升客户综合服务能                                                             第\n                                                                                                               第\n力。报告期内，债券承销业务稳步发展，承销只数同比增长22%，积极践行国家战略，承销科创债规模130亿                                                             第\n元，同比增长220%；承销绿色债券及绿色资产证券化项目规模79亿元，同比增长107%；服务民营企业及中小                                                           第\n微企业融资规模52亿元，并成功发行全国首单绿色中小微企业支持公司债券。资产支持证券市场竞争力保持行业                                                             第\n                                                                                                               第\n前列，REITs类业务取得重大突破，作为独家财务顾问成功发行全国首单农贸市场公募REITs，作为独家销售机构                                                         第\n                                                                                                               第\n及计划管理人成功发行全国首单跨境电商产业园机构间REITs及全国首单分布式清洁能源资产机构间REITs。                                                           第\n                                                                                                               第\n    未来展望\n\n    公司将持续深化债权融资业务高质量发展，增强专业服务能力与综合竞争力。巩固产品创新优势，支持科技\n企业发行科创债、知识产权ABS、数据中心REITs等产品，依托综合金融服务优势赋能实体经济转型升级；持续\n拓展绿色金融产品体系，深化绿色债券及ABS创新实践；同时着力推进投行业务一体化发展，增强债权融资业务\n国际竞争力。\n\n   （3）区域股权交易市场\n\n    市场环境\n\n    伴随我国经济向高质量发展阶段稳步转型，区域性股权市场作为重要金融基础设施的功能定位持续夯实，\n以服务科技中小企业为核心的功能获得政策持续加力。2025年，多项重磅政策进一步明确了区域性股权市场的\n发展方向与核心任务：2月，中国证监会发布《关于资本市场做好金融“五篇大文章”的实施意见》，明确要求\n“规范发展区域性股权市场，健全‘专精特新’专板综合服务，加强与全国性证券交易场所的有机联系。推动区\n域性股权市场规则对接、标准统一”；7月，中国人民银行等七部门联合印发《关于金融支持新型工业化的指导\n意见》，强调“高质量建设区域股权市场专精特新专板，加强企业上市培育辅导和专业服务”。上述系列政策部\n署，进一步凸显并强化了区域性股权市场在科技金融、普惠金融、绿色金融等领域的枢纽功能。\n\n    经营举措及业绩\n\n    报告期内，公司参股公司海峡股交立足金融基础设施的核心功能，高质量落实科技金融、普惠金融、绿色金\n融等工作，不断提升科创企业培育能力、扩大普惠服务覆盖范围、深化绿色金融创新实践。完善科创企业培育体\n系，以“专精特新”专板建设为抓手，持续引导中小企业走“专精特新”发展路径，并首次通过三四板“绿色通\n道”助推福建省首家企业登陆新三板；创新普惠金融服务模式，联合各级政府持续举办各类惠企活动，深入县\n域、乡镇以金融服务筛选优质潜力企业；引领绿色金融创新实践，获批联合筹建福建省“双碳”能力建设中心，\n完成全国首宗“沉积碳—惰性碳”海洋渔业碳汇交易，并实现全国首笔河湖碳汇交易落地。\n\n\n\n\n\n\n                                                                                041     ●2025           年度报告 ●"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0010",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          43
+        ],
+        "source_spans": [
+          {
+            "page": 43,
+            "start": 0,
+            "end": 1334,
+            "quote": "         未来展望\n\n         海峡股交将持续打造“一体两翼”业务框架体系，依托“四大基地”资源优势，聚焦“专精特新”企业服\n     务，进一步丰富科技型中小企业普惠服务产品及体系建设，持续深化县域、乡镇金融服务，优化重点企业培育机\n     制，不断挖掘优质上市后备企业；依托资源环境交易中心，持续开拓创新双碳背景下的绿色金融业务。\n\n    （三）自营投资业务\n\n第        市场环境\n第        报告期内，股票市场展现较强复苏韧性，上证指数在波动中震荡上行，全年累计涨幅显著，围绕创新药、机\n第\n第    器人、海外算力等新质生产力领域呈现多点开花局面，为股票自营提供了较好的投资窗口期；另一方面，随着\n第    ETF与量化资金在市场中的作用日益凸显，券商自营的投资范式也逐渐从传统选股向多资产、多策略的组合配置\n第    转变。债券市场方面，十年期国债收益率趋势性下行后进入低位区间震荡，在低利率常态化背景下，债券自营业\n第\n第    务面临一定挑战，传统杠杆与久期策略在当下利率环境中更依赖交易能力。\n第\n第        一级股权投资方面，受益于政策支持及市场回暖，股权投资呈现结构性复苏态势。国有资本继续发挥主导\n第\n     作用，投资聚焦机器人、半导体、AI产业链等新质生产力领域；一级市场退出渠道持续拓宽，港股IPO市场强劲\n     复苏，并购重组交易活跃度显著提升，科创板“1+6” 等政策新规为战略新兴行业企业拓宽上市通道，A股市场\n     IPO常态化进程加速，一级市场多元化退出机制日趋完善。\n\n         经营举措及业绩\n\n         1.     权益投资业务\n\n         报告期内，公司秉持稳健投资与价值投资理念，严控风险，通过优化持仓结构、精选优质行业、丰富投资策\n     略组合，有效降低了持仓波动与回撤水平，在复杂市场环境中实现了较好的绝对收益与相对收益表现。同时，公\n     司持续夯实投研体系建设，不断拓展研究广度与深度，强化团队协同与成果转化，为业务高质量发展奠定了坚实\n     基础。\n\n         2.     固定收益投资业务\n\n         报告期内，公司发挥投研交易优势，积极挖掘正息差资产机会，应用多元交易策略增厚收益，并结合市场变\n     化适时调整债券资产结构，实现了稳定的投资回报，业绩表现位列可比基金前茅。面对信用分层加剧、信用风险\n     事件仍存的市场特征，公司持续开展信用跟踪研究和持仓结构优化，保持高等级品种的较高持仓占比，有效管控\n     组合信用风险。\n\n         3.     另类投资业务\n\n         集团通过全资子公司兴证投资开展另类投资业务。报告期内，兴证投资专注主业、提升专业化能力，深耕半\n     导体、新能源、先进制造、数字经济等新质生产力领域的股权投资，各项业务稳健发展，集团协同效应持续深\n     化，投后管理与退出工作有序推进，内控与风险管理体系不断完善。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n     ●2025           年度报告 ●     042"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0011",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          44
+        ],
+        "source_spans": [
+          {
+            "page": 44,
+            "start": 0,
+            "end": 2538,
+            "quote": "     未来展望\n\n     权益投资方面，公司将深化研究驱动投资的业务导向，有效整合内外部研究资源，提升研究效率与成果转化\n 能力，推进投资决策的科技赋能和数字化转型；同时，持续强化风险收益动态平衡，构建多策略、多资产、全天\n 候多元投研体系，力求在控制波动与回撤的前提下实现稳健回报。\n\n     固定收益投资方面，公司将坚持稳健投资理念，在有效管控风险的前提下，挖掘优质正息差资产，保持交易\n 策略多样化，布局全球化多元化大类资产配置、探索低波动类固收替代策略，以应对低利率环境并保障投资收\n 益稳定性；同时，持续强化利率风险与信用风险的双重管控，加强持仓债券的信用跟踪与评估，筑牢风险防御                                                              第\n 体系。                                                                                                           第\n                                                                                                               第\n     另类投资方面，兴证投资将深耕股权投资主责主业，在服务实体经济和新质生产力发展方面强化使命担当，                                                           第\n                                                                                                               第\n 聚焦硬科技赛道，布局新兴产业和未来产业，深化投承联动，发挥协同效能；扎实做好投后管理，积极拓宽退出                                                             第\n 渠道，加速推进资产盘活赋能，持续提升整体经营效益。                                                                                     第\n                                                                                                               第\n                                                                                                               第\n（四）海外业务                                                                                                        第\n                                                                                                               第\n     市场环境\n\n     尽管面临地缘政治摩擦与全球经济增长放缓等挑战，香港作为国际金融中心的地位依然稳固，港股市场展\n 现强劲复苏动能，在全球资本市场中表现亮眼。2025年恒生指数累计上涨27.8%，居全球主要股市前列，港股\n 交投活跃度显著提升，同时南向资金净流入大幅增长为港股市场注入活力，报告期内港股日均成交额2,498亿港\n 元，同比增长90%，创下历史新高；融资业务方面，随着港交所推行多项措施吸引企业赴港上市，以及国际投资\n 者对中国核心资产配置需求日益增强，港股IPO市场迎来强劲复苏，报告期内共完成119家新股上市，同比增长\n 68%，合计募集资金2,858.43亿港元，同比增长225%。\n\n     经营举措及业绩\n\n     报告期内，公司全资子公司兴证香港依托专业优势，持续推动业务转型升级。财富管理业务方面，不断丰富\n 产品体系，积极拓展“跨境理财通”业务，产品覆盖人民币、港币及美元等多币种，有效满足客户跨境财富管理\n 需求。投资银行业务方面，债券承销业务优势持续巩固，完成债券承销项目203单，承销规模达19.86亿美元，在\n 港中资券商排名第7位，完成股权承销项目15单，承销家数中资券商排名第8位。自营投资业务方面，坚持稳健\n 谨慎的投资策略，前瞻布局多元化投资组合，有效提升投资收益稳定性与组合韧性。ESG实践成效显著，兴证国\n 际连续三年维持万得ESG评级BBB级，在投资者关系、企业管治、企业透明度及沟通渠道建设方面亦获得业内认\n 可，蝉联香港投资者关系大奖优秀奖。\n\n     未来展望\n\n     未来，兴证香港将继续坚持“稳健经营、稳中求进”的原则，把握跨境理财通和基金互认等业务机会，深化\n 财富管理转型升级，强化技术研发与业务储备，加速资产管理产品推陈出新，满足客户多元服务需求；持续巩固\n 债券承销业务品牌优势，紧抓港股融资市场活跃机遇，聚焦重点行业，强化专业能力与协同效能，全面提升投\n 行业务竞争力；坚守合规风控底线和绿色金融服务理念，优化资源配置，形成专业化、市场化、国际化的人才\n 队伍，多维度赋能全球客户跨境综合金融需求，助力中国企业“走出去”，并在“一带一路”建设中发挥积极\n 作用。\n\n\n\n\n\n                                                                                 043     ●2025           年度报告 ●"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0012",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "五、报告期内主要经营情况"
+        ],
+        "physical_pages": [
+          46
+        ],
+        "source_spans": [
+          {
+            "page": 46,
+            "start": 2039,
+            "end": 2367,
+            "quote": "五、报告期内主要经营情况\n\n\n     截至2025年末，集团资产总额3,449.89亿元，较上年末增长14.61%；净资产666.89亿元，较上年末增长\n 5.99%；归属母公司净资产616.38亿元，较上年末增长6.61%。2025年,集团实现营业收入118.41亿元，同比增长\n 21.03%，净利润37.14亿元，归属母公司股东的净利润28.70亿元，分别同比增长28.21%和32.64%。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                  045     ●2025           年度报告 ●"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0013",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "五、报告期内主要经营情况"
+        ],
+        "physical_pages": [
+          47
+        ],
+        "source_spans": [
+          {
+            "page": 47,
+            "start": 0,
+            "end": 3795,
+            "quote": "       (     一     ) 主营业务分析\n\n             1、  利润表及现金流量表相关科目变动分析表\n                                                                                                                     单位          ：元  币种          ：人民币\n\n        科目                                     本期数                 上年同期数           变动比例（%）                          主要变动原因\n        投资收益                      3,860,955,227.47          2,278,321,983.33                 69.46      主要系交易性金融工具投资收益同\n                                                                                                        比增加\n第       其他收益                        101,211,511.58            256,599,575.78                 -60.56     主要系收到政府补助同比减少\n第                                                                                                       主要系衍生金融工具公允价值变动\n第       公允价值变动收益                    -123,576,202.04           545,395,286.29               -122.66      损失同比增加\n第\n第       汇兑收益                          40,579,101.62              2,957,126.78             1,272.25      主要系汇率变动所致\n第                                                                                                       主要系子公司“保险         +         期货”业务\n第       其他业务收入                         4,972,738.94              8,043,509.84                -38.18\n第                                                                                                       收入同比减少\n第                                                                                                       主要系使用权资产处置收益同比减\n第       资产处置收益                            844,736.28             1,412,464.02                -40.19\n第                                                                                                       少\n        信用减值损失                        78,745,353.22             36,325,242.78               116.78      主要系计提的其他应收款项坏账准\n                                                                                                        备同比增加\n        其他资产减值损失                       -4,398,606.08             2,065,396.36              -312.97      主要系大宗商品存货跌价准备转回\n        营业外收入                          8,526,808.19             16,308,811.40                -47.72     主要系上年收到案件追偿款\n        营业外支出                         32,989,987.34             16,799,089.11                96.38      主要系计提未决诉讼预计负债\n        所得税费用                       450,276,267.73            184,581,084.28                143.94      主要系递延所得税费用增加\n        其他综合收益的税                    -320,125,832.42           630,504,956.35               -150.77      主要系本年发生其他债权投资公允\n        后净额                                                                                             价值变动损失，而上年为收益\n        经营活动产生的现                                                                                        主要系为交易目的而持有的金融工\n        金流量净额                    19,332,488,671.70         24,143,006,376.01                 -19.93     具净增加导致现金流出，而上年为\n                                                                                                        现金流入\n        投资活动产生的现                 -4,663,674,690.67        -22,768,907,849.82                不适用         主要系收回投资收到的现金增加\n        金流量净额\n        筹资活动产生的现                 -4,650,650,902.34         10,188,860,789.70               -145.64      主要系发行债券及短期融资券收到\n        金流量净额                                                                                           的现金减少\n\n             营业收入变动原因说明：报告期内公司实现营业收入118.41亿元，同比增长21.03%，主要是由于集团投资\n       收益、手续费佣金及净收入及利息净收入同比增长。其中，投资收益38.61亿元，较去年同期增长69.46%，主要\n       系交易性金融工具投资收益同比增加；手续费及佣金净收入63.71亿元，较去年同期增长20.83%，主要系经纪业\n       务手续费净收入同比增加；利息净收入15.85亿元，较去年同期增长11.75%，主要系融资融券利息收入同比增加\n       及应付债券、代理买卖证券款利息支出同比减少。\n\n             营业成本变动原因说明：报告期内集团营业成本76.53亿元，同比增长14.18%，主要是由于本年发生业务及\n       管理费74.89亿元，同比增长13.73%。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n       ●2025           年度报告 ●     046"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0014",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "五、报告期内主要经营情况"
+        ],
+        "physical_pages": [
+          48
+        ],
+        "source_spans": [
+          {
+            "page": 48,
+            "start": 0,
+            "end": 2433,
+            "quote": "     经营活动产生的现金流量净额变动原因说明：经营活动产生的现金净流入额193.32亿元。其中，经营活动现\n金流入494.64亿元，主要是回购业务资金净增加169.99亿元，收取利息、手续费及佣金的现金123.05亿元，代理\n买卖证券收到现金净额93.03亿元，拆入资金净增加额85.10亿元，收到其他与经营活动有关的现金23.48亿元；\n经营活动现金流出301.32亿元，主要是融出资金增加而减少现金96.57亿元，支付给职工以及为职工支付的现金\n43.98亿元，为交易目的而持有的金融工具净增加而减少现金34.12亿元，支付利息、手续费及佣金的现金33.76\n亿元，支付的各项税费24.24亿元，支付其他与经营活动有关的现金68.65亿元。\n\n     投资活动产生的现金流量净额变动原因说明：投资活动产生的现金净流出额46.64亿元。其中，投资活动产                                                                                                  第\n生的现金流入182.24亿元，主要是收回投资收到现金158.35亿元，取得投资收益收到现金23.81亿元等；投资活                                                                                               第\n动产生的现金流出228.88亿元，主要是投资所支付的现金225.73亿元，为购建固定资产、无形资产和其他长期资                                                                                                 第\n产所支付的现金3.15亿元。                                                                                                                                          第\n                                                                                                                                                        第\n                                                                                                                                                        第\n     筹资活动产生的现金流量净额变动原因说明：筹资活动产生的现金净流出额46.51亿元。其中，筹资活动现                                                                                                  第\n金流入636.94亿元，主要是发行债券及短期融资券收到现金493.22亿元，取得借款收到现金116.82亿元；筹资                                                                                               第\n                                                                                                                                                        第\n活动现金流出683.44亿元，主要是偿还债务支付现金644.60亿元，分配股利、利润或偿付利息支付现金36.45亿                                                                                               第\n                                                                                                                                                        第\n元等。\n\n     本期公司业务类型、利润构成或利润来源发生重大变动的详细说明\n\n     □适用 √不适用\n\n     2、  收入和成本分析\n\n     √适用  □不适用\n\n     公司的主要业务包括财富管理业务（含证券及期货经纪、资产管理）、机构服务业务、自营投资业务和海外\n业务等。各业务营业收入和成本构成如下所示。\n\n     (1).     主营业务分行业、分产品、分地区、分销售模式情况\n                                                                                                                  单位     :     万元  币种     :     人民币\n\n                                                            "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0015",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "主营业务分行业情况"
+        ],
+        "physical_pages": [
+          48
+        ],
+        "source_spans": [
+          {
+            "page": 48,
+            "start": 2433,
+            "end": 3466,
+            "quote": "主营业务分行业情况\n 分行业                             营业收入             营业成本           毛利率            营业收入比              营业成本比            毛利率比上年增减（%）\n                                                                   （%）      上年增减（%）             上年增减（%）\n 证券及期货经纪业务                     377,812.12       234,797.31         37.85               21.37              20.14      增加         0.63         个百分点\n 资产管理业务                        319,408.12        99,295.94         68.91               25.04              42.16      减少         3.75         个百分点\n 机构服务业务                        157,695.89       118,513.51         24.85               58.67              22.06      增加         22.54         个百分点\n 自营投资业务                        321,443.92       138,054.78         57.05                 2.98              -6.13     增加         4.16         个百分点\n 海外业务                           47,705.97        32,473.61         31.93                -1.02             -12.96     增加         9.34         个百分点\n                                                            "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0016",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "主营业务分地区情况"
+        ],
+        "physical_pages": [
+          48
+        ],
+        "source_spans": [
+          {
+            "page": 48,
+            "start": 3466,
+            "end": 4435,
+            "quote": "主营业务分地区情况\n 分地区                             营业收入             营业成本           毛利率            营业收入比              营业成本比            毛利率比上年增减（%）\n                                                                   （%）      上年增减（%）             上年增减（%）\n 福建地区                          230,979.13        70,951.07         69.28               19.63              52.33      减少         6.60         个百分点\n 上海地区                           36,431.20        21,079.95         42.14                 6.50             22.18      减少         7.43         个百分点\n 其他地区                          137,781.41       122,266.20         11.26               39.98              11.25      增加         22.91         个百分点\n 公司本部及子公司                      778,946.68       550,987.99         29.26               19.34              10.97      增加         5.33         个百分点\n\n\n                                                                                                              047     ●2025           年度报告 ●"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0017",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "主营业务分地区情况"
+        ],
+        "physical_pages": [
+          49
+        ],
+        "source_spans": [
+          {
+            "page": 49,
+            "start": 0,
+            "end": 535,
+            "quote": "           主营业务分行业、分产品、分地区、分销售模式情况的说明\n\n           √适用 □不适用\n\n           2025年集团证券及期货经纪业务实现收入人民币37.78亿元，同比增长21.37%；资产管理业务实现收入人民\n      币31.94亿元，同比增长25.04%；机构服务业务实现收入人民币15.77亿元，同比增长58.67%；自营投资业务实\n      现收入人民币32.14亿元，同比增长2.98%；海外业务实现收入人民币4.77亿元，同比下降1.02%。\n\n第          (2).     重大采购合同、重大销售合同的履行情况\n第\n第          √适用 □不适用\n第\n第          本集团以客户需求为驱动，打造了企业、机构及零售客户服务体系，为包括大型国有企业、跨国企业、中小\n第     企业、高净值客户和零售客户等各类客户提供证券产品及综合金融服务。集团主要客户位于中国，同时伴随日渐\n第\n第     完善的海外业务布局，客户来源有所拓宽。2025年，集团前五大客户产生的收入占集团营业收入的比例不超过\n第     10%。鉴于集团的业务性质，本集团无主要供应商。\n第\n第\n           "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0018",
+        "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+        "section_path": [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "八、分部报告"
+        ],
+        "physical_pages": [
+          221
+        ],
+        "source_spans": [
+          {
+            "page": 221,
+            "start": 3638,
+            "end": 3837,
+            "quote": "八、分部报告\n\n\n              本集团以内部组织结构、管理要求、内部报告制度为依据确定经营分部，并据此分配资源及评估分部业绩。\n        本集团2025年12月31日和2024年12月31日的主要分部为财富管理业务分部、机构服务业务分部、自营投资业务\n        分部和海外业务分部。\n\n\n\n\n\n\n        ●2025           年度报告 ●     220"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "limitations": [
+      "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未覆盖完整公司画像。",
+      "分部报告未提供分部收入金额表，板块收入权重无法通过分部报告交叉验证。",
+      "各板块收入合计与集团营业收入的差异及内部抵消未在所选章节披露，未计算占比。"
+    ],
+    "supply_chain": null,
+    "generation": {
+      "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+      "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+      "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+      "selection": {
+        "purpose": "select_profile_sections",
+        "request_id": "bp-work-75219f282a5b80afada802ac:workpaper:sections",
+        "request_hash": "07e17ad881b9193c3c71dfb297c6203313d2d65f321b4f8b9d19128b703a79c9",
+        "response_hash": "fd197aca0b44c9d4b116244912f75a9fd85c14322a0a20b25936edaa2d03bff5",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 17035,
+          "output_tokens": 370,
+          "total_tokens": 17405
+        },
+        "scope_kind": "report_heading_index",
+        "heading_count": 619,
+        "section_ids": [
+          "section-0001",
+          "section-0002",
+          "section-0003",
+          "section-0004",
+          "section-0005",
+          "section-0006",
+          "section-0007",
+          "section-0008",
+          "section-0009",
+          "section-0010",
+          "section-0011",
+          "section-0012",
+          "section-0013",
+          "section-0014",
+          "section-0015",
+          "section-0016",
+          "section-0017",
+          "section-0018",
+          "section-0019",
+          "section-0020",
+          "section-0021",
+          "section-0022",
+          "section-0023",
+          "section-0024",
+          "section-0025",
+          "section-0026",
+          "section-0027",
+          "section-0028",
+          "section-0029",
+          "section-0030",
+          "section-0031",
+          "section-0032",
+          "section-0033",
+          "section-0034",
+          "section-0035",
+          "section-0036",
+          "section-0037",
+          "section-0038",
+          "section-0039",
+          "section-0040",
+          "section-0041",
+          "section-0042",
+          "section-0043",
+          "section-0044",
+          "section-0045",
+          "section-0046",
+          "section-0047",
+          "section-0048",
+          "section-0049",
+          "section-0050",
+          "section-0051",
+          "section-0052",
+          "section-0053",
+          "section-0054",
+          "section-0055",
+          "section-0056",
+          "section-0057",
+          "section-0058",
+          "section-0059",
+          "section-0060",
+          "section-0061",
+          "section-0062",
+          "section-0063",
+          "section-0064",
+          "section-0065",
+          "section-0066",
+          "section-0067",
+          "section-0071",
+          "section-0072",
+          "section-0076",
+          "section-0080",
+          "section-0081",
+          "section-0082",
+          "section-0083",
+          "section-0084",
+          "section-0085",
+          "section-0086",
+          "section-0087",
+          "section-0088",
+          "section-0089",
+          "section-0090",
+          "section-0091",
+          "section-0092",
+          "section-0093",
+          "section-0094",
+          "section-0096",
+          "section-0097",
+          "section-0099",
+          "section-0100",
+          "section-0103",
+          "section-0104",
+          "section-0109",
+          "section-0110",
+          "section-0111",
+          "section-0114",
+          "section-0115",
+          "section-0119",
+          "section-0123",
+          "section-0124",
+          "section-0125",
+          "section-0127",
+          "section-0128",
+          "section-0129",
+          "section-0130",
+          "section-0131",
+          "section-0132",
+          "section-0133",
+          "section-0134",
+          "section-0135",
+          "section-0136",
+          "section-0137",
+          "section-0138",
+          "section-0139",
+          "section-0140",
+          "section-0141",
+          "section-0142",
+          "section-0144",
+          "section-0150",
+          "section-0151",
+          "section-0157",
+          "section-0158",
+          "section-0159",
+          "section-0160",
+          "section-0161",
+          "section-0162",
+          "section-0163",
+          "section-0164",
+          "section-0165",
+          "section-0166",
+          "section-0167",
+          "section-0168",
+          "section-0169",
+          "section-0170",
+          "section-0171",
+          "section-0172",
+          "section-0173",
+          "section-0174",
+          "section-0175",
+          "section-0176",
+          "section-0177",
+          "section-0178",
+          "section-0179",
+          "section-0180",
+          "section-0181",
+          "section-0182",
+          "section-0183",
+          "section-0184",
+          "section-0185",
+          "section-0186",
+          "section-0187",
+          "section-0188",
+          "section-0189",
+          "section-0190",
+          "section-0191",
+          "section-0192",
+          "section-0193",
+          "section-0194",
+          "section-0195",
+          "section-0196",
+          "section-0197",
+          "section-0198",
+          "section-0199",
+          "section-0200",
+          "section-0201",
+          "section-0202",
+          "section-0203",
+          "section-0204",
+          "section-0205",
+          "section-0206",
+          "section-0207",
+          "section-0208",
+          "section-0209",
+          "section-0210",
+          "section-0211",
+          "section-0212",
+          "section-0213",
+          "section-0214",
+          "section-0215",
+          "section-0216",
+          "section-0217",
+          "section-0218",
+          "section-0219",
+          "section-0220",
+          "section-0221",
+          "section-0222",
+          "section-0223",
+          "section-0224",
+          "section-0225",
+          "section-0226",
+          "section-0227",
+          "section-0228",
+          "section-0229",
+          "section-0230",
+          "section-0231",
+          "section-0232",
+          "section-0233",
+          "section-0234",
+          "section-0235",
+          "section-0236",
+          "section-0237",
+          "section-0238",
+          "section-0239",
+          "section-0240",
+          "section-0241",
+          "section-0242",
+          "section-0243",
+          "section-0244",
+          "section-0245",
+          "section-0246",
+          "section-0247",
+          "section-0248",
+          "section-0249",
+          "section-0250",
+          "section-0251",
+          "section-0252",
+          "section-0253",
+          "section-0254",
+          "section-0255",
+          "section-0256",
+          "section-0257",
+          "section-0258",
+          "section-0259",
+          "section-0260",
+          "section-0261",
+          "section-0262",
+          "section-0263",
+          "section-0264",
+          "section-0265",
+          "section-0266",
+          "section-0267",
+          "section-0268",
+          "section-0269",
+          "section-0270",
+          "section-0271",
+          "section-0272",
+          "section-0273",
+          "section-0274",
+          "section-0275",
+          "section-0276",
+          "section-0277",
+          "section-0278",
+          "section-0279",
+          "section-0280",
+          "section-0281",
+          "section-0282",
+          "section-0283",
+          "section-0284",
+          "section-0285",
+          "section-0286",
+          "section-0287",
+          "section-0288",
+          "section-0289",
+          "section-0290",
+          "section-0291",
+          "section-0292",
+          "section-0293",
+          "section-0294",
+          "section-0295",
+          "section-0296",
+          "section-0297",
+          "section-0298",
+          "section-0299",
+          "section-0300",
+          "section-0301",
+          "section-0302",
+          "section-0303",
+          "section-0304",
+          "section-0305",
+          "section-0306",
+          "section-0307",
+          "section-0308",
+          "section-0309",
+          "section-0310",
+          "section-0311",
+          "section-0312",
+          "section-0313",
+          "section-0314",
+          "section-0315",
+          "section-0316",
+          "section-0317",
+          "section-0318",
+          "section-0319",
+          "section-0320",
+          "section-0321",
+          "section-0322",
+          "section-0323",
+          "section-0324",
+          "section-0325",
+          "section-0326",
+          "section-0327",
+          "section-0328",
+          "section-0329",
+          "section-0330",
+          "section-0331",
+          "section-0332",
+          "section-0333",
+          "section-0334",
+          "section-0335",
+          "section-0336",
+          "section-0337",
+          "section-0338",
+          "section-0339",
+          "section-0340",
+          "section-0341",
+          "section-0342",
+          "section-0343",
+          "section-0344",
+          "section-0345",
+          "section-0346",
+          "section-0347",
+          "section-0348",
+          "section-0349",
+          "section-0350",
+          "section-0351",
+          "section-0352",
+          "section-0353",
+          "section-0354",
+          "section-0355",
+          "section-0356",
+          "section-0357",
+          "section-0358",
+          "section-0359",
+          "section-0360",
+          "section-0361",
+          "section-0362",
+          "section-0363",
+          "section-0364",
+          "section-0365",
+          "section-0366",
+          "section-0367",
+          "section-0368",
+          "section-0369",
+          "section-0370",
+          "section-0371",
+          "section-0372",
+          "section-0373",
+          "section-0374",
+          "section-0375",
+          "section-0376",
+          "section-0377",
+          "section-0378",
+          "section-0379",
+          "section-0380",
+          "section-0381",
+          "section-0382",
+          "section-0383",
+          "section-0384",
+          "section-0385",
+          "section-0386",
+          "section-0387",
+          "section-0388",
+          "section-0389",
+          "section-0390",
+          "section-0394",
+          "section-0397",
+          "section-0399",
+          "section-0400",
+          "section-0401",
+          "section-0402",
+          "section-0403",
+          "section-0404",
+          "section-0405",
+          "section-0406",
+          "section-0407",
+          "section-0408",
+          "section-0409",
+          "section-0410",
+          "section-0411",
+          "section-0412",
+          "section-0413",
+          "section-0414",
+          "section-0418",
+          "section-0420",
+          "section-0421",
+          "section-0422",
+          "section-0425",
+          "section-0426",
+          "section-0427",
+          "section-0428",
+          "section-0429",
+          "section-0430",
+          "section-0431",
+          "section-0432",
+          "section-0433",
+          "section-0434",
+          "section-0435",
+          "section-0436",
+          "section-0437",
+          "section-0438",
+          "section-0439",
+          "section-0440",
+          "section-0444",
+          "section-0448",
+          "section-0449",
+          "section-0450",
+          "section-0451",
+          "section-0452",
+          "section-0453",
+          "section-0454",
+          "section-0455",
+          "section-0456",
+          "section-0457",
+          "section-0458",
+          "section-0459",
+          "section-0460",
+          "section-0461",
+          "section-0462",
+          "section-0463",
+          "section-0464",
+          "section-0465",
+          "section-0466",
+          "section-0467",
+          "section-0468",
+          "section-0469",
+          "section-0470",
+          "section-0471",
+          "section-0472",
+          "section-0473",
+          "section-0474",
+          "section-0475",
+          "section-0476",
+          "section-0477",
+          "section-0478",
+          "section-0479",
+          "section-0480",
+          "section-0481",
+          "section-0482",
+          "section-0483",
+          "section-0484",
+          "section-0485",
+          "section-0486",
+          "section-0487",
+          "section-0488",
+          "section-0489",
+          "section-0490",
+          "section-0491",
+          "section-0492",
+          "section-0493",
+          "section-0494",
+          "section-0495",
+          "section-0496",
+          "section-0497",
+          "section-0498",
+          "section-0499",
+          "section-0500",
+          "section-0501",
+          "section-0502",
+          "section-0503",
+          "section-0504",
+          "section-0505",
+          "section-0506",
+          "section-0507",
+          "section-0508",
+          "section-0509",
+          "section-0510",
+          "section-0511",
+          "section-0512",
+          "section-0515",
+          "section-0520",
+          "section-0521",
+          "section-0522",
+          "section-0530",
+          "section-0534",
+          "section-0535",
+          "section-0540",
+          "section-0541",
+          "section-0544",
+          "section-0545",
+          "section-0546",
+          "section-0547",
+          "section-0548",
+          "section-0549",
+          "section-0553",
+          "section-0554",
+          "section-0555",
+          "section-0557",
+          "section-0558",
+          "section-0559",
+          "section-0560",
+          "section-0563",
+          "section-0566",
+          "section-0569",
+          "section-0570",
+          "section-0571",
+          "section-0574",
+          "section-0577",
+          "section-0578",
+          "section-0579",
+          "section-0581",
+          "section-0582",
+          "section-0583",
+          "section-0584",
+          "section-0585",
+          "section-0586",
+          "section-0587",
+          "section-0588",
+          "section-0590",
+          "section-0591",
+          "section-0592",
+          "section-0593",
+          "section-0594",
+          "section-0597",
+          "section-0598",
+          "section-0599",
+          "section-0600",
+          "section-0601",
+          "section-0605",
+          "section-0608",
+          "section-0613",
+          "section-0614",
+          "section-0617",
+          "section-0623",
+          "section-0629",
+          "section-0633",
+          "section-0637",
+          "section-0640",
+          "section-0643",
+          "section-0646",
+          "section-0649",
+          "section-0650",
+          "section-0656",
+          "section-0657",
+          "section-0658",
+          "section-0663",
+          "section-0667",
+          "section-0668",
+          "section-0669",
+          "section-0670",
+          "section-0671",
+          "section-0673",
+          "section-0678",
+          "section-0679",
+          "section-0680",
+          "section-0681",
+          "section-0684",
+          "section-0685",
+          "section-0686",
+          "section-0687",
+          "section-0688",
+          "section-0691",
+          "section-0692",
+          "section-0693",
+          "section-0694",
+          "section-0695",
+          "section-0696",
+          "section-0697",
+          "section-0698",
+          "section-0702",
+          "section-0704",
+          "section-0705",
+          "section-0709",
+          "section-0710",
+          "section-0711",
+          "section-0712",
+          "section-0713",
+          "section-0714",
+          "section-0715",
+          "section-0716",
+          "section-0717",
+          "section-0720",
+          "section-0721",
+          "section-0722",
+          "section-0726",
+          "section-0730",
+          "section-0733",
+          "section-0735",
+          "section-0736",
+          "section-0740",
+          "section-0741",
+          "section-0746",
+          "section-0750",
+          "section-0751",
+          "section-0752",
+          "section-0753",
+          "section-0754",
+          "section-0756",
+          "section-0757",
+          "section-0758",
+          "section-0760",
+          "section-0767",
+          "section-0771",
+          "section-0772",
+          "section-0773",
+          "section-0774",
+          "section-0775",
+          "section-0776",
+          "section-0777",
+          "section-0778",
+          "section-0779",
+          "section-0780",
+          "section-0781",
+          "section-0782",
+          "section-0783",
+          "section-0784",
+          "section-0787",
+          "section-0789",
+          "section-0797",
+          "section-0798",
+          "section-0799",
+          "section-0800",
+          "section-0801",
+          "section-0802",
+          "section-0804",
+          "section-0805",
+          "section-0806",
+          "section-0807",
+          "section-0808",
+          "section-0812",
+          "section-0815",
+          "section-0816",
+          "section-0817",
+          "section-0821",
+          "section-0822",
+          "section-0823",
+          "section-0826",
+          "section-0827",
+          "section-0828",
+          "section-0829",
+          "section-0830"
+        ],
+        "physical_pages": []
+      },
+      "extraction": {
+        "purpose": "extract_profile_workpaper",
+        "request_id": "bp-work-75219f282a5b80afada802ac:workpaper:extract",
+        "request_hash": "bfe41507132d0025ce11cd2d44a9de86a174da73b937ea45b08513068e6706fa",
+        "response_hash": "58b097fdb0afaf9001d24575aeb06d77347af983bae89f678d84a540f2322ff2",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "rejected",
+        "usage": {
+          "input_tokens": 17497,
+          "output_tokens": 3005,
+          "total_tokens": 20502
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0062",
+          "section-0064",
+          "section-0092",
+          "section-0096",
+          "section-0097",
+          "section-0750"
+        ],
+        "physical_pages": [
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          46,
+          47,
+          48,
+          49,
+          221
+        ]
+      },
+      "local_schema_normalization": {
+        "policy": "enrichment_empty_unread_status.v1",
+        "original_content_sha256": "58b097fdb0afaf9001d24575aeb06d77347af983bae89f678d84a540f2322ff2",
+        "normalized_object_sha256": "b4b898361b911d72b72cff52577ce5580155785034bcb5d63346d01529778b39",
+        "target_elements": [
+          "revenue_model"
+        ],
+        "normalized_elements": [
+          "business_structure",
+          "products_services",
+          "scale_and_mix",
+          "operations_and_inputs",
+          "customers_channels_markets",
+          "operating_drivers",
+          "material_changes"
+        ]
+      }
+    },
+    "quality_review": {
+      "status": "completed_with_open_findings",
+      "policy_version": "company_profile_workpaper_review.v12",
+      "original_draft_hash": "103ce71f4367b51ebe31a2267ee2fed8ddaafcdaa1188f689c888f647f4d50cb",
+      "findings": [
+        {
+          "finding_id": "F-RM007-SCOPE",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "affected_fact_id": "RM-007",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0017",
+            "source-0015"
+          ],
+          "explanation": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+          "resolution": "metrics_limited",
+          "original_fact": {
+            "fact_id": "RM-007",
+            "text": "主营业务分行业情况说明中，2025年集团证券及期货经纪业务实现收入37.78亿元，资产管理业务31.94亿元，机构服务业务15.77亿元，自营投资业务32.14亿元，海外业务4.77亿元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0017"
+            ],
+            "metrics": [
+              {
+                "name": "证券及期货经纪业务收入（说明段）",
+                "raw_value": "37.78",
+                "value": "37.78",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "资产管理业务收入（说明段）",
+                "raw_value": "31.94",
+                "value": "31.94",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "机构服务业务收入（说明段）",
+                "raw_value": "15.77",
+                "value": "15.77",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "自营投资业务收入（说明段）",
+                "raw_value": "32.14",
+                "value": "32.14",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海外业务收入（说明段）",
+                "raw_value": "4.77",
+                "value": "4.77",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "revised_fact": null,
+          "metric_limit": {
+            "fact_sha256": "9efe7023e9208ce94b4e6a6a887323fd1075e3a0a817b2a7c8b3eae7d6d18231",
+            "narrative_supported": true,
+            "metric_indices": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        }
+      ],
+      "checked_fact_ids": [
+        "RM-001",
+        "RM-002",
+        "RM-003",
+        "RM-004",
+        "RM-005",
+        "RM-006",
+        "RM-007",
+        "RM-008"
+      ],
+      "calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-75219f282a5b80afada802ac:workpaper:review",
+          "request_hash": "c34d4b9711e07bafe6e537739950d8f9a9f4779e20f223b5d88909cb4c655227",
+          "response_hash": "c6e3f04fc9078044288c0d3f177cbe65e4474238808d8f1fcbbbe99e4d525146",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 21787,
+            "output_tokens": 354,
+            "total_tokens": 35698
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0062",
+            "section-0064",
+            "section-0092",
+            "section-0096",
+            "section-0097",
+            "section-0750"
+          ],
+          "physical_pages": [
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            46,
+            47,
+            48,
+            49,
+            221
+          ]
+        }
+      ],
+      "retained_request_ids": [],
+      "locally_revalidated_request_ids": [],
+      "error": null,
+      "checked_fact_hashes": {
+        "RM-001": "32b1dfc8a1c51eed294a9c89c8482903c8f3cfedf881e98f24eddb1661bf8a01",
+        "RM-002": "528a16d145731ac30de8175bbf46c15f55f5a6bc40adfec603a869d4ce23d6fd",
+        "RM-003": "b9b8039403f54db90a865ad3cc7b21009ca46f94bbfd8f9fbe3be2ba94b99ebd",
+        "RM-004": "ce8c1d5b27011eade67d4d104864641cc36a7ca41f7fd86a26045d70c32ae1f5",
+        "RM-005": "88c28aa7ee47d349261193695d2bf73c5b28225bf16ae12368d6942881218144",
+        "RM-006": "74202b19db4119f8ea806de6dd921a04f748317f9b0062091ca24ce224591903",
+        "RM-007": "9efe7023e9208ce94b4e6a6a887323fd1075e3a0a817b2a7c8b3eae7d6d18231",
+        "RM-008": "8f0cfc41e52769e28494ed271e3819b2b0a870bbfc93c640d7758fd56555e914"
+      },
+      "metric_limit_policy": "source_review_exact_metric_limits.v1"
+    },
+    "standardization_notes": []
+  },
+  "workpaper_raw_for_audit": true,
+  "workpaper_delivery": {
+    "policy_version": "company_profile_research_delivery.v1",
+    "research_only": true,
+    "formal_acceptance": "not_assessed",
+    "production_authorization": "not_authorized",
+    "information_gaps": [
+      {
+        "element": "business_structure",
+        "status": "unclear",
+        "reasons": [
+          "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对业务结构要素重新提取。"
+        ]
+      },
+      {
+        "element": "products_services",
+        "status": "unclear",
+        "reasons": [
+          "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对产品与服务要素重新提取。"
+        ]
+      },
+      {
+        "element": "revenue_model",
+        "status": "observed",
+        "reasons": [
+          "分部报告章节仅提供分部名称与划分依据，未提供分部收入金额表，故无法用分部报告交叉验证各板块收入与内部抵消。",
+          "主营业务分行业表未列示合计行与内部抵消行，各板块收入合计与集团营业收入118.41亿元之间的差异及抵消关系未在所选章节披露，未计算占比。",
+          "管理层讨论中的业务板块收入（亿元口径）与分行业表（万元口径）数值一致，但分行业表未明确标注为合并口径，板块口径以原文为准。"
+        ]
+      },
+      {
+        "element": "scale_and_mix",
+        "status": "unclear",
+        "reasons": [
+          "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对规模与结构要素单独提取；相关收入数据见收入模式要素。"
+        ]
+      },
+      {
+        "element": "operations_and_inputs",
+        "status": "unclear",
+        "reasons": [
+          "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对运营与投入要素重新提取。"
+        ]
+      },
+      {
+        "element": "customers_channels_markets",
+        "status": "unclear",
+        "reasons": [
+          "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对客户与渠道要素重新提取。"
+        ]
+      },
+      {
+        "element": "operating_drivers",
+        "status": "unclear",
+        "reasons": [
+          "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对经营驱动要素重新提取。"
+        ]
+      },
+      {
+        "element": "material_changes",
+        "status": "unclear",
+        "reasons": [
+          "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对重大变化要素重新提取。"
+        ]
+      },
+      {
+        "element": "revenue_model",
+        "fact_id": "RM-007",
+        "status": "unclear",
+        "metric_indices": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "metric_names": [
+          "证券及期货经纪业务收入（说明段）",
+          "资产管理业务收入（说明段）",
+          "机构服务业务收入（说明段）",
+          "自营投资业务收入（说明段）",
+          "海外业务收入（说明段）"
+        ],
+        "evidence_ids": [
+          "source-0017"
+        ],
+        "reasons": [
+          "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+          "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+          "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+          "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+          "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+        ],
+        "review_basis": "model_source_check",
+        "model_finding_ids": [
+          "F-RM007-SCOPE"
+        ],
+        "suggested_reading": "建议定向精读该事实的原业务章节，核对指标主体、方向、期间和表头；不推断替代值。"
+      }
+    ],
+    "suggested_acquisitions": [
+      {
+        "element": "revenue_model",
+        "fact_id": "RM-007",
+        "metric_indices": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "metric_names": [
+          "证券及期货经纪业务收入（说明段）",
+          "资产管理业务收入（说明段）",
+          "机构服务业务收入（说明段）",
+          "自营投资业务收入（说明段）",
+          "海外业务收入（说明段）"
+        ],
+        "severity": "material",
+        "reason": "建议定向精读该事实的原业务章节，核对指标主体、方向、期间和表头；不推断替代值。 source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。；source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。；source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。；source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。；source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+        "evidence_ids": [
+          "source-0017"
+        ]
+      }
+    ],
+    "counts": {
+      "reviewed": 7,
+      "pending": 0,
+      "limited": 1,
+      "source_only": 0,
+      "withheld": 0,
+      "duplicate": 0
+    },
+    "labels": {
+      "reviewed": "已核（研究用途，非正式接受）",
+      "pending": "待核（无其他限用）",
+      "limited": "保真限用",
+      "source_only": "仅源参考／解释",
+      "withheld": "已隔离",
+      "duplicate": "重复未再展示"
+    },
+    "pending_review_count": 0,
+    "facts": [
+      {
+        "fact_id": "RM-001",
+        "element": "revenue_model",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0012",
+          "source-0013"
+        ],
+        "fact": {
+          "fact_id": "RM-001",
+          "text": "2025年集团实现营业收入118.41亿元，同比增长21.03%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0012",
+            "source-0013"
+          ],
+          "metrics": [
+            {
+              "name": "营业收入",
+              "raw_value": "118.41",
+              "value": "118.41",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业收入同比增长率",
+              "raw_value": "21.03",
+              "value": "21.03",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "RM-002",
+        "element": "revenue_model",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0014",
+          "source-0015"
+        ],
+        "fact": {
+          "fact_id": "RM-002",
+          "text": "主营业务分行业情况表列示证券及期货经纪业务营业收入377,812.12万元，营业成本234,797.31万元，毛利率37.85%，营业收入比上年增减21.37%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "metrics": [
+            {
+              "name": "证券及期货经纪业务营业收入",
+              "raw_value": "377,812.12",
+              "value": "377812.12",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "证券及期货经纪业务营业成本",
+              "raw_value": "234,797.31",
+              "value": "234797.31",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "证券及期货经纪业务毛利率",
+              "raw_value": "37.85",
+              "value": "37.85",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "证券及期货经纪业务营业收入比上年增减",
+              "raw_value": "21.37",
+              "value": "21.37",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "RM-003",
+        "element": "revenue_model",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0014",
+          "source-0015"
+        ],
+        "fact": {
+          "fact_id": "RM-003",
+          "text": "主营业务分行业情况表列示资产管理业务营业收入319,408.12万元，营业成本99,295.94万元，毛利率68.91%，营业收入比上年增减25.04%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "metrics": [
+            {
+              "name": "资产管理业务营业收入",
+              "raw_value": "319,408.12",
+              "value": "319408.12",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "资产管理业务营业成本",
+              "raw_value": "99,295.94",
+              "value": "99295.94",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "资产管理业务毛利率",
+              "raw_value": "68.91",
+              "value": "68.91",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "资产管理业务营业收入比上年增减",
+              "raw_value": "25.04",
+              "value": "25.04",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "RM-004",
+        "element": "revenue_model",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0014",
+          "source-0015"
+        ],
+        "fact": {
+          "fact_id": "RM-004",
+          "text": "主营业务分行业情况表列示机构服务业务营业收入157,695.89万元，营业成本118,513.51万元，毛利率24.85%，营业收入比上年增减58.67%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "metrics": [
+            {
+              "name": "机构服务业务营业收入",
+              "raw_value": "157,695.89",
+              "value": "157695.89",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "机构服务业务营业成本",
+              "raw_value": "118,513.51",
+              "value": "118513.51",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "机构服务业务毛利率",
+              "raw_value": "24.85",
+              "value": "24.85",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "机构服务业务营业收入比上年增减",
+              "raw_value": "58.67",
+              "value": "58.67",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "RM-005",
+        "element": "revenue_model",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0014",
+          "source-0015"
+        ],
+        "fact": {
+          "fact_id": "RM-005",
+          "text": "主营业务分行业情况表列示自营投资业务营业收入321,443.92万元，营业成本138,054.78万元，毛利率57.05%，营业收入比上年增减2.98%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "metrics": [
+            {
+              "name": "自营投资业务营业收入",
+              "raw_value": "321,443.92",
+              "value": "321443.92",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "自营投资业务营业成本",
+              "raw_value": "138,054.78",
+              "value": "138054.78",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "自营投资业务毛利率",
+              "raw_value": "57.05",
+              "value": "57.05",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "自营投资业务营业收入比上年增减",
+              "raw_value": "2.98",
+              "value": "2.98",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "RM-006",
+        "element": "revenue_model",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0014",
+          "source-0015"
+        ],
+        "fact": {
+          "fact_id": "RM-006",
+          "text": "主营业务分行业情况表列示海外业务营业收入47,705.97万元，营业成本32,473.61万元，毛利率31.93%，营业收入比上年增减-1.02%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "metrics": [
+            {
+              "name": "海外业务营业收入",
+              "raw_value": "47,705.97",
+              "value": "47705.97",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "海外业务营业成本",
+              "raw_value": "32,473.61",
+              "value": "32473.61",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "海外业务毛利率",
+              "raw_value": "31.93",
+              "value": "31.93",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "海外业务营业收入比上年增减",
+              "raw_value": "-1.02",
+              "value": "-1.02",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "RM-007",
+        "element": "revenue_model",
+        "state": "limited",
+        "label": "保真限用／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [
+          "模型源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。"
+        ],
+        "evidence_ids": [
+          "source-0017"
+        ],
+        "fact": {
+          "fact_id": "RM-007",
+          "text": "主营业务分行业情况说明中，2025年集团证券及期货经纪业务实现收入37.78亿元，资产管理业务31.94亿元，机构服务业务15.77亿元，自营投资业务32.14亿元，海外业务4.77亿元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0017"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        "metric_gaps": [
+          {
+            "metric_index": 0,
+            "name": "证券及期货经纪业务收入（说明段）",
+            "state": "withheld",
+            "reason": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+            "review_basis": "model_source_check",
+            "model_finding_ids": [
+              "F-RM007-SCOPE"
+            ],
+            "model_reasons": [
+              "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+            ]
+          },
+          {
+            "metric_index": 1,
+            "name": "资产管理业务收入（说明段）",
+            "state": "withheld",
+            "reason": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+            "review_basis": "model_source_check",
+            "model_finding_ids": [
+              "F-RM007-SCOPE"
+            ],
+            "model_reasons": [
+              "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+            ]
+          },
+          {
+            "metric_index": 2,
+            "name": "机构服务业务收入（说明段）",
+            "state": "withheld",
+            "reason": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+            "review_basis": "model_source_check",
+            "model_finding_ids": [
+              "F-RM007-SCOPE"
+            ],
+            "model_reasons": [
+              "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+            ]
+          },
+          {
+            "metric_index": 3,
+            "name": "自营投资业务收入（说明段）",
+            "state": "withheld",
+            "reason": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+            "review_basis": "model_source_check",
+            "model_finding_ids": [
+              "F-RM007-SCOPE"
+            ],
+            "model_reasons": [
+              "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+            ]
+          },
+          {
+            "metric_index": 4,
+            "name": "海外业务收入（说明段）",
+            "state": "withheld",
+            "reason": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+            "review_basis": "model_source_check",
+            "model_finding_ids": [
+              "F-RM007-SCOPE"
+            ],
+            "model_reasons": [
+              "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+            ]
+          }
+        ],
+        "metric_source_indices": []
+      },
+      {
+        "fact_id": "RM-008",
+        "element": "revenue_model",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0013"
+        ],
+        "fact": {
+          "fact_id": "RM-008",
+          "text": "利润表科目变动分析显示，手续费及佣金净收入63.71亿元，同比增长20.83%；利息净收入15.85亿元，同比增长11.75%；投资收益38.61亿元，同比增长69.46%。上述为会计科目口径，不等同于业务板块收入。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "metrics": [
+            {
+              "name": "手续费及佣金净收入",
+              "raw_value": "63.71",
+              "value": "63.71",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "手续费及佣金净收入同比增长率",
+              "raw_value": "20.83",
+              "value": "20.83",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "利息净收入",
+              "raw_value": "15.85",
+              "value": "15.85",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "利息净收入同比增长率",
+              "raw_value": "11.75",
+              "value": "11.75",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "投资收益",
+              "raw_value": "38.61",
+              "value": "38.61",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "投资收益同比增长率",
+              "raw_value": "69.46",
+              "value": "69.46",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      }
+    ]
+  },
+  "workpaper_markdown": "# 601377.SH｜2025-12-31 公司画像底稿\n\n真实模型底稿（待核，不代表正式公司可用）\n\n来源版本：`71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb`。发布时点：2026-03-27T16:00:00+00:00。\n\n研究分级不等于正式可信发布；以下普通正文不含隔离、仅源参考或重复对象。原底稿及后文复核记录保留审计。\n\n已核（研究用途，非正式接受） 7；待核（无其他限用） 0；保真限用 1；仅源参考／解释 0；已隔离 0；重复未再展示 0\n待核合计（含限用中的待核）：0。\n\n## 业务结构\n\n- 限制：本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对业务结构要素重新提取。\n\n## 产品、服务及用途\n\n- 限制：本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对产品与服务要素重新提取。\n\n## 怎么赚钱\n\n- 【已核（研究用途，非正式接受）／模型源核】2025年集团实现营业收入118.41亿元，同比增长21.03%。（[source-0012](#source-0012)、[source-0013](#source-0013)）\n  - 营业收入：118.41 亿元；2025年度，consolidated_group。\n  - 营业收入同比增长率：21.03 %；2025年度，consolidated_group。\n- 【已核（研究用途，非正式接受）／模型源核】主营业务分行业情况表列示证券及期货经纪业务营业收入377,812.12万元，营业成本234,797.31万元，毛利率37.85%，营业收入比上年增减21.37%。（[source-0014](#source-0014)、[source-0015](#source-0015)）\n  - 证券及期货经纪业务营业收入：377,812.12 万元；2025年度，business_segment。\n  - 证券及期货经纪业务营业成本：234,797.31 万元；2025年度，business_segment。\n  - 证券及期货经纪业务毛利率：37.85 %；2025年度，business_segment。\n  - 证券及期货经纪业务营业收入比上年增减：21.37 %；2025年度，business_segment。\n- 【已核（研究用途，非正式接受）／模型源核】主营业务分行业情况表列示资产管理业务营业收入319,408.12万元，营业成本99,295.94万元，毛利率68.91%，营业收入比上年增减25.04%。（[source-0014](#source-0014)、[source-0015](#source-0015)）\n  - 资产管理业务营业收入：319,408.12 万元；2025年度，business_segment。\n  - 资产管理业务营业成本：99,295.94 万元；2025年度，business_segment。\n  - 资产管理业务毛利率：68.91 %；2025年度，business_segment。\n  - 资产管理业务营业收入比上年增减：25.04 %；2025年度，business_segment。\n- 【已核（研究用途，非正式接受）／模型源核】主营业务分行业情况表列示机构服务业务营业收入157,695.89万元，营业成本118,513.51万元，毛利率24.85%，营业收入比上年增减58.67%。（[source-0014](#source-0014)、[source-0015](#source-0015)）\n  - 机构服务业务营业收入：157,695.89 万元；2025年度，business_segment。\n  - 机构服务业务营业成本：118,513.51 万元；2025年度，business_segment。\n  - 机构服务业务毛利率：24.85 %；2025年度，business_segment。\n  - 机构服务业务营业收入比上年增减：58.67 %；2025年度，business_segment。\n- 【已核（研究用途，非正式接受）／模型源核】主营业务分行业情况表列示自营投资业务营业收入321,443.92万元，营业成本138,054.78万元，毛利率57.05%，营业收入比上年增减2.98%。（[source-0014](#source-0014)、[source-0015](#source-0015)）\n  - 自营投资业务营业收入：321,443.92 万元；2025年度，business_segment。\n  - 自营投资业务营业成本：138,054.78 万元；2025年度，business_segment。\n  - 自营投资业务毛利率：57.05 %；2025年度，business_segment。\n  - 自营投资业务营业收入比上年增减：2.98 %；2025年度，business_segment。\n- 【已核（研究用途，非正式接受）／模型源核】主营业务分行业情况表列示海外业务营业收入47,705.97万元，营业成本32,473.61万元，毛利率31.93%，营业收入比上年增减-1.02%。（[source-0014](#source-0014)、[source-0015](#source-0015)）\n  - 海外业务营业收入：47,705.97 万元；2025年度，business_segment。\n  - 海外业务营业成本：32,473.61 万元；2025年度，business_segment。\n  - 海外业务毛利率：31.93 %；2025年度，business_segment。\n  - 海外业务营业收入比上年增减：-1.02 %；2025年度，business_segment。\n- 【保真限用／模型源核】主营业务分行业情况说明中，2025年集团证券及期货经纪业务实现收入37.78亿元，资产管理业务31.94亿元，机构服务业务15.77亿元，自营投资业务32.14亿元，海外业务4.77亿元。（[source-0017](#source-0017)）\n  - 使用限制：模型源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。\n- 【已核（研究用途，非正式接受）／模型源核】利润表科目变动分析显示，手续费及佣金净收入63.71亿元，同比增长20.83%；利息净收入15.85亿元，同比增长11.75%；投资收益38.61亿元，同比增长69.46%。上述为会计科目口径，不等同于业务板块收入。（[source-0013](#source-0013)）\n  - 手续费及佣金净收入：63.71 亿元；2025年度，consolidated_group。\n  - 手续费及佣金净收入同比增长率：20.83 %；2025年度，consolidated_group。\n  - 利息净收入：15.85 亿元；2025年度，consolidated_group。\n  - 利息净收入同比增长率：11.75 %；2025年度，consolidated_group。\n  - 投资收益：38.61 亿元；2025年度，consolidated_group。\n  - 投资收益同比增长率：69.46 %；2025年度，consolidated_group。\n- 限制：分部报告章节仅提供分部名称与划分依据，未提供分部收入金额表，故无法用分部报告交叉验证各板块收入与内部抵消。\n- 限制：主营业务分行业表未列示合计行与内部抵消行，各板块收入合计与集团营业收入118.41亿元之间的差异及抵消关系未在所选章节披露，未计算占比。\n- 限制：管理层讨论中的业务板块收入（亿元口径）与分行业表（万元口径）数值一致，但分行业表未明确标注为合并口径，板块口径以原文为准。\n\n## 规模与业务权重\n\n- 限制：本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对规模与结构要素单独提取；相关收入数据见收入模式要素。\n\n## 经营方式与关键投入\n\n- 限制：本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对运营与投入要素重新提取。\n\n## 客户、渠道与市场\n\n- 限制：本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对客户与渠道要素重新提取。\n\n## 关键经营影响因素\n\n- 限制：本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对经营驱动要素重新提取。\n\n## 近期重要变化\n\n- 限制：本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对重大变化要素重新提取。\n\n## 建议获取（不阻塞画像交付）\n\n- 怎么赚钱：建议定向精读该事实的原业务章节，核对指标主体、方向、期间和表头；不推断替代值。 source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。；source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。；source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。；source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。；source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。\n\n## 阅读范围与取舍\n\n本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。\n\n- 第九节 证券公司信息披露 ----------------------------------------249 / 一、报告期内公司从事的业务情况，物理页34—34：本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。\n- 第九节 证券公司信息披露 ----------------------------------------249 / 三、经营情况讨论与分析，物理页35—45：本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。\n- 第九节 证券公司信息披露 ----------------------------------------249 / 五、报告期内主要经营情况，物理页46—48：本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。\n- 第九节 证券公司信息披露 ----------------------------------------249 / 主营业务分行业情况，物理页48—48：本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。\n- 第九节 证券公司信息披露 ----------------------------------------249 / 主营业务分地区情况，物理页48—49：本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。\n- 第九节 证券公司信息披露 ----------------------------------------249 / 八、分部报告，物理页221—222：本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。\n\n停止理由：已覆盖业务概述、经营讨论、收入成本分析、分行业/分地区收入构成及分部报告，可回答四大业务收入与权重问题；剩余为会计科目附注与行业背景，超出定向补充范围，停止。\n\n- 未读/后置：section-0065至section-0084各业务明细子节：其内容已被section-0064整体覆盖，避免父子重复选取\n- 未读/后置：section-0702手续费及佣金净收入、section-0704利息净收入等会计科目附注：仅在板块收入无法安全归属时定向补充，本次以分部报告与主营业务表为主，暂不展开\n- 未读/后置：section-0063行业情况、section-0085核心竞争力：属行业背景与泛化竞争力，非本次收入权重定向目标，暂不选\n- 限制：本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未覆盖完整公司画像。\n- 限制：分部报告未提供分部收入金额表，板块收入权重无法通过分部报告交叉验证。\n- 限制：各板块收入合计与集团营业收入的差异及内部抵消未在所选章节披露，未计算占比。\n\n## 模型处理记录\n\n- 选章：deepseek-flash（deepseek:deepseek-flash，semantic_extraction__deepseek），报告标题索引（619个候选章节）；输入/输出/合计 17035/370/17405；finish=stop；requested_reasoning=high。\n- 正文抽取：deepseek-flash（deepseek:deepseek-flash，semantic_extraction__deepseek），章节 section-0062, section-0064, section-0092, section-0096, section-0097, section-0750；物理页 34,35,36,37,38,39,40,41,42,43,44,46,47,48,49,221；输入/输出/合计 17497/3005/20502；finish=stop；requested_reasoning=high。\n- 提示版本：`company_profile_workpaper.2026-11-19.independent-assertions.v21`；预处理：`toc_sections_native_layout.v8.structured-note-markers`。\n\n## 原文复核（开发结果仍待正式核验）\n\n复核状态：`completed_with_open_findings`。\n- 已检查原事实：8条；范围限于本次所选原文，不是全报告完整性保证。\n- 原始底稿哈希：`103ce71f4367b51ebe31a2267ee2fed8ddaafcdaa1188f689c888f647f4d50cb`。\n- review_profile_workpaper：grok-4.7（scorpio:grok-4.7）；requested_reasoning=high；usage=35698；本次调用。\n- material / wrong_subject / metrics_limited：source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。（[source-0017](#source-0017)、[source-0015](#source-0015)）\n  - 原事实（已保留审计）：主营业务分行业情况说明中，2025年集团证券及期货经纪业务实现收入37.78亿元，资产管理业务31.94亿元，机构服务业务15.77亿元，自营投资业务32.14亿元，海外业务4.77亿元。\n\n## 来源\n\n### source-0001\n\n第九节 证券公司信息披露 ----------------------------------------249 / 一、报告期内公司从事的业务情况\n\n物理页34，字符0—1578：\n\n> 一、报告期内公司从事的业务情况 公司致力于“建设有温度的一流证券金融集团”，为境内外各类客户提供全方位的综合金融服务。按照客户 群体及业务属性的不同，公司所从事的主要业务分为四大板块，分别是财富管理业务、机构服务业务、自营投资 业务、海外业务。 财富管理业务包括证券及期货经纪业务和资产管理业务。其中，证券及期货经纪业务是指通过线下和线上相 结合的方式提供包括代理客户买卖股票、基金、债券、期货及期权等交易服务、金融产品销售、基金投顾、融资 第 融券、股票质押式回购、股权激励行权融资等多元化服务；资产管理业务包括为客户提供各类证券资产管理、基 第 金资产管理、私募股权基金管理等服务。 第 第 机构服务业务包括研究与机构服务业务和投资银行业务。其中，研究与机构服务业务包括为各类机构客户提 第 第 供证券研究与销售交易服务、资产托管与基金服务、机构交易服务等业务；投资银行业务主要包括股权融资、债 第 权融资、财务顾问、中小微企业融资、区域股权市场服务等业务。 第 第 第 自营投资业务是在价值投资、稳健经营的前提下，从事股票、债券、衍生品、股权、另类等多品种自有资金 第 投资交易业务。 海外业务主要是通过全资子公司兴证（香港）金融控股有限公司开展环球证券及期货经纪、机构销售与研 究、企业融资、自营投资、资产管理、私人财富管理等业务。 公司主要围绕上述主营业务展业，通过提供综合金融产品和服务获取各类手续费及佣金收入、利息收入及投 资收益等。 报告期内公司新增重要非主营业务的说明 □适用 √不适用\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0002\n\n第九节 证券公司信息披露 ----------------------------------------249 / 三、经营情况讨论与分析\n\n物理页35，字符547—1785：\n\n> 三、经营情况讨论与分析 第 第 第 过去一年，集团上下以习近平新时代中国特色社会主义思想为指导，深入学习贯彻党的二十届四中全会精 第 第 神、习近平总书记在闽金融论述与实践精神以及在福建考察时的重要讲话精神，认真贯彻落实省委省政府工作部 署与要求，奋勇争先、再上台阶，持续深化拓展“三争”行动。下半年以来，在“建设有温度的一流证券金融集 团”的愿景和“向上向善”核心价值观指引下，党建、改革、创新、质效、文化、规则“六个引领”给公司带来 强大的活力、动力和凝聚力，公司综合实力、抗风险能力和经营业绩稳步提升，高质量发展取得良好成效。围绕 做深普惠金融和数字金融大文章，深化财富管理业务买方转型，打造“知己理财”财富品牌，“懂你更为你”理 念获得市场高度认可，新开户市占率、客户规模及兴业证券APP（优理宝）月活跃用户数均创历史新高，代销金 融产品业务排名行业前列；公募基金管理投资业绩保持行业领先，主动权益类基金近三年收益率在大型权益基金 公司中位列第一，管理规模突破历史新高，养老基金Y份额保有规模位居行业前三，产品布局持续完善，成功发 行行业首只沪深300质量ETF、首只跨市场沪港深300指数增强基金和首批新型浮动费率基金；券商资管公募牌照 战略价值加速释放，初步形成覆盖不同风险偏好的公募产品线布局，持续夯实固收业务基本盘，满足居民多元化 资产管理需求。围绕做实科技金融和绿色金融大文章，股权融资业务完成同宇新材、山大电力等新质生产力领域 多家企业股权融资，担任独立财务顾问助力综艺股份重大资产重组、中金公司吸收合并东兴和信达；债权融资业 务科创债和绿色债券承销规模显著提升，成功发行市场首单农贸市场基础设施公募REITs、首单跨境电商产业园 机构间REITs及首单分布式清洁能源资产机构间REITs；一级股权投资业务科技与绿色领域业务布局不断强化，培 育支持“专精特新”企业创新发展，行业影响力持续增强。机构综合服务能力巩固提升，研究业务创收创誉水平 稳定在行业第一梯队，综合研究转型取得积极成效，在产业研究、智库服务及绿色金融等领域深化拓展，围绕金 融“五篇大文章”持续输出高质量投研成果；资产托管与基金服务保持竞争优势，期末存续托管私募证券投资基 金产品数量行业排名第六位。自有资金多元化投资策略纵深推进，投资管理能力长期稳定在业内前列。公司积极 践行金融工作政治性和人民性，在文化建设、社会责任领域亦获高度认可，连续三年蝉联行业文化建设实践评估 最高评级，党建工作、投资者教育、慈善工作等领域荣获多项国家级、省部级荣誉。 ●2025 年度报告 ● 034\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0003\n\n第九节 证券公司信息披露 ----------------------------------------249 / 三、经营情况讨论与分析\n\n物理页36，字符0—2676：\n\n> （一）财富管理业务 1. 证券及期货经纪业务 市场环境 报告期内，证券市场在政策呵护和流动性改善的双重支撑下迎来明确拐点，随着以险资为主的中长期资金增 配权益市场、投资者信心修复带来新开户数量增长和客户银证转账的净流入，推动市场成交显著放量；期货市场 交投受益于品类创新和大宗商品波动率增大维持高活跃度，市场赚钱效应提升进一步增强居民财富管理需求。 根据沪深交易所、中国证券业协会等机构统计数据，2025年沪深两市累计股基成交额998.15万亿元，同比增长 第 第 70.4%；截至2025年末，市场融资融券余额2.54万亿元，较去年末上升36.3%。根据中国期货业协会统计数据， 第 以单边计算，2025年期货市场累计成交量90.74亿手，同比增长17.4%；累计成交额766.25万亿元，同比增长 第 第 23.7%。 第 第 经营举措及业绩 第 第 在证券经纪业务领域，公司秉承以客户为中心的理念，坚定推行买方投顾转型，持续提升服务质量。报告期 第 第 内，公司发布“知己理财”财富管理品牌，推出以客户利益为中心的买方投顾服务体系，围绕交易与配置两大客 户场景，构建“知已享投”“知己优投”“知己智投”三大产品体系，精准匹配客户资产配置、专业投资、智能 交易三大核心需求，“懂你更为你”理念获得市场高度认可。以“知己享投”为抓手，创新“9+4+N”多元资产 配置框架，为投资者提供全方位、多层次的资产配置解决方案，以“知己优投”为引领，围绕“总部投、分支 顾”定位，推动专业能力精准下沉，投顾服务效能持续增强，以“知己智投”为驱动，围绕“让每笔交易更聪 明”的目标，深化量化投研与策略工具，打造覆盖投前、投中、投后的智能交易全流程服务体系。公司数智化服 务能力不断提升，集约化服务效能充分释放，新开户市占率、客户规模、兴业证券APP（优理宝）月活跃用户数 均创历史新高。根据沪深交易所公布数据，2025年公司股票基金交易总金额13.74万亿元，同比增长81.4%，母 公司实现代理买卖证券业务净收入(含席位)24.47亿元，同比增长42.5%。 在金融产品销售业务领域，以多元配置为导向，持续丰富产品供给，升级买方投顾服务体系；针对客户个性 化需求，加强产品定制化能力，满足客户多样化的财富配置需求。报告期，产品保有结构持续优化，母公司实现 代理销售金融产品净收入3.66亿元，同比增长17%。 在融资融券业务领域，公司持续强化总分协同，优化迭代业务模式，为高净值客户、机构客户提供差异化、 综合化服务，推动业务发展。截至2025年末，公司融资融券期末余额417.30亿元，较上年末增长31%。 在股票质押回购业务领域，公司秉持金融服务实体经济的宗旨，积极发挥专业优势，同步强化全面风险管 理。截至2025年末，公司股票质押业务规模8.71亿元，较上年末增长12%，其中公司自有资金融出规模7.26亿 元，较上年末增长15%，平均履约保障比例为425%。 在期货经纪业务领域，集团全资子公司兴证期货始终坚持以机构经纪为核心业务方向，通过构建“投资、研 究、交易、风险管理”四大核心能力，形成以经纪业务为基础，期货资管和风险管理业务为两翼，做市、自营及 国际业务为未来战略布局的“一体两翼三布局”的业务模式。报告期内，依托集团协同优势，客户数量及资产规 模稳步增长；深化产业客户服务，有效运用期货衍生品工具服务实体经济高质量发展，“保险+期货”商业项目 实现突破和业务模式进阶。截至2025年末，兴证期货期末客户权益285.84亿元。 035 ●2025 年度报告 ●\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0004\n\n第九节 证券公司信息披露 ----------------------------------------249 / 三、经营情况讨论与分析\n\n物理页37，字符0—1523：\n\n> 未来展望 公司将继续践行金融工作的政治性与人民性，坚守客户需求导向，加快买方模式转型，打造具有兴证特色的 金融产品和服务体系。聚焦多元资产配置与买方服务转型，通过层次化的服务设计实现客户全覆盖，持续深化 “知己理财”品牌内涵，围绕交易与配置两大核心客户场景，不断升级“知己享投”“知己优投”“知己智投” 三大服务体系；线上线下一体化多措并举做大客群塔基，强化AI赋能引擎，打造一支以“专业、专心、专属”为 服务内核的投顾队伍，切实满足居民日益增长的多元化财富管理需求，提升满意度与获得感。 第 2. 资产管理业务 第 第 （1）券商资产管理业务 第 第 市场环境 第 第 报告期内，券商资管在监管与市场的多重因素驱动下呈现出“总量趋稳、结构优化、特色凸显”的新态势。 第 第 根据中国证券投资基金业协会数据统计，截至2025年末，券商私募资管规模达到5.8万亿元，较年初增长6%，产 第 品结构不断优化，以集合资管为代表的主动管理产品规模占比持续提升，超过单一资管规模占比，体现了行业主 第 动管理转型的成效；固收类产品规模依然是券商资管的基本盘，同时权益市场全面回暖带动股票和混合类产品规 模显著增长。 经营举措及业绩 报告期内，集团全资子公司兴证资管通过优化组织架构、重塑产品矩阵、完善人才梯队，推动业务向主动 管理和高附加值业务转型；持续深耕“固收+”策略，夯实固收业务基本盘，依托现金管理、固收纯债等系列产 品不断拓展机构业务合作边界；积极响应国家战略部署，设立多只战略配售专项资管计划支持专精特新企业发 展，绿色金融产品规模创历史新高。截至2025年末，兴证资管受托资产管理资金总额1,272亿元，较上年末增长 26%。 未来展望 兴证资管将持续深化“固收+”战略，着力强化投资研究、科技赋能、渠道建设与合规风控能力，依托公募 基金牌照，前瞻布局公私募产品线，为客户打造有弹性、有特色的“固收+”产品；加速数字化转型，打造差异 化核心竞争力，提升运营效率与客户体验；同时积极践行社会责任，重点布局绿色金融、普惠金融和科技创新等 领域。 （2）公募基金管理业务 市场环境 2025年，公募行业在政策改革深化与市场环境演变的双重作用下，实现了规模扩张与高质量发展的良性共 振。监管政策层面，公募销售新规正式落地标志着行业三阶段费改全面收官，投资者持有成本实现有效下降，同 时《推动公募基金高质量发展行动方案》围绕考核制度、收费机制和薪酬体系重塑行业生态，引导基金公司回归 本源，确立了以投资者利益为核心的经营导向，夯实了行业长期发展的根基。市场环境层面，在宏观利率中枢下 行与权益市场估值修复的背景下，居民资产配置需求发生结构性调整，叠加结构性行情下权益基金赚钱效应逐步 显现，公募基金凭借制度规范优势与投研管理能力，有效承接了居民储蓄向投资转化的资金需求，推动行业规 模持续稳健增长。根据中国证券投资基金业协会数据统计，截至2025年末公募基金资产管理规模合计37.71万亿 元，较上年末增长15%。 ●2025 年度报告 ● 036\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0005\n\n第九节 证券公司信息披露 ----------------------------------------249 / 三、经营情况讨论与分析\n\n物理页38，字符0—2428：\n\n> 经营举措及业绩 报告期内，集团控股子公司兴全基金始终恪守“基金持有人利益最大化”原则，通过良好的主动管理能力为 客户创造长期价值回报。产品业绩稳居行业前列，截至2025年末，根据国泰海通证券数据，兴全基金旗下主动 型权益类基金、主动型固收类基金过往三年加权平均收益率分别在权益类大型公司、固定收益类中型公司中位列 第一和第二；业务创新实现新突破，成功发行行业首只沪深300质量ETF，场内业务生态建设取得实质性进展， 完成行业首只跨市场沪港深300指数增强基金和首批新型浮动费率基金发行，基金投顾策略获2025基金投顾创新 案例金牛奖；积极做好养老金融大文章，养老基金Y份额保有规模位居行业前三；跨境投研能力持续深化，报告 第 期内新加坡子公司正式获批，QDII业务额度扩容。截至2025年末，兴全基金公募基金规模达到7,490.57亿元，较 第 上年末增长15%。 第 第 未来展望 第 第 在全球经济不确定性增加、国内资本市场深化改革的背景下，兴全基金将围绕高质量发展主线夯实竞争力， 第 第 以长周期视角培育新动能、完善体系化能力建设。通过深化“数字驱动、智慧赋能”的科技服务体系，加强人才 第 机制与合规风控建设，厚植“责任”文化，深耕养老金融生态，并依托海外子公司推进“内外协同”，提升国际 第 第 化水平。在行业深度变革中，兴全基金将更好发挥公募基金支持实体经济作用，践行公募基金的社会责任，以专 业能力统筹规模与质量，坚定走高质量可持续发展之路，为更广大的居民财富保值增值与资本市场健康发展贡献 专业力量。 （3）私募股权基金管理业务 市场环境 报告期内，私募股权基金行业在政策驱动和产业变革催化下整体运行平稳，呈现募资端逐步企稳、投资结构 持续优化、退出渠道更加多元的发展态势。银行、险资等长期资金扩容推动募资端实现触底维稳，与此同时，监 管政策积极推动社保基金、保险资金、产业资本参与私募股权投资，大力培育壮大耐心资本、长期资本，进一步 拓宽了资金来源；投资端延续聚焦硬科技的趋势，人工智能、半导体、生物医药、新材料等战略新兴产业成为投 资热点，投资活跃度较上年有所回升；退出机制持续突破，A股IPO发行家数和规模同比增长，港股IPO市场显著 回暖，科创板“1+6”新政重启未盈利企业适用科创板第五套标准上市，为战略新兴行业企业拓宽上市通道，新 “国九条”“并购六条”等政策为并购退出打开空间，S基金机制持续优化，多元化退出体系进一步完善。 经营举措及业绩 集团通过全资子公司兴证资本开展私募股权基金管理业务。兴证资本聚焦科技智能、医疗健康、碳中和及先 进制造四大重点行业，强化科技和绿色领域布局，发挥新质生产力引擎作用服务实体经济。报告期内，兴证资本 持续推进产品创设工作，完成多只基金工商设立和基金扩募；投资能力获市场高度认可，多个已投项目完成IPO 发行或获得受理；行业影响力持续提升，荣获投中“2024年度中国最佳私募股权投资机构TOP100”“2024年度 中国最佳券商私募基金子公司TOP10”“2025年度最佳国资投资机构TOP100”和清科“2025年中国股权投资市 场机构有限合伙人TOP50”等业内重量级奖项。 037 ●2025 年度报告 ●\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0006\n\n第九节 证券公司信息披露 ----------------------------------------249 / 三、经营情况讨论与分析\n\n物理页39，字符0—1405：\n\n> 未来展望 兴证资本将持续深化与政府机构、企业等出资方的战略合作，紧贴客户需求创新业务模式与服务方式；围绕 国家壮大战略性新兴产业、培育未来产业的发展方向，聚焦科技金融与绿色金融核心命题，深度挖掘优质项目资 源，切实发挥私募股权投资基金服务实体经济的重要功能。 （二）机构服务业务 第 1. 研究与机构服务 第 （1）研究服务业务 第 第 市场环境 第 第 随着《公开募集证券投资基金证券交易费用管理规定》全面实施，研究业务迎来新的发展窗口期，一方面交 第 第 易费率下行对于研究业务带来客观压力，另一方面随着交易佣金使用的日益规范也为研究业务创造更健康的发展 第 第 空间。2025年随着证券市场的回暖，公募基金的规模随之迎来修复性增长，市场热度的提升带来行业佣金收入 第 改善。长期来看，随着无风险利率的下行和居民储蓄资产的逐步溢出，未来公募基金有望成为承接居民财富保值 增值的重要载体，研究服务业务依然具备较大发展潜力。因此行业仍需加强投研能力建设、提升研究深度与服务 质量强化自身竞争力，推动研究与机构服务业务长期健康发展。 经营举措及业绩 报告期内，公司研究业务蝉联证券时报最佳分析师评选最佳研究团队第三名，连续十届荣膺前五，研究实力 稳居行业第一梯队，分仓佣金收入市场竞争力优势稳固。综合研究转型取得积极进展，持续赋能财富管理战略转 型，依托重大事件点评机制协同发声，护航打造“知己理财”品牌，“投行+研究”模式助力多家优质企业登陆 资本市场。围绕金融“五篇大文章”，积极承接监管机构和政策部门的研究需求，多项课题获中国证券业协会、 福建省金融学会优秀课题，经济与金融研究院获聘社会价值实验室副理事长成员单位，与联合国开发计划署、国 务院发展研究中心联合开展“银发经济与养老金融”研究，联合举办银发经济论坛并发布成果，在ESG、绿色金 融及养老金融领域的品牌影响力进一步提升。积极赋能区域经济发展，为福建省重要专题座谈会建言献策，深度 融入地方决策与产业布局；为省内多地政府、国有企业及大型民营企业提供资本运作与专项研究服务，以专业金 融实践助力金融强省建设。 未来展望 公司将积极拥抱行业机遇，坚守深度研究立身之本，坚持扎实稳健、富于前瞻的兴证研究特色，持续强化深 度研究、专题研究及产业链研究能力，通过体系化建设巩固强化研究服务领先优势。深化“研究+”协同赋能模 式创新，发挥二级市场研究优势，以“投研+投行+投资”模式锻造集团重点优势行业竞争力，布局前瞻产业， 打造全面赋能集团发展的智慧中枢，加快实现研究综合效益转化提质增效。同时，积极服务国家战略，围绕金融 “五篇大文章”，聚焦高层级智库服务，加强与权威机构合作，打造行业标杆研究品牌，助力“十五五”良好开 局，更好地服务经济社会高质量发展。 ●2025 年度报告 ● 038\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0007\n\n第九节 证券公司信息披露 ----------------------------------------249 / 三、经营情况讨论与分析\n\n物理页40，字符0—2359：\n\n> （2）资产托管与基金服务业务 市场环境 报告期内，《私募证券投资基金运作指引》等监管政策全面深化落地，行业加速出清中小私募机构，优质私 募客群价值凸显。市场环境回暖亦带动私募产品发行企稳回升，在此背景下，证券公司加速构建机构客户服务生 态圈，着力提升全业务链综合服务能力，在深耕传统私募领域的同时，加快拓展与公募及其他持牌金融机构的多 元化合作，行业竞争焦点正向全业务链综合服务能力比拼升级。 经营举措及业绩 第 第 第 公司依托集团综合化经营平台优势，以客户需求为导向，整合串联资产托管与基金服务、产品销售、机构经 第 纪、投资研究及衍生品等主经纪商业务，打通“资金-交易-资产”服务链条，为专业投资机构提供全场景一站式 第 服务。报告期内，私募证券基金托管业务保持竞争优势，新增托管私募产品数市场份额稳步提升，期末存续服务 第 第 私募产品数量行业排名第6位；公募基金托管业务加速突破，托管规模在券商同业中位列前十，产品结构持续优 第 第 化，合作公募管理人质量显著提升；其他持牌金融机构业务合作深化，新增托管产品数量与规模增长明显，产品 第 数同比增长128%，月日均规模同比增长146%；业务自动化率、风控覆盖率、品牌影响力保持行业领先水平。 第 未来展望 公司将坚定不移以客户需求为核心，锚定行业发展趋势，双线并行推进业务高质量发展，一方面加速推进资 方服务生态体系迭代升级，加快打造具有兴证特色的差异化服务品牌和资方服务平台，全面提升面向专业机构投 资者的综合金融服务能力；另一方面全面融入集团大财富管理发展战略，依托数据赋能精准匹配居民财富管理需 求，打通专业机构产品与大众财富配置的服务桥梁。 （3）机构交易服务业务 市场环境 报告期内，场外衍生品与做市业务在“需求旺盛”与“监管强化”并行的背景下持续发展，业务的功能性定 位更加清晰。场外衍生品业务随着监管加强对业务底层资产、资金流向和杠杆水平的穿透式管理，合规与风控要 求进一步强化，与此同时，其精准服务实体经济、助力金融“五篇大文章”的核心价值更为凸显。做市业务则持 续发挥市场“稳定器”功能，在科创债、ETF等金融工具以及北交所、科创板等市场的活跃度提升，有效增强了 市场流动性与韧性。 经营举措及业绩 公司坚持以客需服务为导向开展场外衍生品业务，持续提升产品设计、交易定价及风险管理能力，进一步丰 富产品结构和策略体系，基于更加多元的资产配置与风险管理工具为机构客户提供一站式衍生品交易服务，同时 践行金融服务实体经济，落地挂钩绿色和科创类标的的场外衍生品，以金融创新引导资金配置低碳资产、服务新 质生产力发展。做市业务获批成为上交所基金主做市商，取得沪深交易所期权一般做市商资格，做市规模实现跨 越式增长，报告期内，有序推进基金做市服务体系化建设，参与首批科创债ETF做市交易，为公募基金客户提供 智能化、策略化、专业化的高质量做市服务；持续为超长期特别国债、科创债提供做市报价服务，债券做市数量 位列沪深两市一般做市第一，在深交所信用债一般做市中荣获2025年度优秀做市商评价；服务多层次资本市场 建设，开展科创板和北交所做市业务，做市能力位居行业前列。 039 ●2025 年度报告 ●\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0008\n\n第九节 证券公司信息披露 ----------------------------------------249 / 三、经营情况讨论与分析\n\n物理页41，字符0—1455：\n\n> 未来展望 公司将以金融“五篇大文章”为指引，持续完善“柜台市场业务、场外衍生品业务与做市业务”三位一体的 对客交易服务体系，巩固提升差异化竞争优势。场外衍生品业务着力提升交易定价与风险对冲能力，深化多资 产、多结构产品布局，通过打造立体化的衍生产品服务矩阵，拓宽中长期资金入市渠道；做市业务继续锻造多资 产、跨市场的做市交易能力，强化系统支撑与策略创新，有效提升市场流动性。 2. 投资银行业务 第 （1）股权融资业务 第 第 第 市场环境 第 第 报告期内，股权融资市场呈现政策托底与市场修复并存的态势，一方面，宏观经济回暖和产业升级需求推动 第 企业融资需求增长，与此同时资本市场改革红利加速释放，随着科创板 “1+6”改革重启未盈利企业上市通道、 第 第 创业板第三套标准启用等政策相继推出，资本市场制度改革带动股权融资市场活跃度显著修复；另一方面，国 第 有大行注资计划成为2025年股权融资市场的最大增长动能，推动股权融资规模迎来跨越式增长。根据Wind数据 第 统计，报告期内A股市场股权融资总规模（不含资产类）约9,416亿元，同比增长274%，融资家数305家，同比 增长8%。其中，IPO上市116家，同比增长16%，融资规模1318亿元，同比增长96%；市场新增新三板挂牌332 家，其中创新层151家。 经营举措及业绩 在股权融资业务领域，公司紧密围绕国家战略，以服务实体经济发展为初心使命，以建设一流投行为目标， 高质量书写五篇大文章，助力新质生产力发展。业务开拓上做实区域，做深行业，深挖存量，拓展增量，助力 “科技、资本、产业”的良性循环。报告期内共完成境内股权主承销项目6单，家数排名行业第15位，其中完成 创业板IPO项目2单，创业板IPO家数排名行业第5位；完成A股重大资产重组项目1单，并担任中金公司吸收合并 东兴和信达的独立财务顾问。公司加强对创新型中小企业的资本赋能，构建立体化服务矩阵，完成新三板定增4 单，融资规模行业排名第5位，期末持续督导新三板项目数120家，其中创新层督导55家，行业排名第10位。统 筹推进大投行业务一体化发展，强化人员培训提升、业务流程梳理和项目储备开发，提升跨境融资综合服务水 平。公司股权融资业务表现屡获业界认可，报告期内荣获“2025新财富杂志本土最佳投行”“2025新财富杂志 最佳践行ESG投行”“2025中国证券业社会责任投行君鼎奖”等荣誉。 未来展望 公司将充分发挥投行功能性，将业务发展深度嵌入国家战略布局，以新质生产力为核心、产业整合为抓手、 区域深耕为基础、多元创新为引擎，向产业投行转型；聚焦人工智能、高端制造、绿色科技等战略赛道，顺应产 业从“高速扩张”到“存量优化”的转型趋势，为企业提供“并购重组+融资支持+合规风控”全链条服务，并扎 实推进投行业务一体化发展，通过资源整合为客户提供更加集约高效的股权融资服务。 ●2025 年度报告 ● 040\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0009\n\n第九节 证券公司信息披露 ----------------------------------------249 / 三、经营情况讨论与分析\n\n物理页42，字符0—2386：\n\n> （2）债权融资业务 市场环境 2025年，低利率背景下企业融资成本下降，叠加监管层专项债、科创债等定向政策工具支持，债权融资市 场保持稳健发展。全国信用债（不含同业存单）发行规模22.23万亿元，同比增长9%；公司债发行规模5.89万亿 元，同比增长20%；证监会主管资产支持证券发行规模1.46万亿元，同比增长17%。 经营举措及业绩 第 在债权融资业务领域，公司坚持业务创新，深化集团协同，强化业务功能发挥，不断提升客户综合服务能 第 第 力。报告期内，债券承销业务稳步发展，承销只数同比增长22%，积极践行国家战略，承销科创债规模130亿 第 元，同比增长220%；承销绿色债券及绿色资产证券化项目规模79亿元，同比增长107%；服务民营企业及中小 第 微企业融资规模52亿元，并成功发行全国首单绿色中小微企业支持公司债券。资产支持证券市场竞争力保持行业 第 第 前列，REITs类业务取得重大突破，作为独家财务顾问成功发行全国首单农贸市场公募REITs，作为独家销售机构 第 第 及计划管理人成功发行全国首单跨境电商产业园机构间REITs及全国首单分布式清洁能源资产机构间REITs。 第 第 未来展望 公司将持续深化债权融资业务高质量发展，增强专业服务能力与综合竞争力。巩固产品创新优势，支持科技 企业发行科创债、知识产权ABS、数据中心REITs等产品，依托综合金融服务优势赋能实体经济转型升级；持续 拓展绿色金融产品体系，深化绿色债券及ABS创新实践；同时着力推进投行业务一体化发展，增强债权融资业务 国际竞争力。 （3）区域股权交易市场 市场环境 伴随我国经济向高质量发展阶段稳步转型，区域性股权市场作为重要金融基础设施的功能定位持续夯实， 以服务科技中小企业为核心的功能获得政策持续加力。2025年，多项重磅政策进一步明确了区域性股权市场的 发展方向与核心任务：2月，中国证监会发布《关于资本市场做好金融“五篇大文章”的实施意见》，明确要求 “规范发展区域性股权市场，健全‘专精特新’专板综合服务，加强与全国性证券交易场所的有机联系。推动区 域性股权市场规则对接、标准统一”；7月，中国人民银行等七部门联合印发《关于金融支持新型工业化的指导 意见》，强调“高质量建设区域股权市场专精特新专板，加强企业上市培育辅导和专业服务”。上述系列政策部 署，进一步凸显并强化了区域性股权市场在科技金融、普惠金融、绿色金融等领域的枢纽功能。 经营举措及业绩 报告期内，公司参股公司海峡股交立足金融基础设施的核心功能，高质量落实科技金融、普惠金融、绿色金 融等工作，不断提升科创企业培育能力、扩大普惠服务覆盖范围、深化绿色金融创新实践。完善科创企业培育体 系，以“专精特新”专板建设为抓手，持续引导中小企业走“专精特新”发展路径，并首次通过三四板“绿色通 道”助推福建省首家企业登陆新三板；创新普惠金融服务模式，联合各级政府持续举办各类惠企活动，深入县 域、乡镇以金融服务筛选优质潜力企业；引领绿色金融创新实践，获批联合筹建福建省“双碳”能力建设中心， 完成全国首宗“沉积碳—惰性碳”海洋渔业碳汇交易，并实现全国首笔河湖碳汇交易落地。 041 ●2025 年度报告 ●\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0010\n\n第九节 证券公司信息披露 ----------------------------------------249 / 三、经营情况讨论与分析\n\n物理页43，字符0—1334：\n\n> 未来展望 海峡股交将持续打造“一体两翼”业务框架体系，依托“四大基地”资源优势，聚焦“专精特新”企业服 务，进一步丰富科技型中小企业普惠服务产品及体系建设，持续深化县域、乡镇金融服务，优化重点企业培育机 制，不断挖掘优质上市后备企业；依托资源环境交易中心，持续开拓创新双碳背景下的绿色金融业务。 （三）自营投资业务 第 市场环境 第 报告期内，股票市场展现较强复苏韧性，上证指数在波动中震荡上行，全年累计涨幅显著，围绕创新药、机 第 第 器人、海外算力等新质生产力领域呈现多点开花局面，为股票自营提供了较好的投资窗口期；另一方面，随着 第 ETF与量化资金在市场中的作用日益凸显，券商自营的投资范式也逐渐从传统选股向多资产、多策略的组合配置 第 转变。债券市场方面，十年期国债收益率趋势性下行后进入低位区间震荡，在低利率常态化背景下，债券自营业 第 第 务面临一定挑战，传统杠杆与久期策略在当下利率环境中更依赖交易能力。 第 第 一级股权投资方面，受益于政策支持及市场回暖，股权投资呈现结构性复苏态势。国有资本继续发挥主导 第 作用，投资聚焦机器人、半导体、AI产业链等新质生产力领域；一级市场退出渠道持续拓宽，港股IPO市场强劲 复苏，并购重组交易活跃度显著提升，科创板“1+6” 等政策新规为战略新兴行业企业拓宽上市通道，A股市场 IPO常态化进程加速，一级市场多元化退出机制日趋完善。 经营举措及业绩 1. 权益投资业务 报告期内，公司秉持稳健投资与价值投资理念，严控风险，通过优化持仓结构、精选优质行业、丰富投资策 略组合，有效降低了持仓波动与回撤水平，在复杂市场环境中实现了较好的绝对收益与相对收益表现。同时，公 司持续夯实投研体系建设，不断拓展研究广度与深度，强化团队协同与成果转化，为业务高质量发展奠定了坚实 基础。 2. 固定收益投资业务 报告期内，公司发挥投研交易优势，积极挖掘正息差资产机会，应用多元交易策略增厚收益，并结合市场变 化适时调整债券资产结构，实现了稳定的投资回报，业绩表现位列可比基金前茅。面对信用分层加剧、信用风险 事件仍存的市场特征，公司持续开展信用跟踪研究和持仓结构优化，保持高等级品种的较高持仓占比，有效管控 组合信用风险。 3. 另类投资业务 集团通过全资子公司兴证投资开展另类投资业务。报告期内，兴证投资专注主业、提升专业化能力，深耕半 导体、新能源、先进制造、数字经济等新质生产力领域的股权投资，各项业务稳健发展，集团协同效应持续深 化，投后管理与退出工作有序推进，内控与风险管理体系不断完善。 ●2025 年度报告 ● 042\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0011\n\n第九节 证券公司信息披露 ----------------------------------------249 / 三、经营情况讨论与分析\n\n物理页44，字符0—2538：\n\n> 未来展望 权益投资方面，公司将深化研究驱动投资的业务导向，有效整合内外部研究资源，提升研究效率与成果转化 能力，推进投资决策的科技赋能和数字化转型；同时，持续强化风险收益动态平衡，构建多策略、多资产、全天 候多元投研体系，力求在控制波动与回撤的前提下实现稳健回报。 固定收益投资方面，公司将坚持稳健投资理念，在有效管控风险的前提下，挖掘优质正息差资产，保持交易 策略多样化，布局全球化多元化大类资产配置、探索低波动类固收替代策略，以应对低利率环境并保障投资收 益稳定性；同时，持续强化利率风险与信用风险的双重管控，加强持仓债券的信用跟踪与评估，筑牢风险防御 第 体系。 第 第 另类投资方面，兴证投资将深耕股权投资主责主业，在服务实体经济和新质生产力发展方面强化使命担当， 第 第 聚焦硬科技赛道，布局新兴产业和未来产业，深化投承联动，发挥协同效能；扎实做好投后管理，积极拓宽退出 第 渠道，加速推进资产盘活赋能，持续提升整体经营效益。 第 第 第 （四）海外业务 第 第 市场环境 尽管面临地缘政治摩擦与全球经济增长放缓等挑战，香港作为国际金融中心的地位依然稳固，港股市场展 现强劲复苏动能，在全球资本市场中表现亮眼。2025年恒生指数累计上涨27.8%，居全球主要股市前列，港股 交投活跃度显著提升，同时南向资金净流入大幅增长为港股市场注入活力，报告期内港股日均成交额2,498亿港 元，同比增长90%，创下历史新高；融资业务方面，随着港交所推行多项措施吸引企业赴港上市，以及国际投资 者对中国核心资产配置需求日益增强，港股IPO市场迎来强劲复苏，报告期内共完成119家新股上市，同比增长 68%，合计募集资金2,858.43亿港元，同比增长225%。 经营举措及业绩 报告期内，公司全资子公司兴证香港依托专业优势，持续推动业务转型升级。财富管理业务方面，不断丰富 产品体系，积极拓展“跨境理财通”业务，产品覆盖人民币、港币及美元等多币种，有效满足客户跨境财富管理 需求。投资银行业务方面，债券承销业务优势持续巩固，完成债券承销项目203单，承销规模达19.86亿美元，在 港中资券商排名第7位，完成股权承销项目15单，承销家数中资券商排名第8位。自营投资业务方面，坚持稳健 谨慎的投资策略，前瞻布局多元化投资组合，有效提升投资收益稳定性与组合韧性。ESG实践成效显著，兴证国 际连续三年维持万得ESG评级BBB级，在投资者关系、企业管治、企业透明度及沟通渠道建设方面亦获得业内认 可，蝉联香港投资者关系大奖优秀奖。 未来展望 未来，兴证香港将继续坚持“稳健经营、稳中求进”的原则，把握跨境理财通和基金互认等业务机会，深化 财富管理转型升级，强化技术研发与业务储备，加速资产管理产品推陈出新，满足客户多元服务需求；持续巩固 债券承销业务品牌优势，紧抓港股融资市场活跃机遇，聚焦重点行业，强化专业能力与协同效能，全面提升投 行业务竞争力；坚守合规风控底线和绿色金融服务理念，优化资源配置，形成专业化、市场化、国际化的人才 队伍，多维度赋能全球客户跨境综合金融需求，助力中国企业“走出去”，并在“一带一路”建设中发挥积极 作用。 043 ●2025 年度报告 ●\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0012\n\n第九节 证券公司信息披露 ----------------------------------------249 / 五、报告期内主要经营情况\n\n物理页46，字符2039—2367：\n\n> 五、报告期内主要经营情况 截至2025年末，集团资产总额3,449.89亿元，较上年末增长14.61%；净资产666.89亿元，较上年末增长 5.99%；归属母公司净资产616.38亿元，较上年末增长6.61%。2025年,集团实现营业收入118.41亿元，同比增长 21.03%，净利润37.14亿元，归属母公司股东的净利润28.70亿元，分别同比增长28.21%和32.64%。 045 ●2025 年度报告 ●\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0013\n\n第九节 证券公司信息披露 ----------------------------------------249 / 五、报告期内主要经营情况\n\n物理页47，字符0—3795：\n\n> ( 一 ) 主营业务分析 1、 利润表及现金流量表相关科目变动分析表 单位 ：元 币种 ：人民币 科目 本期数 上年同期数 变动比例（%） 主要变动原因 投资收益 3,860,955,227.47 2,278,321,983.33 69.46 主要系交易性金融工具投资收益同 比增加 第 其他收益 101,211,511.58 256,599,575.78 -60.56 主要系收到政府补助同比减少 第 主要系衍生金融工具公允价值变动 第 公允价值变动收益 -123,576,202.04 545,395,286.29 -122.66 损失同比增加 第 第 汇兑收益 40,579,101.62 2,957,126.78 1,272.25 主要系汇率变动所致 第 主要系子公司“保险 + 期货”业务 第 其他业务收入 4,972,738.94 8,043,509.84 -38.18 第 收入同比减少 第 主要系使用权资产处置收益同比减 第 资产处置收益 844,736.28 1,412,464.02 -40.19 第 少 信用减值损失 78,745,353.22 36,325,242.78 116.78 主要系计提的其他应收款项坏账准 备同比增加 其他资产减值损失 -4,398,606.08 2,065,396.36 -312.97 主要系大宗商品存货跌价准备转回 营业外收入 8,526,808.19 16,308,811.40 -47.72 主要系上年收到案件追偿款 营业外支出 32,989,987.34 16,799,089.11 96.38 主要系计提未决诉讼预计负债 所得税费用 450,276,267.73 184,581,084.28 143.94 主要系递延所得税费用增加 其他综合收益的税 -320,125,832.42 630,504,956.35 -150.77 主要系本年发生其他债权投资公允 后净额 价值变动损失，而上年为收益 经营活动产生的现 主要系为交易目的而持有的金融工 金流量净额 19,332,488,671.70 24,143,006,376.01 -19.93 具净增加导致现金流出，而上年为 现金流入 投资活动产生的现 -4,663,674,690.67 -22,768,907,849.82 不适用 主要系收回投资收到的现金增加 金流量净额 筹资活动产生的现 -4,650,650,902.34 10,188,860,789.70 -145.64 主要系发行债券及短期融资券收到 金流量净额 的现金减少 营业收入变动原因说明：报告期内公司实现营业收入118.41亿元，同比增长21.03%，主要是由于集团投资 收益、手续费佣金及净收入及利息净收入同比增长。其中，投资收益38.61亿元，较去年同期增长69.46%，主要 系交易性金融工具投资收益同比增加；手续费及佣金净收入63.71亿元，较去年同期增长20.83%，主要系经纪业 务手续费净收入同比增加；利息净收入15.85亿元，较去年同期增长11.75%，主要系融资融券利息收入同比增加 及应付债券、代理买卖证券款利息支出同比减少。 营业成本变动原因说明：报告期内集团营业成本76.53亿元，同比增长14.18%，主要是由于本年发生业务及 管理费74.89亿元，同比增长13.73%。 ●2025 年度报告 ● 046\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0014\n\n第九节 证券公司信息披露 ----------------------------------------249 / 五、报告期内主要经营情况\n\n物理页48，字符0—2433：\n\n> 经营活动产生的现金流量净额变动原因说明：经营活动产生的现金净流入额193.32亿元。其中，经营活动现 金流入494.64亿元，主要是回购业务资金净增加169.99亿元，收取利息、手续费及佣金的现金123.05亿元，代理 买卖证券收到现金净额93.03亿元，拆入资金净增加额85.10亿元，收到其他与经营活动有关的现金23.48亿元； 经营活动现金流出301.32亿元，主要是融出资金增加而减少现金96.57亿元，支付给职工以及为职工支付的现金 43.98亿元，为交易目的而持有的金融工具净增加而减少现金34.12亿元，支付利息、手续费及佣金的现金33.76 亿元，支付的各项税费24.24亿元，支付其他与经营活动有关的现金68.65亿元。 投资活动产生的现金流量净额变动原因说明：投资活动产生的现金净流出额46.64亿元。其中，投资活动产 第 生的现金流入182.24亿元，主要是收回投资收到现金158.35亿元，取得投资收益收到现金23.81亿元等；投资活 第 动产生的现金流出228.88亿元，主要是投资所支付的现金225.73亿元，为购建固定资产、无形资产和其他长期资 第 产所支付的现金3.15亿元。 第 第 第 筹资活动产生的现金流量净额变动原因说明：筹资活动产生的现金净流出额46.51亿元。其中，筹资活动现 第 金流入636.94亿元，主要是发行债券及短期融资券收到现金493.22亿元，取得借款收到现金116.82亿元；筹资 第 第 活动现金流出683.44亿元，主要是偿还债务支付现金644.60亿元，分配股利、利润或偿付利息支付现金36.45亿 第 第 元等。 本期公司业务类型、利润构成或利润来源发生重大变动的详细说明 □适用 √不适用 2、 收入和成本分析 √适用 □不适用 公司的主要业务包括财富管理业务（含证券及期货经纪、资产管理）、机构服务业务、自营投资业务和海外 业务等。各业务营业收入和成本构成如下所示。 (1). 主营业务分行业、分产品、分地区、分销售模式情况 单位 : 万元 币种 : 人民币\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0015\n\n第九节 证券公司信息披露 ----------------------------------------249 / 主营业务分行业情况\n\n物理页48，字符2433—3466：\n\n> 主营业务分行业情况 分行业 营业收入 营业成本 毛利率 营业收入比 营业成本比 毛利率比上年增减（%） （%） 上年增减（%） 上年增减（%） 证券及期货经纪业务 377,812.12 234,797.31 37.85 21.37 20.14 增加 0.63 个百分点 资产管理业务 319,408.12 99,295.94 68.91 25.04 42.16 减少 3.75 个百分点 机构服务业务 157,695.89 118,513.51 24.85 58.67 22.06 增加 22.54 个百分点 自营投资业务 321,443.92 138,054.78 57.05 2.98 -6.13 增加 4.16 个百分点 海外业务 47,705.97 32,473.61 31.93 -1.02 -12.96 增加 9.34 个百分点\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0016\n\n第九节 证券公司信息披露 ----------------------------------------249 / 主营业务分地区情况\n\n物理页48，字符3466—4435：\n\n> 主营业务分地区情况 分地区 营业收入 营业成本 毛利率 营业收入比 营业成本比 毛利率比上年增减（%） （%） 上年增减（%） 上年增减（%） 福建地区 230,979.13 70,951.07 69.28 19.63 52.33 减少 6.60 个百分点 上海地区 36,431.20 21,079.95 42.14 6.50 22.18 减少 7.43 个百分点 其他地区 137,781.41 122,266.20 11.26 39.98 11.25 增加 22.91 个百分点 公司本部及子公司 778,946.68 550,987.99 29.26 19.34 10.97 增加 5.33 个百分点 047 ●2025 年度报告 ●\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0017\n\n第九节 证券公司信息披露 ----------------------------------------249 / 主营业务分地区情况\n\n物理页49，字符0—535：\n\n> 主营业务分行业、分产品、分地区、分销售模式情况的说明 √适用 □不适用 2025年集团证券及期货经纪业务实现收入人民币37.78亿元，同比增长21.37%；资产管理业务实现收入人民 币31.94亿元，同比增长25.04%；机构服务业务实现收入人民币15.77亿元，同比增长58.67%；自营投资业务实 现收入人民币32.14亿元，同比增长2.98%；海外业务实现收入人民币4.77亿元，同比下降1.02%。 第 (2). 重大采购合同、重大销售合同的履行情况 第 第 √适用 □不适用 第 第 本集团以客户需求为驱动，打造了企业、机构及零售客户服务体系，为包括大型国有企业、跨国企业、中小 第 企业、高净值客户和零售客户等各类客户提供证券产品及综合金融服务。集团主要客户位于中国，同时伴随日渐 第 第 完善的海外业务布局，客户来源有所拓宽。2025年，集团前五大客户产生的收入占集团营业收入的比例不超过 第 10%。鉴于集团的业务性质，本集团无主要供应商。 第 第\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0018\n\n第九节 证券公司信息披露 ----------------------------------------249 / 八、分部报告\n\n物理页221，字符3638—3837：\n\n> 八、分部报告 本集团以内部组织结构、管理要求、内部报告制度为依据确定经营分部，并据此分配资源及评估分部业绩。 本集团2025年12月31日和2024年12月31日的主要分部为财富管理业务分部、机构服务业务分部、自营投资业务 分部和海外业务分部。 ●2025 年度报告 ● 220\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n",
+  "workpaper_status": "review_limited_pending_verification",
+  "workpaper_receipts": [
+    {
+      "request_id": "bp-work-75219f282a5b80afada802ac:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "07e17ad881b9193c3c71dfb297c6203313d2d65f321b4f8b9d19128b703a79c9",
+      "response_hash": "fd197aca0b44c9d4b116244912f75a9fd85c14322a0a20b25936edaa2d03bff5",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0062\",\"section-0064\",\"section-0092\",\"section-0093\",\"section-0096\",\"section-0097\",\"section-0750\"],\"rationale\":\"本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。\",\"deferred\":[\"section-0065至section-0084各业务明细子节：其内容已被section-0064整体覆盖，避免父子重复选取\",\"section-0702手续费及佣金净收入、section-0704利息净收入等会计科目附注：仅在板块收入无法安全归属时定向补充，本次以分部报告与主营业务表为主，暂不展开\",\"section-0063行业情况、section-0085核心竞争力：属行业背景与泛化竞争力，非本次收入权重定向目标，暂不选\"],\"stop_reason\":\"已覆盖业务概述、经营讨论、收入成本分析、分行业/分地区收入构成及分部报告，可回答四大业务收入与权重问题；剩余为会计科目附注与行业背景，超出定向补充范围，停止。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0062",
+          "section-0064",
+          "section-0092",
+          "section-0093",
+          "section-0096",
+          "section-0097",
+          "section-0750"
+        ],
+        "rationale": "本次为定向补充阅读，核心是回答四大业务板块的收入与权重。section-0062为报告期内公司从事业务情况的概述，说明业务结构与经营模式；section-0064为经营情况讨论与分析，其下财富管理、机构服务、自营投资、海外各业务子节完整披露各板块经营与收入；section-0092及section-0093提供利润表科目变动分析，可核对营业收入总额与结构；section-0096主营业务分行业情况、section-0097主营业务分地区情况提供收入构成表；section-0750分部报告提供分部收入与利润的完整表头与抵消信息，用于交叉验证板块权重。以上均为实质正文而非目录重复，且未同时选取父子重叠项。",
+        "deferred": [
+          "section-0065至section-0084各业务明细子节：其内容已被section-0064整体覆盖，避免父子重复选取",
+          "section-0702手续费及佣金净收入、section-0704利息净收入等会计科目附注：仅在板块收入无法安全归属时定向补充，本次以分部报告与主营业务表为主，暂不展开",
+          "section-0063行业情况、section-0085核心竞争力：属行业背景与泛化竞争力，非本次收入权重定向目标，暂不选"
+        ],
+        "stop_reason": "已覆盖业务概述、经营讨论、收入成本分析、分行业/分地区收入构成及分部报告，可回答四大业务收入与权重问题；剩余为会计科目附注与行业背景，超出定向补充范围，停止。"
+      },
+      "usage": {
+        "input_tokens": 17035,
+        "output_tokens": 370,
+        "total_tokens": 17405
+      }
+    },
+    {
+      "request_id": "bp-work-75219f282a5b80afada802ac:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "bfe41507132d0025ce11cd2d44a9de86a174da73b937ea45b08513068e6706fa",
+      "response_hash": "58b097fdb0afaf9001d24575aeb06d77347af983bae89f678d84a540f2322ff2",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+      "contract_status": "rejected",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"not_read_for_this_task\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对业务结构要素重新提取。\"]},\"products_services\":{\"status\":\"not_read_for_this_task\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对产品与服务要素重新提取。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"RM-001\",\"text\":\"2025年集团实现营业收入118.41亿元，同比增长21.03%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\",\"source-0013\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"118.41\",\"value\":\"118.41\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比增长率\",\"raw_value\":\"21.03\",\"value\":\"21.03\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"}]},{\"fact_id\":\"RM-002\",\"text\":\"主营业务分行业情况表列示证券及期货经纪业务营业收入377,812.12万元，营业成本234,797.31万元，毛利率37.85%，营业收入比上年增减21.37%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\",\"source-0015\"],\"metrics\":[{\"name\":\"证券及期货经纪业务营业收入\",\"raw_value\":\"377,812.12\",\"value\":\"377812.12\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"证券及期货经纪业务营业成本\",\"raw_value\":\"234,797.31\",\"value\":\"234797.31\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"证券及期货经纪业务毛利率\",\"raw_value\":\"37.85\",\"value\":\"37.85\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"证券及期货经纪业务营业收入比上年增减\",\"raw_value\":\"21.37\",\"value\":\"21.37\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"}]},{\"fact_id\":\"RM-003\",\"text\":\"主营业务分行业情况表列示资产管理业务营业收入319,408.12万元，营业成本99,295.94万元，毛利率68.91%，营业收入比上年增减25.04%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\",\"source-0015\"],\"metrics\":[{\"name\":\"资产管理业务营业收入\",\"raw_value\":\"319,408.12\",\"value\":\"319408.12\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"资产管理业务营业成本\",\"raw_value\":\"99,295.94\",\"value\":\"99295.94\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"资产管理业务毛利率\",\"raw_value\":\"68.91\",\"value\":\"68.91\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"资产管理业务营业收入比上年增减\",\"raw_value\":\"25.04\",\"value\":\"25.04\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"}]},{\"fact_id\":\"RM-004\",\"text\":\"主营业务分行业情况表列示机构服务业务营业收入157,695.89万元，营业成本118,513.51万元，毛利率24.85%，营业收入比上年增减58.67%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\",\"source-0015\"],\"metrics\":[{\"name\":\"机构服务业务营业收入\",\"raw_value\":\"157,695.89\",\"value\":\"157695.89\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"机构服务业务营业成本\",\"raw_value\":\"118,513.51\",\"value\":\"118513.51\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"机构服务业务毛利率\",\"raw_value\":\"24.85\",\"value\":\"24.85\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"机构服务业务营业收入比上年增减\",\"raw_value\":\"58.67\",\"value\":\"58.67\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"}]},{\"fact_id\":\"RM-005\",\"text\":\"主营业务分行业情况表列示自营投资业务营业收入321,443.92万元，营业成本138,054.78万元，毛利率57.05%，营业收入比上年增减2.98%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\",\"source-0015\"],\"metrics\":[{\"name\":\"自营投资业务营业收入\",\"raw_value\":\"321,443.92\",\"value\":\"321443.92\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"自营投资业务营业成本\",\"raw_value\":\"138,054.78\",\"value\":\"138054.78\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"自营投资业务毛利率\",\"raw_value\":\"57.05\",\"value\":\"57.05\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"自营投资业务营业收入比上年增减\",\"raw_value\":\"2.98\",\"value\":\"2.98\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"}]},{\"fact_id\":\"RM-006\",\"text\":\"主营业务分行业情况表列示海外业务营业收入47,705.97万元，营业成本32,473.61万元，毛利率31.93%，营业收入比上年增减-1.02%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\",\"source-0015\"],\"metrics\":[{\"name\":\"海外业务营业收入\",\"raw_value\":\"47,705.97\",\"value\":\"47705.97\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"海外业务营业成本\",\"raw_value\":\"32,473.61\",\"value\":\"32473.61\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"海外业务毛利率\",\"raw_value\":\"31.93\",\"value\":\"31.93\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"海外业务营业收入比上年增减\",\"raw_value\":\"-1.02\",\"value\":\"-1.02\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"}]},{\"fact_id\":\"RM-007\",\"text\":\"主营业务分行业情况说明中，2025年集团证券及期货经纪业务实现收入37.78亿元，资产管理业务31.94亿元，机构服务业务15.77亿元，自营投资业务32.14亿元，海外业务4.77亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"证券及期货经纪业务收入（说明段）\",\"raw_value\":\"37.78\",\"value\":\"37.78\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"资产管理业务收入（说明段）\",\"raw_value\":\"31.94\",\"value\":\"31.94\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"机构服务业务收入（说明段）\",\"raw_value\":\"15.77\",\"value\":\"15.77\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"自营投资业务收入（说明段）\",\"raw_value\":\"32.14\",\"value\":\"32.14\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"海外业务收入（说明段）\",\"raw_value\":\"4.77\",\"value\":\"4.77\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"RM-008\",\"text\":\"利润表科目变动分析显示，手续费及佣金净收入63.71亿元，同比增长20.83%；利息净收入15.85亿元，同比增长11.75%；投资收益38.61亿元，同比增长69.46%。上述为会计科目口径，不等同于业务板块收入。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"手续费及佣金净收入\",\"raw_value\":\"63.71\",\"value\":\"63.71\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"手续费及佣金净收入同比增长率\",\"raw_value\":\"20.83\",\"value\":\"20.83\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"},{\"name\":\"利息净收入\",\"raw_value\":\"15.85\",\"value\":\"15.85\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"利息净收入同比增长率\",\"raw_value\":\"11.75\",\"value\":\"11.75\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"},{\"name\":\"投资收益\",\"raw_value\":\"38.61\",\"value\":\"38.61\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"投资收益同比增长率\",\"raw_value\":\"69.46\",\"value\":\"69.46\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"上年同期\"}]}],\"limitations\":[\"分部报告章节仅提供分部名称与划分依据，未提供分部收入金额表，故无法用分部报告交叉验证各板块收入与内部抵消。\",\"主营业务分行业表未列示合计行与内部抵消行，各板块收入合计与集团营业收入118.41亿元之间的差异及抵消关系未在所选章节披露，未计算占比。\",\"管理层讨论中的业务板块收入（亿元口径）与分行业表（万元口径）数值一致，但分行业表未明确标注为合并口径，板块口径以原文为准。\"]},\"scale_and_mix\":{\"status\":\"not_read_for_this_task\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对规模与结构要素单独提取；相关收入数据见收入模式要素。\"]},\"operations_and_inputs\":{\"status\":\"not_read_for_this_task\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对运营与投入要素重新提取。\"]},\"customers_channels_markets\":{\"status\":\"not_read_for_this_task\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对客户与渠道要素重新提取。\"]},\"operating_drivers\":{\"status\":\"not_read_for_this_task\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对经营驱动要素重新提取。\"]},\"material_changes\":{\"status\":\"not_read_for_this_task\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对重大变化要素重新提取。\"]}},\"limitations\":[\"本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未覆盖完整公司画像。\",\"分部报告未提供分部收入金额表，板块收入权重无法通过分部报告交叉验证。\",\"各板块收入合计与集团营业收入的差异及内部抵消未在所选章节披露，未计算占比。\"]}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "not_read_for_this_task",
+            "facts": [],
+            "limitations": [
+              "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对业务结构要素重新提取。"
+            ]
+          },
+          "products_services": {
+            "status": "not_read_for_this_task",
+            "facts": [],
+            "limitations": [
+              "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对产品与服务要素重新提取。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "RM-001",
+                "text": "2025年集团实现营业收入118.41亿元，同比增长21.03%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0012",
+                  "source-0013"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "118.41",
+                    "value": "118.41",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "营业收入同比增长率",
+                    "raw_value": "21.03",
+                    "value": "21.03",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  }
+                ]
+              },
+              {
+                "fact_id": "RM-002",
+                "text": "主营业务分行业情况表列示证券及期货经纪业务营业收入377,812.12万元，营业成本234,797.31万元，毛利率37.85%，营业收入比上年增减21.37%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0014",
+                  "source-0015"
+                ],
+                "metrics": [
+                  {
+                    "name": "证券及期货经纪业务营业收入",
+                    "raw_value": "377,812.12",
+                    "value": "377812.12",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "证券及期货经纪业务营业成本",
+                    "raw_value": "234,797.31",
+                    "value": "234797.31",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "证券及期货经纪业务毛利率",
+                    "raw_value": "37.85",
+                    "value": "37.85",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "证券及期货经纪业务营业收入比上年增减",
+                    "raw_value": "21.37",
+                    "value": "21.37",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  }
+                ]
+              },
+              {
+                "fact_id": "RM-003",
+                "text": "主营业务分行业情况表列示资产管理业务营业收入319,408.12万元，营业成本99,295.94万元，毛利率68.91%，营业收入比上年增减25.04%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0014",
+                  "source-0015"
+                ],
+                "metrics": [
+                  {
+                    "name": "资产管理业务营业收入",
+                    "raw_value": "319,408.12",
+                    "value": "319408.12",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "资产管理业务营业成本",
+                    "raw_value": "99,295.94",
+                    "value": "99295.94",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "资产管理业务毛利率",
+                    "raw_value": "68.91",
+                    "value": "68.91",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "资产管理业务营业收入比上年增减",
+                    "raw_value": "25.04",
+                    "value": "25.04",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  }
+                ]
+              },
+              {
+                "fact_id": "RM-004",
+                "text": "主营业务分行业情况表列示机构服务业务营业收入157,695.89万元，营业成本118,513.51万元，毛利率24.85%，营业收入比上年增减58.67%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0014",
+                  "source-0015"
+                ],
+                "metrics": [
+                  {
+                    "name": "机构服务业务营业收入",
+                    "raw_value": "157,695.89",
+                    "value": "157695.89",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "机构服务业务营业成本",
+                    "raw_value": "118,513.51",
+                    "value": "118513.51",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "机构服务业务毛利率",
+                    "raw_value": "24.85",
+                    "value": "24.85",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "机构服务业务营业收入比上年增减",
+                    "raw_value": "58.67",
+                    "value": "58.67",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  }
+                ]
+              },
+              {
+                "fact_id": "RM-005",
+                "text": "主营业务分行业情况表列示自营投资业务营业收入321,443.92万元，营业成本138,054.78万元，毛利率57.05%，营业收入比上年增减2.98%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0014",
+                  "source-0015"
+                ],
+                "metrics": [
+                  {
+                    "name": "自营投资业务营业收入",
+                    "raw_value": "321,443.92",
+                    "value": "321443.92",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "自营投资业务营业成本",
+                    "raw_value": "138,054.78",
+                    "value": "138054.78",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "自营投资业务毛利率",
+                    "raw_value": "57.05",
+                    "value": "57.05",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "自营投资业务营业收入比上年增减",
+                    "raw_value": "2.98",
+                    "value": "2.98",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  }
+                ]
+              },
+              {
+                "fact_id": "RM-006",
+                "text": "主营业务分行业情况表列示海外业务营业收入47,705.97万元，营业成本32,473.61万元，毛利率31.93%，营业收入比上年增减-1.02%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0014",
+                  "source-0015"
+                ],
+                "metrics": [
+                  {
+                    "name": "海外业务营业收入",
+                    "raw_value": "47,705.97",
+                    "value": "47705.97",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "海外业务营业成本",
+                    "raw_value": "32,473.61",
+                    "value": "32473.61",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "海外业务毛利率",
+                    "raw_value": "31.93",
+                    "value": "31.93",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "海外业务营业收入比上年增减",
+                    "raw_value": "-1.02",
+                    "value": "-1.02",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  }
+                ]
+              },
+              {
+                "fact_id": "RM-007",
+                "text": "主营业务分行业情况说明中，2025年集团证券及期货经纪业务实现收入37.78亿元，资产管理业务31.94亿元，机构服务业务15.77亿元，自营投资业务32.14亿元，海外业务4.77亿元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017"
+                ],
+                "metrics": [
+                  {
+                    "name": "证券及期货经纪业务收入（说明段）",
+                    "raw_value": "37.78",
+                    "value": "37.78",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "资产管理业务收入（说明段）",
+                    "raw_value": "31.94",
+                    "value": "31.94",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "机构服务业务收入（说明段）",
+                    "raw_value": "15.77",
+                    "value": "15.77",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "自营投资业务收入（说明段）",
+                    "raw_value": "32.14",
+                    "value": "32.14",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "海外业务收入（说明段）",
+                    "raw_value": "4.77",
+                    "value": "4.77",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "RM-008",
+                "text": "利润表科目变动分析显示，手续费及佣金净收入63.71亿元，同比增长20.83%；利息净收入15.85亿元，同比增长11.75%；投资收益38.61亿元，同比增长69.46%。上述为会计科目口径，不等同于业务板块收入。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0013"
+                ],
+                "metrics": [
+                  {
+                    "name": "手续费及佣金净收入",
+                    "raw_value": "63.71",
+                    "value": "63.71",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "手续费及佣金净收入同比增长率",
+                    "raw_value": "20.83",
+                    "value": "20.83",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  },
+                  {
+                    "name": "利息净收入",
+                    "raw_value": "15.85",
+                    "value": "15.85",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "利息净收入同比增长率",
+                    "raw_value": "11.75",
+                    "value": "11.75",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  },
+                  {
+                    "name": "投资收益",
+                    "raw_value": "38.61",
+                    "value": "38.61",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "投资收益同比增长率",
+                    "raw_value": "69.46",
+                    "value": "69.46",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "分部报告章节仅提供分部名称与划分依据，未提供分部收入金额表，故无法用分部报告交叉验证各板块收入与内部抵消。",
+              "主营业务分行业表未列示合计行与内部抵消行，各板块收入合计与集团营业收入118.41亿元之间的差异及抵消关系未在所选章节披露，未计算占比。",
+              "管理层讨论中的业务板块收入（亿元口径）与分行业表（万元口径）数值一致，但分行业表未明确标注为合并口径，板块口径以原文为准。"
+            ]
+          },
+          "scale_and_mix": {
+            "status": "not_read_for_this_task",
+            "facts": [],
+            "limitations": [
+              "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对规模与结构要素单独提取；相关收入数据见收入模式要素。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "not_read_for_this_task",
+            "facts": [],
+            "limitations": [
+              "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对运营与投入要素重新提取。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "not_read_for_this_task",
+            "facts": [],
+            "limitations": [
+              "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对客户与渠道要素重新提取。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "not_read_for_this_task",
+            "facts": [],
+            "limitations": [
+              "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对经营驱动要素重新提取。"
+            ]
+          },
+          "material_changes": {
+            "status": "not_read_for_this_task",
+            "facts": [],
+            "limitations": [
+              "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未针对重大变化要素重新提取。"
+            ]
+          }
+        },
+        "limitations": [
+          "本次为定向补充阅读，仅回答四大业务板块收入与权重问题，未覆盖完整公司画像。",
+          "分部报告未提供分部收入金额表，板块收入权重无法通过分部报告交叉验证。",
+          "各板块收入合计与集团营业收入的差异及内部抵消未在所选章节披露，未计算占比。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 17497,
+        "output_tokens": 3005,
+        "total_tokens": 20502
+      },
+      "contract_error": "schema_validation_error"
+    },
+    {
+      "request_id": "bp-work-75219f282a5b80afada802ac:workpaper:review",
+      "purpose": "review_profile_workpaper",
+      "request_hash": "c34d4b9711e07bafe6e537739950d8f9a9f4779e20f223b5d88909cb4c655227",
+      "response_hash": "c6e3f04fc9078044288c0d3f177cbe65e4474238808d8f1fcbbbe99e4d525146",
+      "finish_reason": "stop",
+      "source_label": "scorpio:grok-4.7",
+      "model": "grok-4.7",
+      "selected_profile": "semantic_extraction__scorpio_grok",
+      "logical_profile": "semantic_extraction__scorpio_grok",
+      "reasoning_effort": "high",
+      "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+      "contract_status": "accepted",
+      "raw_content": "{\"findings\":[{\"finding_id\":\"F-RM007-SCOPE\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"limit_metrics\",\"affected_fact_id\":\"RM-007\",\"evidence_ids\":[\"source-0017\",\"source-0015\"],\"explanation\":\"source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。\",\"metric_limit\":{\"fact_sha256\":\"9efe7023e9208ce94b4e6a6a887323fd1075e3a0a817b2a7c8b3eae7d6d18231\",\"narrative_supported\":true,\"metric_indices\":[0,1,2,3,4]}}],\"reviewed_fact_ids\":[\"RM-001\",\"RM-002\",\"RM-003\",\"RM-004\",\"RM-005\",\"RM-006\",\"RM-007\",\"RM-008\"]}",
+      "response_payload": {
+        "findings": [
+          {
+            "finding_id": "F-RM007-SCOPE",
+            "element": "revenue_model",
+            "severity": "material",
+            "issue_type": "wrong_subject",
+            "action": "limit_metrics",
+            "affected_fact_id": "RM-007",
+            "evidence_ids": [
+              "source-0017",
+              "source-0015"
+            ],
+            "explanation": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+            "metric_limit": {
+              "fact_sha256": "9efe7023e9208ce94b4e6a6a887323fd1075e3a0a817b2a7c8b3eae7d6d18231",
+              "narrative_supported": true,
+              "metric_indices": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ]
+            }
+          }
+        ],
+        "reviewed_fact_ids": [
+          "RM-001",
+          "RM-002",
+          "RM-003",
+          "RM-004",
+          "RM-005",
+          "RM-006",
+          "RM-007",
+          "RM-008"
+        ]
+      },
+      "usage": {
+        "input_tokens": 21787,
+        "output_tokens": 354,
+        "total_tokens": 35698
+      }
+    }
+  ],
+  "workpaper_summary": {
+    "origin": "llm_generated",
+    "business_description": "",
+    "fact_count": 8,
+    "metric_count": 28,
+    "element_fact_counts": {
+      "business_structure": 0,
+      "products_services": 0,
+      "revenue_model": 8,
+      "scale_and_mix": 0,
+      "operations_and_inputs": 0,
+      "customers_channels_markets": 0,
+      "operating_drivers": 0,
+      "material_changes": 0
+    },
+    "review_status": "completed_with_open_findings",
+    "open_finding_count": 1,
+    "extraction_model": "deepseek-flash",
+    "review_model": "grok-4.7",
+    "delivery_counts": {
+      "reviewed": 7,
+      "pending": 0,
+      "limited": 1,
+      "source_only": 0,
+      "withheld": 0,
+      "duplicate": 0
+    },
+    "delivery_pending_review_count": 0,
+    "delivery_reviewed_count": 7,
+    "delivery_pending_count": 0,
+    "delivery_limited_count": 1,
+    "delivery_source_only_count": 0,
+    "delivery_withheld_count": 0,
+    "delivery_duplicate_count": 0,
+    "metric_gaps": [
+      {
+        "fact_id": "RM-007",
+        "element": "revenue_model",
+        "metric_index": 0,
+        "name": "证券及期货经纪业务收入（说明段）",
+        "state": "withheld",
+        "reason": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+        "review_basis": "model_source_check",
+        "model_finding_ids": [
+          "F-RM007-SCOPE"
+        ],
+        "model_reasons": [
+          "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+        ]
+      },
+      {
+        "fact_id": "RM-007",
+        "element": "revenue_model",
+        "metric_index": 1,
+        "name": "资产管理业务收入（说明段）",
+        "state": "withheld",
+        "reason": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+        "review_basis": "model_source_check",
+        "model_finding_ids": [
+          "F-RM007-SCOPE"
+        ],
+        "model_reasons": [
+          "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+        ]
+      },
+      {
+        "fact_id": "RM-007",
+        "element": "revenue_model",
+        "metric_index": 2,
+        "name": "机构服务业务收入（说明段）",
+        "state": "withheld",
+        "reason": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+        "review_basis": "model_source_check",
+        "model_finding_ids": [
+          "F-RM007-SCOPE"
+        ],
+        "model_reasons": [
+          "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+        ]
+      },
+      {
+        "fact_id": "RM-007",
+        "element": "revenue_model",
+        "metric_index": 3,
+        "name": "自营投资业务收入（说明段）",
+        "state": "withheld",
+        "reason": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+        "review_basis": "model_source_check",
+        "model_finding_ids": [
+          "F-RM007-SCOPE"
+        ],
+        "model_reasons": [
+          "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+        ]
+      },
+      {
+        "fact_id": "RM-007",
+        "element": "revenue_model",
+        "metric_index": 4,
+        "name": "海外业务收入（说明段）",
+        "state": "withheld",
+        "reason": "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。",
+        "review_basis": "model_source_check",
+        "model_finding_ids": [
+          "F-RM007-SCOPE"
+        ],
+        "model_reasons": [
+          "source-0017支持叙述中的五项金额：2025年集团证券及期货经纪、资产管理、机构服务、自营投资、海外业务收入分别为37.78亿元、31.94亿元、15.77亿元、32.14亿元、4.77亿元，且与分行业表万元数四舍五入一致，叙述和证据可保留。但这五项各自对应分行业业务行，不是集团营业收入总额118.41亿元；业务或行业行不得因句中出现“集团”或表属合并披露而继承consolidated_group。原指标数组第0至第4项均把subject_scope标成consolidated_group，结构化口径不可靠。限制这些指标的结构化使用，不改写叙述，也不提供替代数值。"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "task": "6.FO",
+  "temporary_root": "/home/python/Quote/data/QuoteBak/company-profile-6fo-b-dKOvkrzU",
+  "temporary_root_absent": true,
+  "removed_files": 5,
+  "removed_logical_bytes": 18383,
+  "removed_relative_paths": [
+    "deliver.py",
+    "finalize.py",
+    "logs/access.log",
+    "logs/sys.log",
+    "logs/task.log"
+  ],
+  "previous_6FN_matching_roots_remaining": [],
+  "A_parallel_root_untouched": "/home/python/Quote/data/QuoteBak/company-profile-6fo-a-N6lSpz6C",
+  "unknown_or_parallel_roots_removed": false,
+  "retained": [
+    "36 byte-identical original-writer records in original research root",
+    "one current API snapshot and original-reader export in original research root",
+    "compact b-result.json/cleanup.json; no full API in evidence directory"
+  ],
+  "recovery": "Deleted B scripts/logs and A full expected-copy/helpers are reconstructible from the previous committed records, preserved safe delivery, current original-owner records and compact hash-bound audits.",
+  "A": {
+    "temporary_root": "/home/python/Quote/data/QuoteBak/company-profile-6fo-a-N6lSpz6C",
+    "temporary_root_absent": true,
+    "removed_files": 7,
+    "removed_logical_bytes": 9852610,
+    "removed_relative_paths": ["stage_owned.py", "expected.json", "baseline.json", "staged-stat.txt", "owned-management.patch", "verify_http.py", "freeze.py"],
+    "necessary_evidence": "a-read-audit.json preserves all39 complete-profile hashes, actual8 HTTP results, two bound unexecuted plans, file protection and byte-equal record checks; full data remain once per frozen/current delivery purpose."
+  },
+  "review": {
+    "blocking_P1_P2_found": 0,
+    "nonblocking": "Original-reader Markdown PDF-quote trailing whitespace and CSV CRLF retained with original hashes; no source text rewrite or scope expansion.",
+    "unrelated_inherited_tracked_changes_preserved": 49,
+    "owned_staged_files": 131,
+    "management_documents_only_owned_blocks_staged": 3,
+    "application_source_changes": 0,
+    "new_model_calls": 0
+  },
+  "validation": {
+    "HTTP_full39_detail4_plan2": "passed;8 actual dependency HTTP200;191.437 seconds;no reader override",
+    "models_and_TaskService_execution_guard": "not triggered",
+    "links_checked": 14,
+    "missing_links": 0,
+    "openspec_strict": "passed",
+    "diff_check_handwritten_and_JSON": "passed",
+    "full_diff_check": "nonblocking whitespace warnings in original-reader Markdown/CSV exports",
+    "pytest": "not repeated;no application code changed;prior same-version relevant checks retained",
+    "original21_and_safe18_complete_profiles": "equal before/after;API/export/fresh equal",
+    "protected_original_files": "297 unchanged plus one authorized navigation update"
+  }
+}

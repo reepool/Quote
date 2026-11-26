@@ -1,0 +1,3188 @@
+{
+  "schema_version": "company_profile_common_core_runtime.v3",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "production_authorization": "not_authorized",
+  "work_id": "bp-work-6127d9c4284821a709f416d7",
+  "report": {
+    "instrument_id": "600893.SH",
+    "report_id": "asset_69cf74b00c26aa60fc8367ea7c84b2b3",
+    "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-01T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "assessment": {
+    "mapping_version": "company_profile_common_core_mapping.v1",
+    "production_authorization": "not_authorized",
+    "report": {
+      "instrument_id": "600893.SH",
+      "report_id": "asset_69cf74b00c26aa60fc8367ea7c84b2b3",
+      "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-01T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "principal_business": {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "products_services": {
+      "dimension_id": "products_services",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "revenue_model": {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "core_complete": false
+  },
+  "activated_chapters": [],
+  "evidence_gap_codes": [],
+  "provider_calls": [
+    "select_profile_sections",
+    "extract_profile_workpaper",
+    "review_profile_workpaper",
+    "repair_profile_workpaper",
+    "verify_profile_workpaper_repair"
+  ],
+  "provider_blocked": false,
+  "execution": {
+    "schema_version": "company_profile_execution_record.v1",
+    "production_authorization": "not_authorized",
+    "input_identity": {
+      "instrument_id": "600893.SH",
+      "report_id": "asset_69cf74b00c26aa60fc8367ea7c84b2b3",
+      "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+      "report_period": "2025-12-31",
+      "policy_version": "company_profile_common_core_mapping.v2",
+      "processing_identity": {
+        "execution_mode": "provider",
+        "logical_request_timeout_seconds": 2450,
+        "max_layout_characters": 500000,
+        "max_section_characters": 160000,
+        "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+        "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "quality_review_profile": "semantic_extraction__scorpio_grok",
+        "reading_strategy": "chapter_workpaper_v1",
+        "repair_profile": "semantic_extraction__deepseek",
+        "review_existing_draft_hash": "dd6a68fdd1d16659c4f7c0fa09ef20c028bb2ce7cb52a7a979d31e38001db767",
+        "review_max_output_tokens": 16384,
+        "review_seed_receipts_hash": "21282bd2ebe7b7b4a3060765b4be2ad87ae0ec8ba8e21e7f570dc3ab65d3f9a9",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "semantic_policy": "company_profile_llm_led.v2",
+        "semantic_reuse": false,
+        "source_binding_policy": "company_workpaper_source_literals.column-wrapped-amounts.v8",
+        "workpaper_format_recovery": "local_shape_before_retry.v3",
+        "workpaper_max_output_tokens": 12000,
+        "workpaper_metric_format_policy": "source_metric_unparsed_value_null.v1",
+        "workpaper_metric_limit_policy": "source_review_exact_metric_limits.v1",
+        "workpaper_review_policy": "company_profile_workpaper_review.v13",
+        "workpaper_review_recovery": {
+          "base_work_id": "bp-work-744f502f4ba6b08019eced75",
+          "base_workpaper_sha256": "dd6a68fdd1d16659c4f7c0fa09ef20c028bb2ce7cb52a7a979d31e38001db767",
+          "plan_sha256": "5575f7e280909299c95d6b77d77880a93d88128584a623a36a8482bacd32bb9d",
+          "prior_use_review": null,
+          "report": {
+            "document_type": "annual_report",
+            "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+            "instrument_id": "600893.SH",
+            "published_at": "2026-04-01T16:00:00+00:00",
+            "report_id": "asset_69cf74b00c26aa60fc8367ea7c84b2b3",
+            "report_period": "2025-12-31"
+          },
+          "request_id": "6fn-review-600893-SH"
+        }
+      }
+    },
+    "scope_digests": {},
+    "model_attempts": [],
+    "token_budget": {
+      "total_token_budget": 1000000,
+      "extract_max_output_tokens": 4000,
+      "verify_max_output_tokens": 2000,
+      "tokens_used": 128116,
+      "tokens_remaining": 871884
+    },
+    "scope_token_allocations": {},
+    "transport_retries": 0,
+    "semantic_disputes": [],
+    "predecessor_lineage": []
+  },
+  "legacy_writers_invoked": [],
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "llm_generated",
+    "report": {
+      "instrument_id": "600893.SH",
+      "report_id": "asset_69cf74b00c26aa60fc8367ea7c84b2b3",
+      "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-01T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0025",
+          "section_path": [
+            "第二节 公司简介和主要财务指标",
+            "七、 近三年主要会计数据和财务指标"
+          ],
+          "start_page": 7,
+          "end_page": 8,
+          "rationale": "选择近三年主要会计数据与财务指标以取得公司口径的收入、利润和同比变化；选择“报告期内公司从事的业务情况”以覆盖主要产品、业务用途和经营模式；选择“经营情况讨论与分析”和“报告期内主要经营情况”以获取公司本期经营变化、利润表/现金流变动及收入成本分析；再选主营业务分行业、分产品、分地区、分销售模式四个实际表节，补足收入构成和主要业务权重。上述均为公司经营与收入结构的实质章节，且未同时选择父子节。"
+        },
+        {
+          "section_id": "section-0045",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 10,
+          "end_page": 10,
+          "rationale": "选择近三年主要会计数据与财务指标以取得公司口径的收入、利润和同比变化；选择“报告期内公司从事的业务情况”以覆盖主要产品、业务用途和经营模式；选择“经营情况讨论与分析”和“报告期内主要经营情况”以获取公司本期经营变化、利润表/现金流变动及收入成本分析；再选主营业务分行业、分产品、分地区、分销售模式四个实际表节，补足收入构成和主要业务权重。上述均为公司经营与收入结构的实质章节，且未同时选择父子节。"
+        },
+        {
+          "section_id": "section-0049",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 11,
+          "end_page": 13,
+          "rationale": "选择近三年主要会计数据与财务指标以取得公司口径的收入、利润和同比变化；选择“报告期内公司从事的业务情况”以覆盖主要产品、业务用途和经营模式；选择“经营情况讨论与分析”和“报告期内主要经营情况”以获取公司本期经营变化、利润表/现金流变动及收入成本分析；再选主营业务分行业、分产品、分地区、分销售模式四个实际表节，补足收入构成和主要业务权重。上述均为公司经营与收入结构的实质章节，且未同时选择父子节。"
+        },
+        {
+          "section_id": "section-0054",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ],
+          "start_page": 14,
+          "end_page": 15,
+          "rationale": "选择近三年主要会计数据与财务指标以取得公司口径的收入、利润和同比变化；选择“报告期内公司从事的业务情况”以覆盖主要产品、业务用途和经营模式；选择“经营情况讨论与分析”和“报告期内主要经营情况”以获取公司本期经营变化、利润表/现金流变动及收入成本分析；再选主营业务分行业、分产品、分地区、分销售模式四个实际表节，补足收入构成和主要业务权重。上述均为公司经营与收入结构的实质章节，且未同时选择父子节。"
+        },
+        {
+          "section_id": "section-0059",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分行业情况"
+          ],
+          "start_page": 15,
+          "end_page": 15,
+          "rationale": "选择近三年主要会计数据与财务指标以取得公司口径的收入、利润和同比变化；选择“报告期内公司从事的业务情况”以覆盖主要产品、业务用途和经营模式；选择“经营情况讨论与分析”和“报告期内主要经营情况”以获取公司本期经营变化、利润表/现金流变动及收入成本分析；再选主营业务分行业、分产品、分地区、分销售模式四个实际表节，补足收入构成和主要业务权重。上述均为公司经营与收入结构的实质章节，且未同时选择父子节。"
+        },
+        {
+          "section_id": "section-0060",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分产品情况"
+          ],
+          "start_page": 15,
+          "end_page": 15,
+          "rationale": "选择近三年主要会计数据与财务指标以取得公司口径的收入、利润和同比变化；选择“报告期内公司从事的业务情况”以覆盖主要产品、业务用途和经营模式；选择“经营情况讨论与分析”和“报告期内主要经营情况”以获取公司本期经营变化、利润表/现金流变动及收入成本分析；再选主营业务分行业、分产品、分地区、分销售模式四个实际表节，补足收入构成和主要业务权重。上述均为公司经营与收入结构的实质章节，且未同时选择父子节。"
+        },
+        {
+          "section_id": "section-0061",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分地区情况"
+          ],
+          "start_page": 15,
+          "end_page": 15,
+          "rationale": "选择近三年主要会计数据与财务指标以取得公司口径的收入、利润和同比变化；选择“报告期内公司从事的业务情况”以覆盖主要产品、业务用途和经营模式；选择“经营情况讨论与分析”和“报告期内主要经营情况”以获取公司本期经营变化、利润表/现金流变动及收入成本分析；再选主营业务分行业、分产品、分地区、分销售模式四个实际表节，补足收入构成和主要业务权重。上述均为公司经营与收入结构的实质章节，且未同时选择父子节。"
+        },
+        {
+          "section_id": "section-0062",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分销售模式情况"
+          ],
+          "start_page": 15,
+          "end_page": 16,
+          "rationale": "选择近三年主要会计数据与财务指标以取得公司口径的收入、利润和同比变化；选择“报告期内公司从事的业务情况”以覆盖主要产品、业务用途和经营模式；选择“经营情况讨论与分析”和“报告期内主要经营情况”以获取公司本期经营变化、利润表/现金流变动及收入成本分析；再选主营业务分行业、分产品、分地区、分销售模式四个实际表节，补足收入构成和主要业务权重。上述均为公司经营与收入结构的实质章节，且未同时选择父子节。"
+        }
+      ],
+      "unread_or_deferred": [
+        "section-0048 行业情况：属于行业背景，非公司层面经营解释的核心",
+        "section-0050 核心竞争力分析：与业务/经营讨论部分重叠，暂不扩读",
+        "section-0102 未来发展讨论与分析：前瞻性内容，非本期经营事实",
+        "section-0070 主要客户供应商及费用/研发/现金流：客户供应商为可选，费用研发现金流可由主营分析和经营讨论覆盖",
+        "section-0079 资产负债情况分析：非收入结构和主要经营解释的必要范围",
+        "section-0326 财务报告附注及关联交易：仅在公司经营解释出现明确缺口时定向补充"
+      ],
+      "selection_rationale": "选择近三年主要会计数据与财务指标以取得公司口径的收入、利润和同比变化；选择“报告期内公司从事的业务情况”以覆盖主要产品、业务用途和经营模式；选择“经营情况讨论与分析”和“报告期内主要经营情况”以获取公司本期经营变化、利润表/现金流变动及收入成本分析；再选主营业务分行业、分产品、分地区、分销售模式四个实际表节，补足收入构成和主要业务权重。上述均为公司经营与收入结构的实质章节，且未同时选择父子节。",
+      "stop_reason": "已覆盖业务与产品模式、公司总量、本期经营变化、主营收入成本分析以及分行业/产品/地区/销售模式的收入构成；剩余章节主要为行业泛化、前瞻计划、治理股东或财务附注细节，停止阅读不影响对公司本期经营和收入结构的判断。",
+      "transcription_version": "shared-pdf-pypdf-layout.structured-notes.v1"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F001",
+            "text": "公司主营业务分为三类：航空发动机及衍生产品业务、外贸出口转包业务、非航空产品及其他业务。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未展开各子公司或各业务板块的资产、产能等细分结构。"
+        ]
+      },
+      "products_services": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F002",
+            "text": "航空发动机及衍生产品业务的主要产品和服务包括航空发动机及燃气轮机整机、部件、零组件，维修保障服务；产品主要为航空器、舰船提供动力，并为油气、电力两大领域提供能源装备。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F003",
+            "text": "外贸出口转包业务处于产业链中游，以生产制造为主，开展国际民用航空发动机和燃气轮机零部件制造及部分新型民用航空发动机零部件试制；主要产品包括盘、环、槽形件、轴、机匣、整体叶盘、叶片等零部件，以及石油钻探深海领域及轴类产品、医疗诊断产品、医疗植入件等民用产品的加工贸易与技术服务。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F004",
+            "text": "非航空产品及其他业务主要发展与航空发动机技术同源、工艺相近的高附加值产品及服务，如工艺装备、工业物业等。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未逐一列示全部产品型号及零部件规格。"
+        ]
+      },
+      "revenue_model": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F005",
+            "text": "公司经营模式为多元化经营，具备涵盖产品全寿命周期的设计、制造、总装、试车整套技术和综合服务保障能力；从实现价值的方式看为差异化模式，以全谱系航空发动机产品和全生命周期研发制造及维修服务保障为特色。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未披露各业务的具体定价、结算或收入确认机制。"
+        ]
+      },
+      "scale_and_mix": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F006",
+            "text": "2025年度公司实现营业收入46,331,495,671.40元，同比减少3.23%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入",
+                "raw_value": "46,331,495,671.40",
+                "value": "46331495671.40",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入同比",
+                "raw_value": "-3.23",
+                "value": "-3.23",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F007",
+            "text": "2025年度利润总额907,425,066.12元，同比减少20.10%；归属于上市公司股东的净利润634,328,156.80元，同比减少26.27%；归属于上市公司股东的扣除非经常性损益的净利润294,441,306.51元，同比减少62.81%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [
+              {
+                "name": "利润总额",
+                "raw_value": "907,425,066.12",
+                "value": "907425066.12",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "利润总额同比",
+                "raw_value": "-20.10",
+                "value": "-20.10",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "归属于上市公司股东的净利润",
+                "raw_value": "634,328,156.80",
+                "value": "634328156.80",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "归属于上市公司股东的净利润同比",
+                "raw_value": "-26.27",
+                "value": "-26.27",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "归属于上市公司股东的扣除非经常性损益的净利润",
+                "raw_value": "294,441,306.51",
+                "value": "294441306.51",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "归属于上市公司股东的扣除非经常性损益的净利润同比",
+                "raw_value": "-62.81",
+                "value": "-62.81",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F008",
+            "text": "报告期内，公司主营业务收入45,658,787,811.56元，同比减少3.40%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008",
+              "source-0012"
+            ],
+            "metrics": [
+              {
+                "name": "主营业务收入",
+                "raw_value": "45,658,787,811.56",
+                "value": "45658787811.56",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "主营业务收入同比",
+                "raw_value": "-3.40",
+                "value": "-3.40",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F009",
+            "text": "报告另列其他业务收入67,270.79万元，同比增长9.36%；该口径与主营业务中的‘非航空产品及其他业务’分列，具体构成未披露。",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "其他业务收入",
+                "raw_value": "67,270.79",
+                "value": "67270.79",
+                "unit": "万元",
+                "source_unit": "万元",
+                "currency": "人民币",
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "其他业务收入为主营业务之外的收入类别，未披露具体构成；不等同于主营业务中的‘非航空产品及其他业务’。"
+              },
+              {
+                "name": "其他业务收入同比",
+                "raw_value": "9.36",
+                "value": "9.36",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": "其他业务收入为主营业务之外的收入类别，未披露具体构成；不等同于主营业务中的‘非航空产品及其他业务’。"
+              }
+            ],
+            "uncertainty_reason": "其他业务收入为主营业务之外的收入类别，未披露具体构成；不等同于主营业务中的‘非航空产品及其他业务’。"
+          },
+          {
+            "fact_id": "F010",
+            "text": "航空发动机及衍生产品业务2025年度实现收入43,476,253,945.25元，同比减少3.37%，毛利率8.50%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0010",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "航空发动机及衍生产品营业收入",
+                "raw_value": "43,476,253,945.25",
+                "value": "43476253945.25",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "航空发动机及衍生产品营业收入同比",
+                "raw_value": "-3.37",
+                "value": "-3.37",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "航空发动机及衍生产品毛利率",
+                "raw_value": "8.50",
+                "value": "8.50",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F011",
+            "text": "外贸出口转包业务2025年度实现收入1,950,520,200.78元，同比减少5.94%，毛利率20.61%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0010",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "外贸出口转包营业收入",
+                "raw_value": "1,950,520,200.78",
+                "value": "1950520200.78",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "外贸出口转包营业收入同比",
+                "raw_value": "-5.94",
+                "value": "-5.94",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "外贸出口转包毛利率",
+                "raw_value": "20.61",
+                "value": "20.61",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F012",
+            "text": "非航空产品及其他业务2025年度实现收入232,013,665.53元，同比增长17.83%，毛利率25.61%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0010",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "非航空产品及其他营业收入",
+                "raw_value": "232,013,665.53",
+                "value": "232013665.53",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "非航空产品及其他营业收入同比",
+                "raw_value": "17.83",
+                "value": "17.83",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "非航空产品及其他毛利率",
+                "raw_value": "25.61",
+                "value": "25.61",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "分行业表未逐行列示；分产品构成已覆盖主要业务。",
+          "其他业务收入具体构成未披露；未计算收入占比。"
+        ]
+      },
+      "operations_and_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F015",
+            "text": "公司通过供应商管理、质量风险防控和数字化协同提升供应链稳定性；供应链管理体系建成供应链全景地图架构，试点‘品类+标签’管理模式，建立供应商产能模型，推进物资统谈集采；在原材料涨价的情况下采购价格平稳。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未披露具体原材料品类、采购金额或主要供应商名称；供应链管理多为定性披露。"
+        ]
+      },
+      "customers_channels_markets": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F013",
+            "text": "外贸出口转包业务主要客户包括SAFRAN（法国赛峰集团）、RR（英国罗尔斯·罗伊斯公司）、GE Aerospace（美国通用电气航空航天集团）、SLB（美国斯伦贝谢公司）、GEHC（美国通用医疗公司）、Stryker（爱尔兰史赛克公司）等；产品配套于LEAP、CFM56、GE9X、TrentXWB-97K、Pearl、LM2500、LM6000等航空发动机和燃气轮机，并涉及石油钻探深海领域及医疗诊断、医疗植入件等民用产品加工贸易与技术服务。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F014",
+            "text": "分地区看，2025年度境内销售收入43,708,267,610.78元，境外销售收入1,950,520,200.78元。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0011",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "境内销售收入",
+                "raw_value": "43,708,267,610.78",
+                "value": "43708267610.78",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "境外销售收入",
+                "raw_value": "1,950,520,200.78",
+                "value": "1950520200.78",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未披露客户收入占比；主营业务分销售模式表仅列示直销，未披露其他渠道收入。"
+        ]
+      },
+      "operating_drivers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F016",
+            "text": "公司说明营业收入同比下降主要因客户需求变化、交付不及预期；营业成本下降主要因销售减少及新产品成熟度影响。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F017",
+            "text": "利润总额、归属于上市公司股东的净利润及归属于上市公司股东的扣除非经常性损益的净利润同比下降。公司说明：利润总额和归属于上市公司股东的净利润下降主要受新产品成熟度影响毛利额减少、财务费用增加，以及其他收益、投资收益增加；归属于上市公司股东的扣除非经常性损益的净利润下降主要受新产品成熟度影响毛利额减少、财务费用增加，以及其他收益增加。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F018",
+            "text": "分产品看，航空发动机及衍生产品收入下降因客户需求变化、交付不及预期，毛利率下降因新产品成熟度有待提升；外贸出口转包收入下降因出口订单减少；非航空产品及其他收入增长因民品等业务增加，毛利率上升因部分毛利高的产品收入增加。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0013"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "公司未量化各驱动因素对收入、毛利率或利润的影响。"
+        ]
+      },
+      "material_changes": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F019",
+            "text": "报告期内，AES100涡轴发动机获批生产许可证并配装三型飞机实现首飞；大型涡扇发动机‘秦岭’改型动力配装‘九天’无人机实现顺利首飞；配装公司QD280燃气轮机的太行25燃气轮机发电机组助力国家能源局燃气轮机创新示范项目首次并网一次成功。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F020",
+            "text": "2025年度经营活动产生的现金流量净额为-4,417,719,128.58元，同比增长69.13%，主要因销售商品、提供劳务收到现金增加。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0002"
+            ],
+            "metrics": [
+              {
+                "name": "经营活动产生的现金流量净额",
+                "raw_value": "-4,417,719,128.58",
+                "value": "-4417719128.58",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "经营活动产生的现金流量净额同比",
+                "raw_value": "69.13",
+                "value": "69.13",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "型号进展未披露对本期收入的具体金额贡献；未将事件时点外推至其他期间。"
+        ]
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+        "section_path": [
+          "第二节 公司简介和主要财务指标",
+          "七、 近三年主要会计数据和财务指标"
+        ],
+        "physical_pages": [
+          7
+        ],
+        "source_spans": [
+          {
+            "page": 7,
+            "start": 661,
+            "end": 3218,
+            "quote": "七、     近三年主要会计数据和财务指标\n\n   (一)    主要会计数据\n                                                                                         单位：元          币种：人民币\n                                                                                  本期比上年\n   主要会计数据                         2025年                       2024年                同期增减                    2023年\n                                                                                       (%)\n营业收入                       46,331,495,671.40           47,879,700,739.80                 -3.23     43,733,881,854.98\n利润总额                           907,425,066.12            1,135,721,957.86               -20.10      1,708,566,943.75\n归属于上市公司                        634,328,156.80              860,291,114.25               -26.27      1,421,421,585.27\n股东的净利润\n归属于上市公司\n股东的扣除非经常                       294,441,306.51              791,633,395.19               -62.81      1,221,616,797.20\n性损益的净利润\n经营活动产生的                    -4,417,719,128.58          -14,308,924,075.35                 69.13     -6,739,139,308.50\n现金流量净额\n                                                                                  本期末比上\n                                2025年末                       2024年末               年同期末增                  2023年末\n                                                                                    减（%）\n归属于上市公司                    40,190,833,433.19           39,876,344,065.24                   0.79    39,455,041,956.23\n股东的净资产\n总资产                       123,071,590,336.09          115,913,298,911.68                   6.18    99,795,552,106.78\n\n   (二)    主要财务指标\n\n        主要财务指标                           2025年               2024年            本期比上年同期增减                       2023年\n                                                                                        (%)\n基本每股收益（元／股）                                      0.24                0.32                      -25.00                0.53\n稀释每股收益（元／股）                                      0.24                0.32                      -25.00                0.53\n扣除非经常性损益后的基本                                     0.11                0.30                      -63.33                0.46\n每股收益（元／股）\n加权平均净资产收益率（%）                                    1.58                2.17        减少0.59个百分点                          3.66\n扣除非经常性损益后的加权                                     0.73                2.00        减少1.27个百分点                          3.14\n平均净资产收益率（%）\n\n   报告期末公司前三年主要会计数据和财务指标的说明\n   √适用      □不适用\n\n\n                                                          7/ 200"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+        "section_path": [
+          "第二节 公司简介和主要财务指标",
+          "七、 近三年主要会计数据和财务指标"
+        ],
+        "physical_pages": [
+          8
+        ],
+        "source_spans": [
+          {
+            "page": 8,
+            "start": 0,
+            "end": 614,
+            "quote": "                                   中国航发动力股份有限公司2025              年年度报告\n\n\n     1、本期利润总额同比减少                20.10%，主要是受新产品成熟度影响毛利额减少、财务费用增加；其\n     他收益、投资收益增加。\n     2、本期归属于上市公司股东的净利润同比减少                             26.27%，主要是受新产品成熟度影响毛利额减少、\n     财务费用增加；其他收益、投资收益增加。\n     3、本期归属于上市公司股东的扣除非经常性损益的净利润同比减少                                          62.81%，主要是受新产品成\n     熟度影响毛利额减少、财务费用增加；其他收益增加。\n     4、本期经营活动产生的现金流量净额同比增长69.13%，主要是销售商品、提供劳务收到现金增加。\n     5、本期基本每股收益同比减少                   25.00%，主要是归属于上市公司股东的净利润减少。\n     6、本期扣除非经常性损益后的基本每股收益同比减少                                 63.33%，主要是归属于上市公司股东的扣\n     除非经常性损益的净利润减少。\n\n     "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          10
+        ],
+        "source_spans": [
+          {
+            "page": 10,
+            "start": 107,
+            "end": 1443,
+            "quote": "一、报告期内公司从事的业务情况\n（一）主要业务、产品及经营模式\n    公司主营业务分为三类：航空发动机及衍生产品业务、外贸出口转包业务、非航空产品及其\n他业务。主要产品和服务有航空发动机及燃气轮机整机、部件、零组件，维修保障服务，以及航\n空发动机、燃气轮机、石油钻探、医疗器械零部件出口业务等，产品主要为航空器、舰船提供动\n力，为油气、电力两大领域提供能源装备。公司经营模式为多元化经营，具备涵盖产品全寿命周\n期的设计、制造、总装、试车整套技术和综合服务保障能力，综合技术水平国内领先、国际先进。\n从实现价值的方式看，公司为差异化模式，以全谱系航空发动机产品和全生命周期研发制造及维\n修服务保障为特色。\n（二）竞争优势\n    航空发动机及衍生产品业务。在军用动力方面，公司是国内唯一能够研制涡喷、涡扇、涡轴、\n涡桨、活塞等全谱系军用航空发动机的企业，在国际上，公司是能够自主研制航空发动机产品的\n少数企业之一，具备航空发动机、燃气轮机、辅助动力、直升机传动系统等完整的产品供应能力，\n是我国航空器最主要的供应商、舰船重要的供应商。产品覆盖全产业链，包括研制、生产、试验、\n销售、服务保障五大产业链层级；在商用动力方面，公司是长江系列发动机最主要的配套商；在\n通航动力方面，公司充分发挥“国家队”“主力军”作用，精心擘画通用航空与低空经济发展蓝\n图，完善产品谱系，AEP100、AEP60E、AES100            等多型航空发动机产品研制取得重大突破，为持续\n推动我国通航产业发展注入强劲动力；在民用燃机方面，公司具备自主知识产权的                                       DQ280 燃气轮\n机的研制生产能力，拥有国内大档功率轻型燃气轮机领域的良好技术水平。\n    外贸出口转包业务。公司处于产业链中游，以生产制造为主，开展国际民用航空发动机和燃\n气轮机零部件等制造业务，并积极参与部分新型民用航空发动机零部件试制。主要客户有                                          SAFRAN\n（法国赛峰集团）、RR（英国罗尔斯•罗伊斯公司）、GE                      Aerospace（美国通用电气航空航天集团）、\nSLB（美国斯伦贝谢公司）、GEHC（美国通用医疗公司）、Stryker（爱尔兰史赛克公司）等世界\n著名的航空发动机制造商以及石油钻探、医疗器械等非航空企业。主要产品是航空发动机和燃气\n轮机的各类盘、环、槽形件、轴、机匣、整体叶盘、叶片等零部件，主要配套于                                      LEAP、CFM56、\nGE9X、TrentXWB-97K、Pearl、LM2500、LM6000      等航空发动机和燃气轮机；以及石油钻探深海领\n域及轴类产品、医疗诊断产品、医疗植入件等民用产品的加工贸易与技术服务业务。\n    非航空产品及其他业务。主要发展与航空发动机技术同源、工艺相近的高附加值产品及服务，\n如工艺装备、工业物业等。\n\n报告期内公司新增重要非主营业务的说明\n□适用    √不适用\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          11
+        ],
+        "source_spans": [
+          {
+            "page": 11,
+            "start": 736,
+            "end": 1661,
+            "quote": "三、经营情况讨论与分析\n\n    2025年，公司坚持以习近平新时代中国特色社会主义思想为指导，深入学习贯彻党的二十大\n和二十届历次全会精神，全面贯彻落实习近平总书记重要讲话和重要指示批示精神，不断建强“军\n机民机、国内国际、航机燃机”协同发展布局，全面完成“十四五”收官，高质量发展根基更加\n稳固。\n    深化市场布局。公司利用航空发动机和燃气轮机主业优势和平台优势，在政策支持下，向新\n域新质场景拓展，同时加速军贸和通航市场开拓。军用动力方面，多型新产品落户；商用动力方\n面，能够高效率、高质量完成长江系列发动机配套试制任务，积极争取新产品订单；通航动力方\n面，与多家客户签署         AEP100、AEP60E、AES100   等产品合作协议或意向采购合同。其中，AES100\n涡轴发动机获批生产许可证并配装三型飞机实现首飞，工程应用与市场拓展取得重大突破；大型\n涡扇发动机“秦岭”改型动力配装“九天”无人机实现顺利首飞；在民用燃机方面，配装公司                                       QD280\n燃气轮机的太行       25 燃气轮机发电机组助力国家能源局燃气轮机创新示范项目首次并网一次成功。\n在外贸出口转包业务方面，加大新产品、新客户开拓力度，产品结构进一步完善。\n    积极响应客户需求。建立客户关系管理机制，完善客户信息管理、客户资产管理、客户沟通\n管理、客户满意度管理流程架构，制定客户走访计划，利用各层级交流互访、会议、供应商大会\n等方式，及时了解、掌握、传递相关方需求和期望，在战略规划、生产经营中落实，通过技术创\n新、全生命周期服务、供应链优化与客户协同，构建高效响应机制，提升合同履约率，促进客户\n关系发展。建立双向信息沟通机制，全面准确收集需求，组织制定保障措施，及时反馈落实，提\n升客户满意度。\n    技术创新更具活力。激发技术创新活力，提升技术创新价值创造。盘活技术创新资源，积极\n推进技术创新平台建设，围绕国家认定企业技术中心，开展技术创新体系建设、技术创新活动等\n                                       11 /200"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          12
+        ],
+        "source_spans": [
+          {
+            "page": 12,
+            "start": 0,
+            "end": 1698,
+            "quote": "                         中国航发动力股份有限公司2025         年年度报告\n\n\n工作，联合高校、科研院所及优势企业开展深度合作，积极开展协同创新。依托各产学研中心，\n以及博士后科研工作站等创新平台，组织开展各渠道预先研究课题申报，争取公司外科研经费资\n助；通过开展揭榜挂帅、厂所联合、产学研合作等多种渠道开展技术攻关，加速推进技术创新，\n为新质生产力提供源动力，加速战略性新兴产业发展。2025                        年，公司及子公司通过开展知识产权\n战略研究及专利体系布局规划，使核心技术得到不断发展和延伸。报告期内，公司申请专利                                         784\n件，其中发明专利        773 件；取得授权专利         527件，其中发明专利         526件；获得省部级科技成果            9\n项。\n    供应链保障能力持续提升。通过深化供应商管理、强化质量风险防控、推进数字化协同等措\n施，有效提升了供应链稳定性与响应效率。供应链管理体系建成供应链全景地图架构，创新试点\n“品类+标签”管理模式，建立供应商产能模型，推进物资统谈集采，在原材料涨价的情况下采购\n价格平稳。\n    流程体系建设向深推进。对准业务战略、目标和变革需求，构建基于运营策划、执行、评估、\n改进的体系运营模式；剖析业务能力短板弱项，激发体系运营活力；基于数字化转型重构业务运\n作模式，贯通基于价值流的端到端业务场景，识别规划业务转型升级路径；审视生产现场不增值\n环节，逐级深化运营评估，助力生产现场业务提速；系统破解高频次、高能耗、高风险业务难题，\n实现体系运营纵深突破；基于流程的体系全面推行和业务自主运营向优聚焦、向深推进、向细延\n伸，价值创造能力持续提升。\n    数字化转型蓝图绘就。实施数字化转型顶层设计，基于业务战略，识别业务转型场景，设计\n数字化转型愿景、4A        架构及实施路径，明确数字化转型蓝图；赋能效果初步显现，持续围绕主价\n值链业务，开展数字化转型建设和应用，赋能业务提质增效；数据管理逐步完善，面向全域数据\n统一管理与应用，规划公司数据交互模式，厘清数据资产，设计数据应用场景及方法，为发挥数\n据资产效能奠定基础；运维效能主动提升，站位用户视角，系统开展                              IT 运维梳理，深入推动运维\n主动服务，初步实现从“被动响应”向“主动服务”转型；前沿技术探索布局，全面开展人工智\n能、物联等技术研究，积极布局关键技术攻关与场景融合试点，为公司转型发展储备核心技术能\n力。\n    人才队伍持续建强。深入推进战略人才管理体系落地，人才队伍持续建强。健全岗位任职资\n格标准，基于岗位履职需要，正向设计岗位任职资格模型及分级标准，为建立岗位学习地图，精\n准实施培训赋能奠定基础。实施精准靶向引才，基于公司产品结构和技术发展需要，精准分析人\n才需求，实施靶向引才。实施灵活调配，提升人力资源使用效能，建立人员动态盘点和调配机制，\n有效满足重点瓶颈单位用工需求。分层分类制定人才培养举措，以职称评审、技能等级认定、技\n能运动会为三大抓手，全面改善人才队伍结构。对标高端人才标准，制定核心层人员登高计划，\n对照职位职级晋升条件，组织骨干层、成长层人员制定成长计划，正向牵引人才成长。\n    健全合规体系。统筹推进“大合规”管理体系运营，明确管理团队具体职责，进一步压实各\n单位合规管理责任；加强型号项目、采购领域合规管理，针对保密、质量、安全环保等关键合规\n领域开展业务合规培训，举办基层合规官、兼职合规管理员合规管理课程，分享合规管理经验，\n传达合规管理要求；针对合规管理重点领域开展合规文化宣传，利用公司广播、报纸、融媒体等\n载体将业务合规管理要求传达至全体员工，强化全员合规意识。\n\n\n\n                                       12/200"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          13
+        ],
+        "source_spans": [
+          {
+            "page": 13,
+            "start": 0,
+            "end": 237,
+            "quote": "                         中国航发动力股份有限公司2025         年年度报告\n\n\n    党建引领助力高质量发展。公司党委坚持以习近平新时代中国特色社会主义思想为指导，\n深入学习党的二十大和二十届历次全会精神，不断增强“四个意识”、坚定“四个自信”、做\n到“两个维护”，锚定“一流的价值创造、一流的运营管理、一流的人才队伍”建设目标，充\n分发挥“把方向、管大局、保落实”作用，将党的政治优势、组织优势转化为攻坚克难、改革\n发展的强大动力。\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ],
+        "physical_pages": [
+          14
+        ],
+        "source_spans": [
+          {
+            "page": 14,
+            "start": 129,
+            "end": 3067,
+            "quote": "五、报告期内主要经营情况\n\n     报告期内，公司实现营业收入                      4,633,149.57     万元，同比减少            3.23%，其中主营业务收入\n4,565,878.78    万元，同比减少            3.40%，其他业务收入              67,270.79    万元，同比增长            9.36%。公司主\n营业务三大板块中，航空发动机及衍生产品业务实现收入                                          4,347,625.39    万元，同比减少             3.37%；\n外贸出口转包业务实现收入                    195,052.02    万元，同比减少            5.94%；非航空产品及其他业务实现收入\n23,201.37   万元，同比增长            17.83%。全年实现归属于母公司股东的净利润                               63,432.82    万元，同比\n减少   26.27%。\n(一)   主营业务分析\n\n1、   利润表及现金流量表相关科目变动分析表\n\n                                                                                  单位：元         币种：人民币\n               科目                              本期数                     上年同期数                 变动比例（%）\n营业收入                                    46,331,495,671.40          47,879,700,739.80                     -3.23\n营业成本                                    42,107,683,732.60          43,063,744,497.28                     -2.22\n税金及附加                                       351,130,256.69             265,444,592.51                    32.28\n销售费用                                        308,403,560.79             293,404,685.87                     5.11\n管理费用                                      1,604,853,844.26          1,581,287,122.04                      1.49\n财务费用                                        627,400,791.46             456,787,611.33                    37.35\n研发费用                                        773,477,689.35             995,228,553.25                  -22.28\n其他收益                                        406,192,173.83             188,505,511.24                  115.48\n投资收益                                        348,753,208.49             164,545,072.97                  111.95\n公允价值变动收益                                      -8,000,000.00            -52,000,000.00                    84.62\n资产处置收益                                        41,220,862.64             18,688,538.47                  120.57\n营业外收入                                         37,494,057.30             84,674,796.79                  -55.72\n营业外支出                                         92,622,296.74             31,834,017.54                  190.95\n经营活动产生的现金流量净额                           -4,417,719,128.58         -14,308,924,075.35                     69.13\n投资活动产生的现金流量净额                           -3,303,111,814.41          -2,846,860,475.67                   -16.03\n筹资活动产生的现金流量净额                             5,470,950,655.96         16,483,499,619.43                   -66.81\n营业收入变动原因说明：主要是客户需求变化，交付不及预期。\n营业成本变动原因说明：主要是销售减少及新产品成熟度影响。\n税金及附加变动原因说明：主要是受税收优惠政策调整影响。\n销售费用变动原因说明：主要是差旅费增加。\n管理费用变动原因说明：主要是员工年度社保基数调整及警防费增加。\n财务费用变动原因说明：主要原因一是带息负债规模增加，利息费用增加，二是受汇率变动影响\n汇兑损失增加。\n研发费用变动原因说明：主要是受研发项目周期安排、投入节点等因素影响。\n其他收益变动原因说明：主要是享受增值税加计抵减政策。\n投资收益变动原因说明：主要是子公司转让航发控制股票。\n公允价值变动收益变动原因说明：主要是贵州银行股价变动影响。\n资产处置收益变动原因说明：主要是安顺市政府收储黎阳动力平坝厂区土地及房产。\n\n                                                    14/ 200"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 0,
+            "end": 655,
+            "quote": "                                     中国航发动力股份有限公司2025                  年年度报告\n\n\n 营业外收入变动原因说明：主要是保险赔款减少。\n 营业外支出变动原因说明：主要是滞纳金及赔偿金增加。\n 经营活动产生的现金流量净额变动原因说明：主要是销售商品、提供劳务收到现金增加。\n 投资活动产生的现金流量净额变动原因说明：主要是购建固定资产等支付现金增加。\n 筹资活动产生的现金流量净额变动原因说明：主要是偿还借款增加。\n 本期公司业务类型、利润构成或利润来源发生重大变动的详细说明\n □适用       √不适用\n\n 2、   收入和成本分析\n\n √适用       □不适用\n      报告期内，公司实现主营业务收入                            4,565,878.78      万元，同比减少             3.40%，主营业务成本\n 4,150,403.42     万元，同比减少              2.41%。\n (1).主营业务分行业、分产品、分地区、分销售模式情况\n\n                                                                                        单位：元          币种：人民币\n                                                 "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "主营业务分行业情况"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 655,
+            "end": 1517,
+            "quote": "主营业务分行业情况\n                                                                  毛利率        营业收入比           营业成本比          毛利率比上\n   分行业                 营业收入                    营业成本                （%）         上年增减           上年增减            年增减\n                                                                                （%）             （%）            （%）\n   制造业            45,505,572,604.32      41,367,568,639.36            9.09          -3.52          -2.53    减少0.93个\n                                                                                                              百分点\n非航空服务业               153,215,207.24          136,465,574.05         10.93           58.11          57.29    增加0.47个\n                                                                                                              百分点\n                                                 "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0010",
+        "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "主营业务分产品情况"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 1517,
+            "end": 2609,
+            "quote": "主营业务分产品情况\n                                                                  毛利率        营业收入比           营业成本比          毛利率比上\n   分产品                 营业收入                    营业成本                （%）         上年增减           上年增减            年增减\n                                                                                （%）             （%）            （%）\n航空发动机及            43,476,253,945.25      39,782,933,589.29            8.50          -3.37          -2.26    减少1.04个\n  衍生产品                                                                                                        百分点\n外贸出口转包             1,950,520,200.78        1,548,513,050.10         20.61           -5.94          -6.98    增加0.89个\n                                                                                                              百分点\n非航空产品及               232,013,665.53          172,587,574.02         25.61           17.83           7.42    增加7.20个\n    其他                                                                                                        百分点\n                                                 "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0011",
+        "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "主营业务分地区情况"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 2609,
+            "end": 3469,
+            "quote": "主营业务分地区情况\n                                                                  毛利率        营业收入比           营业成本比          毛利率比上\n   分地区                 营业收入                    营业成本                （%）         上年增减           上年增减            年增减\n                                                                                （%）             （%）            （%）\n  境内销售            43,708,267,610.78      39,955,521,163.31            8.59          -3.28          -2.22    减少0.98个\n                                                                                                              百分点\n  境外销售             1,950,520,200.78        1,548,513,050.10         20.61           -5.94          -6.98    增加0.89个\n                                                                                                              百分点\n                                               "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0012",
+        "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "主营业务分销售模式情况"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 3469,
+            "end": 4122,
+            "quote": "主营业务分销售模式情况\n                                                                  毛利率        营业收入比           营业成本比          毛利率比上\n  销售模式                 营业收入                    营业成本                （%）         上年增减           上年增减            年增减\n                                                                                （%）             （%）            （%）\n    直销            45,658,787,811.56      41,504,034,213.41            9.10          -3.40          -2.41    减少0.92个\n                                                                                                              百分点\n\n\n\n\n\n                                                        15 /200"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0013",
+        "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "主营业务分销售模式情况"
+        ],
+        "physical_pages": [
+          16
+        ],
+        "source_spans": [
+          {
+            "page": 16,
+            "start": 0,
+            "end": 1811,
+            "quote": "                                   中国航发动力股份有限公司2025              年年度报告\n\n\n   主营业务分行业、分产品、分地区、分销售模式情况的说明\n        从行业角度看，公司              2025  年制造业收入         4,550,557.26   万元，同比减少           3.52%，主要是客户\n   需求变化，产品交付不及预期；非航空服务业收入                                 15,321.52   万元，同比增长          58.11%，主要是民\n   品业务增加。\n        从产品角度看，航空发动机及衍生产品业务实现收入                                   4,347,625.39   万元，同比减少           3.37%，\n   主要是客户需求变化，产品交付不及预期，毛利率下降主要是新产品成熟度有待提升；外贸出口\n   转包业务实现收入             195,052.02   万元，同比减少          5.94%，主要是出口订单减少；非航空产品及其他\n   业务实现收入          23,201.37  万元，同比增长           17.83%，主要是民品等业务增加，毛利率上升主要是部\n   分毛利高的产品收入增加。\n        从地区角度看，境内收入                 4,370,826.76   万元，同比减少           3.28%，境外收入         195,052.02   万元，\n   同比减少       5.94%，境外收入变动情况与外贸出口转包业务一致。\n\n   (2).产销量情况分析表\n\n   √适用      □不适用\n                                                                            生产量比         销售量比         库存量比\n 主要产品             单位             生产量             销售量            库存量         上年增减         上年增减         上年增减\n                                                                             （%）           （%）          （%）\n航空发动机             万元            4,148,919       3,978,293       460,300          0.80        -2.26        58.90\n及衍生产品\n               万美元(按\n外贸             年度平均汇                22,003          21,679        2,277         -4.63        -7.26        16.23\n                 率折算)\n   产销量情况说明\n        航空发动机的产量和销量涉及国家航空武器装备，根据行业主管部门保密要求，公司无法披\n   露相关数据。该表表述的是航空发动机及衍生产品的生产、销售和库存价值量。本期销售量减少\n   主要是客户需求变化，产品交付不及预期。期末库存量增加主要是部分产品暂未交付。\n        外贸产品生产量、销售量减少主要是出口订单减少；库存量增加主要是提前生产备货。\n\n   (3).重大采购合同、重大销售合同的履行情况\n\n   □适用      √不适用\n\n   (4).成本分析表\n                                                                                单位：元        币种：人民币\n                                                  "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "limitations": [
+      "本工作底稿仅基于选定年度报告章节，未涵盖财务报告附注等未读部分。"
+    ],
+    "supply_chain": {
+      "position": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F022",
+            "text": "公司覆盖设计、制造、总装、试车及维修保障；外贸出口转包业务处于产业链中游，以生产制造为主。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "外贸出口转包定位为产业链中游；公司整体覆盖研发制造与服务保障。"
+        ]
+      },
+      "upstream_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F023",
+            "text": "公司披露供应链管理时提及原材料涨价，但未披露具体原材料品类、采购金额或主要供应商。",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [],
+            "uncertainty_reason": "未披露具体原材料品类和采购结构，不能据此认定具体上游投入。"
+          }
+        ],
+        "limitations": [
+          "未披露具体原材料品类、采购金额或供应商。"
+        ]
+      },
+      "downstream_customers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F024",
+            "text": "产品用于航空器、舰船动力，油气、电力能源装备，以及石油钻探、医疗等；外贸出口转包产品配套于民用航空发动机和燃气轮机。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未披露具体下游客户收入占比。"
+        ]
+      }
+    },
+    "generation": {
+      "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+      "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+      "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+      "selection": {
+        "purpose": "select_profile_sections",
+        "request_id": "bp-work-744f502f4ba6b08019eced75:workpaper:sections",
+        "request_hash": "182d69287fe3f5be113b0c698e8a2306ed684165a638664a1c0cac0353ddd8a5",
+        "response_hash": "3f52a67c0b4c3eabf02e94cc1b3e5594d5b9bbdc08b3ca1b1eae1e61050c666c",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 23029,
+          "output_tokens": 6008,
+          "total_tokens": 29037
+        },
+        "scope_kind": "report_heading_index",
+        "heading_count": 831,
+        "section_ids": [
+          "section-0001",
+          "section-0002",
+          "section-0003",
+          "section-0004",
+          "section-0005",
+          "section-0006",
+          "section-0007",
+          "section-0008",
+          "section-0009",
+          "section-0010",
+          "section-0011",
+          "section-0012",
+          "section-0013",
+          "section-0014",
+          "section-0015",
+          "section-0016",
+          "section-0017",
+          "section-0018",
+          "section-0019",
+          "section-0020",
+          "section-0021",
+          "section-0022",
+          "section-0023",
+          "section-0024",
+          "section-0025",
+          "section-0026",
+          "section-0027",
+          "section-0028",
+          "section-0029",
+          "section-0030",
+          "section-0031",
+          "section-0032",
+          "section-0033",
+          "section-0034",
+          "section-0035",
+          "section-0036",
+          "section-0037",
+          "section-0038",
+          "section-0039",
+          "section-0040",
+          "section-0041",
+          "section-0042",
+          "section-0043",
+          "section-0044",
+          "section-0045",
+          "section-0046",
+          "section-0047",
+          "section-0048",
+          "section-0049",
+          "section-0050",
+          "section-0051",
+          "section-0052",
+          "section-0053",
+          "section-0054",
+          "section-0055",
+          "section-0056",
+          "section-0057",
+          "section-0059",
+          "section-0060",
+          "section-0061",
+          "section-0062",
+          "section-0066",
+          "section-0070",
+          "section-0071",
+          "section-0072",
+          "section-0077",
+          "section-0078",
+          "section-0079",
+          "section-0080",
+          "section-0081",
+          "section-0082",
+          "section-0083",
+          "section-0088",
+          "section-0089",
+          "section-0090",
+          "section-0091",
+          "section-0092",
+          "section-0093",
+          "section-0094",
+          "section-0095",
+          "section-0096",
+          "section-0097",
+          "section-0098",
+          "section-0099",
+          "section-0100",
+          "section-0101",
+          "section-0102",
+          "section-0103",
+          "section-0104",
+          "section-0105",
+          "section-0106",
+          "section-0107",
+          "section-0112",
+          "section-0113",
+          "section-0114",
+          "section-0115",
+          "section-0116",
+          "section-0117",
+          "section-0118",
+          "section-0119",
+          "section-0120",
+          "section-0121",
+          "section-0122",
+          "section-0123",
+          "section-0124",
+          "section-0125",
+          "section-0126",
+          "section-0127",
+          "section-0128",
+          "section-0129",
+          "section-0130",
+          "section-0131",
+          "section-0132",
+          "section-0133",
+          "section-0134",
+          "section-0135",
+          "section-0136",
+          "section-0137",
+          "section-0138",
+          "section-0139",
+          "section-0140",
+          "section-0141",
+          "section-0142",
+          "section-0143",
+          "section-0144",
+          "section-0145",
+          "section-0146",
+          "section-0147",
+          "section-0148",
+          "section-0149",
+          "section-0150",
+          "section-0151",
+          "section-0152",
+          "section-0153",
+          "section-0154",
+          "section-0155",
+          "section-0156",
+          "section-0157",
+          "section-0158",
+          "section-0159",
+          "section-0160",
+          "section-0161",
+          "section-0162",
+          "section-0163",
+          "section-0164",
+          "section-0165",
+          "section-0166",
+          "section-0167",
+          "section-0168",
+          "section-0169",
+          "section-0170",
+          "section-0171",
+          "section-0172",
+          "section-0173",
+          "section-0174",
+          "section-0175",
+          "section-0176",
+          "section-0177",
+          "section-0178",
+          "section-0179",
+          "section-0180",
+          "section-0181",
+          "section-0182",
+          "section-0183",
+          "section-0184",
+          "section-0185",
+          "section-0186",
+          "section-0187",
+          "section-0188",
+          "section-0189",
+          "section-0191",
+          "section-0192",
+          "section-0193",
+          "section-0194",
+          "section-0195",
+          "section-0196",
+          "section-0197",
+          "section-0198",
+          "section-0199",
+          "section-0200",
+          "section-0201",
+          "section-0202",
+          "section-0203",
+          "section-0204",
+          "section-0205",
+          "section-0206",
+          "section-0211",
+          "section-0212",
+          "section-0213",
+          "section-0214",
+          "section-0215",
+          "section-0216",
+          "section-0217",
+          "section-0218",
+          "section-0219",
+          "section-0220",
+          "section-0221",
+          "section-0222",
+          "section-0223",
+          "section-0224",
+          "section-0225",
+          "section-0226",
+          "section-0227",
+          "section-0228",
+          "section-0229",
+          "section-0230",
+          "section-0231",
+          "section-0232",
+          "section-0233",
+          "section-0234",
+          "section-0235",
+          "section-0236",
+          "section-0237",
+          "section-0238",
+          "section-0239",
+          "section-0240",
+          "section-0241",
+          "section-0242",
+          "section-0243",
+          "section-0244",
+          "section-0245",
+          "section-0246",
+          "section-0247",
+          "section-0248",
+          "section-0249",
+          "section-0250",
+          "section-0251",
+          "section-0252",
+          "section-0253",
+          "section-0254",
+          "section-0255",
+          "section-0256",
+          "section-0257",
+          "section-0258",
+          "section-0259",
+          "section-0260",
+          "section-0261",
+          "section-0262",
+          "section-0263",
+          "section-0264",
+          "section-0265",
+          "section-0266",
+          "section-0267",
+          "section-0268",
+          "section-0269",
+          "section-0273",
+          "section-0275",
+          "section-0277",
+          "section-0279",
+          "section-0280",
+          "section-0281",
+          "section-0282",
+          "section-0283",
+          "section-0284",
+          "section-0285",
+          "section-0286",
+          "section-0287",
+          "section-0288",
+          "section-0289",
+          "section-0290",
+          "section-0291",
+          "section-0292",
+          "section-0293",
+          "section-0294",
+          "section-0295",
+          "section-0296",
+          "section-0297",
+          "section-0298",
+          "section-0299",
+          "section-0300",
+          "section-0301",
+          "section-0302",
+          "section-0303",
+          "section-0304",
+          "section-0305",
+          "section-0306",
+          "section-0307",
+          "section-0308",
+          "section-0309",
+          "section-0310",
+          "section-0311",
+          "section-0312",
+          "section-0313",
+          "section-0314",
+          "section-0315",
+          "section-0316",
+          "section-0317",
+          "section-0318",
+          "section-0319",
+          "section-0320",
+          "section-0321",
+          "section-0322",
+          "section-0323",
+          "section-0324",
+          "section-0325",
+          "section-0326",
+          "section-0327",
+          "section-0328",
+          "section-0329",
+          "section-0330",
+          "section-0331",
+          "section-0332",
+          "section-0333",
+          "section-0339",
+          "section-0340",
+          "section-0341",
+          "section-0345",
+          "section-0346",
+          "section-0347",
+          "section-0348",
+          "section-0349",
+          "section-0350",
+          "section-0351",
+          "section-0352",
+          "section-0353",
+          "section-0354",
+          "section-0355",
+          "section-0356",
+          "section-0357",
+          "section-0358",
+          "section-0359",
+          "section-0360",
+          "section-0361",
+          "section-0362",
+          "section-0363",
+          "section-0364",
+          "section-0365",
+          "section-0366",
+          "section-0367",
+          "section-0368",
+          "section-0369",
+          "section-0370",
+          "section-0371",
+          "section-0376",
+          "section-0384",
+          "section-0385",
+          "section-0386",
+          "section-0387",
+          "section-0388",
+          "section-0389",
+          "section-0390",
+          "section-0391",
+          "section-0392",
+          "section-0393",
+          "section-0394",
+          "section-0395",
+          "section-0396",
+          "section-0397",
+          "section-0398",
+          "section-0399",
+          "section-0400",
+          "section-0401",
+          "section-0402",
+          "section-0403",
+          "section-0404",
+          "section-0405",
+          "section-0406",
+          "section-0407",
+          "section-0408",
+          "section-0409",
+          "section-0410",
+          "section-0411",
+          "section-0412",
+          "section-0413",
+          "section-0414",
+          "section-0415",
+          "section-0416",
+          "section-0417",
+          "section-0418",
+          "section-0419",
+          "section-0420",
+          "section-0421",
+          "section-0422",
+          "section-0423",
+          "section-0424",
+          "section-0425",
+          "section-0426",
+          "section-0427",
+          "section-0428",
+          "section-0429",
+          "section-0430",
+          "section-0431",
+          "section-0432",
+          "section-0433",
+          "section-0434",
+          "section-0435",
+          "section-0436",
+          "section-0437",
+          "section-0438",
+          "section-0439",
+          "section-0440",
+          "section-0441",
+          "section-0442",
+          "section-0443",
+          "section-0444",
+          "section-0445",
+          "section-0446",
+          "section-0447",
+          "section-0448",
+          "section-0449",
+          "section-0450",
+          "section-0451",
+          "section-0452",
+          "section-0453",
+          "section-0454",
+          "section-0455",
+          "section-0456",
+          "section-0457",
+          "section-0458",
+          "section-0459",
+          "section-0460",
+          "section-0461",
+          "section-0462",
+          "section-0463",
+          "section-0464",
+          "section-0465",
+          "section-0466",
+          "section-0467",
+          "section-0468",
+          "section-0469",
+          "section-0470",
+          "section-0471",
+          "section-0472",
+          "section-0473",
+          "section-0474",
+          "section-0475",
+          "section-0476",
+          "section-0477",
+          "section-0478",
+          "section-0479",
+          "section-0480",
+          "section-0481",
+          "section-0482",
+          "section-0483",
+          "section-0484",
+          "section-0485",
+          "section-0486",
+          "section-0487",
+          "section-0488",
+          "section-0489",
+          "section-0490",
+          "section-0491",
+          "section-0492",
+          "section-0493",
+          "section-0494",
+          "section-0495",
+          "section-0496",
+          "section-0497",
+          "section-0498",
+          "section-0499",
+          "section-0500",
+          "section-0501",
+          "section-0502",
+          "section-0503",
+          "section-0504",
+          "section-0505",
+          "section-0506",
+          "section-0507",
+          "section-0508",
+          "section-0509",
+          "section-0510",
+          "section-0511",
+          "section-0512",
+          "section-0513",
+          "section-0514",
+          "section-0515",
+          "section-0516",
+          "section-0517",
+          "section-0518",
+          "section-0519",
+          "section-0520",
+          "section-0521",
+          "section-0522",
+          "section-0523",
+          "section-0524",
+          "section-0525",
+          "section-0526",
+          "section-0527",
+          "section-0528",
+          "section-0529",
+          "section-0532",
+          "section-0535",
+          "section-0536",
+          "section-0537",
+          "section-0540",
+          "section-0547",
+          "section-0548",
+          "section-0549",
+          "section-0551",
+          "section-0553",
+          "section-0558",
+          "section-0559",
+          "section-0562",
+          "section-0565",
+          "section-0567",
+          "section-0571",
+          "section-0575",
+          "section-0576",
+          "section-0577",
+          "section-0578",
+          "section-0581",
+          "section-0582",
+          "section-0583",
+          "section-0584",
+          "section-0589",
+          "section-0595",
+          "section-0596",
+          "section-0597",
+          "section-0600",
+          "section-0606",
+          "section-0609",
+          "section-0613",
+          "section-0619",
+          "section-0621",
+          "section-0635",
+          "section-0636",
+          "section-0637",
+          "section-0638",
+          "section-0639",
+          "section-0640",
+          "section-0641",
+          "section-0645",
+          "section-0646",
+          "section-0647",
+          "section-0648",
+          "section-0649",
+          "section-0650",
+          "section-0657",
+          "section-0662",
+          "section-0664",
+          "section-0670",
+          "section-0678",
+          "section-0681",
+          "section-0701",
+          "section-0707",
+          "section-0708",
+          "section-0709",
+          "section-0710",
+          "section-0715",
+          "section-0720",
+          "section-0726",
+          "section-0728",
+          "section-0729",
+          "section-0731",
+          "section-0734",
+          "section-0735",
+          "section-0737",
+          "section-0738",
+          "section-0739",
+          "section-0742",
+          "section-0745",
+          "section-0746",
+          "section-0747",
+          "section-0748",
+          "section-0751",
+          "section-0754",
+          "section-0755",
+          "section-0756",
+          "section-0757",
+          "section-0759",
+          "section-0761",
+          "section-0762",
+          "section-0763",
+          "section-0764",
+          "section-0767",
+          "section-0769",
+          "section-0770",
+          "section-0771",
+          "section-0775",
+          "section-0779",
+          "section-0780",
+          "section-0781",
+          "section-0782",
+          "section-0785",
+          "section-0789",
+          "section-0790",
+          "section-0791",
+          "section-0792",
+          "section-0794",
+          "section-0796",
+          "section-0797",
+          "section-0798",
+          "section-0799",
+          "section-0804",
+          "section-0810",
+          "section-0814",
+          "section-0817",
+          "section-0819",
+          "section-0820",
+          "section-0821",
+          "section-0823",
+          "section-0825",
+          "section-0826",
+          "section-0827",
+          "section-0828",
+          "section-0830",
+          "section-0832",
+          "section-0833",
+          "section-0834",
+          "section-0835",
+          "section-0837",
+          "section-0839",
+          "section-0840",
+          "section-0841",
+          "section-0842",
+          "section-0844",
+          "section-0846",
+          "section-0847",
+          "section-0848",
+          "section-0853",
+          "section-0855",
+          "section-0856",
+          "section-0857",
+          "section-0858",
+          "section-0861",
+          "section-0863",
+          "section-0864",
+          "section-0865",
+          "section-0866",
+          "section-0868",
+          "section-0870",
+          "section-0871",
+          "section-0872",
+          "section-0873",
+          "section-0877",
+          "section-0883",
+          "section-0884",
+          "section-0890",
+          "section-0891",
+          "section-0892",
+          "section-0893",
+          "section-0896",
+          "section-0897",
+          "section-0898",
+          "section-0900",
+          "section-0903",
+          "section-0907",
+          "section-0911",
+          "section-0913",
+          "section-0914",
+          "section-0915",
+          "section-0916",
+          "section-0918",
+          "section-0919",
+          "section-0920",
+          "section-0921",
+          "section-0922",
+          "section-0923",
+          "section-0924",
+          "section-0925",
+          "section-0927",
+          "section-0928",
+          "section-0929",
+          "section-0930",
+          "section-0931",
+          "section-0936",
+          "section-0937",
+          "section-0938",
+          "section-0939",
+          "section-0940",
+          "section-0942",
+          "section-0947",
+          "section-0948",
+          "section-0949",
+          "section-0952",
+          "section-0954",
+          "section-0955",
+          "section-0956",
+          "section-0958",
+          "section-0959",
+          "section-0960",
+          "section-0961",
+          "section-0962",
+          "section-0963",
+          "section-0964",
+          "section-0965",
+          "section-0966",
+          "section-0967",
+          "section-0968",
+          "section-0969",
+          "section-0970",
+          "section-0971",
+          "section-0972",
+          "section-0973",
+          "section-0974",
+          "section-0975",
+          "section-0976",
+          "section-0977",
+          "section-0978",
+          "section-0979",
+          "section-0980",
+          "section-0981",
+          "section-0982",
+          "section-0985",
+          "section-0986",
+          "section-0987",
+          "section-0988",
+          "section-0989",
+          "section-0990",
+          "section-0991",
+          "section-0992",
+          "section-0993",
+          "section-0999",
+          "section-1000",
+          "section-1001",
+          "section-1002",
+          "section-1003",
+          "section-1004",
+          "section-1005",
+          "section-1006",
+          "section-1007",
+          "section-1008",
+          "section-1009",
+          "section-1010",
+          "section-1011",
+          "section-1012",
+          "section-1013",
+          "section-1014",
+          "section-1015",
+          "section-1016",
+          "section-1017",
+          "section-1018",
+          "section-1019",
+          "section-1020",
+          "section-1021",
+          "section-1022",
+          "section-1023",
+          "section-1024",
+          "section-1025",
+          "section-1026",
+          "section-1029",
+          "section-1030",
+          "section-1034",
+          "section-1037",
+          "section-1039",
+          "section-1040",
+          "section-1041",
+          "section-1045",
+          "section-1046",
+          "section-1047",
+          "section-1050",
+          "section-1051",
+          "section-1054",
+          "section-1058",
+          "section-1059",
+          "section-1060",
+          "section-1061",
+          "section-1062",
+          "section-1063",
+          "section-1064",
+          "section-1065",
+          "section-1066",
+          "section-1067",
+          "section-1068",
+          "section-1069",
+          "section-1070",
+          "section-1071",
+          "section-1073",
+          "section-1078",
+          "section-1079",
+          "section-1088",
+          "section-1089",
+          "section-1090",
+          "section-1091",
+          "section-1092",
+          "section-1093",
+          "section-1094",
+          "section-1095",
+          "section-1099",
+          "section-1101",
+          "section-1104",
+          "section-1108",
+          "section-1109",
+          "section-1110",
+          "section-1111",
+          "section-1112",
+          "section-1113",
+          "section-1114",
+          "section-1115",
+          "section-1116",
+          "section-1117",
+          "section-1118",
+          "section-1119",
+          "section-1120",
+          "section-1121",
+          "section-1124",
+          "section-1125",
+          "section-1126",
+          "section-1127",
+          "section-1128",
+          "section-1129",
+          "section-1130",
+          "section-1131",
+          "section-1132",
+          "section-1133",
+          "section-1141",
+          "section-1145",
+          "section-1146",
+          "section-1147",
+          "section-1150",
+          "section-1151",
+          "section-1152",
+          "section-1153",
+          "section-1154",
+          "section-1155",
+          "section-1156",
+          "section-1159",
+          "section-1160",
+          "section-1161",
+          "section-1162",
+          "section-1163",
+          "section-1164",
+          "section-1165",
+          "section-1166",
+          "section-1167",
+          "section-1170",
+          "section-1171",
+          "section-1172",
+          "section-1176",
+          "section-1177",
+          "section-1178",
+          "section-1184",
+          "section-1204",
+          "section-1207",
+          "section-1208",
+          "section-1210",
+          "section-1216",
+          "section-1217",
+          "section-1218",
+          "section-1219",
+          "section-1220"
+        ],
+        "physical_pages": []
+      },
+      "extraction": {
+        "purpose": "extract_profile_workpaper",
+        "request_id": "bp-work-744f502f4ba6b08019eced75:workpaper:extract",
+        "request_hash": "ff31904eb6709cdffebb8d5790aba60dea99c091c7f3f9a4aa8b6834b01dc018",
+        "response_hash": "55d7ef5ef51cec26e2a1ac2bf139ff74219154722360fedf8850801d91891e2a",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 11464,
+          "output_tokens": 34022,
+          "total_tokens": 45486
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0025",
+          "section-0045",
+          "section-0049",
+          "section-0054",
+          "section-0059",
+          "section-0060",
+          "section-0061",
+          "section-0062"
+        ],
+        "physical_pages": [
+          7,
+          8,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16
+        ]
+      }
+    },
+    "quality_review": {
+      "status": "completed",
+      "policy_version": "company_profile_workpaper_review.v13",
+      "original_draft_hash": "dd6a68fdd1d16659c4f7c0fa09ef20c028bb2ce7cb52a7a979d31e38001db767",
+      "findings": [
+        {
+          "finding_id": "WF001",
+          "element": "operating_drivers",
+          "severity": "material",
+          "issue_type": "unsupported_causality",
+          "affected_fact_id": "F017",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "利润总额、归母净利润同比下降的公司说明确为新产品成熟度影响毛利额减少、财务费用增加，以及其他收益、投资收益增加；但扣非归母净利润的说明只写其他收益增加，并未将投资收益增加列为原因。事实把三项合并，错误地把投资收益增加归因于扣非净利润变动。应保留三项下降及共同的毛利、财务费用、其他收益说明，并将投资收益增加限定于利润总额和归母净利润。",
+          "resolution": "corrected_pending_trust",
+          "original_fact": {
+            "fact_id": "F017",
+            "text": "利润总额、归母净利润及扣非归母净利润同比下降，公司说明主要受新产品成熟度影响毛利额减少、财务费用增加；其他收益、投资收益增加。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002",
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "revised_fact": {
+            "fact_id": "F017",
+            "text": "利润总额、归属于上市公司股东的净利润及归属于上市公司股东的扣除非经常性损益的净利润同比下降。公司说明：利润总额和归属于上市公司股东的净利润下降主要受新产品成熟度影响毛利额减少、财务费用增加，以及其他收益、投资收益增加；归属于上市公司股东的扣除非经常性损益的净利润下降主要受新产品成熟度影响毛利额减少、财务费用增加，以及其他收益增加。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        }
+      ],
+      "checked_fact_ids": [
+        "F001",
+        "F002",
+        "F003",
+        "F004",
+        "F005",
+        "F006",
+        "F007",
+        "F008",
+        "F009",
+        "F010",
+        "F011",
+        "F012",
+        "F013",
+        "F014",
+        "F015",
+        "F016",
+        "F017",
+        "F018",
+        "F019",
+        "F020",
+        "F021",
+        "F022",
+        "F023",
+        "F024"
+      ],
+      "calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-6127d9c4284821a709f416d7:workpaper:review",
+          "request_hash": "4324be9ffe966b0361b5cd292f3e9bb392162bba0b8957c9d5d43a33615fca3b",
+          "response_hash": "23c8901a4795a9bf5ef215f9a1d329becdaf980a911eb293f11d69cb5fda65e3",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 16733,
+            "output_tokens": 247,
+            "total_tokens": 33840
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0025",
+            "section-0045",
+            "section-0049",
+            "section-0054",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062"
+          ],
+          "physical_pages": [
+            7,
+            8,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-6127d9c4284821a709f416d7:workpaper:repair",
+          "request_hash": "af620398c1c9edfe8fb07a866cfb6797557c74e99a9e1ac7447a935c19986161",
+          "response_hash": "479967a8b677b0ab7312730b76624ab9ba20a9ed8a796dd49fe4cabce2232b87",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 8040,
+            "output_tokens": 734,
+            "total_tokens": 8774
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0025",
+            "section-0045",
+            "section-0049",
+            "section-0054",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062"
+          ],
+          "physical_pages": [
+            7,
+            8,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ]
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "request_id": "bp-work-6127d9c4284821a709f416d7:workpaper:repair-verify",
+          "request_hash": "c33b284e0b0813b320b85e4f1b19b61892709e5785e7996ee4386f674e1547c9",
+          "response_hash": "e356ded5e9cdf65e64a1152391d93fa3c7d425d501c0f3999a43064b9cbb3d06",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 9323,
+            "output_tokens": 154,
+            "total_tokens": 10979
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0025",
+            "section-0045",
+            "section-0049",
+            "section-0054",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062"
+          ],
+          "physical_pages": [
+            7,
+            8,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ]
+        }
+      ],
+      "retained_request_ids": [],
+      "locally_revalidated_request_ids": [],
+      "error": null,
+      "checked_fact_hashes": {
+        "F001": "c497f620a9d0ff7a7d906e18d0f8a6b9c24da52690fc8232e9cb84977ac4d164",
+        "F002": "325c27d6663b39e89ef61881ab461f8068301b14631d1923e381fdabaf016acf",
+        "F003": "dd4da9609a7f06620721b167b1ff28702f512740a9ada98410f8313bbf25d3dc",
+        "F004": "14dc189f1e7a28a8d1edb5a13879ff0bb1d5d5cf123848ec14ab1342f4d4f328",
+        "F005": "c27ce28ce00641806522b5bd38c45e6f553eafea68bf783540629611c0dcb3b0",
+        "F006": "730f942af75b4db9ef853caf192b98a4667fa2b56295111c33566ef8a39407b5",
+        "F007": "15dec1495902bf851f00e080ff3930f6d7c8dcec372168b599370ca054601856",
+        "F008": "2b54d05879b152e1507ebb4c006a0a3e248623f69f430ca1c009d497e2cb3aba",
+        "F009": "71ceb2c8e65a80833a1264137953e8950592128d70ba5514227fd65bc4d13eaf",
+        "F010": "4cacddbf488104cec4ef72d8a30531fd85bb24be1f441be962fe014f894618c5",
+        "F011": "b49ffa9079d619b9fe20bcceedb1c47d85ebcfd62533b2bcf7d9033b39b678a9",
+        "F012": "fb5192a825a5dc17d9aa1bcaba2d432641bf6f7721f917e316e5d259cf2b6eed",
+        "F013": "da6a24495c6362fe1c2d3cb7925d429db76eb0e6e69b487c08b4dfbdb2b2f0e9",
+        "F014": "55474e4a58e39e7a7f427f76a084261815e788b079fcafb94331b1430d610b14",
+        "F015": "2a6192feb3aaa6177329292a5811ec0cbd547e13e033ce0554b1dd6c2ec06dea",
+        "F016": "531b571b31d8d3fc632ca19274dd350a675d28035ec2ba562fb06dfddc7ba2f2",
+        "F017": "14288543533ddb8a1fb11ed765366b97418accb0609abe9e4520f1731d3cfce6",
+        "F018": "0ee464e58746bf37e0419d6b2529a4c9b0aef3ca4708808ab45e8532f36a3f41",
+        "F019": "36c985554ae2fbcd454fc73573aebf4cddecf68622b8efacdef29a1c3ff7db71",
+        "F020": "18e8908523a028dac2911ad0f38b9989061c1376df19668c8ae2a83abed439d8",
+        "F021": "ef9cb3d0aec141dbdb0ea0ec26363bdcd49c5423d7bc10e94fe53f79ab32b141",
+        "F022": "632d9b6ea54219d8552b216f3cf74f9b7adec3a7e0b919a2704bb5dfe669b3f9",
+        "F023": "07beb294f78e9223a80bf5c0813c1d0e3692efeabfdd6da1042733d3a1d7f257",
+        "F024": "180347bb907e9b748838200e38ac814d3da9152842c4431142df5f6768a00372"
+      },
+      "metric_limit_policy": "source_review_exact_metric_limits.v1"
+    },
+    "standardization_notes": [],
+    "company_features": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "F021",
+          "text": "公司是国内唯一能够研制涡喷、涡扇、涡轴、涡桨、活塞等全谱系军用航空发动机的企业，具备航空发动机、燃气轮机、辅助动力、直升机传动系统等完整产品供应能力，是我国航空器最主要供应商、舰船重要供应商；商用动力方面为长江系列发动机最主要配套商；民用燃机方面具备自主知识产权的燃气轮机研制生产能力。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ],
+      "limitations": [
+        "竞争优势表述来自公司披露，未量化市场份额或客户份额。"
+      ]
+    }
+  },
+  "workpaper_receipts": [
+    {
+      "request_id": "bp-work-744f502f4ba6b08019eced75:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "182d69287fe3f5be113b0c698e8a2306ed684165a638664a1c0cac0353ddd8a5",
+      "response_hash": "3f52a67c0b4c3eabf02e94cc1b3e5594d5b9bbdc08b3ca1b1eae1e61050c666c",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0025\",\"section-0045\",\"section-0049\",\"section-0054\",\"section-0059\",\"section-0060\",\"section-0061\",\"section-0062\"],\"rationale\":\"选择近三年主要会计数据与财务指标以取得公司口径的收入、利润和同比变化；选择“报告期内公司从事的业务情况”以覆盖主要产品、业务用途和经营模式；选择“经营情况讨论与分析”和“报告期内主要经营情况”以获取公司本期经营变化、利润表/现金流变动及收入成本分析；再选主营业务分行业、分产品、分地区、分销售模式四个实际表节，补足收入构成和主要业务权重。上述均为公司经营与收入结构的实质章节，且未同时选择父子节。\",\"deferred\":[\"section-0048 行业情况：属于行业背景，非公司层面经营解释的核心\",\"section-0050 核心竞争力分析：与业务/经营讨论部分重叠，暂不扩读\",\"section-0102 未来发展讨论与分析：前瞻性内容，非本期经营事实\",\"section-0070 主要客户供应商及费用/研发/现金流：客户供应商为可选，费用研发现金流可由主营分析和经营讨论覆盖\",\"section-0079 资产负债情况分析：非收入结构和主要经营解释的必要范围\",\"section-0326 财务报告附注及关联交易：仅在公司经营解释出现明确缺口时定向补充\"],\"stop_reason\":\"已覆盖业务与产品模式、公司总量、本期经营变化、主营收入成本分析以及分行业/产品/地区/销售模式的收入构成；剩余章节主要为行业泛化、前瞻计划、治理股东或财务附注细节，停止阅读不影响对公司本期经营和收入结构的判断。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0025",
+          "section-0045",
+          "section-0049",
+          "section-0054",
+          "section-0059",
+          "section-0060",
+          "section-0061",
+          "section-0062"
+        ],
+        "rationale": "选择近三年主要会计数据与财务指标以取得公司口径的收入、利润和同比变化；选择“报告期内公司从事的业务情况”以覆盖主要产品、业务用途和经营模式；选择“经营情况讨论与分析”和“报告期内主要经营情况”以获取公司本期经营变化、利润表/现金流变动及收入成本分析；再选主营业务分行业、分产品、分地区、分销售模式四个实际表节，补足收入构成和主要业务权重。上述均为公司经营与收入结构的实质章节，且未同时选择父子节。",
+        "deferred": [
+          "section-0048 行业情况：属于行业背景，非公司层面经营解释的核心",
+          "section-0050 核心竞争力分析：与业务/经营讨论部分重叠，暂不扩读",
+          "section-0102 未来发展讨论与分析：前瞻性内容，非本期经营事实",
+          "section-0070 主要客户供应商及费用/研发/现金流：客户供应商为可选，费用研发现金流可由主营分析和经营讨论覆盖",
+          "section-0079 资产负债情况分析：非收入结构和主要经营解释的必要范围",
+          "section-0326 财务报告附注及关联交易：仅在公司经营解释出现明确缺口时定向补充"
+        ],
+        "stop_reason": "已覆盖业务与产品模式、公司总量、本期经营变化、主营收入成本分析以及分行业/产品/地区/销售模式的收入构成；剩余章节主要为行业泛化、前瞻计划、治理股东或财务附注细节，停止阅读不影响对公司本期经营和收入结构的判断。"
+      },
+      "usage": {
+        "input_tokens": 23029,
+        "output_tokens": 6008,
+        "total_tokens": 29037
+      },
+      "receipt_origin": "retained_receipt"
+    },
+    {
+      "request_id": "bp-work-744f502f4ba6b08019eced75:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "ff31904eb6709cdffebb8d5790aba60dea99c091c7f3f9a4aa8b6834b01dc018",
+      "response_hash": "55d7ef5ef51cec26e2a1ac2bf139ff74219154722360fedf8850801d91891e2a",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\n  \"schema_version\": \"company_profile_workpaper_draft.v1\",\n  \"elements\": {\n    \"business_structure\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"F001\",\n          \"text\": \"公司主营业务分为三类：航空发动机及衍生产品业务、外贸出口转包业务、非航空产品及其他业务。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0003\"],\n          \"metrics\": []\n        }\n      ],\n      \"limitations\": [\n        \"未展开各子公司或各业务板块的资产、产能等细分结构。\"\n      ]\n    },\n    \"products_services\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"F002\",\n          \"text\": \"航空发动机及衍生产品业务的主要产品和服务包括航空发动机及燃气轮机整机、部件、零组件，维修保障服务；产品主要为航空器、舰船提供动力，并为油气、电力两大领域提供能源装备。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0003\"],\n          \"metrics\": []\n        },\n        {\n          \"fact_id\": \"F003\",\n          \"text\": \"外贸出口转包业务处于产业链中游，以生产制造为主，开展国际民用航空发动机和燃气轮机零部件制造及部分新型民用航空发动机零部件试制；主要产品包括盘、环、槽形件、轴、机匣、整体叶盘、叶片等零部件，以及石油钻探深海领域及轴类产品、医疗诊断产品、医疗植入件等民用产品的加工贸易与技术服务。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0003\"],\n          \"metrics\": []\n        },\n        {\n          \"fact_id\": \"F004\",\n          \"text\": \"非航空产品及其他业务主要发展与航空发动机技术同源、工艺相近的高附加值产品及服务，如工艺装备、工业物业等。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0003\"],\n          \"metrics\": []\n        }\n      ],\n      \"limitations\": [\n        \"未逐一列示全部产品型号及零部件规格。\"\n      ]\n    },\n    \"revenue_model\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"F005\",\n          \"text\": \"公司经营模式为多元化经营，具备涵盖产品全寿命周期的设计、制造、总装、试车整套技术和综合服务保障能力；从实现价值的方式看为差异化模式，以全谱系航空发动机产品和全生命周期研发制造及维修服务保障为特色。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0003\"],\n          \"metrics\": []\n        }\n      ],\n      \"limitations\": [\n        \"未披露各业务的具体定价、结算或收入确认机制。\"\n      ]\n    },\n    \"scale_and_mix\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"F006\",\n          \"text\": \"2025年度公司实现营业收入46,331,495,671.40元，同比减少3.23%。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0001\", \"source-0007\"],\n          \"metrics\": [\n            {\n              \"name\": \"营业收入\",\n              \"raw_value\": \"46,331,495,671.40\",\n              \"value\": \"46331495671.40\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\"\n            },\n            {\n              \"name\": \"营业收入同比\",\n              \"raw_value\": \"-3.23\",\n              \"value\": \"-3.23\",\n              \"currency\": null,\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\",\n              \"comparison_basis\": \"上年同期\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"F007\",\n          \"text\": \"2025年度利润总额907,425,066.12元，同比减少20.10%；归属于上市公司股东的净利润634,328,156.80元，同比减少26.27%；归属于上市公司股东的扣除非经常性损益的净利润294,441,306.51元，同比减少62.81%。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0001\"],\n          \"metrics\": [\n            {\n              \"name\": \"利润总额\",\n              \"raw_value\": \"907,425,066.12\",\n              \"value\": \"907425066.12\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\"\n            },\n            {\n              \"name\": \"利润总额同比\",\n              \"raw_value\": \"-20.10\",\n              \"value\": \"-20.10\",\n              \"currency\": null,\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\",\n              \"comparison_basis\": \"上年同期\"\n            },\n            {\n              \"name\": \"归属于上市公司股东的净利润\",\n              \"raw_value\": \"634,328,156.80\",\n              \"value\": \"634328156.80\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\"\n            },\n            {\n              \"name\": \"归属于上市公司股东的净利润同比\",\n              \"raw_value\": \"-26.27\",\n              \"value\": \"-26.27\",\n              \"currency\": null,\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\",\n              \"comparison_basis\": \"上年同期\"\n            },\n            {\n              \"name\": \"归属于上市公司股东的扣除非经常性损益的净利润\",\n              \"raw_value\": \"294,441,306.51\",\n              \"value\": \"294441306.51\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\"\n            },\n            {\n              \"name\": \"归属于上市公司股东的扣除非经常性损益的净利润同比\",\n              \"raw_value\": \"-62.81\",\n              \"value\": \"-62.81\",\n              \"currency\": null,\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\",\n              \"comparison_basis\": \"上年同期\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"F008\",\n          \"text\": \"报告期内，公司主营业务收入45,658,787,811.56元，同比减少3.40%。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0008\", \"source-0012\"],\n          \"metrics\": [\n            {\n              \"name\": \"主营业务收入\",\n              \"raw_value\": \"45,658,787,811.56\",\n              \"value\": \"45658787811.56\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\"\n            },\n            {\n              \"name\": \"主营业务收入同比\",\n              \"raw_value\": \"-3.40\",\n              \"value\": \"-3.40\",\n              \"currency\": null,\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\",\n              \"comparison_basis\": \"上年同期\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"F009\",\n          \"text\": \"报告另列其他业务收入67,270.79万元，同比增长9.36%；该口径与主营业务中的‘非航空产品及其他业务’分列，具体构成未披露。\",\n          \"subject_scope\": \"unclear\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0007\"],\n          \"uncertainty_reason\": \"其他业务收入为主营业务之外的收入类别，未披露具体构成；不等同于主营业务中的‘非航空产品及其他业务’。\",\n          \"metrics\": [\n            {\n              \"name\": \"其他业务收入\",\n              \"raw_value\": \"67,270.79\",\n              \"value\": \"67270.79\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"万元\",\n              \"unit\": \"万元\",\n              \"subject_scope\": \"unclear\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\",\n              \"uncertainty_reason\": \"其他业务收入为主营业务之外的收入类别，未披露具体构成；不等同于主营业务中的‘非航空产品及其他业务’。\"\n            },\n            {\n              \"name\": \"其他业务收入同比\",\n              \"raw_value\": \"9.36\",\n              \"value\": \"9.36\",\n              \"currency\": null,\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"subject_scope\": \"unclear\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\",\n              \"comparison_basis\": \"上年同期\",\n              \"uncertainty_reason\": \"其他业务收入为主营业务之外的收入类别，未披露具体构成；不等同于主营业务中的‘非航空产品及其他业务’。\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"F010\",\n          \"text\": \"航空发动机及衍生产品业务2025年度实现收入43,476,253,945.25元，同比减少3.37%，毛利率8.50%。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0010\", \"source-0008\"],\n          \"metrics\": [\n            {\n              \"name\": \"航空发动机及衍生产品营业收入\",\n              \"raw_value\": \"43,476,253,945.25\",\n              \"value\": \"43476253945.25\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\"\n            },\n            {\n              \"name\": \"航空发动机及衍生产品营业收入同比\",\n              \"raw_value\": \"-3.37\",\n              \"value\": \"-3.37\",\n              \"currency\": null,\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\",\n              \"comparison_basis\": \"上年同期\"\n            },\n            {\n              \"name\": \"航空发动机及衍生产品毛利率\",\n              \"raw_value\": \"8.50\",\n              \"value\": \"8.50\",\n              \"currency\": null,\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"F011\",\n          \"text\": \"外贸出口转包业务2025年度实现收入1,950,520,200.78元，同比减少5.94%，毛利率20.61%。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0010\", \"source-0008\"],\n          \"metrics\": [\n            {\n              \"name\": \"外贸出口转包营业收入\",\n              \"raw_value\": \"1,950,520,200.78\",\n              \"value\": \"1950520200.78\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\"\n            },\n            {\n              \"name\": \"外贸出口转包营业收入同比\",\n              \"raw_value\": \"-5.94\",\n              \"value\": \"-5.94\",\n              \"currency\": null,\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\",\n              \"comparison_basis\": \"上年同期\"\n            },\n            {\n              \"name\": \"外贸出口转包毛利率\",\n              \"raw_value\": \"20.61\",\n              \"value\": \"20.61\",\n              \"currency\": null,\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"F012\",\n          \"text\": \"非航空产品及其他业务2025年度实现收入232,013,665.53元，同比增长17.83%，毛利率25.61%。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0010\", \"source-0008\"],\n          \"metrics\": [\n            {\n              \"name\": \"非航空产品及其他营业收入\",\n              \"raw_value\": \"232,013,665.53\",\n              \"value\": \"232013665.53\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\"\n            },\n            {\n              \"name\": \"非航空产品及其他营业收入同比\",\n              \"raw_value\": \"17.83\",\n              \"value\": \"17.83\",\n              \"currency\": null,\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\",\n              \"comparison_basis\": \"上年同期\"\n            },\n            {\n              \"name\": \"非航空产品及其他毛利率\",\n              \"raw_value\": \"25.61\",\n              \"value\": \"25.61\",\n              \"currency\": null,\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\"\n            }\n          ]\n        }\n      ],\n      \"limitations\": [\n        \"分行业表未逐行列示；分产品构成已覆盖主要业务。\",\n        \"其他业务收入具体构成未披露；未计算收入占比。\"\n      ]\n    },\n    \"operations_and_inputs\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"F015\",\n          \"text\": \"公司通过供应商管理、质量风险防控和数字化协同提升供应链稳定性；供应链管理体系建成供应链全景地图架构，试点‘品类+标签’管理模式，建立供应商产能模型，推进物资统谈集采；在原材料涨价的情况下采购价格平稳。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0005\"],\n          \"metrics\": []\n        }\n      ],\n      \"limitations\": [\n        \"未披露具体原材料品类、采购金额或主要供应商名称；供应链管理多为定性披露。\"\n      ]\n    },\n    \"customers_channels_markets\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"F013\",\n          \"text\": \"外贸出口转包业务主要客户包括SAFRAN（法国赛峰集团）、RR（英国罗尔斯·罗伊斯公司）、GE Aerospace（美国通用电气航空航天集团）、SLB（美国斯伦贝谢公司）、GEHC（美国通用医疗公司）、Stryker（爱尔兰史赛克公司）等；产品配套于LEAP、CFM56、GE9X、TrentXWB-97K、Pearl、LM2500、LM6000等航空发动机和燃气轮机，并涉及石油钻探深海领域及医疗诊断、医疗植入件等民用产品加工贸易与技术服务。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0003\"],\n          \"metrics\": []\n        },\n        {\n          \"fact_id\": \"F014\",\n          \"text\": \"分地区看，2025年度境内销售收入43,708,267,610.78元，境外销售收入1,950,520,200.78元。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0011\", \"source-0008\"],\n          \"metrics\": [\n            {\n              \"name\": \"境内销售收入\",\n              \"raw_value\": \"43,708,267,610.78\",\n              \"value\": \"43708267610.78\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\"\n            },\n            {\n              \"name\": \"境外销售收入\",\n              \"raw_value\": \"1,950,520,200.78\",\n              \"value\": \"1950520200.78\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\"\n            }\n          ]\n        }\n      ],\n      \"limitations\": [\n        \"未披露客户收入占比；主营业务分销售模式表仅列示直销，未披露其他渠道收入。\"\n      ]\n    },\n    \"operating_drivers\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"F016\",\n          \"text\": \"公司说明营业收入同比下降主要因客户需求变化、交付不及预期；营业成本下降主要因销售减少及新产品成熟度影响。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0007\"],\n          \"metrics\": []\n        },\n        {\n          \"fact_id\": \"F017\",\n          \"text\": \"利润总额、归母净利润及扣非归母净利润同比下降，公司说明主要受新产品成熟度影响毛利额减少、财务费用增加；其他收益、投资收益增加。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0002\", \"source-0007\"],\n          \"metrics\": []\n        },\n        {\n          \"fact_id\": \"F018\",\n          \"text\": \"分产品看，航空发动机及衍生产品收入下降因客户需求变化、交付不及预期，毛利率下降因新产品成熟度有待提升；外贸出口转包收入下降因出口订单减少；非航空产品及其他收入增长因民品等业务增加，毛利率上升因部分毛利高的产品收入增加。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0013\"],\n          \"metrics\": []\n        }\n      ],\n      \"limitations\": [\n        \"公司未量化各驱动因素对收入、毛利率或利润的影响。\"\n      ]\n    },\n    \"material_changes\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"F019\",\n          \"text\": \"报告期内，AES100涡轴发动机获批生产许可证并配装三型飞机实现首飞；大型涡扇发动机‘秦岭’改型动力配装‘九天’无人机实现顺利首飞；配装公司QD280燃气轮机的太行25燃气轮机发电机组助力国家能源局燃气轮机创新示范项目首次并网一次成功。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0004\"],\n          \"metrics\": []\n        },\n        {\n          \"fact_id\": \"F020\",\n          \"text\": \"2025年度经营活动产生的现金流量净额为-4,417,719,128.58元，同比增长69.13%，主要因销售商品、提供劳务收到现金增加。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0001\", \"source-0002\"],\n          \"metrics\": [\n            {\n              \"name\": \"经营活动产生的现金流量净额\",\n              \"raw_value\": \"-4,417,719,128.58\",\n              \"value\": \"-4417719128.58\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\"\n            },\n            {\n              \"name\": \"经营活动产生的现金流量净额同比\",\n              \"raw_value\": \"69.13\",\n              \"value\": \"69.13\",\n              \"currency\": null,\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"qualifier\": \"exact\",\n              \"comparison_basis\": \"上年同期\"\n            }\n          ]\n        }\n      ],\n      \"limitations\": [\n        \"型号进展未披露对本期收入的具体金额贡献；未将事件时点外推至其他期间。\"\n      ]\n    }\n  },\n  \"company_features\": {\n    \"status\": \"observed\",\n    \"facts\": [\n      {\n        \"fact_id\": \"F021\",\n        \"text\": \"公司是国内唯一能够研制涡喷、涡扇、涡轴、涡桨、活塞等全谱系军用航空发动机的企业，具备航空发动机、燃气轮机、辅助动力、直升机传动系统等完整产品供应能力，是我国航空器最主要供应商、舰船重要供应商；商用动力方面为长江系列发动机最主要配套商；民用燃机方面具备自主知识产权的燃气轮机研制生产能力。\",\n        \"subject_scope\": \"consolidated_group\",\n        \"period\": \"2025年度\",\n        \"evidence_ids\": [\"source-0003\"],\n        \"metrics\": []\n      }\n    ],\n    \"limitations\": [\n      \"竞争优势表述来自公司披露，未量化市场份额或客户份额。\"\n    ]\n  },\n  \"supply_chain\": {\n    \"position\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"F022\",\n          \"text\": \"公司覆盖设计、制造、总装、试车及维修保障；外贸出口转包业务处于产业链中游，以生产制造为主。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0003\"],\n          \"metrics\": []\n        }\n      ],\n      \"limitations\": [\n        \"外贸出口转包定位为产业链中游；公司整体覆盖研发制造与服务保障。\"\n      ]\n    },\n    \"upstream_inputs\": {\n      \"status\": \"unclear\",\n      \"facts\": [\n        {\n          \"fact_id\": \"F023\",\n          \"text\": \"公司披露供应链管理时提及原材料涨价，但未披露具体原材料品类、采购金额或主要供应商。\",\n          \"subject_scope\": \"unclear\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0005\"],\n          \"uncertainty_reason\": \"未披露具体原材料品类和采购结构，不能据此认定具体上游投入。\",\n          \"metrics\": []\n        }\n      ],\n      \"limitations\": [\n        \"未披露具体原材料品类、采购金额或供应商。\"\n      ]\n    },\n    \"downstream_customers\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"F024\",\n          \"text\": \"产品用于航空器、舰船动力，油气、电力能源装备，以及石油钻探、医疗等；外贸出口转包产品配套于民用航空发动机和燃气轮机。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\"source-0003\"],\n          \"metrics\": []\n        }\n      ],\n      \"limitations\": [\n        \"未披露具体下游客户收入占比。\"\n      ]\n    }\n  },\n  \"limitations\": [\n    \"本工作底稿仅基于选定年度报告章节，未涵盖财务报告附注等未读部分。\"\n  ]\n}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F001",
+                "text": "公司主营业务分为三类：航空发动机及衍生产品业务、外贸出口转包业务、非航空产品及其他业务。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": []
+              }
+            ],
+            "limitations": [
+              "未展开各子公司或各业务板块的资产、产能等细分结构。"
+            ]
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F002",
+                "text": "航空发动机及衍生产品业务的主要产品和服务包括航空发动机及燃气轮机整机、部件、零组件，维修保障服务；产品主要为航空器、舰船提供动力，并为油气、电力两大领域提供能源装备。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": []
+              },
+              {
+                "fact_id": "F003",
+                "text": "外贸出口转包业务处于产业链中游，以生产制造为主，开展国际民用航空发动机和燃气轮机零部件制造及部分新型民用航空发动机零部件试制；主要产品包括盘、环、槽形件、轴、机匣、整体叶盘、叶片等零部件，以及石油钻探深海领域及轴类产品、医疗诊断产品、医疗植入件等民用产品的加工贸易与技术服务。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": []
+              },
+              {
+                "fact_id": "F004",
+                "text": "非航空产品及其他业务主要发展与航空发动机技术同源、工艺相近的高附加值产品及服务，如工艺装备、工业物业等。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": []
+              }
+            ],
+            "limitations": [
+              "未逐一列示全部产品型号及零部件规格。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F005",
+                "text": "公司经营模式为多元化经营，具备涵盖产品全寿命周期的设计、制造、总装、试车整套技术和综合服务保障能力；从实现价值的方式看为差异化模式，以全谱系航空发动机产品和全生命周期研发制造及维修服务保障为特色。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": []
+              }
+            ],
+            "limitations": [
+              "未披露各业务的具体定价、结算或收入确认机制。"
+            ]
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F006",
+                "text": "2025年度公司实现营业收入46,331,495,671.40元，同比减少3.23%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "46,331,495,671.40",
+                    "value": "46331495671.40",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "营业收入同比",
+                    "raw_value": "-3.23",
+                    "value": "-3.23",
+                    "currency": null,
+                    "source_unit": "%",
+                    "unit": "%",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F007",
+                "text": "2025年度利润总额907,425,066.12元，同比减少20.10%；归属于上市公司股东的净利润634,328,156.80元，同比减少26.27%；归属于上市公司股东的扣除非经常性损益的净利润294,441,306.51元，同比减少62.81%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ],
+                "metrics": [
+                  {
+                    "name": "利润总额",
+                    "raw_value": "907,425,066.12",
+                    "value": "907425066.12",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "利润总额同比",
+                    "raw_value": "-20.10",
+                    "value": "-20.10",
+                    "currency": null,
+                    "source_unit": "%",
+                    "unit": "%",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  },
+                  {
+                    "name": "归属于上市公司股东的净利润",
+                    "raw_value": "634,328,156.80",
+                    "value": "634328156.80",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "归属于上市公司股东的净利润同比",
+                    "raw_value": "-26.27",
+                    "value": "-26.27",
+                    "currency": null,
+                    "source_unit": "%",
+                    "unit": "%",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  },
+                  {
+                    "name": "归属于上市公司股东的扣除非经常性损益的净利润",
+                    "raw_value": "294,441,306.51",
+                    "value": "294441306.51",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "归属于上市公司股东的扣除非经常性损益的净利润同比",
+                    "raw_value": "-62.81",
+                    "value": "-62.81",
+                    "currency": null,
+                    "source_unit": "%",
+                    "unit": "%",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F008",
+                "text": "报告期内，公司主营业务收入45,658,787,811.56元，同比减少3.40%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008",
+                  "source-0012"
+                ],
+                "metrics": [
+                  {
+                    "name": "主营业务收入",
+                    "raw_value": "45,658,787,811.56",
+                    "value": "45658787811.56",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "主营业务收入同比",
+                    "raw_value": "-3.40",
+                    "value": "-3.40",
+                    "currency": null,
+                    "source_unit": "%",
+                    "unit": "%",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F009",
+                "text": "报告另列其他业务收入67,270.79万元，同比增长9.36%；该口径与主营业务中的‘非航空产品及其他业务’分列，具体构成未披露。",
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "uncertainty_reason": "其他业务收入为主营业务之外的收入类别，未披露具体构成；不等同于主营业务中的‘非航空产品及其他业务’。",
+                "metrics": [
+                  {
+                    "name": "其他业务收入",
+                    "raw_value": "67,270.79",
+                    "value": "67270.79",
+                    "currency": "人民币",
+                    "source_unit": "万元",
+                    "unit": "万元",
+                    "subject_scope": "unclear",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "uncertainty_reason": "其他业务收入为主营业务之外的收入类别，未披露具体构成；不等同于主营业务中的‘非航空产品及其他业务’。"
+                  },
+                  {
+                    "name": "其他业务收入同比",
+                    "raw_value": "9.36",
+                    "value": "9.36",
+                    "currency": null,
+                    "source_unit": "%",
+                    "unit": "%",
+                    "subject_scope": "unclear",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期",
+                    "uncertainty_reason": "其他业务收入为主营业务之外的收入类别，未披露具体构成；不等同于主营业务中的‘非航空产品及其他业务’。"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F010",
+                "text": "航空发动机及衍生产品业务2025年度实现收入43,476,253,945.25元，同比减少3.37%，毛利率8.50%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "航空发动机及衍生产品营业收入",
+                    "raw_value": "43,476,253,945.25",
+                    "value": "43476253945.25",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "航空发动机及衍生产品营业收入同比",
+                    "raw_value": "-3.37",
+                    "value": "-3.37",
+                    "currency": null,
+                    "source_unit": "%",
+                    "unit": "%",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  },
+                  {
+                    "name": "航空发动机及衍生产品毛利率",
+                    "raw_value": "8.50",
+                    "value": "8.50",
+                    "currency": null,
+                    "source_unit": "%",
+                    "unit": "%",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F011",
+                "text": "外贸出口转包业务2025年度实现收入1,950,520,200.78元，同比减少5.94%，毛利率20.61%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "外贸出口转包营业收入",
+                    "raw_value": "1,950,520,200.78",
+                    "value": "1950520200.78",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "外贸出口转包营业收入同比",
+                    "raw_value": "-5.94",
+                    "value": "-5.94",
+                    "currency": null,
+                    "source_unit": "%",
+                    "unit": "%",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  },
+                  {
+                    "name": "外贸出口转包毛利率",
+                    "raw_value": "20.61",
+                    "value": "20.61",
+                    "currency": null,
+                    "source_unit": "%",
+                    "unit": "%",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F012",
+                "text": "非航空产品及其他业务2025年度实现收入232,013,665.53元，同比增长17.83%，毛利率25.61%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "非航空产品及其他营业收入",
+                    "raw_value": "232,013,665.53",
+                    "value": "232013665.53",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "非航空产品及其他营业收入同比",
+                    "raw_value": "17.83",
+                    "value": "17.83",
+                    "currency": null,
+                    "source_unit": "%",
+                    "unit": "%",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  },
+                  {
+                    "name": "非航空产品及其他毛利率",
+                    "raw_value": "25.61",
+                    "value": "25.61",
+                    "currency": null,
+                    "source_unit": "%",
+                    "unit": "%",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "分行业表未逐行列示；分产品构成已覆盖主要业务。",
+              "其他业务收入具体构成未披露；未计算收入占比。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F015",
+                "text": "公司通过供应商管理、质量风险防控和数字化协同提升供应链稳定性；供应链管理体系建成供应链全景地图架构，试点‘品类+标签’管理模式，建立供应商产能模型，推进物资统谈集采；在原材料涨价的情况下采购价格平稳。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": []
+              }
+            ],
+            "limitations": [
+              "未披露具体原材料品类、采购金额或主要供应商名称；供应链管理多为定性披露。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F013",
+                "text": "外贸出口转包业务主要客户包括SAFRAN（法国赛峰集团）、RR（英国罗尔斯·罗伊斯公司）、GE Aerospace（美国通用电气航空航天集团）、SLB（美国斯伦贝谢公司）、GEHC（美国通用医疗公司）、Stryker（爱尔兰史赛克公司）等；产品配套于LEAP、CFM56、GE9X、TrentXWB-97K、Pearl、LM2500、LM6000等航空发动机和燃气轮机，并涉及石油钻探深海领域及医疗诊断、医疗植入件等民用产品加工贸易与技术服务。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": []
+              },
+              {
+                "fact_id": "F014",
+                "text": "分地区看，2025年度境内销售收入43,708,267,610.78元，境外销售收入1,950,520,200.78元。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011",
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "境内销售收入",
+                    "raw_value": "43,708,267,610.78",
+                    "value": "43708267610.78",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "境外销售收入",
+                    "raw_value": "1,950,520,200.78",
+                    "value": "1950520200.78",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露客户收入占比；主营业务分销售模式表仅列示直销，未披露其他渠道收入。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F016",
+                "text": "公司说明营业收入同比下降主要因客户需求变化、交付不及预期；营业成本下降主要因销售减少及新产品成熟度影响。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": []
+              },
+              {
+                "fact_id": "F017",
+                "text": "利润总额、归母净利润及扣非归母净利润同比下降，公司说明主要受新产品成熟度影响毛利额减少、财务费用增加；其他收益、投资收益增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002",
+                  "source-0007"
+                ],
+                "metrics": []
+              },
+              {
+                "fact_id": "F018",
+                "text": "分产品看，航空发动机及衍生产品收入下降因客户需求变化、交付不及预期，毛利率下降因新产品成熟度有待提升；外贸出口转包收入下降因出口订单减少；非航空产品及其他收入增长因民品等业务增加，毛利率上升因部分毛利高的产品收入增加。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0013"
+                ],
+                "metrics": []
+              }
+            ],
+            "limitations": [
+              "公司未量化各驱动因素对收入、毛利率或利润的影响。"
+            ]
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F019",
+                "text": "报告期内，AES100涡轴发动机获批生产许可证并配装三型飞机实现首飞；大型涡扇发动机‘秦岭’改型动力配装‘九天’无人机实现顺利首飞；配装公司QD280燃气轮机的太行25燃气轮机发电机组助力国家能源局燃气轮机创新示范项目首次并网一次成功。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": []
+              },
+              {
+                "fact_id": "F020",
+                "text": "2025年度经营活动产生的现金流量净额为-4,417,719,128.58元，同比增长69.13%，主要因销售商品、提供劳务收到现金增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0002"
+                ],
+                "metrics": [
+                  {
+                    "name": "经营活动产生的现金流量净额",
+                    "raw_value": "-4,417,719,128.58",
+                    "value": "-4417719128.58",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "经营活动产生的现金流量净额同比",
+                    "raw_value": "69.13",
+                    "value": "69.13",
+                    "currency": null,
+                    "source_unit": "%",
+                    "unit": "%",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "上年同期"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "型号进展未披露对本期收入的具体金额贡献；未将事件时点外推至其他期间。"
+            ]
+          }
+        },
+        "company_features": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F021",
+              "text": "公司是国内唯一能够研制涡喷、涡扇、涡轴、涡桨、活塞等全谱系军用航空发动机的企业，具备航空发动机、燃气轮机、辅助动力、直升机传动系统等完整产品供应能力，是我国航空器最主要供应商、舰船重要供应商；商用动力方面为长江系列发动机最主要配套商；民用燃机方面具备自主知识产权的燃气轮机研制生产能力。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": []
+            }
+          ],
+          "limitations": [
+            "竞争优势表述来自公司披露，未量化市场份额或客户份额。"
+          ]
+        },
+        "supply_chain": {
+          "position": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F022",
+                "text": "公司覆盖设计、制造、总装、试车及维修保障；外贸出口转包业务处于产业链中游，以生产制造为主。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": []
+              }
+            ],
+            "limitations": [
+              "外贸出口转包定位为产业链中游；公司整体覆盖研发制造与服务保障。"
+            ]
+          },
+          "upstream_inputs": {
+            "status": "unclear",
+            "facts": [
+              {
+                "fact_id": "F023",
+                "text": "公司披露供应链管理时提及原材料涨价，但未披露具体原材料品类、采购金额或主要供应商。",
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "uncertainty_reason": "未披露具体原材料品类和采购结构，不能据此认定具体上游投入。",
+                "metrics": []
+              }
+            ],
+            "limitations": [
+              "未披露具体原材料品类、采购金额或供应商。"
+            ]
+          },
+          "downstream_customers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F024",
+                "text": "产品用于航空器、舰船动力，油气、电力能源装备，以及石油钻探、医疗等；外贸出口转包产品配套于民用航空发动机和燃气轮机。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": []
+              }
+            ],
+            "limitations": [
+              "未披露具体下游客户收入占比。"
+            ]
+          }
+        },
+        "limitations": [
+          "本工作底稿仅基于选定年度报告章节，未涵盖财务报告附注等未读部分。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 11464,
+        "output_tokens": 34022,
+        "total_tokens": 45486
+      },
+      "receipt_origin": "retained_receipt"
+    },
+    {
+      "request_id": "bp-work-6127d9c4284821a709f416d7:workpaper:review",
+      "purpose": "review_profile_workpaper",
+      "request_hash": "4324be9ffe966b0361b5cd292f3e9bb392162bba0b8957c9d5d43a33615fca3b",
+      "response_hash": "23c8901a4795a9bf5ef215f9a1d329becdaf980a911eb293f11d69cb5fda65e3",
+      "finish_reason": "stop",
+      "source_label": "scorpio:grok-4.7",
+      "model": "grok-4.7",
+      "selected_profile": "semantic_extraction__scorpio_grok",
+      "logical_profile": "semantic_extraction__scorpio_grok",
+      "reasoning_effort": "high",
+      "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+      "contract_status": "accepted",
+      "raw_content": "{\"reviewed_fact_ids\":[\"F001\",\"F002\",\"F003\",\"F004\",\"F005\",\"F006\",\"F007\",\"F008\",\"F009\",\"F010\",\"F011\",\"F012\",\"F013\",\"F014\",\"F015\",\"F016\",\"F017\",\"F018\",\"F019\",\"F020\",\"F021\",\"F022\",\"F023\",\"F024\"],\"findings\":[{\"finding_id\":\"WF001\",\"element\":\"operating_drivers\",\"affected_fact_id\":\"F017\",\"severity\":\"material\",\"issue_type\":\"unsupported_causality\",\"action\":\"correct\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"利润总额、归母净利润同比下降的公司说明确为新产品成熟度影响毛利额减少、财务费用增加，以及其他收益、投资收益增加；但扣非归母净利润的说明只写其他收益增加，并未将投资收益增加列为原因。事实把三项合并，错误地把投资收益增加归因于扣非净利润变动。应保留三项下降及共同的毛利、财务费用、其他收益说明，并将投资收益增加限定于利润总额和归母净利润。\"}]}",
+      "response_payload": {
+        "reviewed_fact_ids": [
+          "F001",
+          "F002",
+          "F003",
+          "F004",
+          "F005",
+          "F006",
+          "F007",
+          "F008",
+          "F009",
+          "F010",
+          "F011",
+          "F012",
+          "F013",
+          "F014",
+          "F015",
+          "F016",
+          "F017",
+          "F018",
+          "F019",
+          "F020",
+          "F021",
+          "F022",
+          "F023",
+          "F024"
+        ],
+        "findings": [
+          {
+            "finding_id": "WF001",
+            "element": "operating_drivers",
+            "affected_fact_id": "F017",
+            "severity": "material",
+            "issue_type": "unsupported_causality",
+            "action": "correct",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "explanation": "利润总额、归母净利润同比下降的公司说明确为新产品成熟度影响毛利额减少、财务费用增加，以及其他收益、投资收益增加；但扣非归母净利润的说明只写其他收益增加，并未将投资收益增加列为原因。事实把三项合并，错误地把投资收益增加归因于扣非净利润变动。应保留三项下降及共同的毛利、财务费用、其他收益说明，并将投资收益增加限定于利润总额和归母净利润。"
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 16733,
+        "output_tokens": 247,
+        "total_tokens": 33840
+      }
+    },
+    {
+      "request_id": "bp-work-6127d9c4284821a709f416d7:workpaper:repair",
+      "purpose": "repair_profile_workpaper",
+      "request_hash": "af620398c1c9edfe8fb07a866cfb6797557c74e99a9e1ac7447a935c19986161",
+      "response_hash": "479967a8b677b0ab7312730b76624ab9ba20a9ed8a796dd49fe4cabce2232b87",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F017\",\"text\":\"利润总额、归属于上市公司股东的净利润及归属于上市公司股东的扣除非经常性损益的净利润同比下降。公司说明：利润总额和归属于上市公司股东的净利润下降主要受新产品成熟度影响毛利额减少、财务费用增加，以及其他收益、投资收益增加；归属于上市公司股东的扣除非经常性损益的净利润下降主要受新产品成熟度影响毛利额减少、财务费用增加，以及其他收益增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+      "response_payload": {
+        "repaired_facts": [
+          {
+            "fact_id": "F017",
+            "text": "利润总额、归属于上市公司股东的净利润及归属于上市公司股东的扣除非经常性损益的净利润同比下降。公司说明：利润总额和归属于上市公司股东的净利润下降主要受新产品成熟度影响毛利额减少、财务费用增加，以及其他收益、投资收益增加；归属于上市公司股东的扣除非经常性损益的净利润下降主要受新产品成熟度影响毛利额减少、财务费用增加，以及其他收益增加。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 8040,
+        "output_tokens": 734,
+        "total_tokens": 8774
+      }
+    },
+    {
+      "request_id": "bp-work-6127d9c4284821a709f416d7:workpaper:repair-verify",
+      "purpose": "verify_profile_workpaper_repair",
+      "request_hash": "c33b284e0b0813b320b85e4f1b19b61892709e5785e7996ee4386f674e1547c9",
+      "response_hash": "e356ded5e9cdf65e64a1152391d93fa3c7d425d501c0f3999a43064b9cbb3d06",
+      "finish_reason": "stop",
+      "source_label": "scorpio:grok-4.7",
+      "model": "grok-4.7",
+      "selected_profile": "semantic_extraction__scorpio_grok",
+      "logical_profile": "semantic_extraction__scorpio_grok",
+      "reasoning_effort": "high",
+      "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+      "contract_status": "accepted",
+      "raw_content": "{\"checked_fact_ids\":[\"F017\"],\"checks\":[{\"fact_id\":\"F017\",\"accepted\":true,\"evidence_ids\":[\"source-0002\"],\"explanation\":\"原文分别说明三项同比减少：利润总额与归属于上市公司股东的净利润均主要受新产品成熟度影响毛利额减少、财务费用增加，以及其他收益、投资收益增加；扣除非经常性损益的净利润仅列其他收益增加，未列投资收益。候选事实已按此拆分归因，主体为报告口径公司（合并集团）、期间为本期2025年度，保留“主要”限定，未把投资收益错误归于扣非净利润，也未新增来源没有的数值或确定性，故接受。\"}]}",
+      "response_payload": {
+        "checked_fact_ids": [
+          "F017"
+        ],
+        "checks": [
+          {
+            "fact_id": "F017",
+            "accepted": true,
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "explanation": "原文分别说明三项同比减少：利润总额与归属于上市公司股东的净利润均主要受新产品成熟度影响毛利额减少、财务费用增加，以及其他收益、投资收益增加；扣除非经常性损益的净利润仅列其他收益增加，未列投资收益。候选事实已按此拆分归因，主体为报告口径公司（合并集团）、期间为本期2025年度，保留“主要”限定，未把投资收益错误归于扣非净利润，也未新增来源没有的数值或确定性，故接受。"
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 9323,
+        "output_tokens": 154,
+        "total_tokens": 10979
+      }
+    }
+  ]
+}

@@ -1,0 +1,2257 @@
+{
+  "schema_version": "company_profile_common_core_runtime.v3",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "production_authorization": "not_authorized",
+  "work_id": "bp-work-59dd96b7c16016e086830a4c",
+  "report": {
+    "instrument_id": "920007.BJ",
+    "report_id": "asset_56bc89e30b26b995ee39d62c98fdb7ea",
+    "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-14T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "assessment": {
+    "mapping_version": "company_profile_common_core_mapping.v1",
+    "production_authorization": "not_authorized",
+    "report": {
+      "instrument_id": "920007.BJ",
+      "report_id": "asset_56bc89e30b26b995ee39d62c98fdb7ea",
+      "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-14T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "principal_business": {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "products_services": {
+      "dimension_id": "products_services",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "revenue_model": {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "core_complete": false
+  },
+  "activated_chapters": [],
+  "evidence_gap_codes": [],
+  "provider_calls": [
+    "select_profile_sections",
+    "extract_profile_workpaper"
+  ],
+  "provider_blocked": false,
+  "execution": {
+    "schema_version": "company_profile_execution_record.v1",
+    "production_authorization": "not_authorized",
+    "input_identity": {
+      "instrument_id": "920007.BJ",
+      "report_id": "asset_56bc89e30b26b995ee39d62c98fdb7ea",
+      "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+      "report_period": "2025-12-31",
+      "policy_version": "company_profile_common_core_mapping.v2",
+      "processing_identity": {
+        "execution_mode": "provider",
+        "logical_request_timeout_seconds": 2450,
+        "max_layout_characters": 500000,
+        "max_section_characters": 160000,
+        "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+        "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "quality_review_profile": "semantic_extraction__scorpio_grok",
+        "reading_strategy": "chapter_workpaper_v1",
+        "repair_profile": "semantic_extraction__deepseek",
+        "review_max_output_tokens": 16384,
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "semantic_policy": "company_profile_llm_led.v2",
+        "semantic_reuse": false,
+        "source_binding_policy": "company_workpaper_source_literals.column-wrapped-amounts.v8",
+        "workpaper_format_recovery": "local_shape_before_retry.v3",
+        "workpaper_max_output_tokens": 12000,
+        "workpaper_metric_format_policy": "source_metric_unparsed_value_null.v1",
+        "workpaper_metric_limit_policy": "source_review_exact_metric_limits.v1",
+        "workpaper_review_execution": "deferred",
+        "workpaper_review_policy": "company_profile_workpaper_review.v13"
+      }
+    },
+    "scope_digests": {},
+    "model_attempts": [],
+    "token_budget": {
+      "total_token_budget": 1000000,
+      "extract_max_output_tokens": 4000,
+      "verify_max_output_tokens": 2000,
+      "tokens_used": 62820,
+      "tokens_remaining": 937180
+    },
+    "scope_token_allocations": {},
+    "transport_retries": 0,
+    "semantic_disputes": [],
+    "predecessor_lineage": []
+  },
+  "legacy_writers_invoked": [],
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "llm_generated",
+    "report": {
+      "instrument_id": "920007.BJ",
+      "report_id": "asset_56bc89e30b26b995ee39d62c98fdb7ea",
+      "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-14T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0014",
+          "section_path": [
+            "第三节 会计数据和财务指标"
+          ],
+          "start_page": 9,
+          "end_page": 14,
+          "rationale": "选取财务指标摘要、业务概要、经营情况回顾、营业情况分析、主营业务及营业收入成本附注。该组合覆盖公司产品/服务与用途、经营模式、收入规模及本期变化、成本费用驱动和收入成本构成，且以公司层面经营信息为主。"
+        },
+        {
+          "section_id": "section-0049",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "一、 业务概要"
+          ],
+          "start_page": 14,
+          "end_page": 15,
+          "rationale": "选取财务指标摘要、业务概要、经营情况回顾、营业情况分析、主营业务及营业收入成本附注。该组合覆盖公司产品/服务与用途、经营模式、收入规模及本期变化、成本费用驱动和收入成本构成，且以公司层面经营信息为主。"
+        },
+        {
+          "section_id": "section-0051",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "二、 经营情况回顾"
+          ],
+          "start_page": 15,
+          "end_page": 17,
+          "rationale": "选取财务指标摘要、业务概要、经营情况回顾、营业情况分析、主营业务及营业收入成本附注。该组合覆盖公司产品/服务与用途、经营模式、收入规模及本期变化、成本费用驱动和收入成本构成，且以公司层面经营信息为主。"
+        },
+        {
+          "section_id": "section-0063",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "境外资产占比较高的情况",
+            "2. 营业情况分析"
+          ],
+          "start_page": 17,
+          "end_page": 18,
+          "rationale": "选取财务指标摘要、业务概要、经营情况回顾、营业情况分析、主营业务及营业收入成本附注。该组合覆盖公司产品/服务与用途、经营模式、收入规模及本期变化、成本费用驱动和收入成本构成，且以公司层面经营信息为主。"
+        },
+        {
+          "section_id": "section-0103",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "主营业务"
+          ],
+          "start_page": 24,
+          "end_page": 24,
+          "rationale": "选取财务指标摘要、业务概要、经营情况回顾、营业情况分析、主营业务及营业收入成本附注。该组合覆盖公司产品/服务与用途、经营模式、收入规模及本期变化、成本费用驱动和收入成本构成，且以公司层面经营信息为主。"
+        },
+        {
+          "section_id": "section-0780",
+          "section_path": [
+            "第十一节 财务会计报告",
+            "账面余额 账面价值 受限类型 受限情况 账面余额 账面价值 受限类型 受限情况",
+            "(三十七)营业收入和营业成本"
+          ],
+          "start_page": 131,
+          "end_page": 131,
+          "rationale": "选取财务指标摘要、业务概要、经营情况回顾、营业情况分析、主营业务及营业收入成本附注。该组合覆盖公司产品/服务与用途、经营模式、收入规模及本期变化、成本费用驱动和收入成本构成，且以公司层面经营信息为主。"
+        }
+      ],
+      "unread_or_deferred": [
+        "section-0132、section-0133、section-0137：未来展望与行业趋势偏前瞻和行业背景，非本期经营事实核心",
+        "section-0156：风险因素可在需要风险细节时再补充",
+        "section-0267：公司治理与内部控制与经营分析关系较弱",
+        "section-0296：完整财务会计报告及大部分附注不展开，本次仅取section-0780收入成本附注"
+      ],
+      "selection_rationale": "选取财务指标摘要、业务概要、经营情况回顾、营业情况分析、主营业务及营业收入成本附注。该组合覆盖公司产品/服务与用途、经营模式、收入规模及本期变化、成本费用驱动和收入成本构成，且以公司层面经营信息为主。",
+      "stop_reason": "核心业务、产品、经营模式、收入规模与收入成本结构已由上述章节覆盖；继续扩展将进入前瞻、风险、治理或完整财报附注，边际解释力较低。",
+      "transcription_version": "shared-pdf-pypdf-layout.structured-notes.v1"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-BS-001",
+            "text": "公司深耕光伏支架领域，聚焦光伏支架核心零部件的研发、生产和销售；报告期内商业模式未发生变化。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006",
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-BS-002",
+            "text": "安徽寅天智能装备有限公司为子公司，从事光伏支架核心零部件的生产制造。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0013"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-BS-003",
+            "text": "泰友新能源科技有限公司为子公司，从事光伏支架核心零部件的生产制造。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0013"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "所选章节未完整披露公司组织架构和全部子公司，不能据此视为完整子公司清单。"
+        ]
+      },
+      "products_services": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-PS-001",
+            "text": "公司主营产品包括光伏支架主体支撑扭矩管（TTU）、光伏支架轴承组件（BHA）、光伏组件安装结构件（URA）以及檩条（RAIL）等光伏支架核心零部件；这些产品经组装后可形成光伏支架，包括跟踪支架及固定支架，跟踪支架与配套电控设计、驱动设计共同构成光伏跟踪支架系统。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-PS-002",
+            "text": "光伏支架产品主要分为分布式支架、固定支架和跟踪支架；分布式支架主要应用于工商业、户用屋顶分布式电站，固定支架和跟踪支架应用场景以地面电站为主。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "所选章节未披露各产品子类的收入、销量或产能明细；不能将产品种类等同于收入占比。"
+        ]
+      },
+      "revenue_model": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-RM-001",
+            "text": "公司收入来自光伏支架核心零部件销售，收入分解表按产品类型列示“光伏支架核心零部件”和“其他”两类。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "所选章节未披露分产品收入占比、定价机制或合同条款；“其他”类别的具体构成未披露。"
+        ]
+      },
+      "scale_and_mix": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-SM-001",
+            "text": "报告期公司实现营业收入并结转营业成本；具体金额见指标。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0011",
+              "source-0014"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入",
+                "raw_value": "1,031,109,601.89",
+                "value": "1031109601.89",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业成本",
+                "raw_value": "874,747,668.24",
+                "value": "874747668.24",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-SM-002",
+            "text": "主营业务为光伏支架核心零部件，报告期主营业务收入及成本单独列示。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014",
+              "source-0011"
+            ],
+            "metrics": [
+              {
+                "name": "主营业务收入",
+                "raw_value": "1,016,969,543.44",
+                "value": "1016969543.44",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "主营业务成本",
+                "raw_value": "861,279,002.28",
+                "value": "861279002.28",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-SM-003",
+            "text": "其他业务收入及成本单独列示，属于主营业务之外的收入类别；保留其原始“其他业务”标签，不与主营业务合并。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014",
+              "source-0011"
+            ],
+            "metrics": [
+              {
+                "name": "其他业务收入",
+                "raw_value": "14,140,058.45",
+                "value": "14140058.45",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他业务成本",
+                "raw_value": "13,468,665.96",
+                "value": "13468665.96",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "其他业务的具体构成未在所选章节披露；未计算未披露的收入占比。"
+        ]
+      },
+      "operations_and_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-OP-001",
+            "text": "公司根据业务与技术情况、产业政策与市场需求形成自身经营模式，并在生产经验、工艺技术、产品结构设计、规模化生产、产品质量控制和成本控制等方面积累经验。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取成功：所选章节未披露具体原材料、能源采购、供应商名称或产能利用率；不能从行业描述推断公司采购结构。",
+          "指标格式隔离：事实F-OP-002未作为结论采用；metrics.0: Value error, metric values must be decimal strings；原内容保留在模型回执。"
+        ]
+      },
+      "customers_channels_markets": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-CCM-001",
+            "text": "公司立足国际市场并逐步开拓国内市场，与国内外知名光伏支架企业建立合作关系；产品远销巴西、智利、澳大利亚、加拿大、欧洲、中东等国家和地区。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-CCM-002",
+            "text": "公司收入分解表按销售模式列示直销；经销栏未列示金额。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未披露具体客户名称、销售区域收入占比；经销栏未列示金额，不能据此推定报告期无经销收入。"
+        ]
+      },
+      "operating_drivers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-OD-001",
+            "text": "2025年公司称受益于全球光伏产业持续高增长和下游客户需求旺盛，围绕客户需求加快产能布局，各地生产基地产能顺利释放，并与全球跟踪光伏支架龙头企业深化合作。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-OD-002",
+            "text": "报告期毛利率较上年同期下降。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0011"
+            ],
+            "metrics": [
+              {
+                "name": "毛利率",
+                "raw_value": "15.16%",
+                "value": "15.16",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "2024年度",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "毛利率",
+                "raw_value": "18.42%",
+                "value": "18.42",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2024年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "增长原因主要来自公司管理层说明，所选章节未披露分客户或分区域的量化驱动数据。"
+        ]
+      },
+      "material_changes": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-MC-001",
+            "text": "2025年公司营业收入同比增长，但扣非后归母净利润同比小幅下降。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入同比增长率",
+                "raw_value": "41.47%",
+                "value": "41.47",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "2024年度",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "归属于上市公司股东的扣除非经常性损益后的净利润同比增减率",
+                "raw_value": "-0.53%",
+                "value": "-0.53",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "2024年度",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-MC-002",
+            "text": "公司于2025年8月完成上市，募集资金净额2.79亿元，为未来产能扩张、技术研发及全球化布局提供资金支持。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008",
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "募集资金净额",
+                "raw_value": "2.79",
+                "value": "2.79",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未披露募集资金具体用途金额分解；上市对产能、研发和全球化布局的具体影响未量化。"
+        ]
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+        "section_path": [
+          "第三节 会计数据和财务指标"
+        ],
+        "physical_pages": [
+          9
+        ],
+        "source_spans": [
+          {
+            "page": 9,
+            "start": 38,
+            "end": 3076,
+            "quote": "第三节              会计数据和财务指标\n\n一、         盈利能力\n\n                                                                                                                  单位：元\n                                             2025   年                2024    年           本年比上                 2023    年\n                                                                                         年增减%\n 营业收入                                  1,031,109,601.89         728,842,577.03              41.47%       657,585,651.47\n 毛利率%                                               15.16%                 18.42%             -                     18.49%\n 归属于上市公司股东的                                91,410,670.55          90,047,789.54               1.51%        78,172,691.37\n 净利润\n 归属于上市公司股东的\n 扣除非经常性损益后的                                88,743,186.98          89,217,845.58              -0.53%        76,315,245.03\n 净利润\n 加权平均净资产收益率%\n （依据归属于上市公司                                         19.31%                 36.04%             -                     45.70%\n 股东的净利润计算）\n 加权平均净资产收益率%\n （依据归属于上市公司                                         18.75%                 35.71%             -                     44.61%\n 股东的扣除非经常性损\n 益后的净利润计算）\n 基本每股收益                                                 2.45                   2.92        -16.10%                      2.56\n\n\n二、         营运情况\n\n                                                                                                                  单位：元\n                                                                                         本年末比\n                                            2025   年末               2024   年末            上年末增                2023   年末\n                                                                                             减%\n 资产总计                                  1,062,256,755.12          570,004,562.03             86.36%       469,325,312.47\n 负债总计                                     430,035,576.90         270,440,274.76             59.01%       264,516,346.22\n 归属于上市公司股东的                               630,624,608.36         298,751,678.69            111.09%       204,808,966.25\n 净资产\n 归属于上市公司股东的                                            14.19                   9.70         46.31%                      6.65\n 每股净资产\n 资产负债率%（母公司）                                        36.51%                 42.07%             -                     53.14%\n 资产负债率%（合并）                                         40.48%                 47.45%             -                     56.36%\n 流动比率                                                   2.28                   1.88         21.52%                      1.65\n                                             2025    年                2024   年           本年比上                 2023    年\n                                                                                          年增减%\n 利息保障倍数                                                48.06                  41.16           -                       21.87\n\n\n\n                                                               9\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+        "section_path": [
+          "第三节 会计数据和财务指标"
+        ],
+        "physical_pages": [
+          10
+        ],
+        "source_spans": [
+          {
+            "page": 10,
+            "start": 0,
+            "end": 2832,
+            "quote": " 经营活动产生的现金流                                 49,444,907.10          35,742,934.10             38.33%         -5,315,843.75\n 量净额\n 应收账款周转率                                                 3.71                   3.60           -                         4.37\n 存货周转率                                                   6.11                   6.36           -                       10.64\n 总资产增长率%                                            86.36%                  21.45%             -                    88.87%\n 营业收入增长率%                                           41.47%                  10.84%             -                    51.96%\n 净利润增长率%                                              1.80%                 14.95%             -                    86.35%\n\n\n三、         境内外会计准则下会计数据差异\n\n□适用 √不适用\n\n\n四、         与业绩预告/业绩快报中披露的财务数据差异\n\n√适用 □不适用\n\n        公司于       2026    年   2 月   27  日披露《2025            年年度业绩快报公告》（公告编号：2026-014），\n 公告所载          2025   年度主要财务数据为初步核算数据，未经会计师事务所审计。2025                                                                年年度\n\n 报告中披露的经审计财务数据与业绩快报中披露的财务数据不存在重大差异，差异幅度\n 均未达到          20%。\n\n                                                                                                                   单位：元\n              项目                          年度报告                            业绩快报                           差异幅度\n   营业收入                                   1,031,109,601.89                1,031,109,601.89                            0.00%\n   利润总额                                     108,512,482.91                  107,815,850.60                            0.65%\n   归属于上市公司股东                                  91,410,670.55                  90,815,239.05                            0.66%\n   的净利润\n   归属于上市公司股东\n   的扣除非经常性损益                                  88,743,186.98                  88,445,255.48                            0.34%\n   的净利润\n   基本每股收益                                                2.45                            2.44                         0.41%\n   加权平均净资产收益                                         19.31%                          19.20%                           0.57%\n   率%（扣非前）\n   加权平均净资产收益                                         18.75%                          18.70%                           0.27%\n   率%（扣非后）\n   总资产                                    1,062,256,755.12                1,063,829,596.84                           -0.15%\n   归属于上市公司股东                                630,624,608.36                  659,894,831.39                           -4.44%\n   的所有者权益\n   股本                                         44,432,450.00                  44,432,450.00                            0.00%\n   归属于上市公司股东                                            14.19                          14.82                         -4.25%\n   的每股净资产\n\n                                                               10\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+        "section_path": [
+          "第三节 会计数据和财务指标"
+        ],
+        "physical_pages": [
+          11
+        ],
+        "source_spans": [
+          {
+            "page": 11,
+            "start": 0,
+            "end": 1568,
+            "quote": "五、       2025  年分季度主要财务数据\n\n                                                                                                单位：元\n         项目                  第一季度                第二季度                第三季度                 第四季度\n                           （1-3    月份）         （4-6    月份）         （7-9   月份）          （10-12     月份）\n 营业收入                      272,290,448.45     208,488,287.13      248,395,235.88         301,935,630.43\n 归属于上市公司股                   32,872,825.65       25,076,926.54      25,724,540.08            7,736,378.28\n 东的净利润\n 归属于上市公司股\n 东的扣除非经常性                   32,466,368.49       23,219,769.94      25,474,816.99            7,582,231.56\n 损益后的净利润\n\n季度数据与已披露定期报告数据差异说明：\n □适用 √不适用\n\n六、       非经常性损益项目和金额\n\n                                                                                                单位：元\n                  项目                       2025  年金额         2024  年金额         2023  年金额          说明\n 1．非流动资产处置损益，包括                               -19,683.54       -135,058.52\n 已计提资产减值准备的冲销部分\n 2．计入当期损益的政府补助，\n 但与公司正常经营业务密切相\n 关、符合国家政策规定、按照确                               830,212.96        329,982.24       728,163.64\n 定的标准享有、对公司损益产生\n 持续影响的政府补助除外\n 3．除同公司正常经营业务相关\n 的有效套期保值业务外，非金融\n 企业持有金融资产和金融负债产                               837,263.70      1,612,499.10     3,288,012.53\n 生的公允价值变动损益以及处置\n 金融资产和金融负债产生的损益\n 4．计入当期损益的对非金融企\n 业收取的资金占用费\n 5．委托他人投资或管理资产的\n 损益\n 6.对外委托贷款取得的损益\n 7.因不可抗力因素，如遭受自然\n 灾害而产生的各项资产损失\n 8.单独进行减值测试的应收款项                              350,000.00\n 减值准备转回\n 9.企业取得子公司、联营企业及\n 合营企业的投资成本小于取得投\n\n\n                                                    11\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+        "section_path": [
+          "第三节 会计数据和财务指标"
+        ],
+        "physical_pages": [
+          12
+        ],
+        "source_spans": [
+          {
+            "page": 12,
+            "start": 0,
+            "end": 1234,
+            "quote": " 资时应享有被投资单位可辨认净\n 资产公允价值产生的收益\n 10.同一控制下企业合并产生的子\n 公司期初至合并日的当期净损益\n 11.非货币性资产交换损益\n 12.债务重组损益\n 13.企业因相关经营活动不再持续\n 而发生的一次性费用，如安置职                                                                 -225,191.00\n 工的支出等\n 14.因税收、会计等法律、法规的\n 调整对当期损益产生的一次性影\n 响\n 15.因取消、修改股权激励计划一\n 次性确认的股份支付费用\n 16.对于现金结算的股份支付，在\n 可行权日之后，应付职工薪酬的\n 公允价值变动产生的损益\n 17.采用公允价值模式进行后续计\n 量的投资性房地产公允价值变动\n 产生的损益\n 18.交易价格显失公允的交易产生\n 的收益\n 19.与公司正常经营业务无关的或\n 有事项产生的损益\n 20.受托经营取得的托管费收入\n 21.除上述各项之外的其他营业外                          1,256,907.09       -681,966.98     -1,438,661.89\n 收入和支出\n 22.其他符合非经常性损益定义的\n 损益项目\n         非经常性损益合计                          3,254,700.21      1,125,455.84      2,352,323.28\n 所得税影响数                                      590,791.84        295,511.88        494,876.94\n 少数股东权益影响额（税后）                                 -3,575.20                  -\n         非经常性损益净额                          2,667,483.57        829,943.96      1,857,446.34\n\n\n七、       存在股权激励、员工持股计划的公司可选择披露扣除股份支付影响后的净利润\n\n√适用 □不适用\n     主要会计数据                        2025  年                    2024  年              本年比上年增减%\n 扣除股份支付影响\n 后的归属于上市公                           93,725,061.62              90,970,064.87                      3.03%\n 司股东的净利润\n\n\n\n                                                    12\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+        "section_path": [
+          "第三节 会计数据和财务指标"
+        ],
+        "physical_pages": [
+          13
+        ],
+        "source_spans": [
+          {
+            "page": 13,
+            "start": 0,
+            "end": 259,
+            "quote": "八、      补充财务指标\n\n□适用 √不适用\n\n\n九、      会计政策变更、会计估计变更或重大差错更正等情况\n\n(一)     会计数据追溯调整或重述情况\n\n□会计政策变更 □会计差错更正 □其他原因 √不适用\n\n(二)     会计政策、会计估计变更或重大会计差错更正的原因及影响\n\n□适用 √不适用\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                             13\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ],
+        "physical_pages": [
+          14
+        ],
+        "source_spans": [
+          {
+            "page": 14,
+            "start": 47,
+            "end": 1095,
+            "quote": "一、     业务概要\n\n商业模式报告期内变化情况：\n\n     公司自设立以来深耕光伏支架领域，聚焦光伏支架核心零部件的研发、生产和销售。\n公司主营产品包括光伏支架主体支撑扭矩管（TTU）、光伏支架轴承组件（BHA）、光伏\n\n组件安装结构件（URA）以及檩条（RAIL）等光伏支架核心零部件产品。公司主营产品\n经组装后，可形成光伏电站之“骨骼”——光伏支架，包括跟踪支架及固定支架，其中跟踪\n支架与配套的电控设计、驱动设计共同构成光伏跟踪支架系统。为保障产品质量，提升生\n\n产效率，为客户提供更加优质和便捷的服务，公司根据业务与技术情况，结合产业政策与\n市场需求，形成了自身的经营模式。\n\n     公司秉承“碳致中和、跟踪未来”的发展理念，在光伏支架领域多年的经营过程中，积\n\n累了丰富的生产经验及工艺技术，在产品结构设计、规模化生产、产品质量控制、成本控\n制等方面积累了丰富的行业经验。\n\n     凭借成熟的技术工艺、质量优秀可靠的产品、高效稳定的规模化产品交付能力等竞争\n\n优势，公司立足于国际市场并逐步开拓国内市场，在国内外光伏支架行业，建立了较高的\n知名度，与国内外知名光伏支架企业建立了良好的合作关系，产品远销巴西、智利、澳大\n\n利亚、加拿大、欧洲、中东等国家和地区。\n\n     公司是经江苏省科学技术厅、江苏省财政厅、国家税务总局江苏省税务局联合认定的\n高新技术企业。2020         年  2 月，公司被苏州市工业和信息化局、苏州市科学技术局、苏州\n\n市发展和改革委员会认定为市级                 “企业技术中心”；2022        年  8 月，公司被江苏省工业和信\n息化厅认定为江苏省四星级上云企业；2022                    年 12 月，公司经江苏省工业和信息化厅认定\n为江苏省专精特新中小企业，亦被苏州市发展和改革委员会认定为                                 2022 年度苏州市数字\n\n经济示范企业；2023        年  7 月，公司经国家工业和信息化部认定为国家级专精特新“小巨人”\n企业；2023     年 12 月，公司被江苏省工业和信息化厅等部门认定为省级“企业技术中心”；\n\n2025 年  12 月，公司通过       2022年度省级专精特新中小企业复核。\n\n\n\n\n\n                                        14\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 0,
+            "end": 208,
+            "quote": "     公司目前拥有超过           60 项专利授权，并通过了质量管理体系                     ISO9001、欧盟钢结构产\n\n 品 EN1090、环境管理体系            ISO14001、职业健康安全管理体系                ISO45001  的认证。\n\n     报告期内，公司商业模式未发生变化。\n\n\n报告期内核心竞争力变化情况：\n□适用 √不适用\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "二、 经营情况回顾"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 307,
+            "end": 1048,
+            "quote": "二、      经营情况回顾\n\n(一)     经营计划\n\n\n     2025  年，公司坚持光伏支架核心零部件业务定位，持续巩固在跟踪支架核心零部件\n\n 领域的技术与品质优势，聚焦成本、效率、质量三大核心，与下游主要客户合作持续深入。\n 报告期内，公司主要经营情况如下：\n\n     报告期内，公司实现营业收入                 1,031,109,601.89 元，同比增长        41.47%%；扣非后归母\n\n 净利润    88,743,186.98 元，同比下降        0.53%；公司资产总额          1,062,256,755.12 元，较上年期\n 末增加    86.36%；净资产       630,624,608.36 元，较上年期末增长            111.09%。\n\n     2025  年，受益于全球光伏产业持续高增长、下游客户需求旺盛，公司经营情况持续\n\n 向好。公司围绕客户需求加快产能布局，各地生产基地产能顺利释放，产能实现较快增\n 长，与全球跟踪光伏支架龙头企业的合作进一步深化，市场份额及经营效益均有所提升。\n\n 此外，公司于        2025 年  8月完成上市，募集资金净额                2.79 亿元，为未来产能扩张、技术研\n 发及全球化布局提供了有力的资金支持。\n\n\n\n(二)     行业情况\n\n\n     光伏支架是光伏电站的关键部件之一，不仅起到支撑固定作用，确保光伏电站在各\n 类复杂自然条件下稳定、可靠运行数十年，而且对提高光电转换效率，提高电站收益率\n\n                                           15\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "二、 经营情况回顾"
+        ],
+        "physical_pages": [
+          16
+        ],
+        "source_spans": [
+          {
+            "page": 16,
+            "start": 0,
+            "end": 1994,
+            "quote": " 起到重要作用。同样光伏行业的发展也极大地影响光伏支架行业的发展态势。目前光伏\n\n 支架产品主要分为分布式支架、固定支架和跟踪支架，分布式支架主要应用于工商业、\n 户用屋顶分布式电站，固定支架和跟踪支架应用场景以地面电站为主。\n\n       光伏产业作为清洁能源产业的重要组成部分，符合全球经济发展低碳化的大趋势，\n\n 发展前景广阔。              随着包括我国在内的各国光伏产业一系列扶持政策的推出，全球光伏\n 产业发展持续提速，全球新增光伏装机量屡创新高。同时相关光伏技术也不断取得突\n 破，光伏发电成本也在逐步下降。\n\n       随着光伏平价上网的时代来临，因此即使未来光伏产业扶持力度逐渐下降，光伏发\n 电的需求量仍能够保持一定的增长趋势，光伏产业也因此可以从政策驱动逐步转向市场\n 驱动。光伏支架作为光伏发电站的核心组成部分，其重要性不言而喻。因此光伏发电站\n\n 的持续扩容必然会引起光伏支架需求量的不断上升。\n\n\n\n(三)       财务分析\n\n1.   资产负债结构分析\n                                                                                                     单位：元\n                            2025   年末                            2024  年末\n     项目                 金额             占总资产                 金额              占总资产              变动比例%\n                                        的比重%                                的比重%\n 货币资金             311,628,784.14           29.34%      43,415,547.05             7.62%               617.78%\n 应收票据                7,441,170.20           0.70%        2,618,943.40            0.46%               184.13%\n 应收账款             329,526,193.72           31.02%     198,139,414.52           34.76%                 66.31%\n 存货               159,248,680.73           14.99%     122,513,706.49           21.49%                 29.98%\n 投资性房\n 地产\n 长期股权\n 投资\n 固定资产              49,052,982.29            4.62%      41,298,203.61             7.25%                18.78%\n 在建工程                1,600,683.02           0.15%        7,258,545.52            1.27%               -77.95%\n 无形资产                  782,991.67           0.07%          381,212.33            0.07%               105.40%\n 商誉\n 短期借款              54,773,541.31            5.16%      59,218,906.15           10.39%                  -7.51%\n 长期借款\n 应付票据             149,955,918.96           14.12%      66,739,314.11           11.71%                124.69%\n 预付款项              73,670,043.04            6.94%     101,148,070.13           17.75%                -27.17%\n\n                                                       16\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0010",
+        "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "二、 经营情况回顾"
+        ],
+        "physical_pages": [
+          17
+        ],
+        "source_spans": [
+          {
+            "page": 17,
+            "start": 0,
+            "end": 521,
+            "quote": "资产负债项目重大变动原因：\n\n       1、货币资金较上年末增长了                         617.78%，主要系公司向不特定合格投资者公开发行股\n\n 票并在北京证券交易所上市募集资金入账所致；\n\n       2、应收票据较上年末增长了                         184.13%，主要系是当期期末已背书或贴现但尚未到期\n 的非     9+6  银行承兑汇票金额较大所致；\n\n       3、应收账款较上年末增长了                        66.31%，主要系当期公司营业收入增长，应收账款规模\n\n 随之增长；\n\n       4、在建工程较上年末减少了                         77.95%，主要系公司待安装验收设备减少所致；\n\n       5、无形资产较上年末增长了                         105.40%，主要系公司当期新增购置办公软件金额较大\n\n 所致；\n\n       6、应付票据较上年末增长了                         124.69%，主要系公司应付供应商承兑汇票增加所致。\n\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0011",
+        "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "境外资产占比较高的情况",
+          "2. 营业情况分析"
+        ],
+        "physical_pages": [
+          17
+        ],
+        "source_spans": [
+          {
+            "page": 17,
+            "start": 543,
+            "end": 2104,
+            "quote": "2.   营业情况分析\n(1)  利润构成\n                                                                                                        单位：元\n                                2025   年                               2024   年\n    项目                                         占营业                                占营业             变动比例%\n                           金额                  收入的                金额              收入的\n                                                比重%                                比重%\n 营业收入                  1,031,109,601.89            -        728,842,577.03            -                  41.47%\n 营业成本                    874,747,668.24         84.84%      594,589,871.30          81.58%               47.12%\n 毛利率                              15.16%           -                 18.42%           -                 -\n 销售费用                       3,946,586.15          0.38%        3,590,945.37          0.49%                 9.90%\n 管理费用                     23,114,294.41           2.24%      16,279,413.19           2.23%               41.98%\n 研发费用                     12,504,293.81           1.21%      12,134,346.95           1.66%                 3.05%\n 财务费用                        -502,305.08         -0.05%       -5,859,532.30         -0.80%               91.43%\n 信用减值                      -7,363,719.25         -0.71%       -1,209,942.17         -0.17%              508.60%\n 损失\n 资产减值                      -1,739,698.74         -0.17%       -1,710,026.41         -0.23%                 1.74%\n 损失\n\n                                                        17\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0012",
+        "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "境外资产占比较高的情况",
+          "2. 营业情况分析"
+        ],
+        "physical_pages": [
+          18
+        ],
+        "source_spans": [
+          {
+            "page": 18,
+            "start": 0,
+            "end": 1017,
+            "quote": " 其他收益                        830,212.96         0.08%          277,148.91         0.04%             199.55%\n 投资收益                        889,120.10         0.09%        2,067,918.84         0.28%              -57.00%\n 公允价值                         -51,856.40       -0.01%         -455,419.74        -0.06%               88.61%\n 变动收益\n 资产处置                         -19,683.54        0.00%         -135,058.52        -0.02%               85.43%\n 收益\n 汇兑收益                                    0         0%                     0           0%                   0%\n 营业利润                   107,255,575.82        10.40%      104,769,245.43         14.37%                2.37%\n 营业外收                      1,496,303.10         0.15%          900,500.36         0.12%               66.16%\n 入\n 营业外支                        239,396.01         0.02%        1,529,634.01         0.21%              -84.35%\n 出\n 净利润                      91,474,644.63         8.87%      89,860,375.70         12.33%                1.80%\n\n\n项目重大变动原因：\n\n       "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0013",
+        "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "主营业务"
+        ],
+        "physical_pages": [
+          24
+        ],
+        "source_spans": [
+          {
+            "page": 24,
+            "start": 267,
+            "end": 884,
+            "quote": "主营业务           主营业务            净利润\n  名称      类     业务         本                                         收入              利润\n          型\n                光伏\n 安徽寅            支架\n 天智能       子    核心\n 装备有       公    零部      10,000,000  399,320,721.86 26,600,608.38  334,339,610.49 29,556,331.49  14,349,669.93\n 限公司       司    件的\n                生产\n                制造\n                光伏\n 泰友新            支架\n 能源科       子    核心      80,000,000\n 技有限       公    零部           泰铢     150,060,837.90 16,473,634.10  179,860,880.39  4,063,640.83    639,740.78\n  公司       司    件的\n                生产\n                制造\n\n(2) 主要控股参股公司情况说明\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0014",
+        "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+        "section_path": [
+          "第十一节 财务会计报告",
+          "账面余额 账面价值 受限类型 受限情况 账面余额 账面价值 受限类型 受限情况",
+          "(三十七)营业收入和营业成本"
+        ],
+        "physical_pages": [
+          131
+        ],
+        "source_spans": [
+          {
+            "page": 131,
+            "start": 1782,
+            "end": 3529,
+            "quote": "(三十七) 营业收入和营业成本\n\n        1.营业收入和营业成本情况\n             项目                                             本期发生额                                                                    上期发生额\n                                               收入                                  成本                                 收入                                    成本\n  主营业务                                      1,016,969,543.44                      861,279,002.28                     715,971,400.46                           582,007,630.40\n  其他业务                                          14,140,058.45                       13,468,665.96                      12,871,176.57                           12,582,240.90\n\n                 合计                         1,031,109,601.89                      874,747,668.24                     728,842,577.03                           594,589,871.30\n\n        2.营业收入、营业成本分解信息\n        收入分类                                                                本期发生额                                                             上期发生额\n                                                          营业收入                             营业成本                             营业收入                            营业成本\n  按产品类型\n        光伏支架核心零部件                                        1,016,969,543.44                   861,279,002.28                   715,971,400.46                   582,007,630.40\n        其他                                                   14,140,058.45                    13,468,665.96                    12,871,176.57                    12,582,240.90\n  按销售模式\n        直销                                               1,031,109,601.89                   874,747,668.24                   728,842,577.03                   594,589,871.30\n        经销\n\n        "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "limitations": [
+      "本工作底稿仅基于所选章节，未覆盖的其他章节内容未纳入；未获取的细节已在相应要素中说明。"
+    ],
+    "supply_chain": {
+      "position": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-SC-001",
+            "text": "公司从事光伏支架核心零部件的研发、生产和销售；产品经组装后可形成跟踪支架或固定支架。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "upstream_inputs": {
+        "status": "not_disclosed",
+        "facts": [],
+        "limitations": [
+          "未获取成功：所选章节未披露公司具体原材料、能源、供应商名称或采购金额，不能从行业背景推断其采购结构。"
+        ]
+      },
+      "downstream_customers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-SC-002",
+            "text": "公司产品经组装后用于光伏支架并最终用于光伏电站；公司客户包括国内外知名光伏支架企业。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未披露下游具体客户名称及对应收入占比。"
+        ]
+      }
+    },
+    "generation": {
+      "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+      "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+      "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+      "selection": {
+        "purpose": "select_profile_sections",
+        "request_id": "bp-work-59dd96b7c16016e086830a4c:workpaper:sections",
+        "request_hash": "617e1dab7f7f3dd6ed2b833ecedc3b3b3f7a3afed397c85834fdafea0848c00f",
+        "response_hash": "1e5681d8dcb5a57b3d9893f9bf8502da8ad3d8c17e1eb98dffb340cef01ad83a",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 20690,
+          "output_tokens": 8914,
+          "total_tokens": 29604
+        },
+        "scope_kind": "report_heading_index",
+        "heading_count": 783,
+        "section_ids": [
+          "section-0001",
+          "section-0002",
+          "section-0003",
+          "section-0004",
+          "section-0005",
+          "section-0006",
+          "section-0007",
+          "section-0008",
+          "section-0009",
+          "section-0010",
+          "section-0011",
+          "section-0012",
+          "section-0013",
+          "section-0014",
+          "section-0015",
+          "section-0016",
+          "section-0017",
+          "section-0018",
+          "section-0019",
+          "section-0020",
+          "section-0021",
+          "section-0022",
+          "section-0023",
+          "section-0024",
+          "section-0025",
+          "section-0026",
+          "section-0027",
+          "section-0028",
+          "section-0029",
+          "section-0030",
+          "section-0031",
+          "section-0032",
+          "section-0033",
+          "section-0034",
+          "section-0035",
+          "section-0036",
+          "section-0037",
+          "section-0038",
+          "section-0039",
+          "section-0040",
+          "section-0041",
+          "section-0042",
+          "section-0043",
+          "section-0044",
+          "section-0045",
+          "section-0046",
+          "section-0047",
+          "section-0048",
+          "section-0049",
+          "section-0050",
+          "section-0051",
+          "section-0052",
+          "section-0053",
+          "section-0054",
+          "section-0055",
+          "section-0056",
+          "section-0057",
+          "section-0058",
+          "section-0059",
+          "section-0060",
+          "section-0061",
+          "section-0062",
+          "section-0063",
+          "section-0065",
+          "section-0066",
+          "section-0067",
+          "section-0068",
+          "section-0069",
+          "section-0070",
+          "section-0071",
+          "section-0072",
+          "section-0073",
+          "section-0074",
+          "section-0075",
+          "section-0080",
+          "section-0081",
+          "section-0082",
+          "section-0083",
+          "section-0084",
+          "section-0085",
+          "section-0086",
+          "section-0087",
+          "section-0088",
+          "section-0089",
+          "section-0090",
+          "section-0091",
+          "section-0092",
+          "section-0093",
+          "section-0094",
+          "section-0095",
+          "section-0096",
+          "section-0097",
+          "section-0098",
+          "section-0099",
+          "section-0100",
+          "section-0102",
+          "section-0103",
+          "section-0105",
+          "section-0107",
+          "section-0108",
+          "section-0109",
+          "section-0111",
+          "section-0112",
+          "section-0113",
+          "section-0114",
+          "section-0115",
+          "section-0116",
+          "section-0117",
+          "section-0118",
+          "section-0119",
+          "section-0120",
+          "section-0121",
+          "section-0122",
+          "section-0123",
+          "section-0124",
+          "section-0125",
+          "section-0126",
+          "section-0127",
+          "section-0128",
+          "section-0129",
+          "section-0130",
+          "section-0131",
+          "section-0132",
+          "section-0133",
+          "section-0134",
+          "section-0137",
+          "section-0142",
+          "section-0143",
+          "section-0147",
+          "section-0151",
+          "section-0154",
+          "section-0155",
+          "section-0156",
+          "section-0157",
+          "section-0158",
+          "section-0159",
+          "section-0160",
+          "section-0161",
+          "section-0162",
+          "section-0163",
+          "section-0164",
+          "section-0165",
+          "section-0166",
+          "section-0167",
+          "section-0168",
+          "section-0169",
+          "section-0170",
+          "section-0171",
+          "section-0172",
+          "section-0173",
+          "section-0174",
+          "section-0175",
+          "section-0176",
+          "section-0177",
+          "section-0178",
+          "section-0179",
+          "section-0180",
+          "section-0181",
+          "section-0182",
+          "section-0183",
+          "section-0184",
+          "section-0185",
+          "section-0186",
+          "section-0187",
+          "section-0188",
+          "section-0189",
+          "section-0190",
+          "section-0191",
+          "section-0192",
+          "section-0193",
+          "section-0194",
+          "section-0195",
+          "section-0196",
+          "section-0197",
+          "section-0198",
+          "section-0199",
+          "section-0200",
+          "section-0201",
+          "section-0202",
+          "section-0203",
+          "section-0204",
+          "section-0205",
+          "section-0206",
+          "section-0207",
+          "section-0208",
+          "section-0209",
+          "section-0210",
+          "section-0212",
+          "section-0213",
+          "section-0214",
+          "section-0215",
+          "section-0217",
+          "section-0218",
+          "section-0219",
+          "section-0220",
+          "section-0221",
+          "section-0222",
+          "section-0223",
+          "section-0224",
+          "section-0225",
+          "section-0226",
+          "section-0227",
+          "section-0228",
+          "section-0229",
+          "section-0230",
+          "section-0235",
+          "section-0240",
+          "section-0241",
+          "section-0242",
+          "section-0243",
+          "section-0244",
+          "section-0245",
+          "section-0246",
+          "section-0247",
+          "section-0248",
+          "section-0249",
+          "section-0250",
+          "section-0251",
+          "section-0252",
+          "section-0253",
+          "section-0254",
+          "section-0255",
+          "section-0256",
+          "section-0257",
+          "section-0258",
+          "section-0259",
+          "section-0260",
+          "section-0261",
+          "section-0262",
+          "section-0263",
+          "section-0264",
+          "section-0265",
+          "section-0266",
+          "section-0267",
+          "section-0268",
+          "section-0269",
+          "section-0270",
+          "section-0271",
+          "section-0272",
+          "section-0273",
+          "section-0274",
+          "section-0275",
+          "section-0276",
+          "section-0277",
+          "section-0278",
+          "section-0279",
+          "section-0280",
+          "section-0281",
+          "section-0282",
+          "section-0283",
+          "section-0284",
+          "section-0285",
+          "section-0286",
+          "section-0287",
+          "section-0288",
+          "section-0289",
+          "section-0290",
+          "section-0291",
+          "section-0292",
+          "section-0293",
+          "section-0294",
+          "section-0295",
+          "section-0296",
+          "section-0297",
+          "section-0298",
+          "section-0299",
+          "section-0300",
+          "section-0301",
+          "section-0302",
+          "section-0303",
+          "section-0315",
+          "section-0316",
+          "section-0317",
+          "section-0318",
+          "section-0319",
+          "section-0320",
+          "section-0321",
+          "section-0322",
+          "section-0323",
+          "section-0324",
+          "section-0325",
+          "section-0326",
+          "section-0327",
+          "section-0328",
+          "section-0329",
+          "section-0330",
+          "section-0331",
+          "section-0332",
+          "section-0333",
+          "section-0334",
+          "section-0335",
+          "section-0336",
+          "section-0337",
+          "section-0338",
+          "section-0339",
+          "section-0340",
+          "section-0341",
+          "section-0342",
+          "section-0343",
+          "section-0344",
+          "section-0345",
+          "section-0346",
+          "section-0352",
+          "section-0360",
+          "section-0361",
+          "section-0362",
+          "section-0363",
+          "section-0364",
+          "section-0365",
+          "section-0366",
+          "section-0367",
+          "section-0368",
+          "section-0369",
+          "section-0370",
+          "section-0371",
+          "section-0372",
+          "section-0373",
+          "section-0374",
+          "section-0375",
+          "section-0376",
+          "section-0377",
+          "section-0378",
+          "section-0379",
+          "section-0380",
+          "section-0381",
+          "section-0382",
+          "section-0383",
+          "section-0384",
+          "section-0385",
+          "section-0386",
+          "section-0387",
+          "section-0388",
+          "section-0389",
+          "section-0390",
+          "section-0391",
+          "section-0392",
+          "section-0393",
+          "section-0394",
+          "section-0395",
+          "section-0396",
+          "section-0397",
+          "section-0398",
+          "section-0399",
+          "section-0400",
+          "section-0401",
+          "section-0402",
+          "section-0403",
+          "section-0404",
+          "section-0405",
+          "section-0406",
+          "section-0407",
+          "section-0408",
+          "section-0409",
+          "section-0410",
+          "section-0411",
+          "section-0412",
+          "section-0413",
+          "section-0414",
+          "section-0415",
+          "section-0416",
+          "section-0417",
+          "section-0418",
+          "section-0419",
+          "section-0420",
+          "section-0421",
+          "section-0422",
+          "section-0423",
+          "section-0424",
+          "section-0425",
+          "section-0426",
+          "section-0427",
+          "section-0428",
+          "section-0429",
+          "section-0430",
+          "section-0431",
+          "section-0432",
+          "section-0433",
+          "section-0434",
+          "section-0435",
+          "section-0436",
+          "section-0437",
+          "section-0438",
+          "section-0439",
+          "section-0440",
+          "section-0441",
+          "section-0442",
+          "section-0443",
+          "section-0444",
+          "section-0445",
+          "section-0446",
+          "section-0447",
+          "section-0448",
+          "section-0449",
+          "section-0450",
+          "section-0451",
+          "section-0452",
+          "section-0453",
+          "section-0454",
+          "section-0455",
+          "section-0456",
+          "section-0457",
+          "section-0458",
+          "section-0459",
+          "section-0460",
+          "section-0461",
+          "section-0462",
+          "section-0463",
+          "section-0464",
+          "section-0465",
+          "section-0466",
+          "section-0467",
+          "section-0468",
+          "section-0469",
+          "section-0470",
+          "section-0471",
+          "section-0472",
+          "section-0473",
+          "section-0474",
+          "section-0475",
+          "section-0476",
+          "section-0477",
+          "section-0478",
+          "section-0479",
+          "section-0480",
+          "section-0481",
+          "section-0482",
+          "section-0483",
+          "section-0484",
+          "section-0485",
+          "section-0486",
+          "section-0487",
+          "section-0488",
+          "section-0489",
+          "section-0490",
+          "section-0491",
+          "section-0492",
+          "section-0493",
+          "section-0494",
+          "section-0495",
+          "section-0496",
+          "section-0497",
+          "section-0498",
+          "section-0499",
+          "section-0500",
+          "section-0501",
+          "section-0502",
+          "section-0503",
+          "section-0504",
+          "section-0505",
+          "section-0506",
+          "section-0507",
+          "section-0508",
+          "section-0509",
+          "section-0510",
+          "section-0511",
+          "section-0512",
+          "section-0513",
+          "section-0514",
+          "section-0515",
+          "section-0516",
+          "section-0517",
+          "section-0518",
+          "section-0519",
+          "section-0520",
+          "section-0521",
+          "section-0522",
+          "section-0523",
+          "section-0524",
+          "section-0525",
+          "section-0526",
+          "section-0527",
+          "section-0528",
+          "section-0529",
+          "section-0530",
+          "section-0531",
+          "section-0532",
+          "section-0533",
+          "section-0538",
+          "section-0539",
+          "section-0540",
+          "section-0541",
+          "section-0542",
+          "section-0543",
+          "section-0546",
+          "section-0547",
+          "section-0549",
+          "section-0550",
+          "section-0551",
+          "section-0552",
+          "section-0553",
+          "section-0556",
+          "section-0559",
+          "section-0560",
+          "section-0561",
+          "section-0562",
+          "section-0563",
+          "section-0564",
+          "section-0565",
+          "section-0566",
+          "section-0567",
+          "section-0568",
+          "section-0569",
+          "section-0570",
+          "section-0571",
+          "section-0572",
+          "section-0573",
+          "section-0574",
+          "section-0575",
+          "section-0576",
+          "section-0577",
+          "section-0578",
+          "section-0579",
+          "section-0580",
+          "section-0581",
+          "section-0582",
+          "section-0583",
+          "section-0584",
+          "section-0585",
+          "section-0586",
+          "section-0587",
+          "section-0588",
+          "section-0589",
+          "section-0590",
+          "section-0591",
+          "section-0592",
+          "section-0595",
+          "section-0596",
+          "section-0597",
+          "section-0598",
+          "section-0599",
+          "section-0600",
+          "section-0601",
+          "section-0602",
+          "section-0603",
+          "section-0604",
+          "section-0607",
+          "section-0608",
+          "section-0611",
+          "section-0612",
+          "section-0613",
+          "section-0614",
+          "section-0615",
+          "section-0616",
+          "section-0617",
+          "section-0618",
+          "section-0619",
+          "section-0620",
+          "section-0621",
+          "section-0622",
+          "section-0623",
+          "section-0624",
+          "section-0625",
+          "section-0626",
+          "section-0627",
+          "section-0628",
+          "section-0631",
+          "section-0632",
+          "section-0633",
+          "section-0634",
+          "section-0635",
+          "section-0636",
+          "section-0637",
+          "section-0638",
+          "section-0639",
+          "section-0640",
+          "section-0641",
+          "section-0642",
+          "section-0645",
+          "section-0651",
+          "section-0654",
+          "section-0655",
+          "section-0656",
+          "section-0657",
+          "section-0658",
+          "section-0659",
+          "section-0661",
+          "section-0662",
+          "section-0663",
+          "section-0666",
+          "section-0668",
+          "section-0669",
+          "section-0670",
+          "section-0671",
+          "section-0674",
+          "section-0676",
+          "section-0677",
+          "section-0678",
+          "section-0679",
+          "section-0680",
+          "section-0681",
+          "section-0682",
+          "section-0683",
+          "section-0684",
+          "section-0688",
+          "section-0691",
+          "section-0692",
+          "section-0693",
+          "section-0694",
+          "section-0695",
+          "section-0696",
+          "section-0697",
+          "section-0698",
+          "section-0699",
+          "section-0700",
+          "section-0703",
+          "section-0704",
+          "section-0705",
+          "section-0706",
+          "section-0707",
+          "section-0708",
+          "section-0709",
+          "section-0710",
+          "section-0711",
+          "section-0712",
+          "section-0713",
+          "section-0714",
+          "section-0715",
+          "section-0716",
+          "section-0718",
+          "section-0719",
+          "section-0720",
+          "section-0721",
+          "section-0722",
+          "section-0724",
+          "section-0725",
+          "section-0726",
+          "section-0727",
+          "section-0728",
+          "section-0729",
+          "section-0730",
+          "section-0731",
+          "section-0732",
+          "section-0733",
+          "section-0734",
+          "section-0735",
+          "section-0736",
+          "section-0737",
+          "section-0738",
+          "section-0739",
+          "section-0740",
+          "section-0741",
+          "section-0742",
+          "section-0743",
+          "section-0744",
+          "section-0745",
+          "section-0746",
+          "section-0747",
+          "section-0748",
+          "section-0749",
+          "section-0750",
+          "section-0751",
+          "section-0752",
+          "section-0753",
+          "section-0754",
+          "section-0755",
+          "section-0756",
+          "section-0757",
+          "section-0758",
+          "section-0759",
+          "section-0760",
+          "section-0761",
+          "section-0762",
+          "section-0765",
+          "section-0766",
+          "section-0767",
+          "section-0768",
+          "section-0769",
+          "section-0770",
+          "section-0775",
+          "section-0776",
+          "section-0777",
+          "section-0778",
+          "section-0779",
+          "section-0780",
+          "section-0781",
+          "section-0782",
+          "section-0783",
+          "section-0784",
+          "section-0785",
+          "section-0786",
+          "section-0787",
+          "section-0788",
+          "section-0789",
+          "section-0790",
+          "section-0791",
+          "section-0792",
+          "section-0793",
+          "section-0794",
+          "section-0795",
+          "section-0796",
+          "section-0797",
+          "section-0798",
+          "section-0799",
+          "section-0800",
+          "section-0803",
+          "section-0807",
+          "section-0808",
+          "section-0809",
+          "section-0810",
+          "section-0811",
+          "section-0812",
+          "section-0813",
+          "section-0814",
+          "section-0815",
+          "section-0816",
+          "section-0817",
+          "section-0818",
+          "section-0819",
+          "section-0820",
+          "section-0823",
+          "section-0824",
+          "section-0825",
+          "section-0826",
+          "section-0827",
+          "section-0828",
+          "section-0829",
+          "section-0830",
+          "section-0831",
+          "section-0832",
+          "section-0833",
+          "section-0834",
+          "section-0835",
+          "section-0836",
+          "section-0837",
+          "section-0838",
+          "section-0839",
+          "section-0840",
+          "section-0841",
+          "section-0842",
+          "section-0843",
+          "section-0844",
+          "section-0845",
+          "section-0846",
+          "section-0847",
+          "section-0848",
+          "section-0849",
+          "section-0850",
+          "section-0851",
+          "section-0852",
+          "section-0853",
+          "section-0854",
+          "section-0855",
+          "section-0856",
+          "section-0857",
+          "section-0858",
+          "section-0859",
+          "section-0860",
+          "section-0861",
+          "section-0862",
+          "section-0863",
+          "section-0864",
+          "section-0865",
+          "section-0866",
+          "section-0867",
+          "section-0868",
+          "section-0869",
+          "section-0870",
+          "section-0871",
+          "section-0872",
+          "section-0875",
+          "section-0876",
+          "section-0877",
+          "section-0878",
+          "section-0884",
+          "section-0887",
+          "section-0888",
+          "section-0889",
+          "section-0890",
+          "section-0891",
+          "section-0892",
+          "section-0893",
+          "section-0894",
+          "section-0895",
+          "section-0896",
+          "section-0897",
+          "section-0898",
+          "section-0899",
+          "section-0900",
+          "section-0901",
+          "section-0902",
+          "section-0903",
+          "section-0904",
+          "section-0905"
+        ],
+        "physical_pages": []
+      },
+      "extraction": {
+        "purpose": "extract_profile_workpaper",
+        "request_id": "bp-work-59dd96b7c16016e086830a4c:workpaper:extract",
+        "request_hash": "2cbe54fa600fd56e3de1e1e7d437a2701faf1b1294d2f09cb67daa510ae48bab",
+        "response_hash": "a13eafdcf0baf7bc32fb1cd4a59c5892f53c0f7cdc324357a66f10680ea6c975",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 10883,
+          "output_tokens": 22333,
+          "total_tokens": 33216
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0014",
+          "section-0049",
+          "section-0051",
+          "section-0063",
+          "section-0103",
+          "section-0780"
+        ],
+        "physical_pages": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          24,
+          131
+        ]
+      }
+    },
+    "quality_review": null,
+    "standardization_notes": [
+      "指标格式隔离：事实F-OP-002未作为结论采用；metrics.0: Value error, metric values must be decimal strings；原内容保留在模型回执。"
+    ]
+  },
+  "workpaper_receipts": [
+    {
+      "request_id": "bp-work-59dd96b7c16016e086830a4c:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "617e1dab7f7f3dd6ed2b833ecedc3b3b3f7a3afed397c85834fdafea0848c00f",
+      "response_hash": "1e5681d8dcb5a57b3d9893f9bf8502da8ad3d8c17e1eb98dffb340cef01ad83a",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0014\",\"section-0049\",\"section-0051\",\"section-0063\",\"section-0103\",\"section-0780\"],\"rationale\":\"选取财务指标摘要、业务概要、经营情况回顾、营业情况分析、主营业务及营业收入成本附注。该组合覆盖公司产品/服务与用途、经营模式、收入规模及本期变化、成本费用驱动和收入成本构成，且以公司层面经营信息为主。\",\"deferred\":[\"section-0132、section-0133、section-0137：未来展望与行业趋势偏前瞻和行业背景，非本期经营事实核心\",\"section-0156：风险因素可在需要风险细节时再补充\",\"section-0267：公司治理与内部控制与经营分析关系较弱\",\"section-0296：完整财务会计报告及大部分附注不展开，本次仅取section-0780收入成本附注\"],\"stop_reason\":\"核心业务、产品、经营模式、收入规模与收入成本结构已由上述章节覆盖；继续扩展将进入前瞻、风险、治理或完整财报附注，边际解释力较低。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0014",
+          "section-0049",
+          "section-0051",
+          "section-0063",
+          "section-0103",
+          "section-0780"
+        ],
+        "rationale": "选取财务指标摘要、业务概要、经营情况回顾、营业情况分析、主营业务及营业收入成本附注。该组合覆盖公司产品/服务与用途、经营模式、收入规模及本期变化、成本费用驱动和收入成本构成，且以公司层面经营信息为主。",
+        "deferred": [
+          "section-0132、section-0133、section-0137：未来展望与行业趋势偏前瞻和行业背景，非本期经营事实核心",
+          "section-0156：风险因素可在需要风险细节时再补充",
+          "section-0267：公司治理与内部控制与经营分析关系较弱",
+          "section-0296：完整财务会计报告及大部分附注不展开，本次仅取section-0780收入成本附注"
+        ],
+        "stop_reason": "核心业务、产品、经营模式、收入规模与收入成本结构已由上述章节覆盖；继续扩展将进入前瞻、风险、治理或完整财报附注，边际解释力较低。"
+      },
+      "usage": {
+        "input_tokens": 20690,
+        "output_tokens": 8914,
+        "total_tokens": 29604
+      }
+    },
+    {
+      "request_id": "bp-work-59dd96b7c16016e086830a4c:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "2cbe54fa600fd56e3de1e1e7d437a2701faf1b1294d2f09cb67daa510ae48bab",
+      "response_hash": "a13eafdcf0baf7bc32fb1cd4a59c5892f53c0f7cdc324357a66f10680ea6c975",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"limitations\":[\"本工作底稿仅基于所选章节，未覆盖的其他章节内容未纳入；未获取的细节已在相应要素中说明。\"],\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-001\",\"text\":\"公司深耕光伏支架领域，聚焦光伏支架核心零部件的研发、生产和销售；报告期内商业模式未发生变化。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"]},{\"fact_id\":\"F-BS-002\",\"text\":\"安徽寅天智能装备有限公司为子公司，从事光伏支架核心零部件的生产制造。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"]},{\"fact_id\":\"F-BS-003\",\"text\":\"泰友新能源科技有限公司为子公司，从事光伏支架核心零部件的生产制造。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"]}],\"limitations\":[\"所选章节未完整披露公司组织架构和全部子公司，不能据此视为完整子公司清单。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-001\",\"text\":\"公司主营产品包括光伏支架主体支撑扭矩管（TTU）、光伏支架轴承组件（BHA）、光伏组件安装结构件（URA）以及檩条（RAIL）等光伏支架核心零部件；这些产品经组装后可形成光伏支架，包括跟踪支架及固定支架，跟踪支架与配套电控设计、驱动设计共同构成光伏跟踪支架系统。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]},{\"fact_id\":\"F-PS-002\",\"text\":\"光伏支架产品主要分为分布式支架、固定支架和跟踪支架；分布式支架主要应用于工商业、户用屋顶分布式电站，固定支架和跟踪支架应用场景以地面电站为主。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]}],\"limitations\":[\"所选章节未披露各产品子类的收入、销量或产能明细；不能将产品种类等同于收入占比。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-001\",\"text\":\"公司收入来自光伏支架核心零部件销售，收入分解表按产品类型列示“光伏支架核心零部件”和“其他”两类。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"]}],\"limitations\":[\"所选章节未披露分产品收入占比、定价机制或合同条款；“其他”类别的具体构成未披露。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-001\",\"text\":\"报告期公司实现营业收入并结转营业成本；具体金额见指标。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\",\"source-0014\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"1,031,109,601.89\",\"value\":\"1031109601.89\",\"unit\":\"元\",\"currency\":\"CNY\",\"source_unit\":\"元\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"营业成本\",\"raw_value\":\"874,747,668.24\",\"value\":\"874747668.24\",\"unit\":\"元\",\"currency\":\"CNY\",\"source_unit\":\"元\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-002\",\"text\":\"主营业务为光伏支架核心零部件，报告期主营业务收入及成本单独列示。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\",\"source-0011\"],\"metrics\":[{\"name\":\"主营业务收入\",\"raw_value\":\"1,016,969,543.44\",\"value\":\"1016969543.44\",\"unit\":\"元\",\"currency\":\"CNY\",\"source_unit\":\"元\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"主营业务成本\",\"raw_value\":\"861,279,002.28\",\"value\":\"861279002.28\",\"unit\":\"元\",\"currency\":\"CNY\",\"source_unit\":\"元\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F-SM-003\",\"text\":\"其他业务收入及成本单独列示，属于主营业务之外的收入类别；保留其原始“其他业务”标签，不与主营业务合并。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\",\"source-0011\"],\"metrics\":[{\"name\":\"其他业务收入\",\"raw_value\":\"14,140,058.45\",\"value\":\"14140058.45\",\"unit\":\"元\",\"currency\":\"CNY\",\"source_unit\":\"元\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"其他业务成本\",\"raw_value\":\"13,468,665.96\",\"value\":\"13468665.96\",\"unit\":\"元\",\"currency\":\"CNY\",\"source_unit\":\"元\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"其他业务的具体构成未在所选章节披露；未计算未披露的收入占比。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OP-001\",\"text\":\"公司根据业务与技术情况、产业政策与市场需求形成自身经营模式，并在生产经验、工艺技术、产品结构设计、规模化生产、产品质量控制和成本控制等方面积累经验。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]},{\"fact_id\":\"F-OP-002\",\"text\":\"公司拥有超过60项专利授权，并通过质量管理体系ISO9001、欧盟钢结构产品EN1090、环境管理体系ISO14001、职业健康安全管理体系ISO45001认证。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"专利授权数量\",\"raw_value\":\"超过60\",\"value\":\"60\",\"unit\":\"项\",\"source_unit\":\"项\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"greater_than\"}]}],\"limitations\":[\"未获取成功：所选章节未披露具体原材料、能源采购、供应商名称或产能利用率；不能从行业描述推断公司采购结构。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CCM-001\",\"text\":\"公司立足国际市场并逐步开拓国内市场，与国内外知名光伏支架企业建立合作关系；产品远销巴西、智利、澳大利亚、加拿大、欧洲、中东等国家和地区。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]},{\"fact_id\":\"F-CCM-002\",\"text\":\"公司收入分解表按销售模式列示直销；经销栏未列示金额。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"]}],\"limitations\":[\"未披露具体客户名称、销售区域收入占比；经销栏未列示金额，不能据此推定报告期无经销收入。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-001\",\"text\":\"2025年公司称受益于全球光伏产业持续高增长和下游客户需求旺盛，围绕客户需求加快产能布局，各地生产基地产能顺利释放，并与全球跟踪光伏支架龙头企业深化合作。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"F-OD-002\",\"text\":\"报告期毛利率较上年同期下降。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"毛利率\",\"raw_value\":\"15.16%\",\"value\":\"15.16\",\"unit\":\"%\",\"source_unit\":\"%\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"2024年度\"},{\"name\":\"毛利率\",\"raw_value\":\"18.42%\",\"value\":\"18.42\",\"unit\":\"%\",\"source_unit\":\"%\",\"period\":\"2024年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"增长原因主要来自公司管理层说明，所选章节未披露分客户或分区域的量化驱动数据。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-001\",\"text\":\"2025年公司营业收入同比增长，但扣非后归母净利润同比小幅下降。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0008\"],\"metrics\":[{\"name\":\"营业收入同比增长率\",\"raw_value\":\"41.47%\",\"value\":\"41.47\",\"unit\":\"%\",\"source_unit\":\"%\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"2024年度\"},{\"name\":\"归属于上市公司股东的扣除非经常性损益后的净利润同比增减率\",\"raw_value\":\"-0.53%\",\"value\":\"-0.53\",\"unit\":\"%\",\"source_unit\":\"%\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"2024年度\"}]},{\"fact_id\":\"F-MC-002\",\"text\":\"公司于2025年8月完成上市，募集资金净额2.79亿元，为未来产能扩张、技术研发及全球化布局提供资金支持。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0010\"],\"metrics\":[{\"name\":\"募集资金净额\",\"raw_value\":\"2.79\",\"value\":\"2.79\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"source_unit\":\"亿元\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未披露募集资金具体用途金额分解；上市对产能、研发和全球化布局的具体影响未量化。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-001\",\"text\":\"公司从事光伏支架核心零部件的研发、生产和销售；产品经组装后可形成跟踪支架或固定支架。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"未获取成功：所选章节未披露公司具体原材料、能源、供应商名称或采购金额，不能从行业背景推断其采购结构。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-002\",\"text\":\"公司产品经组装后用于光伏支架并最终用于光伏电站；公司客户包括国内外知名光伏支架企业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]}],\"limitations\":[\"未披露下游具体客户名称及对应收入占比。\"]}}}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "limitations": [
+          "本工作底稿仅基于所选章节，未覆盖的其他章节内容未纳入；未获取的细节已在相应要素中说明。"
+        ],
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-BS-001",
+                "text": "公司深耕光伏支架领域，聚焦光伏支架核心零部件的研发、生产和销售；报告期内商业模式未发生变化。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006",
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "F-BS-002",
+                "text": "安徽寅天智能装备有限公司为子公司，从事光伏支架核心零部件的生产制造。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0013"
+                ]
+              },
+              {
+                "fact_id": "F-BS-003",
+                "text": "泰友新能源科技有限公司为子公司，从事光伏支架核心零部件的生产制造。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0013"
+                ]
+              }
+            ],
+            "limitations": [
+              "所选章节未完整披露公司组织架构和全部子公司，不能据此视为完整子公司清单。"
+            ]
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-PS-001",
+                "text": "公司主营产品包括光伏支架主体支撑扭矩管（TTU）、光伏支架轴承组件（BHA）、光伏组件安装结构件（URA）以及檩条（RAIL）等光伏支架核心零部件；这些产品经组装后可形成光伏支架，包括跟踪支架及固定支架，跟踪支架与配套电控设计、驱动设计共同构成光伏跟踪支架系统。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ]
+              },
+              {
+                "fact_id": "F-PS-002",
+                "text": "光伏支架产品主要分为分布式支架、固定支架和跟踪支架；分布式支架主要应用于工商业、户用屋顶分布式电站，固定支架和跟踪支架应用场景以地面电站为主。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ]
+              }
+            ],
+            "limitations": [
+              "所选章节未披露各产品子类的收入、销量或产能明细；不能将产品种类等同于收入占比。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-RM-001",
+                "text": "公司收入来自光伏支架核心零部件销售，收入分解表按产品类型列示“光伏支架核心零部件”和“其他”两类。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0014"
+                ]
+              }
+            ],
+            "limitations": [
+              "所选章节未披露分产品收入占比、定价机制或合同条款；“其他”类别的具体构成未披露。"
+            ]
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-SM-001",
+                "text": "报告期公司实现营业收入并结转营业成本；具体金额见指标。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011",
+                  "source-0014"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "1,031,109,601.89",
+                    "value": "1031109601.89",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "source_unit": "元",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "营业成本",
+                    "raw_value": "874,747,668.24",
+                    "value": "874747668.24",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "source_unit": "元",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-002",
+                "text": "主营业务为光伏支架核心零部件，报告期主营业务收入及成本单独列示。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0014",
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "主营业务收入",
+                    "raw_value": "1,016,969,543.44",
+                    "value": "1016969543.44",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "source_unit": "元",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "主营业务成本",
+                    "raw_value": "861,279,002.28",
+                    "value": "861279002.28",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "source_unit": "元",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-003",
+                "text": "其他业务收入及成本单独列示，属于主营业务之外的收入类别；保留其原始“其他业务”标签，不与主营业务合并。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0014",
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "其他业务收入",
+                    "raw_value": "14,140,058.45",
+                    "value": "14140058.45",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "source_unit": "元",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "其他业务成本",
+                    "raw_value": "13,468,665.96",
+                    "value": "13468665.96",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "source_unit": "元",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "其他业务的具体构成未在所选章节披露；未计算未披露的收入占比。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-OP-001",
+                "text": "公司根据业务与技术情况、产业政策与市场需求形成自身经营模式，并在生产经验、工艺技术、产品结构设计、规模化生产、产品质量控制和成本控制等方面积累经验。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ]
+              },
+              {
+                "fact_id": "F-OP-002",
+                "text": "公司拥有超过60项专利授权，并通过质量管理体系ISO9001、欧盟钢结构产品EN1090、环境管理体系ISO14001、职业健康安全管理体系ISO45001认证。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "专利授权数量",
+                    "raw_value": "超过60",
+                    "value": "60",
+                    "unit": "项",
+                    "source_unit": "项",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "greater_than"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取成功：所选章节未披露具体原材料、能源采购、供应商名称或产能利用率；不能从行业描述推断公司采购结构。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-CCM-001",
+                "text": "公司立足国际市场并逐步开拓国内市场，与国内外知名光伏支架企业建立合作关系；产品远销巴西、智利、澳大利亚、加拿大、欧洲、中东等国家和地区。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ]
+              },
+              {
+                "fact_id": "F-CCM-002",
+                "text": "公司收入分解表按销售模式列示直销；经销栏未列示金额。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0014"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露具体客户名称、销售区域收入占比；经销栏未列示金额，不能据此推定报告期无经销收入。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-OD-001",
+                "text": "2025年公司称受益于全球光伏产业持续高增长和下游客户需求旺盛，围绕客户需求加快产能布局，各地生产基地产能顺利释放，并与全球跟踪光伏支架龙头企业深化合作。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ]
+              },
+              {
+                "fact_id": "F-OD-002",
+                "text": "报告期毛利率较上年同期下降。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "毛利率",
+                    "raw_value": "15.16%",
+                    "value": "15.16",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "2024年度"
+                  },
+                  {
+                    "name": "毛利率",
+                    "raw_value": "18.42%",
+                    "value": "18.42",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "period": "2024年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "增长原因主要来自公司管理层说明，所选章节未披露分客户或分区域的量化驱动数据。"
+            ]
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-MC-001",
+                "text": "2025年公司营业收入同比增长，但扣非后归母净利润同比小幅下降。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入同比增长率",
+                    "raw_value": "41.47%",
+                    "value": "41.47",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "2024年度"
+                  },
+                  {
+                    "name": "归属于上市公司股东的扣除非经常性损益后的净利润同比增减率",
+                    "raw_value": "-0.53%",
+                    "value": "-0.53",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "2024年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-MC-002",
+                "text": "公司于2025年8月完成上市，募集资金净额2.79亿元，为未来产能扩张、技术研发及全球化布局提供资金支持。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008",
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "募集资金净额",
+                    "raw_value": "2.79",
+                    "value": "2.79",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "source_unit": "亿元",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露募集资金具体用途金额分解；上市对产能、研发和全球化布局的具体影响未量化。"
+            ]
+          }
+        },
+        "supply_chain": {
+          "position": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-SC-001",
+                "text": "公司从事光伏支架核心零部件的研发、生产和销售；产品经组装后可形成跟踪支架或固定支架。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "upstream_inputs": {
+            "status": "not_disclosed",
+            "facts": [],
+            "limitations": [
+              "未获取成功：所选章节未披露公司具体原材料、能源、供应商名称或采购金额，不能从行业背景推断其采购结构。"
+            ]
+          },
+          "downstream_customers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-SC-002",
+                "text": "公司产品经组装后用于光伏支架并最终用于光伏电站；公司客户包括国内外知名光伏支架企业。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露下游具体客户名称及对应收入占比。"
+            ]
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 10883,
+        "output_tokens": 22333,
+        "total_tokens": 33216
+      }
+    }
+  ]
+}

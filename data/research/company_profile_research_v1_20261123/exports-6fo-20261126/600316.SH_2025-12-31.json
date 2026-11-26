@@ -1,0 +1,4468 @@
+{
+  "schema_version": "company_profile_common_core_profile.v3",
+  "production_authorization": "not_authorized",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "work_id": "bp-work-a7d6f3e22b9c7816cd8960d7",
+  "instrument_id": "600316.SH",
+  "report": {
+    "instrument_id": "600316.SH",
+    "report_id": "asset_1a30dda2a856cad8434d78325dae97b7",
+    "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-27T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "freshness": {
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-27T16:00:00+00:00",
+    "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+    "knowledge_time": "2026-03-27T16:00:00+00:00"
+  },
+  "core_complete": false,
+  "dimensions": [
+    {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    {
+      "dimension_id": "products_services",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    }
+  ],
+  "accepted_facts": [],
+  "gaps": [],
+  "evidence_gap_codes": [],
+  "commodity_exposure": {
+    "assessment": {
+      "schema_version": "company_profile_commodity_exposure.v1",
+      "production_authorization": "not_authorized",
+      "report": {
+        "instrument_id": "600316.SH",
+        "report_id": "asset_1a30dda2a856cad8434d78325dae97b7",
+        "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "assessment_status": "not_assessed",
+      "checked_evidence_ids": [],
+      "exposures": []
+    },
+    "reported_period": "2025-12-31",
+    "knowledge_time": "2026-03-27T16:00:00+00:00",
+    "consumer_authorization": {
+      "dcf": false,
+      "trading": false,
+      "price_sensitivity": false
+    }
+  },
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "llm_generated",
+    "report": {
+      "instrument_id": "600316.SH",
+      "report_id": "asset_1a30dda2a856cad8434d78325dae97b7",
+      "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-27T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0037",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 9,
+          "end_page": 10,
+          "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营模式、经营情况讨论、主要经营情况与主营业务分析等实质子节，覆盖产品（教练机、防务产品）、经营模式、收入成本变动与分产品收入构成；并补充财务报告附注中营业收入和营业成本明细，以获取公司层面收入总额与主要业务权重。行业背景、核心竞争力、治理与附录等非核心内容不选。"
+        },
+        {
+          "section_id": "section-0047",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 11,
+          "end_page": 11,
+          "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营模式、经营情况讨论、主要经营情况与主营业务分析等实质子节，覆盖产品（教练机、防务产品）、经营模式、收入成本变动与分产品收入构成；并补充财务报告附注中营业收入和营业成本明细，以获取公司层面收入总额与主要业务权重。行业背景、核心竞争力、治理与附录等非核心内容不选。"
+        },
+        {
+          "section_id": "section-0049",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ],
+          "start_page": 11,
+          "end_page": 12,
+          "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营模式、经营情况讨论、主要经营情况与主营业务分析等实质子节，覆盖产品（教练机、防务产品）、经营模式、收入成本变动与分产品收入构成；并补充财务报告附注中营业收入和营业成本明细，以获取公司层面收入总额与主要业务权重。行业背景、核心竞争力、治理与附录等非核心内容不选。"
+        },
+        {
+          "section_id": "section-0062",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "分产品情况"
+          ],
+          "start_page": 13,
+          "end_page": 14,
+          "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营模式、经营情况讨论、主要经营情况与主营业务分析等实质子节，覆盖产品（教练机、防务产品）、经营模式、收入成本变动与分产品收入构成；并补充财务报告附注中营业收入和营业成本明细，以获取公司层面收入总额与主要业务权重。行业背景、核心竞争力、治理与附录等非核心内容不选。"
+        },
+        {
+          "section_id": "section-0729",
+          "section_path": [
+            "第八节 财务报告",
+            "二、将重分类进",
+            "33、 营业收入和营业成本"
+          ],
+          "start_page": 115,
+          "end_page": 116,
+          "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营模式、经营情况讨论、主要经营情况与主营业务分析等实质子节，覆盖产品（教练机、防务产品）、经营模式、收入成本变动与分产品收入构成；并补充财务报告附注中营业收入和营业成本明细，以获取公司层面收入总额与主要业务权重。行业背景、核心竞争力、治理与附录等非核心内容不选。"
+        }
+      ],
+      "unread_or_deferred": [
+        "section-0042 行业情况",
+        "section-0048 核心竞争力分析",
+        "section-0107 公司治理、环境和社会",
+        "section-0309 财务报告其余附注"
+      ],
+      "selection_rationale": "优先选取第三节管理层讨论与分析中公司业务、经营模式、经营情况讨论、主要经营情况与主营业务分析等实质子节，覆盖产品（教练机、防务产品）、经营模式、收入成本变动与分产品收入构成；并补充财务报告附注中营业收入和营业成本明细，以获取公司层面收入总额与主要业务权重。行业背景、核心竞争力、治理与附录等非核心内容不选。",
+      "stop_reason": "已覆盖业务结构、产品用途、经营模式、收入来源与主要业务构成及本期经营变化，信息足以回答核心问题；行业背景与治理、附录等非必要内容不再扩展。",
+      "transcription_version": "shared-pdf-pypdf-layout.v1"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F01",
+            "text": "公司业务以教练机系列产品的设计、研制、生产、销售、维修及服务保障为主，同时从事防务产品研制生产；按收入分解分为教练机、其他航空产品和非航空产品三类。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0009"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F02",
+            "text": "公司是国内主要的教练机研发生产基地，当前主要产品为CJ6初级教练机、K8基础教练机和L15高级教练机，并推动由单一飞机系统向综合训练系统、由销售教练机向销售集成系统和服务保障延伸。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F03",
+            "text": "公司是国内重要的防务产品研制生产基地之一。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取防务产品的具体产品型号、用途及收入构成明细。"
+        ]
+      },
+      "products_services": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F04",
+            "text": "CJ6初级教练机是我国自行研制并大量投入使用的第一种教练机，1958年首飞、1962年定型，长期用于国防和民用航空飞行员培养。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F05",
+            "text": "K8基础教练机按国际标准设计并通过国际合作方式研制，1990年首飞，主要用于飞行员的基础训练和部分高级训练。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F06",
+            "text": "L15高级教练机是自主研制的新一代双发超音速高级教练机，2006年3月首飞，具有第三代战斗机特征，可满足第三代战斗机飞行员的战斗入门训练和战术基础改装训练。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F07",
+            "text": "公司可为客户提供集飞行员训练、地勤人员培训、训练保障为一体的一揽子训练解决方案。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "防务产品的具体产品与服务内容未在选定章节披露。"
+        ]
+      },
+      "revenue_model": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F08",
+            "text": "公司营业收入主要来自教练机、其他航空产品和非航空产品的销售，2025年营业收入合计744,912.68万元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004",
+              "source-0009"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入",
+                "raw_value": "744,912.68",
+                "value": "744912.68",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入",
+                "raw_value": "7,449,126,774.96",
+                "value": "7449126774.96",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F09",
+            "text": "按商品类型分解，教练机营业收入1,771,660,977.35元，其他航空产品营业收入5,613,077,664.98元，非航空产品营业收入64,388,132.63元。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [
+              {
+                "name": "教练机营业收入",
+                "raw_value": "1,771,660,977.35",
+                "value": "1771660977.35",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他航空产品营业收入",
+                "raw_value": "5,613,077,664.98",
+                "value": "5613077664.98",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "非航空产品营业收入",
+                "raw_value": "64,388,132.63",
+                "value": "64388132.63",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F10",
+            "text": "按经营地区分类，境内营业收入6,183,842,802.41元，境外营业收入1,265,283,972.55元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [
+              {
+                "name": "境内营业收入",
+                "raw_value": "6,183,842,802.41",
+                "value": "6183842802.41",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "境外营业收入",
+                "raw_value": "1,265,283,972.55",
+                "value": "1265283972.55",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F11",
+            "text": "按市场或客户类型分类，关联方营业收入7,446,901,682.06元，非关联方营业收入2,225,092.90元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [
+              {
+                "name": "关联方营业收入",
+                "raw_value": "7,446,901,682.06",
+                "value": "7446901682.06",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "非关联方营业收入",
+                "raw_value": "2,225,092.90",
+                "value": "2225092.90",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F12",
+            "text": "主营业务收入7,407,782,130.11元、成本7,199,519,669.32元；其他业务收入41,344,644.85元、成本30,012,676.58元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [
+              {
+                "name": "主营业务收入",
+                "raw_value": "7,407,782,130.11",
+                "value": "7407782130.11",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "主营业务成本",
+                "raw_value": "7,199,519,669.32",
+                "value": "7199519669.32",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他业务收入",
+                "raw_value": "41,344,644.85",
+                "value": "41344644.85",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他业务成本",
+                "raw_value": "30,012,676.58",
+                "value": "30012676.58",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取各产品的单价、销量及定价机制。"
+        ]
+      },
+      "scale_and_mix": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F13",
+            "text": "2025年公司营业收入744,912.68万元，同比增长41.83%，营业收入创历史新高；营业成本722,953.23万元，同比增长42.54%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003",
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入同比增长率",
+                "raw_value": "41.83",
+                "value": "41.83",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业成本",
+                "raw_value": "7,229,532,345.90",
+                "value": "7229532345.90",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业成本同比增长率",
+                "raw_value": "42.54",
+                "value": "42.54",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "程序显示说明：F13正文722953.23万元为营业成本7,229,532,345.90元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "F14",
+            "text": "2025年归属于上市公司股东的净利润3,975.98万元，同比增长1.33%；扣除非经常性损益后的净利润3,739.35万元，同比增长42.44%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "归属于上市公司股东的净利润",
+                "raw_value": "3,975.98",
+                "value": "3975.98",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "归属于上市公司股东的净利润同比增长率",
+                "raw_value": "1.33",
+                "value": "1.33",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "扣除非经常性损益后的净利润",
+                "raw_value": "3,739.35",
+                "value": "3739.35",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "扣除非经常性损益后的净利润同比增长率",
+                "raw_value": "42.44",
+                "value": "42.44",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F15",
+            "text": "按成本构成，教练机成本合计1,597,275,236.08元，其中材料及外部加工费1,435,834,564.90元、工资及附加82,724,948.91元、制造费用78,715,722.27元。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "教练机成本合计",
+                "raw_value": "1,597,275,236.08",
+                "value": "1597275236.08",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "教练机材料及外部加工费",
+                "raw_value": "1,435,834,564.90",
+                "value": "1435834564.90",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "教练机工资及附加",
+                "raw_value": "82,724,948.91",
+                "value": "82724948.91",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "教练机制造费用",
+                "raw_value": "78,715,722.27",
+                "value": "78715722.27",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F16",
+            "text": "按成本构成，其他航空产品成本合计5,582,310,615.67元，其中材料及外部加工费5,097,356,854.30元、工资及附加253,333,268.46元、制造费用231,620,492.91元。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "其他航空产品成本合计",
+                "raw_value": "5,582,310,615.67",
+                "value": "5582310615.67",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他航空产品材料及外部加工费",
+                "raw_value": "5,097,356,854.30",
+                "value": "5097356854.30",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他航空产品工资及附加",
+                "raw_value": "253,333,268.46",
+                "value": "253333268.46",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他航空产品制造费用",
+                "raw_value": "231,620,492.91",
+                "value": "231620492.91",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F17",
+            "text": "按成本构成，非航空产品成本合计19,933,817.57元，其中材料及外部加工费9,824,173.54元、工资及附加3,972,444.95元、制造费用6,137,199.08元。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006",
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "非航空产品成本合计",
+                "raw_value": "19,933,817.57",
+                "value": "19933817.57",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "非航空产品材料及外部加工费",
+                "raw_value": "9,824,173.54",
+                "value": "9824173.54",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "非航空产品工资及附加",
+                "raw_value": "3,972,444.95",
+                "value": "3972444.95",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "非航空产品制造费用",
+                "raw_value": "6,137,199.08",
+                "value": "6137199.08",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取各产品收入占比的明确披露数值，仅可按收入分解数据理解结构。"
+        ]
+      },
+      "operations_and_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F18",
+            "text": "公司基础材料采购主要包括金属原材料、非金属原材料、电子元器件、成附件、外协加工件等多个种类，由物资采购部门根据需求计划以招标、询价等方式实施采购。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F19",
+            "text": "航空产品主要采用合同订单、多方协议等方式组织生产，公司建立科研生产指挥调度体系，利用信息化手段下达生产计划指令并协调质量检验、工艺与生产人员协作。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F20",
+            "text": "报告期内公司上游供应链情况不断改善，并围绕“精益+数智”理念推进产线及工序优化，产品产能显著提升。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取主要原材料的具体供应商、采购金额及采购集中度。"
+        ]
+      },
+      "customers_channels_markets": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F21",
+            "text": "按经营地区分类，公司2025年境内营业收入6,183,842,802.41元、境外营业收入1,265,283,972.55元，市场覆盖境内与境外。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F22",
+            "text": "按市场或客户类型分类，关联方营业收入7,446,901,682.06元、非关联方营业收入2,225,092.90元；公司按同一控制口径合并列示主要客户和供应商。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0009"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F23",
+            "text": "公司教练机产品面向飞行员训练、地勤人员培训及训练保障等客户需求，提供一揽子训练解决方案；民用初教六飞机继续拓展国内市场。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取主要客户的具体名称、销售金额及客户集中度明细。"
+        ]
+      },
+      "operating_drivers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F24",
+            "text": "报告期内营业收入和营业成本均增长，主要系本期产品交付数量增加；营业成本增长主要随收入增加而增加。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005",
+              "source-0006"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F25",
+            "text": "报告期内销售费用同比增长25.45%，主要系销售服务费增加；管理费用同比增长34.59%，主要系职工薪酬增加；研发费用同比增长26.51%，主要系研发投入增加。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "销售费用同比增长率",
+                "raw_value": "25.45",
+                "value": "25.45",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "管理费用同比增长率",
+                "raw_value": "34.59",
+                "value": "34.59",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "研发费用同比增长率",
+                "raw_value": "26.51",
+                "value": "26.51",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F26",
+            "text": "报告期内经营活动产生的现金流量净额为165,279,020.89元，主要系本期销售商品收到的现金增加。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "经营活动产生的现金流量净额",
+                "raw_value": "165,279,020.89",
+                "value": "165279020.89",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取分产品收入变动的具体原因及订单储备明细。"
+        ]
+      },
+      "material_changes": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F27",
+            "text": "报告期内公司业务类型、利润构成或利润来源未发生重大变动，业务、产品或服务未发生重大变化或调整，报告期主要子公司股权变动导致合并范围变化亦不适用。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005",
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F28",
+            "text": "报告期内公司生产高级教练机参加首都“九三阅兵”，L15高教机跨国转场交付并亮相国际航展，初教-6飞机参加北京、珠海、南昌、沈阳等多次航展或开放日活动。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F29",
+            "text": "报告期内公司多个新型号项目研制及竞标工作取得重大进展，为“十五五”发展提供储备；参股公司洪都商飞C919项目产品交付再创新高。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取新型号项目的具体名称、进度节点及C919项目的收入贡献金额。"
+        ]
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          9
+        ],
+        "source_spans": [
+          {
+            "page": 9,
+            "start": 132,
+            "end": 2228,
+            "quote": "一、报告期内公司从事的业务情况\n\n（一）主营业务\n    1、教练机\n    公司是国内主要的教练机研发生产基地，主要从事教练机系列产品的设计、研制、生产、销\n售、维修及服务保障等。当前主要产品为                   CJ6初级教练机、K8       基础教练机和       L15 高级教练机。公\n司不断探索、基本构建形成“集中筛选、基础通训、专业分轨”的教练机装备体系，将传统意义\n上的教练机业务内涵进行延伸，由单一的飞机系统向综合训练系统拓展，由销售教练机向销售集\n成系统和服务保障发展，将为客户提供集飞行员训练、地勤人员培训、训练保障为一体的一揽子\n训练解决方案。\n    公司教练机系列产品简介如下：\n  产品名                  产品图片                                   产品介绍\n    称\n                                                  CJ6 初级教练机是我国自行研制成功并\n                                              大量投入使用的第一种教练机，于                1958年  7\n CJ6初级                                        月  27 日首飞，1962    年  1 月定型并生产      5 架\n 教练机                                          原型机，后交付部队。60           多年来为中国的国\n                                              防和民用航空培养了数以万计的飞行员，也\n                                              因此被誉为“中国飞行员的摇篮”。\n\n                                                 K8 基础教练机是我国按照国际标准设计\n                                              并通过国际合作的方式研制的基础教练机，\n K8 基础                                        于  1990 年首飞成功。该机具有飞行品质优\n 教练机                                          良、可靠性高、维护性好、全寿命费用低等\n                                              特点，主要用于飞行员的基础训练和部分高\n                                              级训练。\n\n                                                 L15 高级教练机是我国自主研制的新一\n                                              代双发超音速高级教练机，于               2006 年 3 月\n                                              首飞成功。该机具有典型的第三代战斗机特\n L15高级                                        征，设计采用了大边条翼气动布局、高度翼\n 教练机                                          身融合体结构，先进数字飞控电传系统和基\n                                              于开放式数据总线技术的综合航电系统，操\n                                              纵敏捷，大迎角机动性强，能充分满足第三\n                                              代战斗机飞行员的战斗入门训练和战术基\n                                              础改装训练。\n    2、防务产品\n    公司是国内重要的防务产品研制生产基地之一。\n（二）经营模式\n    基础材料采购：公司所需基础材料主要包括金属原材料、非金属原材料、电子元器件、成附\n件、外协加工件等多个种类。由物资采购部门根据需求计划，以招标、询价等方式实施采购。\n    产品生产：航空产品主要采用合同订单、多方协议等方式组织产品生产。公司建立有完善的\n科研生产指挥调度体系，利用信息化手段下达生产计划指令，并协调质量检验人员、工艺人员、\n\n                                        9 /143"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          10
+        ],
+        "source_spans": [
+          {
+            "page": 10,
+            "start": 0,
+            "end": 157,
+            "quote": "                        江西洪都航空工业股份有限公司2025          年年度报告\n\n\n生产人员之间的协作配合，严格按照产品、技术、质量、进度要求落实产品研制与生产，确保所\n承担的科研生产任务能保质保量并按时交付。\n\n报告期内公司新增重要非主营业务的说明\n□适用    √不适用\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          11
+        ],
+        "source_spans": [
+          {
+            "page": 11,
+            "start": 63,
+            "end": 944,
+            "quote": "三、经营情况讨论与分析\n\n    2025 年是“十四五”规划圆满收官之年，也是航空工业高质量发展的关键之年。公司坚持以\n习近平新时代中国特色社会主义思想为指导，全面贯彻落实党中央、国务院决策部署，坚持稳中\n求进、以进促稳，强基固本、守正创新，系统集成、开放协同的工作基调，全力推动科研生产经\n营各项工作顺利完成，奋力书写强国强军事业的新篇章。\n   报告期内，公司实现营业收入               744,912.68 万元，同比增长        41.83%；实现归属于上市公司股东\n的扣非净利润       3,739.35 万元，同比增长        42.44%。2025   年公司营业收入创历史新高。\n   报告期内，公司生产高级教练机参加首都“九三阅兵”，米秒不差飞越天安门广场，光荣接受\n党和人民检阅；L15        高教机跨国转场交付并惊艳亮相国际航展，彰显了中国航空工业科技与品牌\n实力；初教-6      飞机参加北京、珠海、南昌、沈阳等多次航展或开放日活动，并进行精彩编队飞行\n表演。\n   报告期内，公司核心领域研制生产能力持续增强。上游供应链情况不断改善，为航空产品常态\n化批量生产交付奠定基础；围绕“精益+数智”理念，大力推进产线及工序优化，产品产能显著提\n升；多个新型号项目研制及竞标工作取得重大进展，为公司“十五五”发展提供坚实储备和内生\n动力。\n   报告期内，公司不断强化使命担当，加快科技自立自强，加强型号科学管理，科技创新体系有\n力夯实，打造研发及工艺技术创新平台，支撑核心领域前沿技术研究和高层次人才培养，自主立\n项多个技术创新基金项目，核心关键技术不断突破，深入实施，创新成果持续涌现。\n   报告期内，公司民用航空及低空经济领域持续发力。民用初教六飞机继续拓展国内市场；全力\n支撑大飞机项目，参股公司洪都商飞                  C919 项目产品交付再创新高。\n   报告期内，公司践行绿色低碳发展理念，聚焦制造工艺低碳革新，实现生产过程和场所节能降\n碳，节能减排效果显著。\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ],
+        "physical_pages": [
+          11
+        ],
+        "source_spans": [
+          {
+            "page": 11,
+            "start": 1368,
+            "end": 1993,
+            "quote": "五、报告期内主要经营情况\n\n    报告期内，公司实现营业收入               744,912.68  万元，同比增长        41.83%；实现归属于上市公司股\n东的净利润      3,975.98 万元，同比增长        1.33%；实现归属于上市公司股东的扣除非经常性损益后的\n净利润   3,739.35  万元，同比增长        42.44%。\n\n(一)  主营业务分析\n\n1、  利润表及现金流量表相关科目变动分析表\n                                                                  单位：元       币种：人民币\n            科目                       本期数                上年同期数             变动比例（%）\n营业收入                             7,449,126,774.96     5,252,055,627.16              41.83\n营业成本                             7,229,532,345.90     5,072,078,229.07              42.54\n                                         11 /143"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ],
+        "physical_pages": [
+          12
+        ],
+        "source_spans": [
+          {
+            "page": 12,
+            "start": 0,
+            "end": 1403,
+            "quote": "                                江西洪都航空工业股份有限公司2025                年年度报告\n\n\n  销售费用                                         8,766,692.93           6,988,217.13                   25.45\n  管理费用                                       52,378,195.85           38,918,022.66                   34.59\n  财务费用                                       -2,244,589.48           -8,255,805.88                 不适用\n  研发费用                                       83,704,981.19           66,166,201.11                   26.51\n  经营活动产生的现金流量净额                             165,279,020.89        -565,962,452.63                  不适用\n  投资活动产生的现金流量净额                             -12,199,156.51          -33,943,406.98                 不适用\n  筹资活动产生的现金流量净额                             -12,190,946.70          -10,756,717.68                 不适用\n  营业收入变动原因说明：主要系公司本期产品交付数量增加。\n  营业成本变动原因说明：主要随着收入增加而增加。\n  销售费用变动原因说明：主要系公司本期销售服务费增加。\n  管理费用变动原因说明：主要系公司本期计提的职工薪酬增加。\n  财务费用变动原因说明：主要系公司本期利息收入减少。\n  研发费用变动原因说明：主要系公司本期研发投入增加。\n  经营活动产生的现金流量净额变动原因说明：主要系公司本期销售商品收到的现金增加。\n  投资活动产生的现金流量净额变动原因说明：主要系公司本期购建长期资产支付的现金减少。\n  筹资活动产生的现金流量净额变动原因说明：主要系公司本期支付的现金股利增加。\n\n  本期公司业务类型、利润构成或利润来源发生重大变动的详细说明\n  □适用      √不适用\n\n  2、   收入和成本分析\n  √适用      □不适用\n       报告期内，公司营业收入和营业成本均增长主要系本期产品交付数量增加。\n\n  (1).   主营业务分行业、分产品、分地区、分销售模式情况\n                                                                                单位：元        币种：人民币\n                                           "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "分产品情况"
+        ],
+        "physical_pages": [
+          13
+        ],
+        "source_spans": [
+          {
+            "page": 13,
+            "start": 3464,
+            "end": 5461,
+            "quote": "分产品情况\n                                                                    本期占                                     上年同期           本期金额较             情况\n 分产品              成本构成项目                       本期金额                 总成本             上年同期金额                  占总成本           上年同期变             说明\n                                                                    比例(%)                                   比例(%)          动比例(%)\n               材料及外部加工费                   1,435,834,564.90             89.89      1,433,076,830.07              89.97              0.19\n教练机            工资及附加                          82,724,948.91             5.18          81,672,995.21               5.13             1.29\n               制造费用                           78,715,722.27             4.93          78,057,804.40               4.90             0.84\n               合计                         1,597,275,236.08           100.00       1,592,807,629.68             100.00              0.28\n               材料及外部加工费                   5,097,356,854.30             91.31      3,081,446,639.31              88.94             65.42\n其他航空           工资及附加                         253,333,268.46             4.54        198,421,321.89                5.73            27.67\n产品             制造费用                          231,620,492.91             4.15        184,806,339.66                5.33            25.33\n                        合计                5,582,310,615.67           100.00       3,464,674,300.86             100.00             61.12\n非航空产           材料及外部加工费                         9,824,173.54           49.28           5,049,513.40             48.89             94.56\n品              工资及附加                            3,972,444.95           19.93           3,150,181.03             30.50             26.10\n               制造费用                             6,137,199.08           30.79           2,128,879.55             20.61           188.28\n\n                                                                     13 / 143"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "分产品情况"
+        ],
+        "physical_pages": [
+          14
+        ],
+        "source_spans": [
+          {
+            "page": 14,
+            "start": 0,
+            "end": 553,
+            "quote": "                          江西洪都航空工业股份有限公司2025             年年度报告\n\n\n            合计              19,933,817.57   100.00     10,328,573.98    100.00       93.00\n\n成本分析其他情况说明\n    报告期内，公司主营业务分行业中航空产品制造、分产品中其他航空产品成本较上年同期增\n长主要系本期产品交付数量增加。\n\n(5).  报告期主要子公司股权变动导致合并范围变化\n\n□适用    √不适用\n\n(6).  公司报告期内业务、产品或服务发生重大变化或调整有关情况\n□适用    √不适用\n\n(7).  主要销售客户及主要销售客户及主要供应商情况\n    属于同一控制人控制的客户或供应商视为同一客户或供应商合并列示，受同一国有资产管理\n机构实际控制的除外。\n下列客户及供应商信息按照同一控制口径合并计算列示的情况说明\n    公司根据中国证监会和《上海证券交易所股票上市规则》的相关规定确定主要销售客户和主\n要供应商的关联方范围，并据此统计关联方销售额和关联方采购额。\n    中国航空工业集团下属公司指公司实际控制人中国航空工业集团直接或间接控制的公司。\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+        "section_path": [
+          "第八节 财务报告",
+          "二、将重分类进",
+          "33、 营业收入和营业成本"
+        ],
+        "physical_pages": [
+          115
+        ],
+        "source_spans": [
+          {
+            "page": 115,
+            "start": 2147,
+            "end": 2542,
+            "quote": "33、   营业收入和营业成本\n\n(1).营业收入和营业成本情况\n√适用      □不适用\n                                                                                 单位：元         币种：人民币\n    项目                           本期发生额                                           上期发生额\n                         收入                      成本                      收入                      成本\n\n                                                  115 / 143"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+        "section_path": [
+          "第八节 财务报告",
+          "二、将重分类进",
+          "33、 营业收入和营业成本"
+        ],
+        "physical_pages": [
+          116
+        ],
+        "source_spans": [
+          {
+            "page": 116,
+            "start": 0,
+            "end": 2342,
+            "quote": "                                            江西洪都航空工业股份有限公司2025                          年年度报告\n\n\n       主营业务                 7,407,782,130.11             7,199,519,669.32             5,246,024,138.98             5,067,810,504.52\n       其他业务                      41,344,644.85                30,012,676.58                 6,031,488.18                 4,267,724.55\n            合计              7,449,126,774.96             7,229,532,345.90             5,252,055,627.16             5,072,078,229.07\n\n       (2).营业收入、营业成本的分解信息\n       √适用        □不适用\n                                                                                                         单位：元            币种：人民币\n       合同分类                                          洪都航空                                                           合计\n                                      营业收入                          营业成本                         营业收入                          营业成本\n商品类型\n      教练机                       1,771,660,977.35              1,597,275,236.08              1,771,660,977.35              1,597,275,236.08\n      其他航空产品                    5,613,077,664.98              5,582,310,615.67              5,613,077,664.98              5,582,310,615.67\n      非航空产品                          64,388,132.63                 49,946,494.15                 64,388,132.63                49,946,494.15\n按经营地区分类\n      境内                        6,183,842,802.41              6,002,613,585.26              6,183,842,802.41              6,002,613,585.26\n      境外                        1,265,283,972.55              1,226,918,760.64              1,265,283,972.55              1,226,918,760.64\n市场或客户类型\n      关联方                       7,446,901,682.06              7,227,411,659.47              7,446,901,682.06              7,227,411,659.47\n      非关联方                            2,225,092.90                  2,120,686.43                  2,225,092.90                  2,120,686.43\n          合计                    7,449,126,774.96              7,229,532,345.90              7,449,126,774.96              7,229,532,345.90\n\n       其他说明：\n       □适用        √不适用\n\n       (3).履约义务的说明\n       □适用        √不适用\n\n       (4).分摊至剩余履约义务的说明\n       √适用        □不适用\n             本报告期末已签订合同、但尚未履行或尚未履行完毕的履约义务所对应的收入金额为681,960\n       万元，其中：681,960万元预计将于2026年度确认收入。\n\n       (5).重大合同变更或重大交易价格调整\n       □适用        √不适用\n\n       "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "limitations": [
+      "未获取防务产品的具体型号、用途及收入构成明细。",
+      "未获取各产品的单价、销量及定价机制。",
+      "未获取主要客户和供应商的具体名称、金额及集中度明细。",
+      "未获取新型号项目的具体名称、进度节点及C919项目的收入贡献金额。"
+    ],
+    "supply_chain": {
+      "position": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F30",
+            "text": "公司处于航空产品研发制造环节，主要从事教练机系列产品的设计、研制、生产、销售、维修及服务保障，并从事防务产品研制生产。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "upstream_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F31",
+            "text": "公司所需基础材料主要包括金属原材料、非金属原材料、电子元器件、成附件、外协加工件等多个种类，通过招标、询价等方式采购。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取具体原材料供应商名称及采购金额。"
+        ]
+      },
+      "downstream_customers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F32",
+            "text": "公司教练机产品用于飞行员训练、地勤人员培训及训练保障，客户覆盖境内与境外市场，关联方销售占营业收入绝大部分。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0009"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取具体客户名称及终端用户构成。"
+        ]
+      }
+    },
+    "generation": {
+      "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+      "preprocessing_version": "toc_sections_native_layout.v7.ordered-section-remap",
+      "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+      "selection": {
+        "purpose": "select_profile_sections",
+        "request_id": "bp-work-a7d6f3e22b9c7816cd8960d7:workpaper:sections",
+        "request_hash": "c7e33e1675db6d1ef430785bd1b5060f5abc74f44e712bcb543e2f51c99f3946",
+        "response_hash": "d17e0b8790fd38722e31c09bbee9414f6b61953df4f49596b821091e85d7bfb7",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 18276,
+          "output_tokens": 240,
+          "total_tokens": 18516
+        },
+        "scope_kind": "report_heading_index",
+        "heading_count": 681,
+        "section_ids": [
+          "section-0001",
+          "section-0002",
+          "section-0003",
+          "section-0004",
+          "section-0005",
+          "section-0006",
+          "section-0007",
+          "section-0008",
+          "section-0009",
+          "section-0010",
+          "section-0011",
+          "section-0012",
+          "section-0013",
+          "section-0014",
+          "section-0015",
+          "section-0016",
+          "section-0017",
+          "section-0018",
+          "section-0019",
+          "section-0020",
+          "section-0021",
+          "section-0022",
+          "section-0023",
+          "section-0024",
+          "section-0025",
+          "section-0026",
+          "section-0027",
+          "section-0028",
+          "section-0029",
+          "section-0030",
+          "section-0031",
+          "section-0032",
+          "section-0033",
+          "section-0034",
+          "section-0035",
+          "section-0036",
+          "section-0037",
+          "section-0038",
+          "section-0039",
+          "section-0040",
+          "section-0041",
+          "section-0042",
+          "section-0043",
+          "section-0044",
+          "section-0045",
+          "section-0046",
+          "section-0047",
+          "section-0048",
+          "section-0049",
+          "section-0050",
+          "section-0051",
+          "section-0052",
+          "section-0054",
+          "section-0055",
+          "section-0056",
+          "section-0057",
+          "section-0061",
+          "section-0062",
+          "section-0066",
+          "section-0067",
+          "section-0068",
+          "section-0073",
+          "section-0077",
+          "section-0078",
+          "section-0079",
+          "section-0080",
+          "section-0081",
+          "section-0082",
+          "section-0083",
+          "section-0084",
+          "section-0085",
+          "section-0086",
+          "section-0087",
+          "section-0088",
+          "section-0089",
+          "section-0090",
+          "section-0091",
+          "section-0092",
+          "section-0093",
+          "section-0094",
+          "section-0095",
+          "section-0096",
+          "section-0097",
+          "section-0098",
+          "section-0099",
+          "section-0100",
+          "section-0101",
+          "section-0102",
+          "section-0103",
+          "section-0104",
+          "section-0105",
+          "section-0106",
+          "section-0107",
+          "section-0108",
+          "section-0109",
+          "section-0110",
+          "section-0111",
+          "section-0112",
+          "section-0113",
+          "section-0114",
+          "section-0115",
+          "section-0116",
+          "section-0117",
+          "section-0118",
+          "section-0119",
+          "section-0120",
+          "section-0121",
+          "section-0122",
+          "section-0123",
+          "section-0124",
+          "section-0125",
+          "section-0126",
+          "section-0127",
+          "section-0128",
+          "section-0129",
+          "section-0130",
+          "section-0131",
+          "section-0132",
+          "section-0133",
+          "section-0134",
+          "section-0135",
+          "section-0136",
+          "section-0137",
+          "section-0138",
+          "section-0139",
+          "section-0140",
+          "section-0141",
+          "section-0142",
+          "section-0143",
+          "section-0144",
+          "section-0145",
+          "section-0146",
+          "section-0147",
+          "section-0148",
+          "section-0149",
+          "section-0150",
+          "section-0151",
+          "section-0152",
+          "section-0153",
+          "section-0154",
+          "section-0155",
+          "section-0156",
+          "section-0157",
+          "section-0158",
+          "section-0159",
+          "section-0160",
+          "section-0161",
+          "section-0162",
+          "section-0163",
+          "section-0164",
+          "section-0165",
+          "section-0166",
+          "section-0167",
+          "section-0168",
+          "section-0170",
+          "section-0171",
+          "section-0172",
+          "section-0173",
+          "section-0174",
+          "section-0175",
+          "section-0176",
+          "section-0177",
+          "section-0178",
+          "section-0179",
+          "section-0180",
+          "section-0181",
+          "section-0182",
+          "section-0183",
+          "section-0184",
+          "section-0185",
+          "section-0186",
+          "section-0187",
+          "section-0188",
+          "section-0189",
+          "section-0190",
+          "section-0191",
+          "section-0192",
+          "section-0193",
+          "section-0194",
+          "section-0195",
+          "section-0196",
+          "section-0197",
+          "section-0198",
+          "section-0199",
+          "section-0200",
+          "section-0201",
+          "section-0202",
+          "section-0203",
+          "section-0204",
+          "section-0205",
+          "section-0206",
+          "section-0207",
+          "section-0208",
+          "section-0209",
+          "section-0210",
+          "section-0211",
+          "section-0212",
+          "section-0213",
+          "section-0214",
+          "section-0215",
+          "section-0216",
+          "section-0217",
+          "section-0218",
+          "section-0219",
+          "section-0220",
+          "section-0221",
+          "section-0222",
+          "section-0223",
+          "section-0224",
+          "section-0225",
+          "section-0226",
+          "section-0227",
+          "section-0228",
+          "section-0229",
+          "section-0230",
+          "section-0231",
+          "section-0232",
+          "section-0233",
+          "section-0234",
+          "section-0235",
+          "section-0236",
+          "section-0237",
+          "section-0238",
+          "section-0239",
+          "section-0240",
+          "section-0241",
+          "section-0242",
+          "section-0243",
+          "section-0244",
+          "section-0245",
+          "section-0246",
+          "section-0247",
+          "section-0248",
+          "section-0249",
+          "section-0250",
+          "section-0252",
+          "section-0254",
+          "section-0256",
+          "section-0258",
+          "section-0260",
+          "section-0262",
+          "section-0263",
+          "section-0264",
+          "section-0265",
+          "section-0266",
+          "section-0267",
+          "section-0268",
+          "section-0269",
+          "section-0270",
+          "section-0271",
+          "section-0272",
+          "section-0273",
+          "section-0274",
+          "section-0275",
+          "section-0276",
+          "section-0277",
+          "section-0278",
+          "section-0279",
+          "section-0280",
+          "section-0281",
+          "section-0282",
+          "section-0283",
+          "section-0284",
+          "section-0285",
+          "section-0286",
+          "section-0287",
+          "section-0288",
+          "section-0289",
+          "section-0290",
+          "section-0291",
+          "section-0292",
+          "section-0293",
+          "section-0294",
+          "section-0295",
+          "section-0296",
+          "section-0297",
+          "section-0298",
+          "section-0299",
+          "section-0300",
+          "section-0301",
+          "section-0302",
+          "section-0303",
+          "section-0304",
+          "section-0305",
+          "section-0306",
+          "section-0307",
+          "section-0308",
+          "section-0309",
+          "section-0310",
+          "section-0311",
+          "section-0312",
+          "section-0313",
+          "section-0314",
+          "section-0315",
+          "section-0321",
+          "section-0322",
+          "section-0323",
+          "section-0324",
+          "section-0325",
+          "section-0326",
+          "section-0327",
+          "section-0328",
+          "section-0329",
+          "section-0330",
+          "section-0331",
+          "section-0332",
+          "section-0333",
+          "section-0334",
+          "section-0335",
+          "section-0336",
+          "section-0337",
+          "section-0338",
+          "section-0339",
+          "section-0340",
+          "section-0341",
+          "section-0342",
+          "section-0343",
+          "section-0344",
+          "section-0345",
+          "section-0346",
+          "section-0347",
+          "section-0348",
+          "section-0349",
+          "section-0350",
+          "section-0351",
+          "section-0352",
+          "section-0353",
+          "section-0354",
+          "section-0355",
+          "section-0356",
+          "section-0357",
+          "section-0358",
+          "section-0359",
+          "section-0360",
+          "section-0361",
+          "section-0362",
+          "section-0363",
+          "section-0364",
+          "section-0365",
+          "section-0366",
+          "section-0367",
+          "section-0368",
+          "section-0369",
+          "section-0370",
+          "section-0371",
+          "section-0372",
+          "section-0373",
+          "section-0374",
+          "section-0375",
+          "section-0376",
+          "section-0377",
+          "section-0378",
+          "section-0379",
+          "section-0380",
+          "section-0381",
+          "section-0382",
+          "section-0383",
+          "section-0384",
+          "section-0385",
+          "section-0386",
+          "section-0387",
+          "section-0388",
+          "section-0389",
+          "section-0390",
+          "section-0391",
+          "section-0392",
+          "section-0393",
+          "section-0394",
+          "section-0395",
+          "section-0396",
+          "section-0397",
+          "section-0398",
+          "section-0399",
+          "section-0400",
+          "section-0401",
+          "section-0402",
+          "section-0403",
+          "section-0404",
+          "section-0405",
+          "section-0406",
+          "section-0407",
+          "section-0408",
+          "section-0409",
+          "section-0410",
+          "section-0411",
+          "section-0412",
+          "section-0413",
+          "section-0417",
+          "section-0418",
+          "section-0419",
+          "section-0420",
+          "section-0421",
+          "section-0422",
+          "section-0423",
+          "section-0424",
+          "section-0425",
+          "section-0426",
+          "section-0431",
+          "section-0435",
+          "section-0436",
+          "section-0437",
+          "section-0440",
+          "section-0448",
+          "section-0449",
+          "section-0450",
+          "section-0451",
+          "section-0452",
+          "section-0457",
+          "section-0458",
+          "section-0461",
+          "section-0467",
+          "section-0469",
+          "section-0472",
+          "section-0475",
+          "section-0480",
+          "section-0481",
+          "section-0482",
+          "section-0485",
+          "section-0486",
+          "section-0487",
+          "section-0488",
+          "section-0493",
+          "section-0494",
+          "section-0495",
+          "section-0496",
+          "section-0499",
+          "section-0500",
+          "section-0504",
+          "section-0507",
+          "section-0511",
+          "section-0512",
+          "section-0513",
+          "section-0514",
+          "section-0515",
+          "section-0516",
+          "section-0517",
+          "section-0518",
+          "section-0523",
+          "section-0524",
+          "section-0525",
+          "section-0526",
+          "section-0533",
+          "section-0538",
+          "section-0540",
+          "section-0546",
+          "section-0547",
+          "section-0550",
+          "section-0557",
+          "section-0564",
+          "section-0572",
+          "section-0578",
+          "section-0580",
+          "section-0581",
+          "section-0583",
+          "section-0586",
+          "section-0588",
+          "section-0589",
+          "section-0590",
+          "section-0591",
+          "section-0592",
+          "section-0593",
+          "section-0594",
+          "section-0595",
+          "section-0597",
+          "section-0598",
+          "section-0599",
+          "section-0600",
+          "section-0601",
+          "section-0602",
+          "section-0603",
+          "section-0604",
+          "section-0605",
+          "section-0606",
+          "section-0609",
+          "section-0611",
+          "section-0612",
+          "section-0613",
+          "section-0616",
+          "section-0618",
+          "section-0619",
+          "section-0620",
+          "section-0621",
+          "section-0623",
+          "section-0625",
+          "section-0626",
+          "section-0627",
+          "section-0628",
+          "section-0629",
+          "section-0630",
+          "section-0631",
+          "section-0632",
+          "section-0633",
+          "section-0638",
+          "section-0644",
+          "section-0646",
+          "section-0647",
+          "section-0648",
+          "section-0649",
+          "section-0650",
+          "section-0651",
+          "section-0652",
+          "section-0653",
+          "section-0655",
+          "section-0656",
+          "section-0657",
+          "section-0658",
+          "section-0659",
+          "section-0660",
+          "section-0661",
+          "section-0662",
+          "section-0663",
+          "section-0664",
+          "section-0668",
+          "section-0674",
+          "section-0675",
+          "section-0677",
+          "section-0680",
+          "section-0684",
+          "section-0688",
+          "section-0690",
+          "section-0691",
+          "section-0692",
+          "section-0693",
+          "section-0695",
+          "section-0696",
+          "section-0697",
+          "section-0698",
+          "section-0699",
+          "section-0700",
+          "section-0701",
+          "section-0702",
+          "section-0704",
+          "section-0705",
+          "section-0706",
+          "section-0707",
+          "section-0708",
+          "section-0713",
+          "section-0714",
+          "section-0715",
+          "section-0718",
+          "section-0719",
+          "section-0720",
+          "section-0721",
+          "section-0722",
+          "section-0723",
+          "section-0724",
+          "section-0725",
+          "section-0726",
+          "section-0727",
+          "section-0728",
+          "section-0729",
+          "section-0735",
+          "section-0736",
+          "section-0737",
+          "section-0738",
+          "section-0739",
+          "section-0740",
+          "section-0741",
+          "section-0742",
+          "section-0743",
+          "section-0744",
+          "section-0745",
+          "section-0746",
+          "section-0747",
+          "section-0748",
+          "section-0749",
+          "section-0750",
+          "section-0751",
+          "section-0752",
+          "section-0753",
+          "section-0754",
+          "section-0755",
+          "section-0756",
+          "section-0757",
+          "section-0758",
+          "section-0759",
+          "section-0762",
+          "section-0763",
+          "section-0767",
+          "section-0770",
+          "section-0772",
+          "section-0773",
+          "section-0774",
+          "section-0778",
+          "section-0779",
+          "section-0780",
+          "section-0783",
+          "section-0784",
+          "section-0787",
+          "section-0791",
+          "section-0792",
+          "section-0793",
+          "section-0794",
+          "section-0795",
+          "section-0796",
+          "section-0797",
+          "section-0798",
+          "section-0799",
+          "section-0800",
+          "section-0801",
+          "section-0802",
+          "section-0803",
+          "section-0804",
+          "section-0805",
+          "section-0811",
+          "section-0812",
+          "section-0814",
+          "section-0822",
+          "section-0823",
+          "section-0824",
+          "section-0825",
+          "section-0826",
+          "section-0827",
+          "section-0828",
+          "section-0829",
+          "section-0830",
+          "section-0831",
+          "section-0832",
+          "section-0833",
+          "section-0834",
+          "section-0838",
+          "section-0839",
+          "section-0843",
+          "section-0847",
+          "section-0848",
+          "section-0849",
+          "section-0850",
+          "section-0851",
+          "section-0852",
+          "section-0853",
+          "section-0854",
+          "section-0855",
+          "section-0856",
+          "section-0857",
+          "section-0858",
+          "section-0859",
+          "section-0860",
+          "section-0861",
+          "section-0862",
+          "section-0863",
+          "section-0864",
+          "section-0865",
+          "section-0866",
+          "section-0867",
+          "section-0868",
+          "section-0869",
+          "section-0870",
+          "section-0881",
+          "section-0885",
+          "section-0886",
+          "section-0887",
+          "section-0888",
+          "section-0891",
+          "section-0892",
+          "section-0893",
+          "section-0894",
+          "section-0895",
+          "section-0896",
+          "section-0897",
+          "section-0898",
+          "section-0901",
+          "section-0902",
+          "section-0903",
+          "section-0904",
+          "section-0905",
+          "section-0906",
+          "section-0907",
+          "section-0908",
+          "section-0909",
+          "section-0910",
+          "section-0911",
+          "section-0914",
+          "section-0915",
+          "section-0916",
+          "section-0921",
+          "section-0922",
+          "section-0923",
+          "section-0924",
+          "section-0925",
+          "section-0926",
+          "section-0927"
+        ],
+        "physical_pages": []
+      },
+      "extraction": {
+        "purpose": "extract_profile_workpaper",
+        "request_id": "bp-work-a7d6f3e22b9c7816cd8960d7:workpaper:extract",
+        "request_hash": "b6eac3d7d76206a71b2b84eb56cb5f68b4cb1ff4fbdae2ec89257bef61892ac4",
+        "response_hash": "e222d89ada9363bab84f204dcaeb987ff2c4d1d551c715cab6a1ea69aa760bfe",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 8204,
+          "output_tokens": 5074,
+          "total_tokens": 13278
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0037",
+          "section-0047",
+          "section-0049",
+          "section-0062",
+          "section-0729"
+        ],
+        "physical_pages": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          115,
+          116
+        ]
+      }
+    },
+    "quality_review": null,
+    "standardization_notes": [
+      "程序显示说明：F13正文722953.23万元为营业成本7,229,532,345.90元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+    ],
+    "company_features": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "F33",
+          "text": "公司教练机装备体系按“集中筛选、基础通训、专业分轨”构建，将传统教练机业务内涵由单一飞机系统向综合训练系统延伸。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F34",
+          "text": "公司本报告期末已签订合同但尚未履行或尚未履行完毕的履约义务对应收入金额为681,960万元，预计将于2026年度确认收入。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年末",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [
+            {
+              "name": "尚未履行履约义务对应收入金额",
+              "raw_value": "681,960",
+              "value": "681960",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ],
+      "limitations": [
+        "未获取该履约义务对应的具体产品构成及客户分布。"
+      ]
+    }
+  },
+  "workpaper_raw_for_audit": true,
+  "workpaper_delivery": {
+    "policy_version": "company_profile_research_delivery.v1",
+    "research_only": true,
+    "formal_acceptance": "not_assessed",
+    "production_authorization": "not_authorized",
+    "information_gaps": [
+      {
+        "element": "business_structure",
+        "status": "observed",
+        "reasons": [
+          "未获取防务产品的具体产品型号、用途及收入构成明细。"
+        ]
+      },
+      {
+        "element": "products_services",
+        "status": "observed",
+        "reasons": [
+          "防务产品的具体产品与服务内容未在选定章节披露。"
+        ]
+      },
+      {
+        "element": "revenue_model",
+        "status": "observed",
+        "reasons": [
+          "未获取各产品的单价、销量及定价机制。"
+        ]
+      },
+      {
+        "element": "scale_and_mix",
+        "status": "observed",
+        "reasons": [
+          "未获取各产品收入占比的明确披露数值，仅可按收入分解数据理解结构。"
+        ]
+      },
+      {
+        "element": "operations_and_inputs",
+        "status": "observed",
+        "reasons": [
+          "未获取主要原材料的具体供应商、采购金额及采购集中度。"
+        ]
+      },
+      {
+        "element": "customers_channels_markets",
+        "status": "observed",
+        "reasons": [
+          "未获取主要客户的具体名称、销售金额及客户集中度明细。"
+        ]
+      },
+      {
+        "element": "operating_drivers",
+        "status": "observed",
+        "reasons": [
+          "未获取分产品收入变动的具体原因及订单储备明细。"
+        ]
+      },
+      {
+        "element": "material_changes",
+        "status": "observed",
+        "reasons": [
+          "未获取新型号项目的具体名称、进度节点及C919项目的收入贡献金额。"
+        ]
+      },
+      {
+        "element": "upstream_inputs",
+        "status": "observed",
+        "reasons": [
+          "未获取具体原材料供应商名称及采购金额。"
+        ]
+      },
+      {
+        "element": "downstream_customers",
+        "status": "observed",
+        "reasons": [
+          "未获取具体客户名称及终端用户构成。"
+        ]
+      },
+      {
+        "element": "company_features",
+        "status": "observed",
+        "reasons": [
+          "未获取该履约义务对应的具体产品构成及客户分布。"
+        ]
+      }
+    ],
+    "suggested_acquisitions": [],
+    "counts": {
+      "reviewed": 0,
+      "pending": 33,
+      "limited": 1,
+      "source_only": 0,
+      "withheld": 0,
+      "duplicate": 0
+    },
+    "labels": {
+      "reviewed": "已核（研究用途，非正式接受）",
+      "pending": "待核（无其他限用）",
+      "limited": "保真限用",
+      "source_only": "仅源参考／解释",
+      "withheld": "已隔离",
+      "duplicate": "重复未再展示"
+    },
+    "pending_review_count": 34,
+    "facts": [
+      {
+        "fact_id": "F01",
+        "element": "business_structure",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001",
+          "source-0009"
+        ],
+        "fact": {
+          "fact_id": "F01",
+          "text": "公司业务以教练机系列产品的设计、研制、生产、销售、维修及服务保障为主，同时从事防务产品研制生产；按收入分解分为教练机、其他航空产品和非航空产品三类。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0009"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F02",
+        "element": "business_structure",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F02",
+          "text": "公司是国内主要的教练机研发生产基地，当前主要产品为CJ6初级教练机、K8基础教练机和L15高级教练机，并推动由单一飞机系统向综合训练系统、由销售教练机向销售集成系统和服务保障延伸。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F03",
+        "element": "business_structure",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F03",
+          "text": "公司是国内重要的防务产品研制生产基地之一。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F04",
+        "element": "products_services",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F04",
+          "text": "CJ6初级教练机是我国自行研制并大量投入使用的第一种教练机，1958年首飞、1962年定型，长期用于国防和民用航空飞行员培养。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F05",
+        "element": "products_services",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F05",
+          "text": "K8基础教练机按国际标准设计并通过国际合作方式研制，1990年首飞，主要用于飞行员的基础训练和部分高级训练。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F06",
+        "element": "products_services",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F06",
+          "text": "L15高级教练机是自主研制的新一代双发超音速高级教练机，2006年3月首飞，具有第三代战斗机特征，可满足第三代战斗机飞行员的战斗入门训练和战术基础改装训练。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F07",
+        "element": "products_services",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F07",
+          "text": "公司可为客户提供集飞行员训练、地勤人员培训、训练保障为一体的一揽子训练解决方案。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F08",
+        "element": "revenue_model",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0004",
+          "source-0009"
+        ],
+        "fact": {
+          "fact_id": "F08",
+          "text": "公司营业收入主要来自教练机、其他航空产品和非航空产品的销售，2025年营业收入合计744,912.68万元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004",
+            "source-0009"
+          ],
+          "metrics": [
+            {
+              "name": "营业收入",
+              "raw_value": "744,912.68",
+              "value": "744912.68",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业收入",
+              "raw_value": "7,449,126,774.96",
+              "value": "7449126774.96",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F09",
+        "element": "revenue_model",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "fact": {
+          "fact_id": "F09",
+          "text": "按商品类型分解，教练机营业收入1,771,660,977.35元，其他航空产品营业收入5,613,077,664.98元，非航空产品营业收入64,388,132.63元。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [
+            {
+              "name": "教练机营业收入",
+              "raw_value": "1,771,660,977.35",
+              "value": "1771660977.35",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他航空产品营业收入",
+              "raw_value": "5,613,077,664.98",
+              "value": "5613077664.98",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "非航空产品营业收入",
+              "raw_value": "64,388,132.63",
+              "value": "64388132.63",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F10",
+        "element": "revenue_model",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "fact": {
+          "fact_id": "F10",
+          "text": "按经营地区分类，境内营业收入6,183,842,802.41元，境外营业收入1,265,283,972.55元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [
+            {
+              "name": "境内营业收入",
+              "raw_value": "6,183,842,802.41",
+              "value": "6183842802.41",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "境外营业收入",
+              "raw_value": "1,265,283,972.55",
+              "value": "1265283972.55",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F11",
+        "element": "revenue_model",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "fact": {
+          "fact_id": "F11",
+          "text": "按市场或客户类型分类，关联方营业收入7,446,901,682.06元，非关联方营业收入2,225,092.90元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [
+            {
+              "name": "关联方营业收入",
+              "raw_value": "7,446,901,682.06",
+              "value": "7446901682.06",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "非关联方营业收入",
+              "raw_value": "2,225,092.90",
+              "value": "2225092.90",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F12",
+        "element": "revenue_model",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "fact": {
+          "fact_id": "F12",
+          "text": "主营业务收入7,407,782,130.11元、成本7,199,519,669.32元；其他业务收入41,344,644.85元、成本30,012,676.58元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [
+            {
+              "name": "主营业务收入",
+              "raw_value": "7,407,782,130.11",
+              "value": "7407782130.11",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务成本",
+              "raw_value": "7,199,519,669.32",
+              "value": "7199519669.32",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他业务收入",
+              "raw_value": "41,344,644.85",
+              "value": "41344644.85",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他业务成本",
+              "raw_value": "30,012,676.58",
+              "value": "30012676.58",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F13",
+        "element": "scale_and_mix",
+        "state": "limited",
+        "label": "保真限用／待核",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。",
+          "程序显示说明：F13正文722953.23万元为营业成本7,229,532,345.90元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        ],
+        "evidence_ids": [
+          "source-0003",
+          "source-0004"
+        ],
+        "fact": {
+          "fact_id": "F13",
+          "text": "2025年公司营业收入744,912.68万元，同比增长41.83%，营业收入创历史新高；营业成本722,953.23万元，同比增长42.54%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "营业收入同比增长率",
+              "raw_value": "41.83",
+              "value": "41.83",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业成本",
+              "raw_value": "7,229,532,345.90",
+              "value": "7229532345.90",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业成本同比增长率",
+              "raw_value": "42.54",
+              "value": "42.54",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "程序显示说明：F13正文722953.23万元为营业成本7,229,532,345.90元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+        }
+      },
+      {
+        "fact_id": "F14",
+        "element": "scale_and_mix",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "fact": {
+          "fact_id": "F14",
+          "text": "2025年归属于上市公司股东的净利润3,975.98万元，同比增长1.33%；扣除非经常性损益后的净利润3,739.35万元，同比增长42.44%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "归属于上市公司股东的净利润",
+              "raw_value": "3,975.98",
+              "value": "3975.98",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于上市公司股东的净利润同比增长率",
+              "raw_value": "1.33",
+              "value": "1.33",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "扣除非经常性损益后的净利润",
+              "raw_value": "3,739.35",
+              "value": "3739.35",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "扣除非经常性损益后的净利润同比增长率",
+              "raw_value": "42.44",
+              "value": "42.44",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F15",
+        "element": "scale_and_mix",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "fact": {
+          "fact_id": "F15",
+          "text": "按成本构成，教练机成本合计1,597,275,236.08元，其中材料及外部加工费1,435,834,564.90元、工资及附加82,724,948.91元、制造费用78,715,722.27元。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "教练机成本合计",
+              "raw_value": "1,597,275,236.08",
+              "value": "1597275236.08",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "教练机材料及外部加工费",
+              "raw_value": "1,435,834,564.90",
+              "value": "1435834564.90",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "教练机工资及附加",
+              "raw_value": "82,724,948.91",
+              "value": "82724948.91",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "教练机制造费用",
+              "raw_value": "78,715,722.27",
+              "value": "78715722.27",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F16",
+        "element": "scale_and_mix",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "fact": {
+          "fact_id": "F16",
+          "text": "按成本构成，其他航空产品成本合计5,582,310,615.67元，其中材料及外部加工费5,097,356,854.30元、工资及附加253,333,268.46元、制造费用231,620,492.91元。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "其他航空产品成本合计",
+              "raw_value": "5,582,310,615.67",
+              "value": "5582310615.67",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他航空产品材料及外部加工费",
+              "raw_value": "5,097,356,854.30",
+              "value": "5097356854.30",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他航空产品工资及附加",
+              "raw_value": "253,333,268.46",
+              "value": "253333268.46",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他航空产品制造费用",
+              "raw_value": "231,620,492.91",
+              "value": "231620492.91",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F17",
+        "element": "scale_and_mix",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0006",
+          "source-0007"
+        ],
+        "fact": {
+          "fact_id": "F17",
+          "text": "按成本构成，非航空产品成本合计19,933,817.57元，其中材料及外部加工费9,824,173.54元、工资及附加3,972,444.95元、制造费用6,137,199.08元。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006",
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "非航空产品成本合计",
+              "raw_value": "19,933,817.57",
+              "value": "19933817.57",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "非航空产品材料及外部加工费",
+              "raw_value": "9,824,173.54",
+              "value": "9824173.54",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "非航空产品工资及附加",
+              "raw_value": "3,972,444.95",
+              "value": "3972444.95",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "非航空产品制造费用",
+              "raw_value": "6,137,199.08",
+              "value": "6137199.08",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F18",
+        "element": "operations_and_inputs",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F18",
+          "text": "公司基础材料采购主要包括金属原材料、非金属原材料、电子元器件、成附件、外协加工件等多个种类，由物资采购部门根据需求计划以招标、询价等方式实施采购。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F19",
+        "element": "operations_and_inputs",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001",
+          "source-0002"
+        ],
+        "fact": {
+          "fact_id": "F19",
+          "text": "航空产品主要采用合同订单、多方协议等方式组织生产，公司建立科研生产指挥调度体系，利用信息化手段下达生产计划指令并协调质量检验、工艺与生产人员协作。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F20",
+        "element": "operations_and_inputs",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "fact": {
+          "fact_id": "F20",
+          "text": "报告期内公司上游供应链情况不断改善，并围绕“精益+数智”理念推进产线及工序优化，产品产能显著提升。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F21",
+        "element": "customers_channels_markets",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "fact": {
+          "fact_id": "F21",
+          "text": "按经营地区分类，公司2025年境内营业收入6,183,842,802.41元、境外营业收入1,265,283,972.55元，市场覆盖境内与境外。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F22",
+        "element": "customers_channels_markets",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0007",
+          "source-0009"
+        ],
+        "fact": {
+          "fact_id": "F22",
+          "text": "按市场或客户类型分类，关联方营业收入7,446,901,682.06元、非关联方营业收入2,225,092.90元；公司按同一控制口径合并列示主要客户和供应商。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007",
+            "source-0009"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F23",
+        "element": "customers_channels_markets",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001",
+          "source-0003"
+        ],
+        "fact": {
+          "fact_id": "F23",
+          "text": "公司教练机产品面向飞行员训练、地勤人员培训及训练保障等客户需求，提供一揽子训练解决方案；民用初教六飞机继续拓展国内市场。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0003"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F24",
+        "element": "operating_drivers",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0005",
+          "source-0006"
+        ],
+        "fact": {
+          "fact_id": "F24",
+          "text": "报告期内营业收入和营业成本均增长，主要系本期产品交付数量增加；营业成本增长主要随收入增加而增加。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005",
+            "source-0006"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F25",
+        "element": "operating_drivers",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "fact": {
+          "fact_id": "F25",
+          "text": "报告期内销售费用同比增长25.45%，主要系销售服务费增加；管理费用同比增长34.59%，主要系职工薪酬增加；研发费用同比增长26.51%，主要系研发投入增加。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "metrics": [
+            {
+              "name": "销售费用同比增长率",
+              "raw_value": "25.45",
+              "value": "25.45",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "管理费用同比增长率",
+              "raw_value": "34.59",
+              "value": "34.59",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "研发费用同比增长率",
+              "raw_value": "26.51",
+              "value": "26.51",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F26",
+        "element": "operating_drivers",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "fact": {
+          "fact_id": "F26",
+          "text": "报告期内经营活动产生的现金流量净额为165,279,020.89元，主要系本期销售商品收到的现金增加。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "metrics": [
+            {
+              "name": "经营活动产生的现金流量净额",
+              "raw_value": "165,279,020.89",
+              "value": "165279020.89",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F27",
+        "element": "material_changes",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0005",
+          "source-0007"
+        ],
+        "fact": {
+          "fact_id": "F27",
+          "text": "报告期内公司业务类型、利润构成或利润来源未发生重大变动，业务、产品或服务未发生重大变化或调整，报告期主要子公司股权变动导致合并范围变化亦不适用。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005",
+            "source-0007"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F28",
+        "element": "material_changes",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "fact": {
+          "fact_id": "F28",
+          "text": "报告期内公司生产高级教练机参加首都“九三阅兵”，L15高教机跨国转场交付并亮相国际航展，初教-6飞机参加北京、珠海、南昌、沈阳等多次航展或开放日活动。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F29",
+        "element": "material_changes",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "fact": {
+          "fact_id": "F29",
+          "text": "报告期内公司多个新型号项目研制及竞标工作取得重大进展，为“十五五”发展提供储备；参股公司洪都商飞C919项目产品交付再创新高。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F30",
+        "element": "position",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F30",
+          "text": "公司处于航空产品研发制造环节，主要从事教练机系列产品的设计、研制、生产、销售、维修及服务保障，并从事防务产品研制生产。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F31",
+        "element": "upstream_inputs",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F31",
+          "text": "公司所需基础材料主要包括金属原材料、非金属原材料、电子元器件、成附件、外协加工件等多个种类，通过招标、询价等方式采购。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F32",
+        "element": "downstream_customers",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001",
+          "source-0009"
+        ],
+        "fact": {
+          "fact_id": "F32",
+          "text": "公司教练机产品用于飞行员训练、地勤人员培训及训练保障，客户覆盖境内与境外市场，关联方销售占营业收入绝大部分。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0009"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F33",
+        "element": "company_features",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F33",
+          "text": "公司教练机装备体系按“集中筛选、基础通训、专业分轨”构建，将传统教练机业务内涵由单一飞机系统向综合训练系统延伸。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F34",
+        "element": "company_features",
+        "state": "pending",
+        "label": "待核（无其他限用）",
+        "review_basis": "not_reviewed",
+        "model_review_stage": null,
+        "reasons": [
+          "尚未源复核。"
+        ],
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "fact": {
+          "fact_id": "F34",
+          "text": "公司本报告期末已签订合同但尚未履行或尚未履行完毕的履约义务对应收入金额为681,960万元，预计将于2026年度确认收入。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年末",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [
+            {
+              "name": "尚未履行履约义务对应收入金额",
+              "raw_value": "681,960",
+              "value": "681960",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      }
+    ]
+  },
+  "workpaper_markdown": "# 600316.SH｜2025-12-31 公司画像底稿\n\n真实模型底稿（待核，不代表正式公司可用）\n\n来源版本：`4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b`。发布时点：2026-03-27T16:00:00+00:00。\n\n研究分级不等于正式可信发布；以下普通正文不含隔离、仅源参考或重复对象。原底稿及后文复核记录保留审计。\n\n已核（研究用途，非正式接受） 0；待核（无其他限用） 33；保真限用 1；仅源参考／解释 0；已隔离 0；重复未再展示 0\n待核合计（含限用中的待核）：34。\n\n## 业务结构\n\n- 【待核（无其他限用）】公司业务以教练机系列产品的设计、研制、生产、销售、维修及服务保障为主，同时从事防务产品研制生产；按收入分解分为教练机、其他航空产品和非航空产品三类。（[source-0001](#source-0001)、[source-0009](#source-0009)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】公司是国内主要的教练机研发生产基地，当前主要产品为CJ6初级教练机、K8基础教练机和L15高级教练机，并推动由单一飞机系统向综合训练系统、由销售教练机向销售集成系统和服务保障延伸。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】公司是国内重要的防务产品研制生产基地之一。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 限制：未获取防务产品的具体产品型号、用途及收入构成明细。\n\n## 产品、服务及用途\n\n- 【待核（无其他限用）】CJ6初级教练机是我国自行研制并大量投入使用的第一种教练机，1958年首飞、1962年定型，长期用于国防和民用航空飞行员培养。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】K8基础教练机按国际标准设计并通过国际合作方式研制，1990年首飞，主要用于飞行员的基础训练和部分高级训练。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】L15高级教练机是自主研制的新一代双发超音速高级教练机，2006年3月首飞，具有第三代战斗机特征，可满足第三代战斗机飞行员的战斗入门训练和战术基础改装训练。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】公司可为客户提供集飞行员训练、地勤人员培训、训练保障为一体的一揽子训练解决方案。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 限制：防务产品的具体产品与服务内容未在选定章节披露。\n\n## 怎么赚钱\n\n- 【待核（无其他限用）】公司营业收入主要来自教练机、其他航空产品和非航空产品的销售，2025年营业收入合计744,912.68万元。（[source-0004](#source-0004)、[source-0009](#source-0009)）\n  - 使用限制：尚未源复核。\n  - 营业收入：744,912.68 万元；2025年度，consolidated_group。\n  - 营业收入：7,449,126,774.96 元；2025年度，consolidated_group。\n- 【待核（无其他限用）】按商品类型分解，教练机营业收入1,771,660,977.35元，其他航空产品营业收入5,613,077,664.98元，非航空产品营业收入64,388,132.63元。（[source-0009](#source-0009)）\n  - 使用限制：尚未源复核。\n  - 教练机营业收入：1,771,660,977.35 元；2025年度，business_segment。\n  - 其他航空产品营业收入：5,613,077,664.98 元；2025年度，business_segment。\n  - 非航空产品营业收入：64,388,132.63 元；2025年度，business_segment。\n- 【待核（无其他限用）】按经营地区分类，境内营业收入6,183,842,802.41元，境外营业收入1,265,283,972.55元。（[source-0009](#source-0009)）\n  - 使用限制：尚未源复核。\n  - 境内营业收入：6,183,842,802.41 元；2025年度，consolidated_group。\n  - 境外营业收入：1,265,283,972.55 元；2025年度，consolidated_group。\n- 【待核（无其他限用）】按市场或客户类型分类，关联方营业收入7,446,901,682.06元，非关联方营业收入2,225,092.90元。（[source-0009](#source-0009)）\n  - 使用限制：尚未源复核。\n  - 关联方营业收入：7,446,901,682.06 元；2025年度，consolidated_group。\n  - 非关联方营业收入：2,225,092.90 元；2025年度，consolidated_group。\n- 【待核（无其他限用）】主营业务收入7,407,782,130.11元、成本7,199,519,669.32元；其他业务收入41,344,644.85元、成本30,012,676.58元。（[source-0009](#source-0009)）\n  - 使用限制：尚未源复核。\n  - 主营业务收入：7,407,782,130.11 元；2025年度，consolidated_group。\n  - 主营业务成本：7,199,519,669.32 元；2025年度，consolidated_group。\n  - 其他业务收入：41,344,644.85 元；2025年度，consolidated_group。\n  - 其他业务成本：30,012,676.58 元；2025年度，consolidated_group。\n- 限制：未获取各产品的单价、销量及定价机制。\n\n## 规模与业务权重\n\n- 【保真限用／待核】【不确定：程序显示说明：F13正文722953.23万元为营业成本7,229,532,345.90元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。】2025年公司营业收入744,912.68万元，同比增长41.83%，营业收入创历史新高；营业成本722,953.23万元，同比增长42.54%。（[source-0003](#source-0003)、[source-0004](#source-0004)）\n  - 使用限制：尚未源复核。；程序显示说明：F13正文722953.23万元为营业成本7,229,532,345.90元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n  - 营业收入同比增长率：41.83 %；2025年度，consolidated_group。\n  - 营业成本：7,229,532,345.90 元；2025年度，consolidated_group。\n  - 营业成本同比增长率：42.54 %；2025年度，consolidated_group。\n- 【待核（无其他限用）】2025年归属于上市公司股东的净利润3,975.98万元，同比增长1.33%；扣除非经常性损益后的净利润3,739.35万元，同比增长42.44%。（[source-0004](#source-0004)）\n  - 使用限制：尚未源复核。\n  - 归属于上市公司股东的净利润：3,975.98 万元；2025年度，consolidated_group。\n  - 归属于上市公司股东的净利润同比增长率：1.33 %；2025年度，consolidated_group。\n  - 扣除非经常性损益后的净利润：3,739.35 万元；2025年度，consolidated_group。\n  - 扣除非经常性损益后的净利润同比增长率：42.44 %；2025年度，consolidated_group。\n- 【待核（无其他限用）】按成本构成，教练机成本合计1,597,275,236.08元，其中材料及外部加工费1,435,834,564.90元、工资及附加82,724,948.91元、制造费用78,715,722.27元。（[source-0006](#source-0006)）\n  - 使用限制：尚未源复核。\n  - 教练机成本合计：1,597,275,236.08 元；2025年度，business_segment。\n  - 教练机材料及外部加工费：1,435,834,564.90 元；2025年度，business_segment。\n  - 教练机工资及附加：82,724,948.91 元；2025年度，business_segment。\n  - 教练机制造费用：78,715,722.27 元；2025年度，business_segment。\n- 【待核（无其他限用）】按成本构成，其他航空产品成本合计5,582,310,615.67元，其中材料及外部加工费5,097,356,854.30元、工资及附加253,333,268.46元、制造费用231,620,492.91元。（[source-0006](#source-0006)）\n  - 使用限制：尚未源复核。\n  - 其他航空产品成本合计：5,582,310,615.67 元；2025年度，business_segment。\n  - 其他航空产品材料及外部加工费：5,097,356,854.30 元；2025年度，business_segment。\n  - 其他航空产品工资及附加：253,333,268.46 元；2025年度，business_segment。\n  - 其他航空产品制造费用：231,620,492.91 元；2025年度，business_segment。\n- 【待核（无其他限用）】按成本构成，非航空产品成本合计19,933,817.57元，其中材料及外部加工费9,824,173.54元、工资及附加3,972,444.95元、制造费用6,137,199.08元。（[source-0006](#source-0006)、[source-0007](#source-0007)）\n  - 使用限制：尚未源复核。\n  - 非航空产品成本合计：19,933,817.57 元；2025年度，business_segment。\n  - 非航空产品材料及外部加工费：9,824,173.54 元；2025年度，business_segment。\n  - 非航空产品工资及附加：3,972,444.95 元；2025年度，business_segment。\n  - 非航空产品制造费用：6,137,199.08 元；2025年度，business_segment。\n- 限制：未获取各产品收入占比的明确披露数值，仅可按收入分解数据理解结构。\n\n## 经营方式与关键投入\n\n- 【待核（无其他限用）】公司基础材料采购主要包括金属原材料、非金属原材料、电子元器件、成附件、外协加工件等多个种类，由物资采购部门根据需求计划以招标、询价等方式实施采购。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】航空产品主要采用合同订单、多方协议等方式组织生产，公司建立科研生产指挥调度体系，利用信息化手段下达生产计划指令并协调质量检验、工艺与生产人员协作。（[source-0001](#source-0001)、[source-0002](#source-0002)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】报告期内公司上游供应链情况不断改善，并围绕“精益+数智”理念推进产线及工序优化，产品产能显著提升。（[source-0003](#source-0003)）\n  - 使用限制：尚未源复核。\n- 限制：未获取主要原材料的具体供应商、采购金额及采购集中度。\n\n## 客户、渠道与市场\n\n- 【待核（无其他限用）】按经营地区分类，公司2025年境内营业收入6,183,842,802.41元、境外营业收入1,265,283,972.55元，市场覆盖境内与境外。（[source-0009](#source-0009)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】按市场或客户类型分类，关联方营业收入7,446,901,682.06元、非关联方营业收入2,225,092.90元；公司按同一控制口径合并列示主要客户和供应商。（[source-0007](#source-0007)、[source-0009](#source-0009)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】公司教练机产品面向飞行员训练、地勤人员培训及训练保障等客户需求，提供一揽子训练解决方案；民用初教六飞机继续拓展国内市场。（[source-0001](#source-0001)、[source-0003](#source-0003)）\n  - 使用限制：尚未源复核。\n- 限制：未获取主要客户的具体名称、销售金额及客户集中度明细。\n\n## 关键经营影响因素\n\n- 【待核（无其他限用）】报告期内营业收入和营业成本均增长，主要系本期产品交付数量增加；营业成本增长主要随收入增加而增加。（[source-0005](#source-0005)、[source-0006](#source-0006)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】报告期内销售费用同比增长25.45%，主要系销售服务费增加；管理费用同比增长34.59%，主要系职工薪酬增加；研发费用同比增长26.51%，主要系研发投入增加。（[source-0005](#source-0005)）\n  - 使用限制：尚未源复核。\n  - 销售费用同比增长率：25.45 %；2025年度，consolidated_group。\n  - 管理费用同比增长率：34.59 %；2025年度，consolidated_group。\n  - 研发费用同比增长率：26.51 %；2025年度，consolidated_group。\n- 【待核（无其他限用）】报告期内经营活动产生的现金流量净额为165,279,020.89元，主要系本期销售商品收到的现金增加。（[source-0005](#source-0005)）\n  - 使用限制：尚未源复核。\n  - 经营活动产生的现金流量净额：165,279,020.89 元；2025年度，consolidated_group。\n- 限制：未获取分产品收入变动的具体原因及订单储备明细。\n\n## 近期重要变化\n\n- 【待核（无其他限用）】报告期内公司业务类型、利润构成或利润来源未发生重大变动，业务、产品或服务未发生重大变化或调整，报告期主要子公司股权变动导致合并范围变化亦不适用。（[source-0005](#source-0005)、[source-0007](#source-0007)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】报告期内公司生产高级教练机参加首都“九三阅兵”，L15高教机跨国转场交付并亮相国际航展，初教-6飞机参加北京、珠海、南昌、沈阳等多次航展或开放日活动。（[source-0003](#source-0003)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】报告期内公司多个新型号项目研制及竞标工作取得重大进展，为“十五五”发展提供储备；参股公司洪都商飞C919项目产品交付再创新高。（[source-0003](#source-0003)）\n  - 使用限制：尚未源复核。\n- 限制：未获取新型号项目的具体名称、进度节点及C919项目的收入贡献金额。\n\n## 公司特色与自主发现（可选）\n\n- 【待核（无其他限用）】公司教练机装备体系按“集中筛选、基础通训、专业分轨”构建，将传统教练机业务内涵由单一飞机系统向综合训练系统延伸。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 【待核（无其他限用）】公司本报告期末已签订合同但尚未履行或尚未履行完毕的履约义务对应收入金额为681,960万元，预计将于2026年度确认收入。（[source-0009](#source-0009)）\n  - 使用限制：尚未源复核。\n  - 尚未履行履约义务对应收入金额：681,960 万元；2025年末，consolidated_group。\n- 限制：未获取该履约义务对应的具体产品构成及客户分布。\n\n## 供应链信息（可选加分项）\n\n未获取到的信息不影响基础画像交付；以下内容仍待核。\n\n### 公司所处环节\n\n- 【待核（无其他限用）】公司处于航空产品研发制造环节，主要从事教练机系列产品的设计、研制、生产、销售、维修及服务保障，并从事防务产品研制生产。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n\n### 上游原材料与资源\n\n- 【待核（无其他限用）】公司所需基础材料主要包括金属原材料、非金属原材料、电子元器件、成附件、外协加工件等多个种类，通过招标、询价等方式采购。（[source-0001](#source-0001)）\n  - 使用限制：尚未源复核。\n- 限制：未获取具体原材料供应商名称及采购金额。\n\n### 下游用途与客户领域\n\n- 【待核（无其他限用）】公司教练机产品用于飞行员训练、地勤人员培训及训练保障，客户覆盖境内与境外市场，关联方销售占营业收入绝大部分。（[source-0001](#source-0001)、[source-0009](#source-0009)）\n  - 使用限制：尚未源复核。\n- 限制：未获取具体客户名称及终端用户构成。\n\n## 阅读范围与取舍\n\n优先选取第三节管理层讨论与分析中公司业务、经营模式、经营情况讨论、主要经营情况与主营业务分析等实质子节，覆盖产品（教练机、防务产品）、经营模式、收入成本变动与分产品收入构成；并补充财务报告附注中营业收入和营业成本明细，以获取公司层面收入总额与主要业务权重。行业背景、核心竞争力、治理与附录等非核心内容不选。\n\n- 第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况，物理页9—10：优先选取第三节管理层讨论与分析中公司业务、经营模式、经营情况讨论、主要经营情况与主营业务分析等实质子节，覆盖产品（教练机、防务产品）、经营模式、收入成本变动与分产品收入构成；并补充财务报告附注中营业收入和营业成本明细，以获取公司层面收入总额与主要业务权重。行业背景、核心竞争力、治理与附录等非核心内容不选。\n- 第三节 管理层讨论与分析 / 三、经营情况讨论与分析，物理页11—11：优先选取第三节管理层讨论与分析中公司业务、经营模式、经营情况讨论、主要经营情况与主营业务分析等实质子节，覆盖产品（教练机、防务产品）、经营模式、收入成本变动与分产品收入构成；并补充财务报告附注中营业收入和营业成本明细，以获取公司层面收入总额与主要业务权重。行业背景、核心竞争力、治理与附录等非核心内容不选。\n- 第三节 管理层讨论与分析 / 五、报告期内主要经营情况，物理页11—12：优先选取第三节管理层讨论与分析中公司业务、经营模式、经营情况讨论、主要经营情况与主营业务分析等实质子节，覆盖产品（教练机、防务产品）、经营模式、收入成本变动与分产品收入构成；并补充财务报告附注中营业收入和营业成本明细，以获取公司层面收入总额与主要业务权重。行业背景、核心竞争力、治理与附录等非核心内容不选。\n- 第三节 管理层讨论与分析 / 分产品情况，物理页13—14：优先选取第三节管理层讨论与分析中公司业务、经营模式、经营情况讨论、主要经营情况与主营业务分析等实质子节，覆盖产品（教练机、防务产品）、经营模式、收入成本变动与分产品收入构成；并补充财务报告附注中营业收入和营业成本明细，以获取公司层面收入总额与主要业务权重。行业背景、核心竞争力、治理与附录等非核心内容不选。\n- 第八节 财务报告 / 二、将重分类进 / 33、 营业收入和营业成本，物理页115—116：优先选取第三节管理层讨论与分析中公司业务、经营模式、经营情况讨论、主要经营情况与主营业务分析等实质子节，覆盖产品（教练机、防务产品）、经营模式、收入成本变动与分产品收入构成；并补充财务报告附注中营业收入和营业成本明细，以获取公司层面收入总额与主要业务权重。行业背景、核心竞争力、治理与附录等非核心内容不选。\n\n停止理由：已覆盖业务结构、产品用途、经营模式、收入来源与主要业务构成及本期经营变化，信息足以回答核心问题；行业背景与治理、附录等非必要内容不再扩展。\n\n- 未读/后置：section-0042 行业情况\n- 未读/后置：section-0048 核心竞争力分析\n- 未读/后置：section-0107 公司治理、环境和社会\n- 未读/后置：section-0309 财务报告其余附注\n- 限制：未获取防务产品的具体型号、用途及收入构成明细。\n- 限制：未获取各产品的单价、销量及定价机制。\n- 限制：未获取主要客户和供应商的具体名称、金额及集中度明细。\n- 限制：未获取新型号项目的具体名称、进度节点及C919项目的收入贡献金额。\n\n## 模型处理记录\n\n- 选章：deepseek-flash（deepseek:deepseek-flash，semantic_extraction__deepseek），报告标题索引（681个候选章节）；输入/输出/合计 18276/240/18516；finish=stop；requested_reasoning=high。\n- 正文抽取：deepseek-flash（deepseek:deepseek-flash，semantic_extraction__deepseek），章节 section-0037, section-0047, section-0049, section-0062, section-0729；物理页 9,10,11,12,13,14,115,116；输入/输出/合计 8204/5074/13278；finish=stop；requested_reasoning=high。\n- 提示版本：`company_profile_workpaper.2026-11-19.independent-assertions.v21`；预处理：`toc_sections_native_layout.v7.ordered-section-remap`。\n\n## 程序处理说明\n\n- 程序显示说明：F13正文722953.23万元为营业成本7,229,532,345.90元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。\n\n## 来源\n\n### source-0001\n\n第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况\n\n物理页9，字符132—2228：\n\n> 一、报告期内公司从事的业务情况 （一）主营业务 1、教练机 公司是国内主要的教练机研发生产基地，主要从事教练机系列产品的设计、研制、生产、销 售、维修及服务保障等。当前主要产品为 CJ6初级教练机、K8 基础教练机和 L15 高级教练机。公 司不断探索、基本构建形成“集中筛选、基础通训、专业分轨”的教练机装备体系，将传统意义 上的教练机业务内涵进行延伸，由单一的飞机系统向综合训练系统拓展，由销售教练机向销售集 成系统和服务保障发展，将为客户提供集飞行员训练、地勤人员培训、训练保障为一体的一揽子 训练解决方案。 公司教练机系列产品简介如下： 产品名 产品图片 产品介绍 称 CJ6 初级教练机是我国自行研制成功并 大量投入使用的第一种教练机，于 1958年 7 CJ6初级 月 27 日首飞，1962 年 1 月定型并生产 5 架 教练机 原型机，后交付部队。60 多年来为中国的国 防和民用航空培养了数以万计的飞行员，也 因此被誉为“中国飞行员的摇篮”。 K8 基础教练机是我国按照国际标准设计 并通过国际合作的方式研制的基础教练机， K8 基础 于 1990 年首飞成功。该机具有飞行品质优 教练机 良、可靠性高、维护性好、全寿命费用低等 特点，主要用于飞行员的基础训练和部分高 级训练。 L15 高级教练机是我国自主研制的新一 代双发超音速高级教练机，于 2006 年 3 月 首飞成功。该机具有典型的第三代战斗机特 L15高级 征，设计采用了大边条翼气动布局、高度翼 教练机 身融合体结构，先进数字飞控电传系统和基 于开放式数据总线技术的综合航电系统，操 纵敏捷，大迎角机动性强，能充分满足第三 代战斗机飞行员的战斗入门训练和战术基 础改装训练。 2、防务产品 公司是国内重要的防务产品研制生产基地之一。 （二）经营模式 基础材料采购：公司所需基础材料主要包括金属原材料、非金属原材料、电子元器件、成附 件、外协加工件等多个种类。由物资采购部门根据需求计划，以招标、询价等方式实施采购。 产品生产：航空产品主要采用合同订单、多方协议等方式组织产品生产。公司建立有完善的 科研生产指挥调度体系，利用信息化手段下达生产计划指令，并协调质量检验人员、工艺人员、 9 /143\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0002\n\n第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况\n\n物理页10，字符0—157：\n\n> 江西洪都航空工业股份有限公司2025 年年度报告 生产人员之间的协作配合，严格按照产品、技术、质量、进度要求落实产品研制与生产，确保所 承担的科研生产任务能保质保量并按时交付。 报告期内公司新增重要非主营业务的说明 □适用 √不适用\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0003\n\n第三节 管理层讨论与分析 / 三、经营情况讨论与分析\n\n物理页11，字符63—944：\n\n> 三、经营情况讨论与分析 2025 年是“十四五”规划圆满收官之年，也是航空工业高质量发展的关键之年。公司坚持以 习近平新时代中国特色社会主义思想为指导，全面贯彻落实党中央、国务院决策部署，坚持稳中 求进、以进促稳，强基固本、守正创新，系统集成、开放协同的工作基调，全力推动科研生产经 营各项工作顺利完成，奋力书写强国强军事业的新篇章。 报告期内，公司实现营业收入 744,912.68 万元，同比增长 41.83%；实现归属于上市公司股东 的扣非净利润 3,739.35 万元，同比增长 42.44%。2025 年公司营业收入创历史新高。 报告期内，公司生产高级教练机参加首都“九三阅兵”，米秒不差飞越天安门广场，光荣接受 党和人民检阅；L15 高教机跨国转场交付并惊艳亮相国际航展，彰显了中国航空工业科技与品牌 实力；初教-6 飞机参加北京、珠海、南昌、沈阳等多次航展或开放日活动，并进行精彩编队飞行 表演。 报告期内，公司核心领域研制生产能力持续增强。上游供应链情况不断改善，为航空产品常态 化批量生产交付奠定基础；围绕“精益+数智”理念，大力推进产线及工序优化，产品产能显著提 升；多个新型号项目研制及竞标工作取得重大进展，为公司“十五五”发展提供坚实储备和内生 动力。 报告期内，公司不断强化使命担当，加快科技自立自强，加强型号科学管理，科技创新体系有 力夯实，打造研发及工艺技术创新平台，支撑核心领域前沿技术研究和高层次人才培养，自主立 项多个技术创新基金项目，核心关键技术不断突破，深入实施，创新成果持续涌现。 报告期内，公司民用航空及低空经济领域持续发力。民用初教六飞机继续拓展国内市场；全力 支撑大飞机项目，参股公司洪都商飞 C919 项目产品交付再创新高。 报告期内，公司践行绿色低碳发展理念，聚焦制造工艺低碳革新，实现生产过程和场所节能降 碳，节能减排效果显著。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0004\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况\n\n物理页11，字符1368—1993：\n\n> 五、报告期内主要经营情况 报告期内，公司实现营业收入 744,912.68 万元，同比增长 41.83%；实现归属于上市公司股 东的净利润 3,975.98 万元，同比增长 1.33%；实现归属于上市公司股东的扣除非经常性损益后的 净利润 3,739.35 万元，同比增长 42.44%。 (一) 主营业务分析 1、 利润表及现金流量表相关科目变动分析表 单位：元 币种：人民币 科目 本期数 上年同期数 变动比例（%） 营业收入 7,449,126,774.96 5,252,055,627.16 41.83 营业成本 7,229,532,345.90 5,072,078,229.07 42.54 11 /143\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0005\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况\n\n物理页12，字符0—1403：\n\n> 江西洪都航空工业股份有限公司2025 年年度报告 销售费用 8,766,692.93 6,988,217.13 25.45 管理费用 52,378,195.85 38,918,022.66 34.59 财务费用 -2,244,589.48 -8,255,805.88 不适用 研发费用 83,704,981.19 66,166,201.11 26.51 经营活动产生的现金流量净额 165,279,020.89 -565,962,452.63 不适用 投资活动产生的现金流量净额 -12,199,156.51 -33,943,406.98 不适用 筹资活动产生的现金流量净额 -12,190,946.70 -10,756,717.68 不适用 营业收入变动原因说明：主要系公司本期产品交付数量增加。 营业成本变动原因说明：主要随着收入增加而增加。 销售费用变动原因说明：主要系公司本期销售服务费增加。 管理费用变动原因说明：主要系公司本期计提的职工薪酬增加。 财务费用变动原因说明：主要系公司本期利息收入减少。 研发费用变动原因说明：主要系公司本期研发投入增加。 经营活动产生的现金流量净额变动原因说明：主要系公司本期销售商品收到的现金增加。 投资活动产生的现金流量净额变动原因说明：主要系公司本期购建长期资产支付的现金减少。 筹资活动产生的现金流量净额变动原因说明：主要系公司本期支付的现金股利增加。 本期公司业务类型、利润构成或利润来源发生重大变动的详细说明 □适用 √不适用 2、 收入和成本分析 √适用 □不适用 报告期内，公司营业收入和营业成本均增长主要系本期产品交付数量增加。 (1). 主营业务分行业、分产品、分地区、分销售模式情况 单位：元 币种：人民币\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0006\n\n第三节 管理层讨论与分析 / 分产品情况\n\n物理页13，字符3464—5461：\n\n> 分产品情况 本期占 上年同期 本期金额较 情况 分产品 成本构成项目 本期金额 总成本 上年同期金额 占总成本 上年同期变 说明 比例(%) 比例(%) 动比例(%) 材料及外部加工费 1,435,834,564.90 89.89 1,433,076,830.07 89.97 0.19 教练机 工资及附加 82,724,948.91 5.18 81,672,995.21 5.13 1.29 制造费用 78,715,722.27 4.93 78,057,804.40 4.90 0.84 合计 1,597,275,236.08 100.00 1,592,807,629.68 100.00 0.28 材料及外部加工费 5,097,356,854.30 91.31 3,081,446,639.31 88.94 65.42 其他航空 工资及附加 253,333,268.46 4.54 198,421,321.89 5.73 27.67 产品 制造费用 231,620,492.91 4.15 184,806,339.66 5.33 25.33 合计 5,582,310,615.67 100.00 3,464,674,300.86 100.00 61.12 非航空产 材料及外部加工费 9,824,173.54 49.28 5,049,513.40 48.89 94.56 品 工资及附加 3,972,444.95 19.93 3,150,181.03 30.50 26.10 制造费用 6,137,199.08 30.79 2,128,879.55 20.61 188.28 13 / 143\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0007\n\n第三节 管理层讨论与分析 / 分产品情况\n\n物理页14，字符0—553：\n\n> 江西洪都航空工业股份有限公司2025 年年度报告 合计 19,933,817.57 100.00 10,328,573.98 100.00 93.00 成本分析其他情况说明 报告期内，公司主营业务分行业中航空产品制造、分产品中其他航空产品成本较上年同期增 长主要系本期产品交付数量增加。 (5). 报告期主要子公司股权变动导致合并范围变化 □适用 √不适用 (6). 公司报告期内业务、产品或服务发生重大变化或调整有关情况 □适用 √不适用 (7). 主要销售客户及主要销售客户及主要供应商情况 属于同一控制人控制的客户或供应商视为同一客户或供应商合并列示，受同一国有资产管理 机构实际控制的除外。 下列客户及供应商信息按照同一控制口径合并计算列示的情况说明 公司根据中国证监会和《上海证券交易所股票上市规则》的相关规定确定主要销售客户和主 要供应商的关联方范围，并据此统计关联方销售额和关联方采购额。 中国航空工业集团下属公司指公司实际控制人中国航空工业集团直接或间接控制的公司。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0008\n\n第八节 财务报告 / 二、将重分类进 / 33、 营业收入和营业成本\n\n物理页115，字符2147—2542：\n\n> 33、 营业收入和营业成本 (1).营业收入和营业成本情况 √适用 □不适用 单位：元 币种：人民币 项目 本期发生额 上期发生额 收入 成本 收入 成本 115 / 143\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0009\n\n第八节 财务报告 / 二、将重分类进 / 33、 营业收入和营业成本\n\n物理页116，字符0—2342：\n\n> 江西洪都航空工业股份有限公司2025 年年度报告 主营业务 7,407,782,130.11 7,199,519,669.32 5,246,024,138.98 5,067,810,504.52 其他业务 41,344,644.85 30,012,676.58 6,031,488.18 4,267,724.55 合计 7,449,126,774.96 7,229,532,345.90 5,252,055,627.16 5,072,078,229.07 (2).营业收入、营业成本的分解信息 √适用 □不适用 单位：元 币种：人民币 合同分类 洪都航空 合计 营业收入 营业成本 营业收入 营业成本 商品类型 教练机 1,771,660,977.35 1,597,275,236.08 1,771,660,977.35 1,597,275,236.08 其他航空产品 5,613,077,664.98 5,582,310,615.67 5,613,077,664.98 5,582,310,615.67 非航空产品 64,388,132.63 49,946,494.15 64,388,132.63 49,946,494.15 按经营地区分类 境内 6,183,842,802.41 6,002,613,585.26 6,183,842,802.41 6,002,613,585.26 境外 1,265,283,972.55 1,226,918,760.64 1,265,283,972.55 1,226,918,760.64 市场或客户类型 关联方 7,446,901,682.06 7,227,411,659.47 7,446,901,682.06 7,227,411,659.47 非关联方 2,225,092.90 2,120,686.43 2,225,092.90 2,120,686.43 合计 7,449,126,774.96 7,229,532,345.90 7,449,126,774.96 7,229,532,345.90 其他说明： □适用 √不适用 (3).履约义务的说明 □适用 √不适用 (4).分摊至剩余履约义务的说明 √适用 □不适用 本报告期末已签订合同、但尚未履行或尚未履行完毕的履约义务所对应的收入金额为681,960 万元，其中：681,960万元预计将于2026年度确认收入。 (5).重大合同变更或重大交易价格调整 □适用 √不适用\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n",
+  "workpaper_status": "pending_verification",
+  "workpaper_receipts": [
+    {
+      "request_id": "bp-work-a7d6f3e22b9c7816cd8960d7:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "c7e33e1675db6d1ef430785bd1b5060f5abc74f44e712bcb543e2f51c99f3946",
+      "response_hash": "d17e0b8790fd38722e31c09bbee9414f6b61953df4f49596b821091e85d7bfb7",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0037\",\"section-0038\",\"section-0039\",\"section-0041\",\"section-0047\",\"section-0049\",\"section-0050\",\"section-0051\",\"section-0062\",\"section-0729\"],\"rationale\":\"优先选取第三节管理层讨论与分析中公司业务、经营模式、经营情况讨论、主要经营情况与主营业务分析等实质子节，覆盖产品（教练机、防务产品）、经营模式、收入成本变动与分产品收入构成；并补充财务报告附注中营业收入和营业成本明细，以获取公司层面收入总额与主要业务权重。行业背景、核心竞争力、治理与附录等非核心内容不选。\",\"stop_reason\":\"已覆盖业务结构、产品用途、经营模式、收入来源与主要业务构成及本期经营变化，信息足以回答核心问题；行业背景与治理、附录等非必要内容不再扩展。\",\"deferred\":[\"section-0042 行业情况\",\"section-0048 核心竞争力分析\",\"section-0107 公司治理、环境和社会\",\"section-0309 财务报告其余附注\"]}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0037",
+          "section-0038",
+          "section-0039",
+          "section-0041",
+          "section-0047",
+          "section-0049",
+          "section-0050",
+          "section-0051",
+          "section-0062",
+          "section-0729"
+        ],
+        "rationale": "优先选取第三节管理层讨论与分析中公司业务、经营模式、经营情况讨论、主要经营情况与主营业务分析等实质子节，覆盖产品（教练机、防务产品）、经营模式、收入成本变动与分产品收入构成；并补充财务报告附注中营业收入和营业成本明细，以获取公司层面收入总额与主要业务权重。行业背景、核心竞争力、治理与附录等非核心内容不选。",
+        "stop_reason": "已覆盖业务结构、产品用途、经营模式、收入来源与主要业务构成及本期经营变化，信息足以回答核心问题；行业背景与治理、附录等非必要内容不再扩展。",
+        "deferred": [
+          "section-0042 行业情况",
+          "section-0048 核心竞争力分析",
+          "section-0107 公司治理、环境和社会",
+          "section-0309 财务报告其余附注"
+        ]
+      },
+      "usage": {
+        "input_tokens": 18276,
+        "output_tokens": 240,
+        "total_tokens": 18516
+      }
+    },
+    {
+      "request_id": "bp-work-a7d6f3e22b9c7816cd8960d7:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "b6eac3d7d76206a71b2b84eb56cb5f68b4cb1ff4fbdae2ec89257bef61892ac4",
+      "response_hash": "e222d89ada9363bab84f204dcaeb987ff2c4d1d551c715cab6a1ea69aa760bfe",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+      "contract_status": "accepted",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F01\",\"text\":\"公司业务以教练机系列产品的设计、研制、生产、销售、维修及服务保障为主，同时从事防务产品研制生产；按收入分解分为教练机、其他航空产品和非航空产品三类。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0009\"]},{\"fact_id\":\"F02\",\"text\":\"公司是国内主要的教练机研发生产基地，当前主要产品为CJ6初级教练机、K8基础教练机和L15高级教练机，并推动由单一飞机系统向综合训练系统、由销售教练机向销售集成系统和服务保障延伸。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F03\",\"text\":\"公司是国内重要的防务产品研制生产基地之一。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"未获取防务产品的具体产品型号、用途及收入构成明细。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F04\",\"text\":\"CJ6初级教练机是我国自行研制并大量投入使用的第一种教练机，1958年首飞、1962年定型，长期用于国防和民用航空飞行员培养。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F05\",\"text\":\"K8基础教练机按国际标准设计并通过国际合作方式研制，1990年首飞，主要用于飞行员的基础训练和部分高级训练。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F06\",\"text\":\"L15高级教练机是自主研制的新一代双发超音速高级教练机，2006年3月首飞，具有第三代战斗机特征，可满足第三代战斗机飞行员的战斗入门训练和战术基础改装训练。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F07\",\"text\":\"公司可为客户提供集飞行员训练、地勤人员培训、训练保障为一体的一揽子训练解决方案。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"防务产品的具体产品与服务内容未在选定章节披露。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F08\",\"text\":\"公司营业收入主要来自教练机、其他航空产品和非航空产品的销售，2025年营业收入合计744,912.68万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0009\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"744,912.68\",\"value\":\"744912.68\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"营业收入\",\"raw_value\":\"7,449,126,774.96\",\"value\":\"7449126774.96\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F09\",\"text\":\"按商品类型分解，教练机营业收入1,771,660,977.35元，其他航空产品营业收入5,613,077,664.98元，非航空产品营业收入64,388,132.63元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"教练机营业收入\",\"raw_value\":\"1,771,660,977.35\",\"value\":\"1771660977.35\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"其他航空产品营业收入\",\"raw_value\":\"5,613,077,664.98\",\"value\":\"5613077664.98\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"非航空产品营业收入\",\"raw_value\":\"64,388,132.63\",\"value\":\"64388132.63\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F10\",\"text\":\"按经营地区分类，境内营业收入6,183,842,802.41元，境外营业收入1,265,283,972.55元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"境内营业收入\",\"raw_value\":\"6,183,842,802.41\",\"value\":\"6183842802.41\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"境外营业收入\",\"raw_value\":\"1,265,283,972.55\",\"value\":\"1265283972.55\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F11\",\"text\":\"按市场或客户类型分类，关联方营业收入7,446,901,682.06元，非关联方营业收入2,225,092.90元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"关联方营业收入\",\"raw_value\":\"7,446,901,682.06\",\"value\":\"7446901682.06\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"非关联方营业收入\",\"raw_value\":\"2,225,092.90\",\"value\":\"2225092.90\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F12\",\"text\":\"主营业务收入7,407,782,130.11元、成本7,199,519,669.32元；其他业务收入41,344,644.85元、成本30,012,676.58元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"主营业务收入\",\"raw_value\":\"7,407,782,130.11\",\"value\":\"7407782130.11\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"主营业务成本\",\"raw_value\":\"7,199,519,669.32\",\"value\":\"7199519669.32\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"其他业务收入\",\"raw_value\":\"41,344,644.85\",\"value\":\"41344644.85\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"其他业务成本\",\"raw_value\":\"30,012,676.58\",\"value\":\"30012676.58\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取各产品的单价、销量及定价机制。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F13\",\"text\":\"2025年公司营业收入744,912.68万元，同比增长41.83%，营业收入创历史新高；营业成本722,953.23万元，同比增长42.54%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"metrics\":[{\"name\":\"营业收入同比增长率\",\"raw_value\":\"41.83\",\"value\":\"41.83\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"营业成本\",\"raw_value\":\"7,229,532,345.90\",\"value\":\"7229532345.90\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"营业成本同比增长率\",\"raw_value\":\"42.54\",\"value\":\"42.54\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F14\",\"text\":\"2025年归属于上市公司股东的净利润3,975.98万元，同比增长1.33%；扣除非经常性损益后的净利润3,739.35万元，同比增长42.44%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"3,975.98\",\"value\":\"3975.98\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"归属于上市公司股东的净利润同比增长率\",\"raw_value\":\"1.33\",\"value\":\"1.33\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"扣除非经常性损益后的净利润\",\"raw_value\":\"3,739.35\",\"value\":\"3739.35\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"扣除非经常性损益后的净利润同比增长率\",\"raw_value\":\"42.44\",\"value\":\"42.44\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F15\",\"text\":\"按成本构成，教练机成本合计1,597,275,236.08元，其中材料及外部加工费1,435,834,564.90元、工资及附加82,724,948.91元、制造费用78,715,722.27元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"教练机成本合计\",\"raw_value\":\"1,597,275,236.08\",\"value\":\"1597275236.08\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"教练机材料及外部加工费\",\"raw_value\":\"1,435,834,564.90\",\"value\":\"1435834564.90\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"教练机工资及附加\",\"raw_value\":\"82,724,948.91\",\"value\":\"82724948.91\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"教练机制造费用\",\"raw_value\":\"78,715,722.27\",\"value\":\"78715722.27\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F16\",\"text\":\"按成本构成，其他航空产品成本合计5,582,310,615.67元，其中材料及外部加工费5,097,356,854.30元、工资及附加253,333,268.46元、制造费用231,620,492.91元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"其他航空产品成本合计\",\"raw_value\":\"5,582,310,615.67\",\"value\":\"5582310615.67\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"其他航空产品材料及外部加工费\",\"raw_value\":\"5,097,356,854.30\",\"value\":\"5097356854.30\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"其他航空产品工资及附加\",\"raw_value\":\"253,333,268.46\",\"value\":\"253333268.46\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"其他航空产品制造费用\",\"raw_value\":\"231,620,492.91\",\"value\":\"231620492.91\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F17\",\"text\":\"按成本构成，非航空产品成本合计19,933,817.57元，其中材料及外部加工费9,824,173.54元、工资及附加3,972,444.95元、制造费用6,137,199.08元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"metrics\":[{\"name\":\"非航空产品成本合计\",\"raw_value\":\"19,933,817.57\",\"value\":\"19933817.57\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"非航空产品材料及外部加工费\",\"raw_value\":\"9,824,173.54\",\"value\":\"9824173.54\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"非航空产品工资及附加\",\"raw_value\":\"3,972,444.95\",\"value\":\"3972444.95\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"非航空产品制造费用\",\"raw_value\":\"6,137,199.08\",\"value\":\"6137199.08\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取各产品收入占比的明确披露数值，仅可按收入分解数据理解结构。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F18\",\"text\":\"公司基础材料采购主要包括金属原材料、非金属原材料、电子元器件、成附件、外协加工件等多个种类，由物资采购部门根据需求计划以招标、询价等方式实施采购。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F19\",\"text\":\"航空产品主要采用合同订单、多方协议等方式组织生产，公司建立科研生产指挥调度体系，利用信息化手段下达生产计划指令并协调质量检验、工艺与生产人员协作。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]},{\"fact_id\":\"F20\",\"text\":\"报告期内公司上游供应链情况不断改善，并围绕“精益+数智”理念推进产线及工序优化，产品产能显著提升。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}],\"limitations\":[\"未获取主要原材料的具体供应商、采购金额及采购集中度。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F21\",\"text\":\"按经营地区分类，公司2025年境内营业收入6,183,842,802.41元、境外营业收入1,265,283,972.55元，市场覆盖境内与境外。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F22\",\"text\":\"按市场或客户类型分类，关联方营业收入7,446,901,682.06元、非关联方营业收入2,225,092.90元；公司按同一控制口径合并列示主要客户和供应商。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0009\"]},{\"fact_id\":\"F23\",\"text\":\"公司教练机产品面向飞行员训练、地勤人员培训及训练保障等客户需求，提供一揽子训练解决方案；民用初教六飞机继续拓展国内市场。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"]}],\"limitations\":[\"未获取主要客户的具体名称、销售金额及客户集中度明细。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F24\",\"text\":\"报告期内营业收入和营业成本均增长，主要系本期产品交付数量增加；营业成本增长主要随收入增加而增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0006\"]},{\"fact_id\":\"F25\",\"text\":\"报告期内销售费用同比增长25.45%，主要系销售服务费增加；管理费用同比增长34.59%，主要系职工薪酬增加；研发费用同比增长26.51%，主要系研发投入增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"销售费用同比增长率\",\"raw_value\":\"25.45\",\"value\":\"25.45\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"管理费用同比增长率\",\"raw_value\":\"34.59\",\"value\":\"34.59\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"研发费用同比增长率\",\"raw_value\":\"26.51\",\"value\":\"26.51\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F26\",\"text\":\"报告期内经营活动产生的现金流量净额为165,279,020.89元，主要系本期销售商品收到的现金增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"经营活动产生的现金流量净额\",\"raw_value\":\"165,279,020.89\",\"value\":\"165279020.89\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取分产品收入变动的具体原因及订单储备明细。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F27\",\"text\":\"报告期内公司业务类型、利润构成或利润来源未发生重大变动，业务、产品或服务未发生重大变化或调整，报告期主要子公司股权变动导致合并范围变化亦不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0007\"]},{\"fact_id\":\"F28\",\"text\":\"报告期内公司生产高级教练机参加首都“九三阅兵”，L15高教机跨国转场交付并亮相国际航展，初教-6飞机参加北京、珠海、南昌、沈阳等多次航展或开放日活动。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F29\",\"text\":\"报告期内公司多个新型号项目研制及竞标工作取得重大进展，为“十五五”发展提供储备；参股公司洪都商飞C919项目产品交付再创新高。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}],\"limitations\":[\"未获取新型号项目的具体名称、进度节点及C919项目的收入贡献金额。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F30\",\"text\":\"公司处于航空产品研发制造环节，主要从事教练机系列产品的设计、研制、生产、销售、维修及服务保障，并从事防务产品研制生产。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F31\",\"text\":\"公司所需基础材料主要包括金属原材料、非金属原材料、电子元器件、成附件、外协加工件等多个种类，通过招标、询价等方式采购。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"未获取具体原材料供应商名称及采购金额。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F32\",\"text\":\"公司教练机产品用于飞行员训练、地勤人员培训及训练保障，客户覆盖境内与境外市场，关联方销售占营业收入绝大部分。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0009\"]}],\"limitations\":[\"未获取具体客户名称及终端用户构成。\"]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F33\",\"text\":\"公司教练机装备体系按“集中筛选、基础通训、专业分轨”构建，将传统教练机业务内涵由单一飞机系统向综合训练系统延伸。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F34\",\"text\":\"公司本报告期末已签订合同但尚未履行或尚未履行完毕的履约义务对应收入金额为681,960万元，预计将于2026年度确认收入。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"尚未履行履约义务对应收入金额\",\"raw_value\":\"681,960\",\"value\":\"681960\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取该履约义务对应的具体产品构成及客户分布。\"]},\"limitations\":[\"未获取防务产品的具体型号、用途及收入构成明细。\",\"未获取各产品的单价、销量及定价机制。\",\"未获取主要客户和供应商的具体名称、金额及集中度明细。\",\"未获取新型号项目的具体名称、进度节点及C919项目的收入贡献金额。\"]}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F01",
+                "text": "公司业务以教练机系列产品的设计、研制、生产、销售、维修及服务保障为主，同时从事防务产品研制生产；按收入分解分为教练机、其他航空产品和非航空产品三类。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0009"
+                ]
+              },
+              {
+                "fact_id": "F02",
+                "text": "公司是国内主要的教练机研发生产基地，当前主要产品为CJ6初级教练机、K8基础教练机和L15高级教练机，并推动由单一飞机系统向综合训练系统、由销售教练机向销售集成系统和服务保障延伸。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F03",
+                "text": "公司是国内重要的防务产品研制生产基地之一。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取防务产品的具体产品型号、用途及收入构成明细。"
+            ]
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F04",
+                "text": "CJ6初级教练机是我国自行研制并大量投入使用的第一种教练机，1958年首飞、1962年定型，长期用于国防和民用航空飞行员培养。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F05",
+                "text": "K8基础教练机按国际标准设计并通过国际合作方式研制，1990年首飞，主要用于飞行员的基础训练和部分高级训练。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F06",
+                "text": "L15高级教练机是自主研制的新一代双发超音速高级教练机，2006年3月首飞，具有第三代战斗机特征，可满足第三代战斗机飞行员的战斗入门训练和战术基础改装训练。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F07",
+                "text": "公司可为客户提供集飞行员训练、地勤人员培训、训练保障为一体的一揽子训练解决方案。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "防务产品的具体产品与服务内容未在选定章节披露。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F08",
+                "text": "公司营业收入主要来自教练机、其他航空产品和非航空产品的销售，2025年营业收入合计744,912.68万元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004",
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "744,912.68",
+                    "value": "744912.68",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "营业收入",
+                    "raw_value": "7,449,126,774.96",
+                    "value": "7449126774.96",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F09",
+                "text": "按商品类型分解，教练机营业收入1,771,660,977.35元，其他航空产品营业收入5,613,077,664.98元，非航空产品营业收入64,388,132.63元。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "教练机营业收入",
+                    "raw_value": "1,771,660,977.35",
+                    "value": "1771660977.35",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "其他航空产品营业收入",
+                    "raw_value": "5,613,077,664.98",
+                    "value": "5613077664.98",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "非航空产品营业收入",
+                    "raw_value": "64,388,132.63",
+                    "value": "64388132.63",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F10",
+                "text": "按经营地区分类，境内营业收入6,183,842,802.41元，境外营业收入1,265,283,972.55元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "境内营业收入",
+                    "raw_value": "6,183,842,802.41",
+                    "value": "6183842802.41",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "境外营业收入",
+                    "raw_value": "1,265,283,972.55",
+                    "value": "1265283972.55",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F11",
+                "text": "按市场或客户类型分类，关联方营业收入7,446,901,682.06元，非关联方营业收入2,225,092.90元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "关联方营业收入",
+                    "raw_value": "7,446,901,682.06",
+                    "value": "7446901682.06",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "非关联方营业收入",
+                    "raw_value": "2,225,092.90",
+                    "value": "2225092.90",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F12",
+                "text": "主营业务收入7,407,782,130.11元、成本7,199,519,669.32元；其他业务收入41,344,644.85元、成本30,012,676.58元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "主营业务收入",
+                    "raw_value": "7,407,782,130.11",
+                    "value": "7407782130.11",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "主营业务成本",
+                    "raw_value": "7,199,519,669.32",
+                    "value": "7199519669.32",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "其他业务收入",
+                    "raw_value": "41,344,644.85",
+                    "value": "41344644.85",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "其他业务成本",
+                    "raw_value": "30,012,676.58",
+                    "value": "30012676.58",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取各产品的单价、销量及定价机制。"
+            ]
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F13",
+                "text": "2025年公司营业收入744,912.68万元，同比增长41.83%，营业收入创历史新高；营业成本722,953.23万元，同比增长42.54%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003",
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入同比增长率",
+                    "raw_value": "41.83",
+                    "value": "41.83",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "营业成本",
+                    "raw_value": "7,229,532,345.90",
+                    "value": "7229532345.90",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "营业成本同比增长率",
+                    "raw_value": "42.54",
+                    "value": "42.54",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F14",
+                "text": "2025年归属于上市公司股东的净利润3,975.98万元，同比增长1.33%；扣除非经常性损益后的净利润3,739.35万元，同比增长42.44%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "归属于上市公司股东的净利润",
+                    "raw_value": "3,975.98",
+                    "value": "3975.98",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "归属于上市公司股东的净利润同比增长率",
+                    "raw_value": "1.33",
+                    "value": "1.33",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "扣除非经常性损益后的净利润",
+                    "raw_value": "3,739.35",
+                    "value": "3739.35",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "扣除非经常性损益后的净利润同比增长率",
+                    "raw_value": "42.44",
+                    "value": "42.44",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F15",
+                "text": "按成本构成，教练机成本合计1,597,275,236.08元，其中材料及外部加工费1,435,834,564.90元、工资及附加82,724,948.91元、制造费用78,715,722.27元。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "教练机成本合计",
+                    "raw_value": "1,597,275,236.08",
+                    "value": "1597275236.08",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "教练机材料及外部加工费",
+                    "raw_value": "1,435,834,564.90",
+                    "value": "1435834564.90",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "教练机工资及附加",
+                    "raw_value": "82,724,948.91",
+                    "value": "82724948.91",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "教练机制造费用",
+                    "raw_value": "78,715,722.27",
+                    "value": "78715722.27",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F16",
+                "text": "按成本构成，其他航空产品成本合计5,582,310,615.67元，其中材料及外部加工费5,097,356,854.30元、工资及附加253,333,268.46元、制造费用231,620,492.91元。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "其他航空产品成本合计",
+                    "raw_value": "5,582,310,615.67",
+                    "value": "5582310615.67",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "其他航空产品材料及外部加工费",
+                    "raw_value": "5,097,356,854.30",
+                    "value": "5097356854.30",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "其他航空产品工资及附加",
+                    "raw_value": "253,333,268.46",
+                    "value": "253333268.46",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "其他航空产品制造费用",
+                    "raw_value": "231,620,492.91",
+                    "value": "231620492.91",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F17",
+                "text": "按成本构成，非航空产品成本合计19,933,817.57元，其中材料及外部加工费9,824,173.54元、工资及附加3,972,444.95元、制造费用6,137,199.08元。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006",
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "非航空产品成本合计",
+                    "raw_value": "19,933,817.57",
+                    "value": "19933817.57",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "非航空产品材料及外部加工费",
+                    "raw_value": "9,824,173.54",
+                    "value": "9824173.54",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "非航空产品工资及附加",
+                    "raw_value": "3,972,444.95",
+                    "value": "3972444.95",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "非航空产品制造费用",
+                    "raw_value": "6,137,199.08",
+                    "value": "6137199.08",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取各产品收入占比的明确披露数值，仅可按收入分解数据理解结构。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F18",
+                "text": "公司基础材料采购主要包括金属原材料、非金属原材料、电子元器件、成附件、外协加工件等多个种类，由物资采购部门根据需求计划以招标、询价等方式实施采购。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F19",
+                "text": "航空产品主要采用合同订单、多方协议等方式组织生产，公司建立科研生产指挥调度体系，利用信息化手段下达生产计划指令并协调质量检验、工艺与生产人员协作。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "F20",
+                "text": "报告期内公司上游供应链情况不断改善，并围绕“精益+数智”理念推进产线及工序优化，产品产能显著提升。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取主要原材料的具体供应商、采购金额及采购集中度。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F21",
+                "text": "按经营地区分类，公司2025年境内营业收入6,183,842,802.41元、境外营业收入1,265,283,972.55元，市场覆盖境内与境外。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ]
+              },
+              {
+                "fact_id": "F22",
+                "text": "按市场或客户类型分类，关联方营业收入7,446,901,682.06元、非关联方营业收入2,225,092.90元；公司按同一控制口径合并列示主要客户和供应商。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007",
+                  "source-0009"
+                ]
+              },
+              {
+                "fact_id": "F23",
+                "text": "公司教练机产品面向飞行员训练、地勤人员培训及训练保障等客户需求，提供一揽子训练解决方案；民用初教六飞机继续拓展国内市场。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0003"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取主要客户的具体名称、销售金额及客户集中度明细。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F24",
+                "text": "报告期内营业收入和营业成本均增长，主要系本期产品交付数量增加；营业成本增长主要随收入增加而增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005",
+                  "source-0006"
+                ]
+              },
+              {
+                "fact_id": "F25",
+                "text": "报告期内销售费用同比增长25.45%，主要系销售服务费增加；管理费用同比增长34.59%，主要系职工薪酬增加；研发费用同比增长26.51%，主要系研发投入增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": [
+                  {
+                    "name": "销售费用同比增长率",
+                    "raw_value": "25.45",
+                    "value": "25.45",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "管理费用同比增长率",
+                    "raw_value": "34.59",
+                    "value": "34.59",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "研发费用同比增长率",
+                    "raw_value": "26.51",
+                    "value": "26.51",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F26",
+                "text": "报告期内经营活动产生的现金流量净额为165,279,020.89元，主要系本期销售商品收到的现金增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": [
+                  {
+                    "name": "经营活动产生的现金流量净额",
+                    "raw_value": "165,279,020.89",
+                    "value": "165279020.89",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取分产品收入变动的具体原因及订单储备明细。"
+            ]
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F27",
+                "text": "报告期内公司业务类型、利润构成或利润来源未发生重大变动，业务、产品或服务未发生重大变化或调整，报告期主要子公司股权变动导致合并范围变化亦不适用。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005",
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "F28",
+                "text": "报告期内公司生产高级教练机参加首都“九三阅兵”，L15高教机跨国转场交付并亮相国际航展，初教-6飞机参加北京、珠海、南昌、沈阳等多次航展或开放日活动。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              },
+              {
+                "fact_id": "F29",
+                "text": "报告期内公司多个新型号项目研制及竞标工作取得重大进展，为“十五五”发展提供储备；参股公司洪都商飞C919项目产品交付再创新高。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取新型号项目的具体名称、进度节点及C919项目的收入贡献金额。"
+            ]
+          }
+        },
+        "supply_chain": {
+          "position": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F30",
+                "text": "公司处于航空产品研发制造环节，主要从事教练机系列产品的设计、研制、生产、销售、维修及服务保障，并从事防务产品研制生产。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "upstream_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F31",
+                "text": "公司所需基础材料主要包括金属原材料、非金属原材料、电子元器件、成附件、外协加工件等多个种类，通过招标、询价等方式采购。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取具体原材料供应商名称及采购金额。"
+            ]
+          },
+          "downstream_customers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F32",
+                "text": "公司教练机产品用于飞行员训练、地勤人员培训及训练保障，客户覆盖境内与境外市场，关联方销售占营业收入绝大部分。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0009"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取具体客户名称及终端用户构成。"
+            ]
+          }
+        },
+        "company_features": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F33",
+              "text": "公司教练机装备体系按“集中筛选、基础通训、专业分轨”构建，将传统教练机业务内涵由单一飞机系统向综合训练系统延伸。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F34",
+              "text": "公司本报告期末已签订合同但尚未履行或尚未履行完毕的履约义务对应收入金额为681,960万元，预计将于2026年度确认收入。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "尚未履行履约义务对应收入金额",
+                  "raw_value": "681,960",
+                  "value": "681960",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未获取该履约义务对应的具体产品构成及客户分布。"
+          ]
+        },
+        "limitations": [
+          "未获取防务产品的具体型号、用途及收入构成明细。",
+          "未获取各产品的单价、销量及定价机制。",
+          "未获取主要客户和供应商的具体名称、金额及集中度明细。",
+          "未获取新型号项目的具体名称、进度节点及C919项目的收入贡献金额。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 8204,
+        "output_tokens": 5074,
+        "total_tokens": 13278
+      }
+    }
+  ],
+  "workpaper_summary": {
+    "origin": "llm_generated",
+    "business_description": "公司业务以教练机系列产品的设计、研制、生产、销售、维修及服务保障为主，同时从事防务产品研制生产；按收入分解分为教练机、其他航空产品和非航空产品三类。\n公司是国内主要的教练机研发生产基地，当前主要产品为CJ6初级教练机、K8基础教练机和L15高级教练机，并推动由单一飞机系统向综合训练系统、由销售教练机向销售集成系统和服务保障延伸。\n公司是国内重要的防务产品研制生产基地之一。",
+    "fact_count": 34,
+    "metric_count": 37,
+    "element_fact_counts": {
+      "business_structure": 3,
+      "products_services": 4,
+      "revenue_model": 5,
+      "scale_and_mix": 5,
+      "operations_and_inputs": 3,
+      "customers_channels_markets": 3,
+      "operating_drivers": 3,
+      "material_changes": 3,
+      "position": 1,
+      "upstream_inputs": 1,
+      "downstream_customers": 1,
+      "company_features": 2
+    },
+    "review_status": null,
+    "open_finding_count": null,
+    "extraction_model": "deepseek-flash",
+    "review_model": null,
+    "delivery_counts": {
+      "reviewed": 0,
+      "pending": 33,
+      "limited": 1,
+      "source_only": 0,
+      "withheld": 0,
+      "duplicate": 0
+    },
+    "delivery_pending_review_count": 34,
+    "delivery_reviewed_count": 0,
+    "delivery_pending_count": 33,
+    "delivery_limited_count": 1,
+    "delivery_source_only_count": 0,
+    "delivery_withheld_count": 0,
+    "delivery_duplicate_count": 0
+  }
+}

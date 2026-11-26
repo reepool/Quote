@@ -1,0 +1,198 @@
+{
+  "task": "6.FO",
+  "state": "completed",
+  "head": "9333cfdb476bd40b9ea38d1b8628c5ef7a9201e0",
+  "started_utc": "2026-11-26T05:52:49.652269+00:00",
+  "completed_utc": "2026-11-26T05:58:18.274385+00:00",
+  "root": "data/research/company_profile_research_v1_20261123",
+  "source_root": "data/research/company_profile_v1_acceptance_delivery_20261125",
+  "writer_api": "research.company_profile.runtime.CompanyProfileResearchWriter(ROOT).persist(CompanyProfileRuntimeRecordV3)",
+  "record_namespace": "company_profile_common_core.v1",
+  "appended_record_sha256": {
+    "bp-work-0788cd766ed03e2101c554ec.json": "863fcd266bc830c1284eb570044d64edf646eb445a71631c0f90b67886d47a72",
+    "bp-work-19245b8818529e39de4597b1.json": "24fe2b7080db7f02219decc5b3ab66d1bbefe906829dff3f127039eb303e7de0",
+    "bp-work-258f35a5274cfd89f1fd04d0.json": "17df53627572dbac4757653b3040b51f2c10afdd95e9304858b323ebe8d0f23a",
+    "bp-work-2d2d4d8fb14d282413fbbb1b.json": "85b839d02976e0be7b7964fd45727dc55cb420475c03e1dcae447f132a8921d0",
+    "bp-work-3169eae2a749e9bf1ca9ff6a.json": "6d52a0e51630ec5c971f3019beb27e675f9c276bf00eca225bdcbd3d7bcfd4e8",
+    "bp-work-32edf60f200679548ba71b54.json": "aa1a434c166b9bca3e307df24a8d41795fc72632fea81ab29bdffb65372bc23d",
+    "bp-work-3365870b26619438dab9801d.json": "c4a58f719542037021c3e2c411670d89410f6519d9c48181fdb1f8b61b923139",
+    "bp-work-48e5b38db9e2d9737d7a6c78.json": "0e1ac61d276a45ee049c19458fb2c1ec3ac41aecc1c9b61fc19a9be6440eb2eb",
+    "bp-work-4f21b99f14baca20ca15695f.json": "fc295f475bc58d0133899937352da41cb1190c0a3be80af79ba24dfff1b66cbe",
+    "bp-work-59dd96b7c16016e086830a4c.json": "d6262dbed43fe4db1a5618c57cd25483a9ab655e9105569338048a69ae47b586",
+    "bp-work-6127d9c4284821a709f416d7.json": "81bd99a62f9afb775f7fa2b8ace3905a7c60dd130e96a4baaa85f5a1d23efc53",
+    "bp-work-6faebb6704cfd05745377228.json": "49bb5b775cd362b8c48fa1ff61551310ba282c5386ca8861ae560661dae6d950",
+    "bp-work-7068e0776aa19710a81fb7c4.json": "5e72d7e08d333e711c4f6978dac0f566e518071680523e52b203dee7059f607c",
+    "bp-work-744f502f4ba6b08019eced75.json": "d51e333b32c590957c65d909e84085d5ae262d2c01a4df2dc17661e90d891081",
+    "bp-work-788b9eae85cbfa6c2008d5fb.json": "174f74d09475f97226b30fe661e9290a67f0b7c2c13534e25e7f157ee7929f4f",
+    "bp-work-7bec633c2400d091092cd7b3.json": "a5dcc3deb95a9682b0daf85e43a101376c86a45814535f04ec5a09c7f3b8f10e",
+    "bp-work-8316cdd34724f6bb6acdc31a.json": "e66c1ce309093bd875b75c3ca613f1974cfacf5f1ebaa9c5f42d8919cde0c96a",
+    "bp-work-83aa187421a98d76bb66b040.json": "0942dec9cbe8a27168a940824b9541561e086d140d72e3a4f2002d2a6fadfebe",
+    "bp-work-862ee2f2a51376e353c98ed7.json": "5d8f2ade3f4f3a16a162f3bfce63263ca2363fceba1cd9f360382f80e3f7aafe",
+    "bp-work-8a79aad137905d90638f9dca.json": "97693a710499b060fa6b2f77ca86785d1e53fd45f31a477dedb88a1bcdc315d0",
+    "bp-work-8ca1312ebb67ec10559481b4.json": "e0d9cece0e558c08a24183688e01845646481247c896775e2d617a46d271d8bd",
+    "bp-work-9d9c2637afa2f4ffc35c6fcc.json": "843c1a5915371b8b19a70a1059ddbd2110f4aaadc5f79c68c454bd674e04ae96",
+    "bp-work-a62efc2b380d6db237e8a489.json": "3fe569ae988cebb8416bebd011b2356edf00e1764e3e02667f34da3dc3fc29f3",
+    "bp-work-a6a7755d6c83449f04afbe9f.json": "a1ac4619a146ec9779867bebbe941035f0ea7801294b143970b69acfd2a80081",
+    "bp-work-b1b57d7ae854aad5d4c3b50c.json": "59126a073df5ad466347c34f6ce06dfbb83b75cb216eeadd719a2cb79543922d",
+    "bp-work-b2be2ad9371561029ff7648f.json": "a76b98b9acccec63ccfe376787c8737390bdbf09e3525241d0e6bc0733b67c21",
+    "bp-work-b37054c9acc8953c37d6a3fa.json": "b67e4edfa4e449d52b2a23d491664672d384a0b520baf57b42c09ff5b04e1b7b",
+    "bp-work-c5f9ab4bd5ad7613874faf67.json": "002b385c578ad51ab4b87cf839dcb35b0b3961d824e29fe2c388b13ce9cf9e71",
+    "bp-work-cd0afb1f99731027937f26cf.json": "838108f15616b63ecb31001983bab9add15e191ca86b2d11d3997677f2621c9c",
+    "bp-work-d9b77c219ac40f2677b1a702.json": "958a37d973c175fb2875204c408b3913d6475be39aca1231179a9825e8e912eb",
+    "bp-work-e53470a4bfe65c83d9a82b89.json": "ad57cc52815437c2b6a679f89194c56b18af9e81204501b1d724db9c05cacc27",
+    "bp-work-f1cba483b4bf6e44862a2468.json": "9b9a5655e72a375b3e0ea19f0f596aa4a16f1d70457086a42d3b9d76cc076bf4",
+    "bp-work-f235e147abad92262fc44186.json": "1fd5d250dbfd92e7c6db1c9cf0258fecf15fa18ad8d851c07c40fd0a5decc189",
+    "bp-work-f324eb47588bae02e1a52b84.json": "b2f85d45048659b5151f520f2447b03746e224f810d6bcbdd2387f77769e43fa",
+    "bp-work-f7e0f0a8da3af9c1e51ec585.json": "f6e526cfc4e6d663eaccd05b8348dd07f023e1a5b9279a43ed46fe701f1f2865",
+    "bp-work-fc3566d2cc59a5303e29916b.json": "b557929533de7ab6936eeaeb74e1c0cd0cfcda2c45c9910273208ddbff5c953c"
+  },
+  "record_set_sha256": "b65c25aea4cbbcaca8c6ce86ca2f9046c7ef4d8616563f06734b4b38395f1a4e",
+  "base_records": 18,
+  "hash_bound_review_successors": 18,
+  "record_collisions": 0,
+  "stock_overlap": [],
+  "source_writer_serialization_and_target_bytes_equal": true,
+  "profiles": 39,
+  "prior_profiles_unchanged": 21,
+  "new_profiles_equal_safe_delivery": 18,
+  "full_profiles_equal_A_expected": true,
+  "A_expected_sha256": "b8e58e99632e4415f51d666a48541ce5e18aa4673892b08dc3ac669c045f6550",
+  "visible_facts": 1082,
+  "visible_metrics": 1648,
+  "requested_instruments": 41,
+  "missing_instruments": [
+    "601788.SH",
+    "002736.SZ"
+  ],
+  "missing_reason": "annual_report_profile_not_found",
+  "full_model_source_review_restriction_gap_ancestry_preserved": true,
+  "api_path": "data/research/company_profile_research_v1_20261123/current-api-6fo-20261126.json",
+  "api_sha256": "5278df57188627da8f406c3895ab25a604d473abbbbbe032f0899a85a171a934",
+  "export_directory": "data/research/company_profile_research_v1_20261123/exports-6fo-20261126",
+  "export_file_count": 84,
+  "export_tree_sha256": "3b9f0554fa01d358632ecb7793d80a5e986ba093729d3564efd1c480c7a3334f",
+  "export_key_sha256": {
+    "annual_profiles.json": "2a6e49968b47a92c72f6d322bcdf7eb54b287eef5f888a48043b398f28a8d19f",
+    "annual_profiles.md": "558390b9a74090b1812c293ccd42b2d93a3f3ad27fe634cb51b86f01d7c2fc3b",
+    "profiles.csv": "ccb5505b4b17c2ee8e40472ac7e8ae7ad53f5d8b7509209992ef6be6746cc4a9",
+    "export_manifest.json": "1faa559041c6745fd85e6eba60db7a05ca9737785ef64d0df4eab156ca629852"
+  },
+  "export_full_profiles_equal_A_expected": true,
+  "preservation_before_documentation": {
+    "existing_root_files": 260,
+    "safe_delivery_files": 38,
+    "baseline_dirty_files": 49,
+    "root_files_unchanged": true,
+    "dirty_unchanged_except_A_parallel_documentation": true
+  },
+  "A_parallel_documentation_changes": {
+    "docs/development/company_profile_delivery_plan.md": {
+      "A_frozen_sha256": "3a3a2b8a28081c742808d875a0a2867f1b6865bd0b387e5c8fceb377e2315591",
+      "current_sha256": "e4e9f69a4e0213a619961967471a415596ec8ad4b19d8a25176912e8fa4764c1"
+    },
+    "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md": {
+      "A_frozen_sha256": "b85de07091f3df85757462133727b1e8c32176250be3743ae7f7eb33f26432f5",
+      "current_sha256": "a0a497de03ba09fe03f6a66700c40bd82016ca3637a6d10b702cc955af4cfe87"
+    }
+  },
+  "previous_6FN_temporary_roots_matching_glob": [],
+  "timing_seconds": {
+    "append": 0.113,
+    "reader": 21.012,
+    "export": 22.151,
+    "total": 57.517
+  },
+  "new_model_calls": 0,
+  "new_supplier_usage": 0,
+  "shared_configuration_changes": 0,
+  "application_source_changes": 0,
+  "B_HTTP_checks": 0,
+  "HTTP_independent_verification_owner": "A",
+  "staging_or_commits_by_B": 0,
+  "formal_acceptance": "6.FN_failed_unchanged",
+  "production_authorization": "not_authorized",
+  "validation_command": "source scripts/quote_dev_env.sh; PYTHONPATH=/home/python/Quote /home/python/miniconda3/envs/Quote/bin/python <B-owned QuoteBak>/deliver.py",
+  "prewrite_failures": [
+    "system python command unavailable; python3 lacks pandas; retried with existing Quote interpreter",
+    "strict dirty baseline detected A-owned delivery-plan update before any record write; A-owned parallel documentation differences are now reported separately"
+  ],
+  "documentation_sha256": {
+    "data/research/company_profile_research_v1_20261123/research-current.md": "f7ea44ecc927b3093245c12f405561f94dcd5d5d946a5f3e09fe2a99932b35d6",
+    "docs/research/company_profile_http_tasks.md": "438dbfb43ae0aa2e9310e32c771d6b331ec57389e6f13bea1db78eca703d0b5c"
+  },
+  "relative_link_checks": {
+    "data/research/company_profile_research_v1_20261123/research-current.md": {
+      "local_links": 11,
+      "all_exist": true
+    },
+    "docs/research/company_profile_http_tasks.md": {
+      "local_links": 3,
+      "all_exist": true
+    }
+  },
+  "final_preservation": {
+    "baseline_root_files": 298,
+    "unchanged": 297,
+    "authorized_changed": [
+      "data/research/company_profile_research_v1_20261123/research-current.md"
+    ],
+    "safe_delivery_all_38_unchanged": true,
+    "all_36_added_bytes_match_source": true,
+    "B_touched_baseline_dirty_files": 0,
+    "baseline_dirty_files": 49,
+    "other_dirty_files_unchanged": 47
+  },
+  "B_write_set": {
+    "main_root_new_records": 36,
+    "new_api_snapshots": 1,
+    "new_export_files": 84,
+    "updated_existing_documents": [
+      "data/research/company_profile_research_v1_20261123/research-current.md",
+      "docs/research/company_profile_http_tasks.md"
+    ],
+    "evidence_files": [
+      "b-result.json",
+      "cleanup.json"
+    ],
+    "total_paths": 125,
+    "export_file_list_owner": "data/research/company_profile_research_v1_20261123/exports-6fo-20261126/export_manifest.json"
+  },
+  "final_review": "B delivery and cleanup complete. A independent HTTP acceptance passed with actual dependencies and no overrides; A reports no current P1/P2. A owns remaining Review/strict/isolated Git.",
+  "B_terminal_checks": [
+    "36 exact byte hashes; 18 exact parent/hash/report links; no collisions",
+    "fresh original reader 39 full profiles and original annual export equal A expected",
+    "297 protected files unchanged; only research-current.md authorized update",
+    "two documentation relative-link sets resolve; no B edits to original 49 dirty files"
+  ],
+  "cleanup_evidence": "cleanup.json",
+  "delivery_logical_bytes": {
+    "appended_36_records": 7813632,
+    "current_api_snapshot": 12786812,
+    "exports_84_files": 37509563,
+    "updated_documents": {
+      "data/research/company_profile_research_v1_20261123/research-current.md": 4799,
+      "docs/research/company_profile_http_tasks.md": 9751
+    }
+  },
+  "A_independent_acceptance": {
+    "evidence": "a-read-audit.json",
+    "sha256": "82b41727cdc649b19ac7b6b966f63e6cb7ed5027af20c4f76164daaef60a6f11",
+    "result": "passed",
+    "actual_HTTP_dependency": true,
+    "dependency_overrides": false,
+    "HTTP_200_calls": 8,
+    "complete_profiles_equal": 39,
+    "original_profiles_unchanged": 21,
+    "new_profiles_equal_safe_delivery": 18,
+    "protected_files_unchanged": 297,
+    "read_plan_records_unchanged": true,
+    "new_model_requests": 0
+  },
+  "B_cleanup_final": {
+    "temporary_root": "/home/python/Quote/data/QuoteBak/company-profile-6fo-b-dKOvkrzU",
+    "temporary_root_absent": true,
+    "removed_files": 5,
+    "removed_logical_bytes": 18383,
+    "new_temporary_artifacts_for_final_handoff": 0
+  }
+}

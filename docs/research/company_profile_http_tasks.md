@@ -2,7 +2,37 @@
 
 这是已有 TaskService 的研究入口，供有限授权范围内的首读、后台复核和按股补读使用。
 普通画像 GET、批量查询和计划接口始终只读，不会因为缺项或未核状态自动调用模型。
-配置策略不会自动执行任务，也不代表取得付费、外传或生产授权。本轮6.FL仅作离线工程验证。
+配置策略不会自动执行任务，也不代表取得付费、外传或生产授权。6.FL工程验证及后续真实任务各保原范围。
+
+## 当前39股研究读取（2026-11-26，6.FO）
+
+API进程显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT=/home/python/Quote/data/research/company_profile_research_v1_20261123`。
+共享默认配置未改；普通研究读取无需安装任务策略。当前统一39股、1082条可读内容/1648指标，
+原21股与新增18股的来源、模型、审核、独立限制、缺项及同报告链均保留。
+光大证券601788.SH、国信证券002736.SZ尚无画像，显式批量查询列missing，单股返回404；不自动重跑。
+
+[当前研究入口](../../data/research/company_profile_research_v1_20261123/research-current.md) ·
+[39股人读版](../../data/research/company_profile_research_v1_20261123/exports-6fo-20261126/annual_profiles.md) ·
+[当前API快照](../../data/research/company_profile_research_v1_20261123/current-api-6fo-20261126.json)
+
+只读目录：`GET /api/v1/research/company/annual-profiles`。
+单股：`GET /api/v1/research/company/600350.SH/annual-profile`。
+批量：`POST /api/v1/research/company/annual-profiles/query`，请求体例如：
+
+```json
+{"instrument_ids":["600690.SH","600350.SH","601788.SH","002736.SZ"]}
+```
+
+响应中的information_gaps、suggested_acquisitions及各reading的审核/来源用于识别具体研究问题。
+例如山东高速现有sm-12指标1的租赁收入主体限制，可仅生成补读计划：
+`POST /api/v1/research/company/600350.SH/annual-profile/enrichment-plan`，请求体为：
+
+```json
+{"request_id":"research-600350-rental-scope-1","targets":[{"element":"scale_and_mix","question":"核对2025年报其他业务租赁收入的主体与表列口径，对应现有sm-12指标1限制；保留其他业务合计与租赁收入的区别。"}]}
+```
+
+计划绑定当前work/report/hash，execution_started=false，不派任务或解除限制；真正执行仍须下述显式有限策略与授权。
+本轮只合并已保存安全稿，0新增模型/付费。6.FN正式V1未通过及原质量分不改，39股可读不等于99%、S3或生产启用。
 
 ## 服务端一次配置
 

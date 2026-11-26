@@ -1,0 +1,3429 @@
+{
+  "schema_version": "company_profile_common_core_runtime.v3",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "production_authorization": "not_authorized",
+  "work_id": "bp-work-a62efc2b380d6db237e8a489",
+  "report": {
+    "instrument_id": "601872.SH",
+    "report_id": "asset_93a674fa36e28f8b421c8a4dec6416fe",
+    "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-26T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "assessment": {
+    "mapping_version": "company_profile_common_core_mapping.v1",
+    "production_authorization": "not_authorized",
+    "report": {
+      "instrument_id": "601872.SH",
+      "report_id": "asset_93a674fa36e28f8b421c8a4dec6416fe",
+      "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-26T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "principal_business": {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "products_services": {
+      "dimension_id": "products_services",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "revenue_model": {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "core_complete": false
+  },
+  "activated_chapters": [],
+  "evidence_gap_codes": [],
+  "provider_calls": [
+    "select_profile_sections",
+    "extract_profile_workpaper",
+    "review_profile_workpaper",
+    "repair_profile_workpaper",
+    "verify_profile_workpaper_repair"
+  ],
+  "provider_blocked": false,
+  "execution": {
+    "schema_version": "company_profile_execution_record.v1",
+    "production_authorization": "not_authorized",
+    "input_identity": {
+      "instrument_id": "601872.SH",
+      "report_id": "asset_93a674fa36e28f8b421c8a4dec6416fe",
+      "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+      "report_period": "2025-12-31",
+      "policy_version": "company_profile_common_core_mapping.v2",
+      "processing_identity": {
+        "execution_mode": "provider",
+        "logical_request_timeout_seconds": 2450,
+        "max_layout_characters": 500000,
+        "max_section_characters": 160000,
+        "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+        "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "quality_review_profile": "semantic_extraction__scorpio_grok",
+        "reading_strategy": "chapter_workpaper_v1",
+        "repair_profile": "semantic_extraction__deepseek",
+        "review_existing_draft_hash": "185acf6ca35f0583b093fb4f97b455187a50ab869fd7118d7b0cda719183d100",
+        "review_max_output_tokens": 16384,
+        "review_seed_receipts_hash": "898b57f1f4bd4dc332400ece08bba1b9a9ee407644a0a2328a14fef6874c460b",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "semantic_policy": "company_profile_llm_led.v2",
+        "semantic_reuse": false,
+        "source_binding_policy": "company_workpaper_source_literals.column-wrapped-amounts.v8",
+        "workpaper_format_recovery": "local_shape_before_retry.v3",
+        "workpaper_max_output_tokens": 12000,
+        "workpaper_metric_format_policy": "source_metric_unparsed_value_null.v1",
+        "workpaper_metric_limit_policy": "source_review_exact_metric_limits.v1",
+        "workpaper_review_policy": "company_profile_workpaper_review.v13",
+        "workpaper_review_recovery": {
+          "base_work_id": "bp-work-c5f9ab4bd5ad7613874faf67",
+          "base_workpaper_sha256": "185acf6ca35f0583b093fb4f97b455187a50ab869fd7118d7b0cda719183d100",
+          "plan_sha256": "76f205a38d4baeddcfc972c5881972108a9362993650bd1c371f20c00796e06e",
+          "prior_use_review": null,
+          "report": {
+            "document_type": "annual_report",
+            "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+            "instrument_id": "601872.SH",
+            "published_at": "2026-03-26T16:00:00+00:00",
+            "report_id": "asset_93a674fa36e28f8b421c8a4dec6416fe",
+            "report_period": "2025-12-31"
+          },
+          "request_id": "6fn-review-601872-SH"
+        }
+      }
+    },
+    "scope_digests": {},
+    "model_attempts": [],
+    "token_budget": {
+      "total_token_budget": 1000000,
+      "extract_max_output_tokens": 4000,
+      "verify_max_output_tokens": 2000,
+      "tokens_used": 155905,
+      "tokens_remaining": 844095
+    },
+    "scope_token_allocations": {},
+    "transport_retries": 0,
+    "semantic_disputes": [],
+    "predecessor_lineage": []
+  },
+  "legacy_writers_invoked": [],
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "llm_generated",
+    "report": {
+      "instrument_id": "601872.SH",
+      "report_id": "asset_93a674fa36e28f8b421c8a4dec6416fe",
+      "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-26T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0025",
+          "section_path": [
+            "第二节 公司简介和主要财务指标",
+            "七、 近三年主要会计数据和财务指标"
+          ],
+          "start_page": 9,
+          "end_page": 10,
+          "rationale": "所选章节共同覆盖公司业务与产品、船队经营、当期经营结果及收入成本结构。section-0025提供近三年主要会计数据和财务指标，形成总量规模与同比基线；section-0040说明公司从事的业务、主要产品/服务及用途；section-0045为经营情况讨论与分析，覆盖船队发展及各油轮、干散货、散杂货、LNG、滚装、集装箱船队经营，解释经营角色、资源投入和本期变化；section-0058为主要经营情况，含利润表/现金流变动及收入成本分析，说明盈利来源和当期经营结果；section-0072与section-0076保留分行业收入成本表的表头与延续，提供主要业务收入权重和结构。以上均为公司层面实质经营内容，且未同时选择存在祖父子关系的条目。"
+        },
+        {
+          "section_id": "section-0040",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 12,
+          "end_page": 13,
+          "rationale": "所选章节共同覆盖公司业务与产品、船队经营、当期经营结果及收入成本结构。section-0025提供近三年主要会计数据和财务指标，形成总量规模与同比基线；section-0040说明公司从事的业务、主要产品/服务及用途；section-0045为经营情况讨论与分析，覆盖船队发展及各油轮、干散货、散杂货、LNG、滚装、集装箱船队经营，解释经营角色、资源投入和本期变化；section-0058为主要经营情况，含利润表/现金流变动及收入成本分析，说明盈利来源和当期经营结果；section-0072与section-0076保留分行业收入成本表的表头与延续，提供主要业务收入权重和结构。以上均为公司层面实质经营内容，且未同时选择存在祖父子关系的条目。"
+        },
+        {
+          "section_id": "section-0045",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 14,
+          "end_page": 18,
+          "rationale": "所选章节共同覆盖公司业务与产品、船队经营、当期经营结果及收入成本结构。section-0025提供近三年主要会计数据和财务指标，形成总量规模与同比基线；section-0040说明公司从事的业务、主要产品/服务及用途；section-0045为经营情况讨论与分析，覆盖船队发展及各油轮、干散货、散杂货、LNG、滚装、集装箱船队经营，解释经营角色、资源投入和本期变化；section-0058为主要经营情况，含利润表/现金流变动及收入成本分析，说明盈利来源和当期经营结果；section-0072与section-0076保留分行业收入成本表的表头与延续，提供主要业务收入权重和结构。以上均为公司层面实质经营内容，且未同时选择存在祖父子关系的条目。"
+        },
+        {
+          "section_id": "section-0058",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ],
+          "start_page": 20,
+          "end_page": 21,
+          "rationale": "所选章节共同覆盖公司业务与产品、船队经营、当期经营结果及收入成本结构。section-0025提供近三年主要会计数据和财务指标，形成总量规模与同比基线；section-0040说明公司从事的业务、主要产品/服务及用途；section-0045为经营情况讨论与分析，覆盖船队发展及各油轮、干散货、散杂货、LNG、滚装、集装箱船队经营，解释经营角色、资源投入和本期变化；section-0058为主要经营情况，含利润表/现金流变动及收入成本分析，说明盈利来源和当期经营结果；section-0072与section-0076保留分行业收入成本表的表头与延续，提供主要业务收入权重和结构。以上均为公司层面实质经营内容，且未同时选择存在祖父子关系的条目。"
+        },
+        {
+          "section_id": "section-0072",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分行业情况"
+          ],
+          "start_page": 21,
+          "end_page": 22,
+          "rationale": "所选章节共同覆盖公司业务与产品、船队经营、当期经营结果及收入成本结构。section-0025提供近三年主要会计数据和财务指标，形成总量规模与同比基线；section-0040说明公司从事的业务、主要产品/服务及用途；section-0045为经营情况讨论与分析，覆盖船队发展及各油轮、干散货、散杂货、LNG、滚装、集装箱船队经营，解释经营角色、资源投入和本期变化；section-0058为主要经营情况，含利润表/现金流变动及收入成本分析，说明盈利来源和当期经营结果；section-0072与section-0076保留分行业收入成本表的表头与延续，提供主要业务收入权重和结构。以上均为公司层面实质经营内容，且未同时选择存在祖父子关系的条目。"
+        },
+        {
+          "section_id": "section-0076",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "分行业情况"
+          ],
+          "start_page": 22,
+          "end_page": 24,
+          "rationale": "所选章节共同覆盖公司业务与产品、船队经营、当期经营结果及收入成本结构。section-0025提供近三年主要会计数据和财务指标，形成总量规模与同比基线；section-0040说明公司从事的业务、主要产品/服务及用途；section-0045为经营情况讨论与分析，覆盖船队发展及各油轮、干散货、散杂货、LNG、滚装、集装箱船队经营，解释经营角色、资源投入和本期变化；section-0058为主要经营情况，含利润表/现金流变动及收入成本分析，说明盈利来源和当期经营结果；section-0072与section-0076保留分行业收入成本表的表头与延续，提供主要业务收入权重和结构。以上均为公司层面实质经营内容，且未同时选择存在祖父子关系的条目。"
+        }
+      ],
+      "unread_or_deferred": [
+        "行业背景（第二节行业情况及第六节市场展望）仅作次级参考，未纳入；已选经营讨论可解释公司层面影响。",
+        "公司治理、股东与股本、债券、关联交易及财务报表附注等未纳入；当前目标是业务与收入结构，不扩展到全文财务报告。",
+        "主要客户/供应商及未来计划/风险仅属可选或前瞻信息，现有章节已覆盖主要经营与本期变化，故暂缓。"
+      ],
+      "selection_rationale": "所选章节共同覆盖公司业务与产品、船队经营、当期经营结果及收入成本结构。section-0025提供近三年主要会计数据和财务指标，形成总量规模与同比基线；section-0040说明公司从事的业务、主要产品/服务及用途；section-0045为经营情况讨论与分析，覆盖船队发展及各油轮、干散货、散杂货、LNG、滚装、集装箱船队经营，解释经营角色、资源投入和本期变化；section-0058为主要经营情况，含利润表/现金流变动及收入成本分析，说明盈利来源和当期经营结果；section-0072与section-0076保留分行业收入成本表的表头与延续，提供主要业务收入权重和结构。以上均为公司层面实质经营内容，且未同时选择存在祖父子关系的条目。",
+      "stop_reason": "已形成从业务与产品、船队经营、主要经营结果到收入成本分行业结构的闭环，足以回答业务结构、产品服务、收入来源、规模与主要权重及本期经营变化；继续扩展只会进入行业背景、治理或附注明细，边际解释力较低。",
+      "transcription_version": "shared-pdf-pypdf-layout.structured-notes.v1"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "bs_overall",
+            "text": "公司为专注于国际货物运输的专业航运公司，以油气运输、干散货运输为双核心主业，集装箱、汽车滚装等其他运输为有机补充，市场覆盖和货源种类较齐全。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "products_services": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "ps_oil",
+            "text": "油轮船队提供油气/能源运输服务，着力加强VLCC与Aframax协同经营，并拓展DPST穿梭油轮新业务；VLCC船队推进全球化、规模化运营。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ps_dry_bulk_breakbulk",
+            "text": "干散货船队经营VLOC、Capesize、Panamax、Ultramax、Supramax、Handysize、Kamsarmax等船型，并依托VLOC船队服务战略客户；多用途船队深耕新能源等产业运输，62K多用途船出口承运风电项目、重型机械设备、厂房模块、储能设备，回程承运纸浆、粮食、矿石等。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004",
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ps_lng",
+            "text": "气体运输业务通过招商气运（CMLNG）与CLNG等平台，为全球客户提供LNG运输解决方案，聚焦大客户、大项目并参与国际LNG运输项目投标。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004",
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ps_roro",
+            "text": "招商滚装提供汽车滚装运输，覆盖内贸、长江及外贸，推进江海洋一体化运营；2025年全球首批甲醇双燃料动力滚装船“港荣”轮、“深荣”轮交付并完成全球首次滚装船甲醇燃料加注。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004",
+              "source-0008"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ps_container",
+            "text": "中外运集运提供集装箱班轮运输，并依托航线网络提供江海联运、海铁联运、集卡直通等多式联运服务，拓展香港冷链物流业务。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004",
+              "source-0008"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "revenue_model": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "rm_revenue_sources",
+            "text": "公司营业收入主要由运费及船舶租金收入构成，按油轮、散货、集装箱、滚装、LNG等业务板块核算。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0011"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "scale_and_mix": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "scale_company_revenue",
+            "text": "2025年公司合并营业收入为281.77亿元，精确值见下。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入（合并）",
+                "raw_value": "28,177,211,131.95",
+                "value": "28177211131.95",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "程序显示说明：scale_company_revenue正文281.77亿元为营业收入（合并）28,177,211,131.95元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "scale_oil_tanker",
+            "text": "油轮运输板块2025年营业收入、营业成本及毛利率如下。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0011",
+              "source-0012"
+            ],
+            "metrics": [
+              {
+                "name": "油轮运输营业收入",
+                "raw_value": "10,289,276,515.57",
+                "value": "10289276515.57",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "油轮运输营业成本",
+                "raw_value": "6,183,185,067.42",
+                "value": "6183185067.42",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "油轮运输毛利率",
+                "raw_value": "39.91",
+                "value": "39.91",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "scale_dry_bulk",
+            "text": "散货船运输板块2025年营业收入、营业成本及毛利率如下。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0011",
+              "source-0012"
+            ],
+            "metrics": [
+              {
+                "name": "散货船运输营业收入",
+                "raw_value": "8,769,388,393.77",
+                "value": "8769388393.77",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "散货船运输营业成本",
+                "raw_value": "7,301,344,253.81",
+                "value": "7301344253.81",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "散货船运输毛利率",
+                "raw_value": "16.74",
+                "value": "16.74",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "scale_container",
+            "text": "集装箱运输板块2025年营业收入、营业成本及毛利率如下。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0011",
+              "source-0012"
+            ],
+            "metrics": [
+              {
+                "name": "集装箱运输营业收入",
+                "raw_value": "6,149,215,176.25",
+                "value": "6149215176.25",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "集装箱运输营业成本",
+                "raw_value": "4,770,483,686.04",
+                "value": "4770483686.04",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "集装箱运输毛利率",
+                "raw_value": "22.42",
+                "value": "22.42",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "scale_roro",
+            "text": "滚装船运输板块2025年营业收入、营业成本及毛利率如下。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0011",
+              "source-0012"
+            ],
+            "metrics": [
+              {
+                "name": "滚装船运输营业收入",
+                "raw_value": "1,690,427,764.64",
+                "value": "1690427764.64",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "滚装船运输营业成本",
+                "raw_value": "1,273,259,244.68",
+                "value": "1273259244.68",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "滚装船运输毛利率",
+                "raw_value": "24.68",
+                "value": "24.68",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "scale_lng",
+            "text": "LNG运输板块2025年营业收入、营业成本及毛利率如下。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0011",
+              "source-0012"
+            ],
+            "metrics": [
+              {
+                "name": "LNG运输营业收入",
+                "raw_value": "54,949,095.27",
+                "value": "54949095.27",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "LNG运输营业成本",
+                "raw_value": "39,085,391.28",
+                "value": "39085391.28",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "LNG运输毛利率",
+                "raw_value": "28.87",
+                "value": "28.87",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "scale_fleet",
+            "text": "截至2025年末，公司自有船舶235艘，总载重量3884.59万吨；手持订单64艘，总载重量788.02万吨；另有租入船69艘，总载重量465.14万吨。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "evidence_ids": [
+              "source-0005",
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "自有船舶艘数",
+                "raw_value": "235",
+                "value": "235",
+                "unit": "艘",
+                "source_unit": "艘",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "自有船总载重量",
+                "raw_value": "3884.59",
+                "value": "3884.59",
+                "unit": "万吨",
+                "source_unit": "万吨",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "手持订单船舶艘数",
+                "raw_value": "64",
+                "value": "64",
+                "unit": "艘",
+                "source_unit": "艘",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "手持订单总载重量",
+                "raw_value": "788.02",
+                "value": "788.02",
+                "unit": "万吨",
+                "source_unit": "万吨",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "租入船艘数",
+                "raw_value": "69",
+                "value": "69",
+                "unit": "艘",
+                "source_unit": "艘",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "租入船总载重量",
+                "raw_value": "465.14",
+                "value": "465.14",
+                "unit": "万吨",
+                "source_unit": "万吨",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "review-add:omit_segment_net_profit",
+            "text": "报告期公司合并报表主要业务板块分部净利润（单位：亿元，币种：人民币）：油轮船队41.91（同比变动59.06%）、干散货船队11.35（同比变动-26.69%）、集装箱船队13.59（同比变动3.46%）、滚装船队2.29（同比变动-31.91%）、LNG船队6.71（同比变动11.08%）。",
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "油轮船队净利润",
+                "raw_value": "41.91",
+                "value": "41.91",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025",
+                "comparison_basis": "同比变动59.06%",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "干散货船队净利润",
+                "raw_value": "11.35",
+                "value": "11.35",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025",
+                "comparison_basis": "同比变动-26.69%",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "集装箱船队净利润",
+                "raw_value": "13.59",
+                "value": "13.59",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025",
+                "comparison_basis": "同比变动3.46%",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "滚装船队净利润",
+                "raw_value": "2.29",
+                "value": "2.29",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025",
+                "comparison_basis": "同比变动-31.91%",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "LNG船队净利润",
+                "raw_value": "6.71",
+                "value": "6.71",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025",
+                "comparison_basis": "同比变动11.08%",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "分行业表未直接列示各业务收入占比，本稿未自行计算占比。",
+          "分行业收入合计与公司合并营业收入存在差异，选定章节未提供其他业务/抵销明细，本稿未自行计算或填补差额。",
+          "主要业务板块表与主营业务分行业表在散货船营业成本上存在差异，本稿采用主营业务分行业表金额，未混合两个口径。"
+        ]
+      },
+      "operations_and_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "ops_modes_inputs",
+            "text": "公司作为航运承运人组织国际货物运输，采用自有与租入运力、即期与期租、长期协议与大客户项目等多种经营方式，干散货推进租造并举和轻资产运营；营业成本主要由燃料费、港口使费、船员人工成本、折旧成本和租金成本等构成。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004",
+              "source-0007",
+              "source-0011"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取具体主要供应商名称及采购金额。"
+        ]
+      },
+      "customers_channels_markets": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "cust_oil_tanker",
+            "text": "油轮船队以央企石油公司、贸易商及民营独立炼厂等中资客户为基础货源，积极拓展国际大石油公司（oil major）和贸易商，推行航线全球化、客户多元化、服务专业化。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "cust_container",
+            "text": "集装箱班轮服务网络覆盖中国沿海主要港口至日本、韩国、菲律宾、越南、泰国、马来西亚、澳大利亚、印度、墨西哥、新加坡、斯里兰卡、巴基斯坦，以及中国大陆至中国台湾、内地至中国香港；日本航线和两岸航线处于市场领先。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "cust_roro",
+            "text": "滚装船队外贸网络覆盖全球滚装主要区域，稳固内贸核心客户并推进江海洋一体化；报告期开发小鹏、中联重科、金龙、零跑等新客户。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004",
+              "source-0008"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "公司船舶运输为全球承运，客户、起运地、目的地跨国家和地区，难以分地区列示营业收入；未获取具体主要客户名单及销售金额。"
+        ]
+      },
+      "operating_drivers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "drv_revenue_cost",
+            "text": "2025年营业收入变动比例为9.22%，营业成本变动比例为12.19%；收入增长主要系油轮运输船队抢抓市场上行机遇、干散货船队轻资产运营规模扩大、集装箱船队新开航线价量齐升；成本增长主要系自有及租入船规模扩大、货运量增加，船舶折旧及租金、装卸费、港口费等费用同比增加。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入变动比例",
+                "raw_value": "9.22",
+                "value": "9.22",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期比上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业成本变动比例",
+                "raw_value": "12.19",
+                "value": "12.19",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期比上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "drv_oil_tanker",
+            "text": "油轮船队深入贯彻客户多元化和经营全球化，巩固与国际、国内大型石油公司战略合作，拓展新客户和新货源，强化全球大三角航线；VLCC船队TCE水平（含即期及期租租出）再次跑赢指数，即期经营TCE跑赢几乎所有大型VLCC船队同行。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006",
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "drv_dry_bulk",
+            "text": "干散货船队租造并举扩大经营规模、优化运力配置，接收Kamsarmax新船并签约Newcastlemax光船租赁；VLOC项目依托全球规模第一的VLOC船队实施精细化成本管控；好望角型、巴拿马型、灵便型船队根据市场波动调整运力与航线，总体跑赢指数。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004",
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "drv_container",
+            "text": "2025年集运船队累计承运重箱122万TEU，同比增加18.4%；在SCFI下降、成本上升背景下，公司出口单箱收入基本持平，进口单箱收入略降，经营盈利基本保持稳定。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "集装箱船队承运重箱量",
+                "raw_value": "122",
+                "value": "122",
+                "unit": "万TEU",
+                "source_unit": "万TEU",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "集装箱船队承运重箱量同比变化",
+                "raw_value": "增加18.4%",
+                "value": null,
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": "源文以“同比增加18.4%”表述，保留方向词，未转换为带符号数值。"
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "material_changes": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "chg_fleet",
+            "text": "报告期内共接收16艘新船，包括VLCC、LNG船、Kamsarmax散货船、重吊多用途船和滚装船等；完成处置5艘老龄和非节能型船，船队结构进一步优化。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "接收新船艘数",
+                "raw_value": "16",
+                "value": "16",
+                "unit": "艘",
+                "source_unit": "艘",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "处置老龄和非节能型船艘数",
+                "raw_value": "5",
+                "value": "5",
+                "unit": "艘",
+                "source_unit": "艘",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+        "section_path": [
+          "第二节 公司简介和主要财务指标",
+          "七、 近三年主要会计数据和财务指标"
+        ],
+        "physical_pages": [
+          9
+        ],
+        "source_spans": [
+          {
+            "page": 9,
+            "start": 1653,
+            "end": 2794,
+            "quote": "七、    近三年主要会计数据和财务指标\n\n(一)   主要会计数据\n                                                                                   单位：元         币种：人民币\n  主要会计数据                      2025年                   2024年             本期比上年同                   2023年\n                                                                          期增减(%)\n营业收入                     28,177,211,131.95      25,799,279,395.20               9.22%       25,881,013,078.04\n利润总额                      6,874,638,414.30       5,952,337,069.26              15.49%        5,414,594,621.75\n归属于上市公司股                  6,012,096,267.97       5,107,447,941.27              17.71%        4,836,966,617.91\n东的净利润\n归属于上市公司股\n东的扣除非经常性                  5,024,011,136.90       5,015,004,674.52                0.18%       4,640,441,615.09\n损益的净利润\n经营活动产生的现                  9,054,927,611.30       8,476,220,586.11               6.83%        8,917,304,888.14\n金流量净额\n                             2025年末                  2024年末             本期末比上年                  2023年末\n                                                                         同期末增减\n                                                     9/ 246"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+        "section_path": [
+          "第二节 公司简介和主要财务指标",
+          "七、 近三年主要会计数据和财务指标"
+        ],
+        "physical_pages": [
+          10
+        ],
+        "source_spans": [
+          {
+            "page": 10,
+            "start": 0,
+            "end": 1480,
+            "quote": "                                    招商局能源运输股份有限公司2025                    年年度报告\n\n\n                                                                                  （%）\n\n 归属于上市公司股                   43,005,621,793.17        40,043,682,654.46                 7.40%       36,891,113,703.65\n 东的净资产\n 总资产                        82,054,880,078.89        70,619,308,351.63                16.19%       62,394,661,514.41\n\n  (二)    主要财务指标\n\n\n            主要财务指标                               2025年             2024年          本期比上年同                   2023年\n                                                                                    期增减(%)\n基本每股收益（元／股）                                             0.74              0.63             17.46%                  0.60\n稀释每股收益（元／股）                                             0.74              0.63             17.46%                  0.60\n扣除非经常性损益后的基本每股                                          0.62              0.62                     -               0.57\n收益（元／股）\n加权平均净资产收益率（%）                                          14.55             13.21     增加1.34个百                       13.25\n                                                                                              分点\n扣除非经常性损益后的加权平均                                         12.16             12.97     减少0.81个百                       12.71\n净资产收益率（%）                                                                                     分点\n\n  报告期末公司前三年主要会计数据和财务指标的说明\n  □适用      √不适用\n\n  "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          12
+        ],
+        "source_spans": [
+          {
+            "page": 12,
+            "start": 1558,
+            "end": 2307,
+            "quote": "一、报告期内公司从事的业务情况\n    报告期内，公司作为专注于国际货物运输的专业航运公司，以油气运输、干散货运输为双核\n心主业，其他运输（集装箱、汽车滚装等）为有机补充，业务布局清晰，市场覆盖和货源种类齐\n\n全。公司结合市场情况，灵活采用多种方式有序开展各类生产经营和投资活动。\n    公司油轮船队坚持以市场为中心，继续保持经营弹性。推行“航线全球化，客户多元化，服\n\n务专业化”策略，以涵盖央企石油公司、贸易商及民营独立炼厂在内的中资客户为基础货源，不\n断拓展海外市场，积极开发国际客户，持续加大与国际大石油公司（oil                                            major）、贸易商的业务\n\n合作。公司着力加强             VLCC   船队“全球化、规模化”运营，报告期内接收全球第                                 1艘甲醇双燃料，\n同时，公司持续加强              Aframax   船队能力，增强与            VLCC   船队协同经营。通过建立更加广泛的全\n球货源网络和航线组合，公司为中国及全球客户提供安全、优质、高效的能源运输服务。公司船\n\n队持续加强市场营销和做强客户矩阵，以多种形式的运输协议获取持续稳定的货源保障，拓展高\n价值货源。公司油轮船队把握市场机遇，取得良好经营效果。                                       油轮船队还拓展了            DPST   穿梭油轮\n\n新业务，为发展提供新平台。\n\n                                                12/246"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          13
+        ],
+        "source_spans": [
+          {
+            "page": 13,
+            "start": 0,
+            "end": 1286,
+            "quote": "                         招商局能源运输股份有限公司2025          年年度报告\n\n\n    公司干散货船队贯彻整体发展战略，持续提升船队核心竞争力，不断推进船队结构迭代，租\n\n造并举持续扩大经营规模、优化运力配置。报告期内，公司接收                              2艘  8.2万吨  Kamsarmax  型船，\n并签约   4 艘 21 万吨   Newcastlemax型船光船租赁项目，优化主力船型结构。通过强化市场研判，\n\n优化经营规划，根据市场动态调整经营策略，报告期各船型经营效益稳步提升，跑赢指数，深化\n轻资产运营能力，灵活经营模式贡献收益弹性。标杆化管理                             VLOC  项目，依托全球规模第一的\n\nVLOC  船队优势，实施精细化成本管控，开展数智化、节能减排等技术创新，提高经营效益及能\n效表现。深耕战略客户，推动项目攻坚，拓展多维度长期合作，其中多用途船队继续深耕新能源\n等产业运输市场，坚持大客户策略，加强海外开拓，服务客户的能力和市场竞争力不断提升。\n\n    公司气体运输业务把握市场发展机遇，保持稳健发展。招商气运（CMLNG）与国内外主要\n大型能源公司、知名         LNG  船东公司、主要        LNG  船舶制造企业广泛建立互利合作关系，为全球客\n\n户提供安全、优质、经济、高效的能源运输解决方案。报告期内，公司坚持聚焦大客户、大项目，\n积极参与国际一流        LNG  运输项目投标，通过卡气二期等项目实现船队规模和长约船舶锁定比例的\n稳健提升，一举确立在           LNG 运输市场的重要船东地位。\n\n    公司滚装运输船队继续提升外贸经营能力，行业地位进一步提升。滚装船队积极增运力、拓\n航线，全球航线网络布局基本完成；稳固内贸业务核心客户，聚焦增量，持续推进江海洋一体化\n\n运营。公司外贸业务网络已覆盖全球滚装主要区域。2025                        年，招商滚装全球首批甲醇双燃料动力\n滚装船舶“港荣”轮、“深荣”轮顺利交付，并实现全球首次滚装船甲醇燃料加注作业，成为绿\n\n色航运新标杆。\n    公司集装箱运输船队始终坚持“以客户为中心、以市场为导向”，做强航运主业，保持经营\n韧性，增值延伸服务，加速质效提升，推进高质量发展，力求迅速成长为具有核心竞争力的一流\n\n班轮公司。服务网络覆盖中国沿海主要港口至日本、韩国、菲律宾、越南、泰国、马来西亚、澳\n大利亚、印度、墨西哥、新加坡、斯里兰卡、巴基斯坦，中国大陆至中国台湾和内地至中国香港\n\n开辟有多条集装箱班轮航线。其中，日本航线和两岸航线深耕多年，在业内处于市场领先地位。\n同时，依托集装箱班轮航线网络，积极拓展香港冷链物流业务，助力香港民生改善。此外，还提\n\n供网点众多的优质江海联运、海铁联运、集卡直通等多式联运服务。\n\n\n报告期内公司新增重要非主营业务的说明\n□适用    √不适用\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          14
+        ],
+        "source_spans": [
+          {
+            "page": 14,
+            "start": 1630,
+            "end": 2133,
+            "quote": "三、经营情况讨论与分析\n\n    1.船队发展情况\n    报告期内共接收         16艘新船，包括        1 艘  VLCC，8   艘  LNG  船（含    CLNG   公司  7 艘），2    艘  8.2\n万吨卡姆萨型散货船，3            艘  6.2万吨重吊多用途船，2           艘  9000 车滚装船，并新签         1+1 艘  DPST（动\n\n力定位穿梭油轮）订单，接受                1艘  1.4年船龄二手燃油加注船，完成处置                   5 艘老龄和非节能型船\n（1 艘滚装船，4       艘油轮），船队结构进一步优化。截至                     2025 年 12 月  31 日，公司船队自有船舶\n\n235艘，合计      3884.59万载重吨；手持订单           64 艘，合计     788.02 万载重吨，运力总规模继续位列国\n际前列。\n\n                                           14/246"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 0,
+            "end": 5019,
+            "quote": "                                             招商局能源运输股份有限公司2025                                年年度报告\n\n\n\n\n                                                           报告期末招商轮船船队概况\n\n\n                                                                 现有船舶                                                       订单船舶\n                分类                      船舶艘数         总载重量(万吨)           箱位数(TEU)/车         平均船龄         船舶艘数          总载重量(万吨)            箱位数(TEU)/车\n                                                                            位数(辆)                                                             位数(辆)\n\n油轮小计                                       58             1642.7                             10.08          13             244.85\n               Aframax                      6             65.89                               9.67          7              80.50\n                VLCC                       51            1576.01                              10.3          5              152.95\n           DPST穿梭油轮                                                                                         1               11.4\n             燃料加注船                          1              0.80                               1.4\n气体船小计                                      30             260.92                              7.1           34             301.66\n                 LNG                       30             260.92                              7.1           34             301.66\n散货船小计                                      98            1882.03                             10.61          12             227.20\n                VLOC                       34            1313.13                              8.18\n            Newcastlemax                                                                                    10             210.80\n               Capesize                    16             286.89                             15.09\n              kamsarmax                     2             16.38                               0.22          2              16.40\n               Panamax                      6             45.78                              12.84\n               Ultramax                    20             125.73                              9.56\n              Supramax                     10             57.95                               14.1\n              Handysize                    10             36.17                               11.1\n件杂货船小计                                      7             43.01                               2.4           1               6.11\n        General Dry Cargo Ship              7             43.01                               2.4           1               6.11\n滚装船小计                                      23             13.53              58820            11.5          4               8.20               31200\n            长江800车位                         7              0.80               5600            12.3\n            长江1000车位                        4              0.60               4000            8.4\n            远洋2000车位                        6              2.16              13306            15.5\n            远洋3800车位                        2              2.36               8132            4.6\n            远洋4300车位                        1              1.28               4310            25.6\n         远洋4900车位以上                         1              1.23               4872            16.3\n            远洋9300车位                        2              5.1               18600            0.2           4               8.2                31200\n集装箱船小计                                     19             42.40              30491            11.5\n             Container - P                  1              7.12               4015            8.8\n            Container - H                  12             23.03              17627            13.8\n          Container-Freemax                 3              3.85               2876            12.6\n              Container                     3              8.40               5973            2.4\n自有船总计                                      235           3884.59                              9.95          64             788.02\n租入船总计                                      69             465.14                             11.52\n\n       2.船队经营概况\n       报告期内，公司旗下船队周转量为                                        11,129,85       亿吨海里，同时公司持续推动货运量的稳定增长，\n\n其中油轮船队货运量                         8,162    万吨；干散货船队货运量                               11,419     万吨；LNG              船队货运量               2,467    万吨；\n滚装船队货运量                    664   万吨；集装箱船队货运量                               109    万   TEU。\n\n\n\n\n       3.油轮船队经营情况\n       报告期内，公司油轮船队深入贯彻“客户多元化”和“经营全球化”部署。在巩固与国际、\n\n国内大型石油公司战略合作关系的基础上，积极拓展新客户资源，开发新货源渠道，持续强化全\n球大三角航线的市场地位。公司充分发挥大船队规模优势，精准把握市场节奏，动态优化航线布\n\n局，实现客户结构、航线网络及经营模式的多元配置，有效增强抗风险能力和可持续盈利能力。\n通过加强市场趋势研判，前瞻性把控运力投放节奏，在提升船舶营运率的同时有效平衡市场波动\n\n                                                                         15  /246"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          16
+        ],
+        "source_spans": [
+          {
+            "page": 16,
+            "start": 0,
+            "end": 1521,
+            "quote": "                         招商局能源运输股份有限公司2025          年年度报告\n\n\n风险。报告期联合石油公司短期期租租入                   1 艘 VLCC，取得良好效果，这也是公司油轮船队多年\n\n来首次重返租入船市场的成功尝试。此外，油轮船队持续加大在                             AI 系统、低碳减排、智慧经营等\n领域的创新投入，推动从技术研发到运营执行全链条的精细化管理升级。\n\n    报告期公司      VLCC  船队实现     TCE 水平（含即期及期租租出）再次跑赢指数，即期经营                         TCE\n跑赢几乎所有大型         VLCC  船队同行，助力公司油轮船队经营业绩创历史新高。截止报告期末，自\n\n有 VLCC  期租（含一年内短期租和            1 年及以上长期租）比例不足             10%。\n\n\n    4.干散货船队经营情况\n    报告期内，公司干散货船队紧扣核心货源与战略客户需求，深挖轻资产经营潜力，紧跟市场\n\n节奏，优化布局，把握波段稳健经营，压实责任，强化管理，推进改革创新。\n    2025年  VLOC  项目船队深化精益管理，持续推进坞修船舶高效油漆改造，提升运营效率；好\n\n望角型船队在全年剧烈波动的市场行情中，严谨判断保持节奏，前瞻性布局运力，相对高位及时\n锁定；巴拿马船队在保障长期船队稳定基础上，加大滚动操作力度，提升船队运力弹性与市场响\n\n应能力；灵便型船队坚持三角航线和全球经营，博取区域市场溢价，长短结合保持经营灵活性。\n好望角及灵便型船队在全年前低后高的市场态势下，总体均跑赢指数。\n\n\n    5.散杂货船队经营情况\n\n    报告期内，公司散杂货船队紧紧围绕市场走势研判，调整航线经营重点，结合自身船队特色\n加强在风电、纸浆、澳新等重点货源及航线上的营销和经营力度，不断优化散杂结合收益水平。\n\n在经历上半年市场的阶段性调整后，三季度期间集中运力进行区域内的订载、锁定及摆位抢抓市\n场机遇，提升船队效益；同时通过航线调整、租入运力等多措并举方式，持续提升运力。船队中\n\n大部分船型     TCE  跑赢市场。\n    大灵便船队积极应对市场波动以及                CII 等级的提升，以远东、东南亚、印度洋区域内散杂结\n\n合经营为主线，优化航线设置，合理布局船位的同时保持合理的环保评级。小灵便船队持续通过\n第三国及直客开发加大澳新航线投入力度，为远东运力提供了有力支撑。经营区域从远东延伸至\n东南亚-澳新范围，同时适当摆位欧美区域，合理分配运力布局。62K                              多用途船队出口继续巩固风\n\n电项目基本盘，同时兼顾重型机械设备、厂房模块、储能设备等其它拼舱货源，回程聚焦纸浆、\n粮食、矿石等散货货源，丰富航线组合，进一步提升了船型在市场上的散杂兼容特性。\n\n\n    6.LNG 船队经营情况\n    面对比往年更剧烈波动的市场形势，招商气运坚持聚焦大客户、大项目，积极参与国际一流\n\nLNG 运输项目投标，通过卡气二期等项目实现船队规模和长约船舶锁定比例的稳健提升，确立了\n在 LNG  运输市场的重要船东地位。截至报告期末，公司已投资                          LNG  船舶  64 艘（其中     61艘已锁\n\n\n\n\n                                        16/246"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          17
+        ],
+        "source_spans": [
+          {
+            "page": 17,
+            "start": 0,
+            "end": 1798,
+            "quote": "                          招商局能源运输股份有限公司2025           年年度报告\n\n\n定长约），其中独资企业             CMLNG   持有自主订单船        18 艘和参股项目船         10艘，共    28 艘  LNG  船；\n\n参股企业     CLNG  运营船舶     29 艘，在建船舶       7 艘。\n\n\n    7.汽车滚装船队经营情况\n\n    招商滚装持续提升外贸经营能力，增运力拓航线，全球航线网络布局基本完成；内贸稳固核\n心客户，拓展客户增量，持续推进江海洋一体化运营。全年共计完成运量                                     68.71万辆，其中外贸\n\n运量  15.67 万辆，同比增长        47%；完成沿海运量          31.33万辆，同比下降        19%；完成长江运量          21.71\n万辆，同比下降        25%。\n    2025 年，招商滚装全球首批甲醇双燃料动力滚装船舶“港荣”轮、“深荣”轮顺利交付，并\n\n实现全球首次滚装船甲醇燃料加注作业，成为绿色航运新标杆。开拓新航线、新港口，公司外贸\n业务网络已覆盖全球滚装主要区域。新增挂靠吉布提、亚历山大、马拉加、卡萨布兰卡、卡拉奇、\n\n北欧基本港等港口；新开通“钦州-波湾”、“中国-摩洛哥”、“中国-西北欧”、“泰国-北欧”、\n“泰国-巴西”等航线。开辟新市场、新模式，成功开发小鹏、中联重科、金龙、零跑等新客户，\n\n深耕第三国市场。持续践行江海洋一体化战略，助力核心客户畅通出海通道，实现联运                                           56 航次，\n共计  1.5 万辆。\n\n\n    8.集装箱船队经营情况\n\n    报告期内，公司集运船队持续稳定向好，截至报告期末，自有集装箱船舶                                      19 艘、租赁船舶\n24艘，控制运力       69,506TEU。根据     Alphaliner数据，集运船队运力排名全球第                29 名。中外运集运\n\n始终深耕主责主业，全体船岸员工奋力拼搏推动航线业务发展，各航线                                   2025年全年累计承运重箱\n122万  TEU，同比增加       18.4%。2025   年，上海出口集装箱运价指数（SCFI）同比下降                      33%，公司\n\n集装箱船队实现出口单箱收入基本持平，进口单箱收入略降                              2.4%，船队克服成本上升压力，实现\n经营盈利基本保持稳定，再次展现了中外运集运多年来持续优秀的经营实力。\n\n    报告期船中外运集运聚焦东非、红海、中南美新兴市场，开展航线调研，对中南美、东非、\n红海，以及印东、印西、澳洲、墨西哥与第三国间等目标市场开展市场调研，为拓展航线网络做\n好市场研究；围绕全球航运动态、贸易流向与细分产业，深入开展专项研究，全年共完成                                            19篇高\n\n质量的专项报告与贸易透视特刊，涵盖中泰中柬冷链、美国关税影响、伊以冲突下的中东市场、\n智利车厘子、越南         ICD、印中辣椒贸易、白色家电、坚果市场等重点主题，牢牢把握市场脉搏，\n\n全面提升公司研判能力。\n    报告期新开辟华东泰国航线（CTX）、远东墨西哥航线（MEX）、海防二线（CHS2）；升\n级印西航线和华北菲律宾航线（NCP）；优化华东海防航线(CHS)、华南菲律宾航线（SPS1）和\n\n福建菲律宾航线(WM1)；同时研究中东航线方案；进一步完善航线网络布局。持续深化客户服务\n价值，稳定长期协议客户比例。同时，加强成本管控，深挖创效潜力，提前做好船舶续租方案，\n\n选择合适时机续租船舶，避免高租金、长租约的租船风险。\n\n                                          17/246"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          18
+        ],
+        "source_spans": [
+          {
+            "page": 18,
+            "start": 0,
+            "end": 61,
+            "quote": "                         招商局能源运输股份有限公司2025         年年度报告\n\n\n\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0010",
+        "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ],
+        "physical_pages": [
+          20
+        ],
+        "source_spans": [
+          {
+            "page": 20,
+            "start": 78,
+            "end": 3087,
+            "quote": "五、报告期内主要经营情况\n\n\n 报告期公司合并报表的主要业务板块收入、成本及利润的分部情况如下（详见会计报表附注-分部\n 数据）：\n\n                                                                                   单位：亿元         币种：人民币\n   项目            油轮船队               干散货船队               集装箱船队                 滚装船队                LNG   船队\n               金额     同比变动         金额     同比变动         金额      同比变动        金额      同比变动        金额       同比变动\n\n 营业收入        102.89    11.77%     87.69    10.45%     61.49    13.16%     16.90    -7.98%      0.55     83.16%\n\n 营业成本         61.83     3.29%     72.62    19.55%     47.70    25.30%     12.71    -1.01%      0.39    143.27%\n\n  净利润         41.91    59.06%     11.35    -26.69%    13.59     3.46%      2.29    -31.91%     6.71     11.08%\n\n\n (一)  主营业务分析\n\n 1、   利润表及现金流量表相关科目变动分析表\n\n                                                                                    单位：元         币种：人民币\n                 科目                               本期数                     上年同期数                变动比例（%）\n营业收入                                           28,177,211,131.95         25,799,279,395.20                 9.22\n营业成本                                           20,717,507,250.47         18,466,914,585.60                12.19\n销售费用                                              113,835,157.63            107,633,463.84                 5.76\n管理费用                                              976,123,179.32            819,102,732.86                19.17\n财务费用                                            1,159,711,575.55          1,056,539,123.01                 9.77\n研发费用                                               27,580,622.37             18,583,964.20                48.41\n经营活动产生的现金流量净额                                   9,054,927,611.30          8,476,220,586.11                 6.83\n投资活动产生的现金流量净额                                  -7,958,495,588.37        -7,862,537,868.61                  1.22\n筹资活动产生的现金流量净额                                    -889,812,817.18         -1,047,004,896.08               -15.01\n\n （1）营业收入变动原因说明：报告期内营业收入同比增加                                          237,793.17   万元，增长         9.22%，主要系\n 报告期内油轮运输船队抢抓市场上行机遇，收入上涨，干散货运输船队轻资产运营规模扩大，集\n\n 装箱运输船队新开辟航线，价量齐升，综合影响公司运输收入同比增加。\n （2）营业成本变动原因说明：报告期内营业成本同比增加                                           225,059.27   万元，增长         12.19%，主要\n 系报告期内自有及租入船规模扩大、货运量增加，船舶折旧及租金、装卸费、港口费等费用同比\n 增加所致。\n （3）销售费用变动原因说明：报告期内销售费用同比增加                                            620.17  万元，增长         5.76%，主要系报\n 告期内销售人员增加所致。\n （4）管理费用变动原因说明：报告期内管理费用同比增加                                          15,702.04   万元，增长        19.17%，主要系\n 上年同期冲回第二期股权激励费用，报告期内无相关事项，导致同比增加。\n （5）财务费用变动原因说明：报告期内财务费用同比增加                                           10,317.25  万元，增长          9.77%，主要系\n 报告期内汇兑损失较上年同比增加所致。\n （6）研发费用变动原因说明：报告期内研发费用同比增加                                            899.67   万元，增长         48.41%，主要系\n 报告期内研发项目投入增加所致。\n （7）经营活动产生的现金流量净额变动原因说明：经营活动产生的现金流量净流入较上年同期增\n 加  57,870.70   万元，增长        6.83%，主要系报告期内油轮运输业务运价上涨，收到的运费收入较上年\n 同比增加所致。\n\n                                                     20 /246"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0011",
+        "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ],
+        "physical_pages": [
+          21
+        ],
+        "source_spans": [
+          {
+            "page": 21,
+            "start": 0,
+            "end": 1156,
+            "quote": "                              招商局能源运输股份有限公司2025               年年度报告\n\n\n（8）投资活动产生的现金流量净额变动原因说明：投资活动产生的现金流量净流出较上年同期增\n加  9,595.77 万元，增长        1.22%，主要系报告期内收到的船舶处置收入增加，同时船舶建造支出、\n股权投资等资本性支出增加，综合导致同比小幅增长。\n（9）筹资活动产生的现金流量净额变动原因说明：筹资活动产生的现金流量净流出较上年同期减\n少  15,719.21 万元，下降        15.01%，主要系报告期内新增借款较上年同比增加，现金流入增加抵减\n了净流出所致。\n\n本期公司业务类型、利润构成或利润来源发生重大变动的详细说明\n□适用    √不适用\n\n2、  收入和成本分析\n√适用     □不适用\n    本报告期营业收入             281.77 亿元，主要由运费及船舶租金收入构成，各业务板块营业收入分别\n为：油轮运输         102.89  亿元、散货船运输             87.69 亿元、集装箱运输             61.49 亿元，滚装船运输             16.90\n亿元，LNG      运输    0.55 亿元，营业收入同比增长                 9.22%，主要系报告期内油轮运输船队抢抓市场上\n行机遇，收入上涨，干散货运输船队轻资产运营规模扩大、集装箱运输船队新开辟航线，价量齐\n升，综合影响公司运输收入同比增加。\n    本报告期营业成本             207.18 亿元，主要由燃料费、港口使费、船员人工成本、折旧成本和租金\n成本等构成，各业务板块营业成本分别为：油轮运输                                  61.83 亿元、散货运输           73.01 亿元，集装箱运\n输  47.70 亿元、滚装船运输            12.73 亿元，LNG       运输    0.39 亿元，营业成本同比增长                 12.19%，主要系\n报告期内自有及租入船规模扩大、货运量增加，船舶折旧及租金、装卸费、港口费等费用同比增\n加所致。\n\n(1).  主营业务分行业、分产品、分地区、分销售模式情况\n\n                                                                             单位：元        币种：人民币\n                                         "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0012",
+        "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "主营业务分行业情况"
+        ],
+        "physical_pages": [
+          21
+        ],
+        "source_spans": [
+          {
+            "page": 21,
+            "start": 1156,
+            "end": 3149,
+            "quote": "主营业务分行业情况\n                                                                         营业收        营业成         毛利率\n  分行业               营业收入                   营业成本               毛利率        入比上        本比上         比上年\n                                                              （%）        年增减        年增减          增减\n                                                                         （%）        （%）         （%）\n                                                                                                   增加\n油轮运输            10,289,276,515.57        6,183,185,067.42       39.91      11.77        3.29    4.94 个\n                                                                                                百分点\n                                                                                                   减少\n散货船运输            8,769,388,393.77        7,301,344,253.81       16.74      10.44       20.20    6.76 个\n                                                                                                百分点\n                                                                                                   减少\n集装箱运输            6,149,215,176.25        4,770,483,686.04       22.42      13.15       25.30    7.52 个\n                                                                                                百分点\n                                                                                                   减少\n滚装船运输            1,690,427,764.64        1,273,259,244.68       24.68       -7.97      -0.83    5.42 个\n                                                                                                百分点\n                                                                                                   减少\nLNG 运输              54,949,095.27            39,085,391.28      28.87      83.16     144.28    17.80 个\n                                                                                                百分点\n\n\n\n                                                21 /246"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0013",
+        "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "主营业务分行业情况"
+        ],
+        "physical_pages": [
+          22
+        ],
+        "source_spans": [
+          {
+            "page": 22,
+            "start": 0,
+            "end": 501,
+            "quote": "                                              招商局能源运输股份有限公司2025                               年年度报告\n\n\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n本公司船舶运输属全球承运，公司的客户、起运地、目的地处于不同的国家和地区，因此难以分\n地区列示营业收入情况。\n\n\n\n(2).      产销量情况分析表\n\n□适用          √不适用\n\n\n\n\n(3).      重大采购合同、重大销售合同的履行情况\n□适用          √不适用\n\n(4).      成本分析表\n                                                                                                                    单位：元              币种：人民币\n                                                                   "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0014",
+        "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "分行业情况"
+        ],
+        "physical_pages": [
+          22
+        ],
+        "source_spans": [
+          {
+            "page": 22,
+            "start": 501,
+            "end": 5113,
+            "quote": "分行业情况\n                                                                      本期占                                          上年同            本期金\n                 成本构成项                                                总成本                                          期占总            额较上             情况\n分行业                     目                    本期金额                       比例             上年同期金额                      成本比            年同期             说明\n                                                                         (%)                                        例(%)          变动比\n                                                                                                                                   例(%)\n               燃油费                       2,467,729,882.92                39.91        2,589,039,890.17                43.25          -4.69\n               港口费                          558,147,739.50                 9.03          545,035,579.95                 9.10          2.41\n               船员费用                         789,531,648.78               12.77           759,287,569.20               12.68           3.98\n               保险费                          108,066,302.96                 1.75          101,720,636.30                 1.70          6.24\n               坞修、航修                        358,737,216.60                 5.80          265,009,615.41                 4.43        35.37\n油轮运            检验费                           45,127,938.41                 0.73           36,759,228.88                 0.61        22.77\n   输           备件费                          158,958,503.59                 2.57          136,239,967.56                 2.28        16.68\n               物料费                           81,215,208.24                 1.31           74,143,858.27                 1.24          9.54\n               润滑油                           82,736,660.76                 1.34           81,454,593.73                 1.36          1.57\n               船舶租金                          72,426,582.55                 1.17\n               船舶折旧费                     1,281,630,728.78                20.73        1,239,315,725.14                20.70           3.41\n               其他                           178,876,654.33                 2.89          158,461,547.74                 2.65        12.88\n               燃油费                       1,826,100,392.05                25.01        1,711,200,283.99                28.17           6.71\n               港口费                          412,356,682.93                 5.65          287,215,295.69                 4.73        43.57\n               船员费用                         864,816,031.99               11.84           834,179,301.88               13.73           3.67\n               保险费                           89,757,367.04                 1.23           90,384,949.58                 1.49         -0.69\n               坞修、航修                        240,744,917.47                 3.30          197,551,881.31                 3.25        21.86\n散货船            检验费                           27,597,202.21                 0.38           30,875,376.45                 0.51       -10.62\n 运输            备件费                          107,095,262.14                 1.47          106,401,476.37                 1.75          0.65\n               物料费                           68,404,263.18                 0.94           68,344,446.78                 1.13          0.09\n               润滑油                           61,894,011.41                 0.85           64,070,974.30                 1.05         -3.40\n               船舶租金                         837,714,582.73               11.47           787,946,604.68               12.97           6.32\n               船舶折旧费                     1,195,856,203.46                16.38           923,857,051.78               15.21         29.44\n               程租运费                         764,772,461.12               10.47           233,000,733.97                 3.84       228.23\n               其他                           804,234,876.08               11.01           739,242,900.76               12.17           8.79\n集装箱            燃油费                          826,482,382.07               17.32           743,072,936.44               19.52         11.22\n 运输            港口费                          256,767,212.27                 5.38          215,534,174.82                 5.66        19.13\n               装卸费                       1,678,399,393.76                35.18        1,367,625,351.09                35.92         22.72\n\n                                                                         22  / 246"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0015",
+        "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "分行业情况"
+        ],
+        "physical_pages": [
+          23
+        ],
+        "source_spans": [
+          {
+            "page": 23,
+            "start": 0,
+            "end": 4579,
+            "quote": "                                             招商局能源运输股份有限公司2025                              年年度报告\n\n\n               船舶租金                     1,002,366,830.07               21.01          583,600,020.12               15.33         71.76\n               箱费                         211,961,573.60                 4.44         253,262,247.82                6.65        -16.31\n               包舱费                        183,623,191.54                 3.85         222,621,421.06                5.85        -17.52\n               船员费用                       164,892,145.56                 3.46         166,489,371.23                4.37         -0.96\n               保险费                          11,988,282.57                0.25           10,429,831.31               0.27         14.94\n               坞修、航修                        16,849,712.75                0.35           21,441,407.52               0.56        -21.42\n               备件费                          19,096,747.20                0.40           15,437,608.90               0.41         23.70\n               物料费                          14,440,000.00                0.30           13,524,159.26               0.36           6.77\n               润滑油                            9,288,973.43               0.19             9,038,424.91              0.24           2.77\n               船舶折旧费                        87,143,139.74                1.83           86,007,088.50               2.26           1.32\n               其他                         287,184,101.48                 6.02           99,056,795.66                 2.6      189.92\n               代理费及运                    174,059,983.30                 13.67            64,031,106.81               4.99       171.84\n               费\n               燃油费                      249,439,480.04                 19.59          288,175,334.40               22.45        -13.44\n               港口费                       66,575,712.89                   5.23           27,637,231.56               2.15       140.89\n               货物费                      173,281,371.84                 13.61          183,444,808.58               14.29         -5.54\n               租舱费                      308,638,655.12                 24.24          411,353,441.47               32.04        -24.97\n滚装船            船员费用                      99,611,107.58                   7.82           96,482,232.82               7.51           3.24\n 运输            保险费                       13,960,712.00                   1.10           12,058,699.67               0.94         15.77\n               坞修、航修                     17,365,854.67                   1.36           21,258,081.19               1.66        -18.31\n               备件费                       10,598,825.09                   0.83           13,052,269.83               1.02        -18.80\n               物料费                        5,855,224.29                   0.46             4,875,773.66              0.38         20.09\n               润滑油                        8,897,569.12                   0.70             7,898,789.62              0.62         12.64\n               船舶折旧费                     99,819,457.39                   7.84           94,701,973.55               7.38           5.40\n               其他                        45,155,291.35                   3.55           58,923,102.88               4.59        -23.37\n               燃油费                            4,035,372.77             10.32\n               船员费用                         21,069,028.92              53.91            10,366,463.97              64.79       103.24\n液化天            保险费                              499,718.05               1.28\n然气运            检验费                              143,269.82               0.37\n   输           备件费                              261,422.62               0.67\n               物料费                              136,931.94               0.35\n               船舶折旧费                        11,151,229.83              28.53\n               其他                             1,788,417.33               4.58             5,633,536.03             35.21        -68.25\n\n成本分析其他情况说明\n无\n\n(5).      报告期主要子公司股权变动导致合并范围变化\n√适用          □不适用\n        2025    年   8  月   28   日，公司第七届董事会第二十三次会议审议通过《关于购置境内自用办公物\n业的关联交易的议案》，董事会同意公司通过购买关联方招商局蛇口工业区控股股份有限公司下\n属全资子公司                 100%股权的方式购入深圳市太子湾招商积余大厦整栋作为自用办公物业。报告期\n内，公司通过现金方式收购深圳市太子湾商储置业有限公司                                                                     100%股权，并实现并表。\n\n\n\n(6).      公司报告期内业务、产品或服务发生重大变化或调整有关情况\n□适用          √不适用\n\n\n\n                                                                       23  / 246"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0016",
+        "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "分行业情况"
+        ],
+        "physical_pages": [
+          24
+        ],
+        "source_spans": [
+          {
+            "page": 24,
+            "start": 0,
+            "end": 228,
+            "quote": "                           招商局能源运输股份有限公司2025            年年度报告\n\n\n(7). 主要销售客户及主要供应商情况\n\n属于同一控制人控制的客户或供应商视为同一客户或供应商合并列示，受同一国有资产管理机构\n实际控制的除外。\n下列客户及供应商信息按照同一控制口径合并计算列示的情况说明\n公司已将招商局集团有限公司、中国石油化工集团有限公司等属于同一控制人控制的客户或供应\n商视为同一客户或供应商合并列示。\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "limitations": [
+      "仅基于选定章节，未覆盖行业背景、公司治理、股东与股本、债券、关联交易及财务报表附注；主要客户/供应商具体名单与金额未获取。"
+    ],
+    "supply_chain": null,
+    "generation": {
+      "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+      "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+      "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+      "selection": {
+        "purpose": "select_profile_sections",
+        "request_id": "bp-work-c5f9ab4bd5ad7613874faf67:workpaper:sections",
+        "request_hash": "96af42fad176d1d384aa3f4e3e0d97c48b3d3c67665e95c2fd878ad45b51bc29",
+        "response_hash": "e59b2eac8ae0abb78865ab16c5f08078b1e87bcc67012fca0b2bbdba2220ed6f",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 23891,
+          "output_tokens": 8030,
+          "total_tokens": 31921
+        },
+        "scope_kind": "report_heading_index",
+        "heading_count": 886,
+        "section_ids": [
+          "section-0001",
+          "section-0002",
+          "section-0003",
+          "section-0004",
+          "section-0005",
+          "section-0006",
+          "section-0007",
+          "section-0008",
+          "section-0009",
+          "section-0010",
+          "section-0011",
+          "section-0012",
+          "section-0013",
+          "section-0014",
+          "section-0015",
+          "section-0016",
+          "section-0017",
+          "section-0018",
+          "section-0019",
+          "section-0020",
+          "section-0021",
+          "section-0022",
+          "section-0023",
+          "section-0024",
+          "section-0025",
+          "section-0026",
+          "section-0027",
+          "section-0028",
+          "section-0029",
+          "section-0030",
+          "section-0031",
+          "section-0032",
+          "section-0033",
+          "section-0034",
+          "section-0035",
+          "section-0036",
+          "section-0037",
+          "section-0038",
+          "section-0039",
+          "section-0040",
+          "section-0041",
+          "section-0042",
+          "section-0043",
+          "section-0044",
+          "section-0045",
+          "section-0046",
+          "section-0047",
+          "section-0048",
+          "section-0049",
+          "section-0050",
+          "section-0051",
+          "section-0052",
+          "section-0053",
+          "section-0054",
+          "section-0055",
+          "section-0056",
+          "section-0057",
+          "section-0058",
+          "section-0059",
+          "section-0060",
+          "section-0070",
+          "section-0072",
+          "section-0076",
+          "section-0080",
+          "section-0081",
+          "section-0082",
+          "section-0087",
+          "section-0088",
+          "section-0089",
+          "section-0090",
+          "section-0112",
+          "section-0115",
+          "section-0124",
+          "section-0127",
+          "section-0128",
+          "section-0129",
+          "section-0130",
+          "section-0131",
+          "section-0132",
+          "section-0133",
+          "section-0134",
+          "section-0135",
+          "section-0136",
+          "section-0137",
+          "section-0138",
+          "section-0139",
+          "section-0140",
+          "section-0141",
+          "section-0142",
+          "section-0143",
+          "section-0144",
+          "section-0145",
+          "section-0146",
+          "section-0147",
+          "section-0150",
+          "section-0151",
+          "section-0152",
+          "section-0153",
+          "section-0154",
+          "section-0155",
+          "section-0156",
+          "section-0157",
+          "section-0158",
+          "section-0159",
+          "section-0160",
+          "section-0161",
+          "section-0162",
+          "section-0163",
+          "section-0164",
+          "section-0165",
+          "section-0166",
+          "section-0167",
+          "section-0168",
+          "section-0169",
+          "section-0170",
+          "section-0171",
+          "section-0172",
+          "section-0173",
+          "section-0174",
+          "section-0175",
+          "section-0176",
+          "section-0177",
+          "section-0178",
+          "section-0179",
+          "section-0180",
+          "section-0181",
+          "section-0182",
+          "section-0183",
+          "section-0184",
+          "section-0185",
+          "section-0186",
+          "section-0187",
+          "section-0188",
+          "section-0189",
+          "section-0190",
+          "section-0191",
+          "section-0192",
+          "section-0193",
+          "section-0194",
+          "section-0195",
+          "section-0196",
+          "section-0197",
+          "section-0198",
+          "section-0199",
+          "section-0200",
+          "section-0201",
+          "section-0202",
+          "section-0203",
+          "section-0204",
+          "section-0205",
+          "section-0206",
+          "section-0207",
+          "section-0208",
+          "section-0209",
+          "section-0210",
+          "section-0211",
+          "section-0212",
+          "section-0213",
+          "section-0214",
+          "section-0215",
+          "section-0216",
+          "section-0217",
+          "section-0218",
+          "section-0219",
+          "section-0220",
+          "section-0221",
+          "section-0222",
+          "section-0225",
+          "section-0228",
+          "section-0229",
+          "section-0230",
+          "section-0231",
+          "section-0233",
+          "section-0234",
+          "section-0235",
+          "section-0236",
+          "section-0237",
+          "section-0238",
+          "section-0239",
+          "section-0240",
+          "section-0241",
+          "section-0242",
+          "section-0243",
+          "section-0244",
+          "section-0245",
+          "section-0246",
+          "section-0247",
+          "section-0248",
+          "section-0249",
+          "section-0250",
+          "section-0251",
+          "section-0252",
+          "section-0253",
+          "section-0254",
+          "section-0255",
+          "section-0256",
+          "section-0257",
+          "section-0258",
+          "section-0259",
+          "section-0260",
+          "section-0261",
+          "section-0262",
+          "section-0263",
+          "section-0264",
+          "section-0265",
+          "section-0266",
+          "section-0267",
+          "section-0268",
+          "section-0269",
+          "section-0270",
+          "section-0271",
+          "section-0272",
+          "section-0273",
+          "section-0274",
+          "section-0275",
+          "section-0276",
+          "section-0277",
+          "section-0278",
+          "section-0279",
+          "section-0280",
+          "section-0281",
+          "section-0282",
+          "section-0283",
+          "section-0284",
+          "section-0285",
+          "section-0286",
+          "section-0287",
+          "section-0288",
+          "section-0289",
+          "section-0290",
+          "section-0291",
+          "section-0292",
+          "section-0293",
+          "section-0294",
+          "section-0295",
+          "section-0296",
+          "section-0297",
+          "section-0298",
+          "section-0299",
+          "section-0300",
+          "section-0301",
+          "section-0302",
+          "section-0303",
+          "section-0304",
+          "section-0305",
+          "section-0306",
+          "section-0307",
+          "section-0308",
+          "section-0309",
+          "section-0310",
+          "section-0312",
+          "section-0314",
+          "section-0316",
+          "section-0318",
+          "section-0320",
+          "section-0322",
+          "section-0323",
+          "section-0324",
+          "section-0325",
+          "section-0326",
+          "section-0327",
+          "section-0328",
+          "section-0329",
+          "section-0330",
+          "section-0331",
+          "section-0332",
+          "section-0333",
+          "section-0334",
+          "section-0335",
+          "section-0336",
+          "section-0337",
+          "section-0338",
+          "section-0339",
+          "section-0340",
+          "section-0341",
+          "section-0342",
+          "section-0343",
+          "section-0344",
+          "section-0345",
+          "section-0346",
+          "section-0347",
+          "section-0348",
+          "section-0349",
+          "section-0350",
+          "section-0351",
+          "section-0352",
+          "section-0353",
+          "section-0354",
+          "section-0355",
+          "section-0356",
+          "section-0357",
+          "section-0358",
+          "section-0359",
+          "section-0360",
+          "section-0361",
+          "section-0362",
+          "section-0363",
+          "section-0364",
+          "section-0365",
+          "section-0366",
+          "section-0367",
+          "section-0368",
+          "section-0369",
+          "section-0370",
+          "section-0371",
+          "section-0372",
+          "section-0373",
+          "section-0374",
+          "section-0375",
+          "section-0376",
+          "section-0377",
+          "section-0378",
+          "section-0379",
+          "section-0380",
+          "section-0381",
+          "section-0382",
+          "section-0383",
+          "section-0384",
+          "section-0385",
+          "section-0386",
+          "section-0387",
+          "section-0388",
+          "section-0389",
+          "section-0390",
+          "section-0397",
+          "section-0398",
+          "section-0399",
+          "section-0400",
+          "section-0401",
+          "section-0402",
+          "section-0403",
+          "section-0404",
+          "section-0405",
+          "section-0406",
+          "section-0407",
+          "section-0408",
+          "section-0409",
+          "section-0410",
+          "section-0411",
+          "section-0412",
+          "section-0413",
+          "section-0414",
+          "section-0415",
+          "section-0416",
+          "section-0417",
+          "section-0422",
+          "section-0430",
+          "section-0431",
+          "section-0432",
+          "section-0433",
+          "section-0434",
+          "section-0435",
+          "section-0436",
+          "section-0437",
+          "section-0438",
+          "section-0439",
+          "section-0440",
+          "section-0441",
+          "section-0442",
+          "section-0443",
+          "section-0444",
+          "section-0445",
+          "section-0446",
+          "section-0447",
+          "section-0448",
+          "section-0449",
+          "section-0450",
+          "section-0451",
+          "section-0452",
+          "section-0453",
+          "section-0454",
+          "section-0455",
+          "section-0456",
+          "section-0457",
+          "section-0458",
+          "section-0459",
+          "section-0460",
+          "section-0461",
+          "section-0462",
+          "section-0463",
+          "section-0464",
+          "section-0465",
+          "section-0466",
+          "section-0467",
+          "section-0468",
+          "section-0469",
+          "section-0470",
+          "section-0471",
+          "section-0472",
+          "section-0473",
+          "section-0474",
+          "section-0475",
+          "section-0476",
+          "section-0477",
+          "section-0478",
+          "section-0479",
+          "section-0480",
+          "section-0481",
+          "section-0482",
+          "section-0483",
+          "section-0484",
+          "section-0485",
+          "section-0486",
+          "section-0487",
+          "section-0488",
+          "section-0489",
+          "section-0490",
+          "section-0491",
+          "section-0492",
+          "section-0493",
+          "section-0494",
+          "section-0495",
+          "section-0496",
+          "section-0497",
+          "section-0498",
+          "section-0499",
+          "section-0500",
+          "section-0501",
+          "section-0502",
+          "section-0503",
+          "section-0504",
+          "section-0505",
+          "section-0506",
+          "section-0507",
+          "section-0508",
+          "section-0509",
+          "section-0510",
+          "section-0511",
+          "section-0512",
+          "section-0513",
+          "section-0514",
+          "section-0515",
+          "section-0516",
+          "section-0517",
+          "section-0518",
+          "section-0519",
+          "section-0520",
+          "section-0521",
+          "section-0522",
+          "section-0523",
+          "section-0524",
+          "section-0525",
+          "section-0526",
+          "section-0527",
+          "section-0528",
+          "section-0529",
+          "section-0530",
+          "section-0531",
+          "section-0532",
+          "section-0533",
+          "section-0534",
+          "section-0535",
+          "section-0536",
+          "section-0537",
+          "section-0538",
+          "section-0539",
+          "section-0540",
+          "section-0541",
+          "section-0542",
+          "section-0543",
+          "section-0544",
+          "section-0545",
+          "section-0546",
+          "section-0547",
+          "section-0548",
+          "section-0549",
+          "section-0550",
+          "section-0551",
+          "section-0552",
+          "section-0553",
+          "section-0554",
+          "section-0555",
+          "section-0556",
+          "section-0557",
+          "section-0558",
+          "section-0559",
+          "section-0560",
+          "section-0561",
+          "section-0562",
+          "section-0563",
+          "section-0564",
+          "section-0565",
+          "section-0566",
+          "section-0567",
+          "section-0568",
+          "section-0569",
+          "section-0570",
+          "section-0571",
+          "section-0572",
+          "section-0573",
+          "section-0574",
+          "section-0575",
+          "section-0576",
+          "section-0577",
+          "section-0578",
+          "section-0580",
+          "section-0581",
+          "section-0582",
+          "section-0583",
+          "section-0584",
+          "section-0585",
+          "section-0586",
+          "section-0587",
+          "section-0588",
+          "section-0589",
+          "section-0590",
+          "section-0605",
+          "section-0612",
+          "section-0613",
+          "section-0614",
+          "section-0616",
+          "section-0617",
+          "section-0618",
+          "section-0619",
+          "section-0621",
+          "section-0622",
+          "section-0623",
+          "section-0627",
+          "section-0628",
+          "section-0629",
+          "section-0630",
+          "section-0631",
+          "section-0632",
+          "section-0633",
+          "section-0634",
+          "section-0635",
+          "section-0636",
+          "section-0637",
+          "section-0638",
+          "section-0639",
+          "section-0640",
+          "section-0641",
+          "section-0643",
+          "section-0646",
+          "section-0647",
+          "section-0648",
+          "section-0649",
+          "section-0650",
+          "section-0658",
+          "section-0659",
+          "section-0660",
+          "section-0661",
+          "section-0666",
+          "section-0667",
+          "section-0668",
+          "section-0669",
+          "section-0675",
+          "section-0676",
+          "section-0677",
+          "section-0678",
+          "section-0685",
+          "section-0690",
+          "section-0691",
+          "section-0692",
+          "section-0693",
+          "section-0694",
+          "section-0695",
+          "section-0696",
+          "section-0697",
+          "section-0698",
+          "section-0699",
+          "section-0700",
+          "section-0701",
+          "section-0702",
+          "section-0709",
+          "section-0714",
+          "section-0716",
+          "section-0722",
+          "section-0723",
+          "section-0730",
+          "section-0733",
+          "section-0736",
+          "section-0743",
+          "section-0750",
+          "section-0758",
+          "section-0764",
+          "section-0765",
+          "section-0766",
+          "section-0767",
+          "section-0769",
+          "section-0773",
+          "section-0774",
+          "section-0776",
+          "section-0780",
+          "section-0781",
+          "section-0787",
+          "section-0788",
+          "section-0790",
+          "section-0791",
+          "section-0793",
+          "section-0796",
+          "section-0797",
+          "section-0801",
+          "section-0803",
+          "section-0804",
+          "section-0805",
+          "section-0810",
+          "section-0814",
+          "section-0815",
+          "section-0816",
+          "section-0819",
+          "section-0822",
+          "section-0823",
+          "section-0824",
+          "section-0825",
+          "section-0827",
+          "section-0830",
+          "section-0831",
+          "section-0832",
+          "section-0833",
+          "section-0838",
+          "section-0844",
+          "section-0848",
+          "section-0851",
+          "section-0853",
+          "section-0854",
+          "section-0855",
+          "section-0857",
+          "section-0860",
+          "section-0861",
+          "section-0862",
+          "section-0863",
+          "section-0865",
+          "section-0868",
+          "section-0869",
+          "section-0870",
+          "section-0871",
+          "section-0873",
+          "section-0876",
+          "section-0877",
+          "section-0878",
+          "section-0879",
+          "section-0881",
+          "section-0883",
+          "section-0884",
+          "section-0885",
+          "section-0889",
+          "section-0892",
+          "section-0893",
+          "section-0894",
+          "section-0895",
+          "section-0897",
+          "section-0900",
+          "section-0901",
+          "section-0902",
+          "section-0903",
+          "section-0905",
+          "section-0907",
+          "section-0908",
+          "section-0909",
+          "section-0910",
+          "section-0914",
+          "section-0920",
+          "section-0921",
+          "section-0927",
+          "section-0928",
+          "section-0929",
+          "section-0930",
+          "section-0933",
+          "section-0934",
+          "section-0935",
+          "section-0937",
+          "section-0940",
+          "section-0944",
+          "section-0948",
+          "section-0950",
+          "section-0951",
+          "section-0952",
+          "section-0953",
+          "section-0954",
+          "section-0956",
+          "section-0957",
+          "section-0958",
+          "section-0959",
+          "section-0960",
+          "section-0961",
+          "section-0962",
+          "section-0964",
+          "section-0965",
+          "section-0966",
+          "section-0967",
+          "section-0968",
+          "section-0973",
+          "section-0974",
+          "section-0975",
+          "section-0976",
+          "section-0977",
+          "section-0979",
+          "section-0984",
+          "section-0985",
+          "section-0986",
+          "section-0989",
+          "section-0991",
+          "section-0992",
+          "section-0993",
+          "section-0995",
+          "section-0996",
+          "section-0997",
+          "section-0998",
+          "section-0999",
+          "section-1000",
+          "section-1003",
+          "section-1004",
+          "section-1005",
+          "section-1006",
+          "section-1007",
+          "section-1008",
+          "section-1009",
+          "section-1010",
+          "section-1011",
+          "section-1012",
+          "section-1013",
+          "section-1014",
+          "section-1015",
+          "section-1016",
+          "section-1022",
+          "section-1023",
+          "section-1024",
+          "section-1025",
+          "section-1026",
+          "section-1027",
+          "section-1028",
+          "section-1029",
+          "section-1030",
+          "section-1031",
+          "section-1032",
+          "section-1033",
+          "section-1034",
+          "section-1035",
+          "section-1036",
+          "section-1037",
+          "section-1038",
+          "section-1039",
+          "section-1040",
+          "section-1041",
+          "section-1042",
+          "section-1043",
+          "section-1044",
+          "section-1045",
+          "section-1046",
+          "section-1047",
+          "section-1048",
+          "section-1049",
+          "section-1052",
+          "section-1053",
+          "section-1057",
+          "section-1060",
+          "section-1062",
+          "section-1063",
+          "section-1064",
+          "section-1068",
+          "section-1069",
+          "section-1070",
+          "section-1073",
+          "section-1074",
+          "section-1077",
+          "section-1081",
+          "section-1082",
+          "section-1083",
+          "section-1084",
+          "section-1085",
+          "section-1086",
+          "section-1087",
+          "section-1088",
+          "section-1089",
+          "section-1090",
+          "section-1091",
+          "section-1092",
+          "section-1093",
+          "section-1094",
+          "section-1095",
+          "section-1101",
+          "section-1102",
+          "section-1111",
+          "section-1112",
+          "section-1113",
+          "section-1114",
+          "section-1115",
+          "section-1116",
+          "section-1117",
+          "section-1118",
+          "section-1119",
+          "section-1120",
+          "section-1122",
+          "section-1123",
+          "section-1126",
+          "section-1127",
+          "section-1128",
+          "section-1132",
+          "section-1136",
+          "section-1137",
+          "section-1138",
+          "section-1139",
+          "section-1140",
+          "section-1144",
+          "section-1147",
+          "section-1148",
+          "section-1149",
+          "section-1150",
+          "section-1151",
+          "section-1152",
+          "section-1153",
+          "section-1154",
+          "section-1155",
+          "section-1156",
+          "section-1157",
+          "section-1158",
+          "section-1159",
+          "section-1160",
+          "section-1161",
+          "section-1162",
+          "section-1163",
+          "section-1164",
+          "section-1165",
+          "section-1166",
+          "section-1167",
+          "section-1168",
+          "section-1169",
+          "section-1170",
+          "section-1171",
+          "section-1172",
+          "section-1173",
+          "section-1174",
+          "section-1175",
+          "section-1176",
+          "section-1177",
+          "section-1178",
+          "section-1179",
+          "section-1180",
+          "section-1185",
+          "section-1186",
+          "section-1187",
+          "section-1188",
+          "section-1189",
+          "section-1190",
+          "section-1191",
+          "section-1192",
+          "section-1193",
+          "section-1194",
+          "section-1195",
+          "section-1196",
+          "section-1197",
+          "section-1198",
+          "section-1203",
+          "section-1207",
+          "section-1208",
+          "section-1211",
+          "section-1212",
+          "section-1215",
+          "section-1216",
+          "section-1217",
+          "section-1218",
+          "section-1219",
+          "section-1220",
+          "section-1221",
+          "section-1222",
+          "section-1225",
+          "section-1226",
+          "section-1227",
+          "section-1228",
+          "section-1229",
+          "section-1230",
+          "section-1231",
+          "section-1232",
+          "section-1233",
+          "section-1234",
+          "section-1237",
+          "section-1238",
+          "section-1239",
+          "section-1244",
+          "section-1245",
+          "section-1246",
+          "section-1247",
+          "section-1252",
+          "section-1254",
+          "section-1261",
+          "section-1268",
+          "section-1276",
+          "section-1280",
+          "section-1286",
+          "section-1287",
+          "section-1288",
+          "section-1289",
+          "section-1290",
+          "section-1291",
+          "section-1292"
+        ],
+        "physical_pages": []
+      },
+      "extraction": {
+        "purpose": "extract_profile_workpaper",
+        "request_id": "bp-work-c5f9ab4bd5ad7613874faf67:workpaper:extract",
+        "request_hash": "6acf789b2f0b317e0f2e8d410beaee67b5e2cba70116234fb5ce3181ce3ca0ae",
+        "response_hash": "e51c35d99efe030773bca91ef8cf5b1c0e417d5d521918b96b1b200309936206",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 15174,
+          "output_tokens": 27692,
+          "total_tokens": 42866
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0025",
+          "section-0040",
+          "section-0045",
+          "section-0058",
+          "section-0072",
+          "section-0076"
+        ],
+        "physical_pages": [
+          9,
+          10,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          20,
+          21,
+          22,
+          23,
+          24
+        ]
+      }
+    },
+    "quality_review": {
+      "status": "completed_with_open_findings",
+      "policy_version": "company_profile_workpaper_review.v13",
+      "original_draft_hash": "185acf6ca35f0583b093fb4f97b455187a50ab869fd7118d7b0cda719183d100",
+      "findings": [
+        {
+          "finding_id": "omit_segment_net_profit",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "explanation": "合并报表主要业务板块已列示分部净利润，但草稿仅有分行业营业收入、营业成本及毛利率，未反映利润结构。源表单位为亿元：油轮船队净利润41.91、同比增59.06%；干散货船队11.35、同比降26.69%；集装箱船队13.59、同比增3.46%；滚装船队2.29、同比降31.91%；LNG船队6.71、同比增11.08%。干散货收入规模居前但利润明显回落；LNG营业收入仅约0.55亿元，分部净利润却为6.71亿元，不能由毛利率推知。该差异会改变对盈利来源和主业组合的理解。应沿用分部表原生类别单独补充各板块净利润及同比方向，不要与主营业务分行业收入成本口径混用，也不要把公司利润总额或未列明的收入差额并入同一修补目标。",
+          "resolution": "corrected_pending_trust",
+          "original_fact": null,
+          "revised_fact": {
+            "fact_id": "review-add:omit_segment_net_profit",
+            "text": "报告期公司合并报表主要业务板块分部净利润（单位：亿元，币种：人民币）：油轮船队41.91（同比变动59.06%）、干散货船队11.35（同比变动-26.69%）、集装箱船队13.59（同比变动3.46%）、滚装船队2.29（同比变动-31.91%）、LNG船队6.71（同比变动11.08%）。",
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "油轮船队净利润",
+                "raw_value": "41.91",
+                "value": "41.91",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025",
+                "comparison_basis": "同比变动59.06%",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "干散货船队净利润",
+                "raw_value": "11.35",
+                "value": "11.35",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025",
+                "comparison_basis": "同比变动-26.69%",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "集装箱船队净利润",
+                "raw_value": "13.59",
+                "value": "13.59",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025",
+                "comparison_basis": "同比变动3.46%",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "滚装船队净利润",
+                "raw_value": "2.29",
+                "value": "2.29",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025",
+                "comparison_basis": "同比变动-31.91%",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "LNG船队净利润",
+                "raw_value": "6.71",
+                "value": "6.71",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025",
+                "comparison_basis": "同比变动11.08%",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "finding_id": "omit_fleet_freight_volume",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "船队经营概况已给出各船队货运量：油轮8,162万吨、干散货11,419万吨、LNG 2,467万吨、滚装664万吨、集装箱109万TEU。草稿未收录这些实物量。已记录的122万TEU是中外运集运承运重箱，不能替代集装箱货运量109万TEU。周转量原文数字排版不清，不应据以补数。此为经营规模补充，不否定已支持的收入与船队规模事实。",
+          "resolution": "omission_candidate",
+          "original_fact": null,
+          "revised_fact": null
+        }
+      ],
+      "checked_fact_ids": [
+        "bs_overall",
+        "ps_oil",
+        "ps_dry_bulk_breakbulk",
+        "ps_lng",
+        "ps_roro",
+        "ps_container",
+        "rm_revenue_sources",
+        "scale_company_revenue",
+        "scale_oil_tanker",
+        "scale_dry_bulk",
+        "scale_container",
+        "scale_roro",
+        "scale_lng",
+        "scale_fleet",
+        "ops_modes_inputs",
+        "cust_oil_tanker",
+        "cust_container",
+        "cust_roro",
+        "drv_revenue_cost",
+        "drv_oil_tanker",
+        "drv_dry_bulk",
+        "drv_container",
+        "chg_fleet"
+      ],
+      "calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-a62efc2b380d6db237e8a489:workpaper:review",
+          "request_hash": "d07ad10e032652b83cce603d3ffad941615478eef141ec9e5761c21074fd175b",
+          "response_hash": "6425e05b3f03726321324c32aa049d2ff80a99b311706a66fd5799c4dba701cd",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 21293,
+            "output_tokens": 589,
+            "total_tokens": 48813
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0025",
+            "section-0040",
+            "section-0045",
+            "section-0058",
+            "section-0072",
+            "section-0076"
+          ],
+          "physical_pages": [
+            9,
+            10,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            20,
+            21,
+            22,
+            23,
+            24
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-a62efc2b380d6db237e8a489:workpaper:repair",
+          "request_hash": "eaf433d23b2fee531a2b1d4f58a7b4c134e99c9d001b761c6a875127edd1ee96",
+          "response_hash": "5e5c00f99f2c22dfe5547fd8446d6a1a0d0b9118ec554e9f66adf8a6c1cbf515",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 11719,
+            "output_tokens": 3396,
+            "total_tokens": 15115
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0025",
+            "section-0040",
+            "section-0045",
+            "section-0058",
+            "section-0072",
+            "section-0076"
+          ],
+          "physical_pages": [
+            9,
+            10,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            20,
+            21,
+            22,
+            23,
+            24
+          ]
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "request_id": "bp-work-a62efc2b380d6db237e8a489:workpaper:repair-verify",
+          "request_hash": "d0c5bbc22fc4f6e7c4c961edd3b4ac40a45c001ebd60669603e1ea231f1ac443",
+          "response_hash": "d2c15023e024c4748802806f51c2fd4c975520c3dca11c4ec703674f7948d981",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 14399,
+            "output_tokens": 212,
+            "total_tokens": 17190
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0025",
+            "section-0040",
+            "section-0045",
+            "section-0058",
+            "section-0072",
+            "section-0076"
+          ],
+          "physical_pages": [
+            9,
+            10,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            20,
+            21,
+            22,
+            23,
+            24
+          ]
+        }
+      ],
+      "retained_request_ids": [],
+      "locally_revalidated_request_ids": [],
+      "error": null,
+      "checked_fact_hashes": {
+        "bs_overall": "b52e61239488bc31c36be116ffc395debccecc7b18493e948911c0164a560c9e",
+        "ps_oil": "e4039aa30fbc26e1781421b3462f9512b1018dc964480c686046317353c4e8db",
+        "ps_dry_bulk_breakbulk": "692649b18ab2365bddac431010e503f4d73599e0b383893e0fd891bac99cf132",
+        "ps_lng": "aa95ace00ee5300c2fc8b5fedbb6ffff77a46723a419481f8d269a7b9fc1598a",
+        "ps_roro": "acd1a5097815060cf7c5d67506aad03243a95630f8183ed027c149d640bf2760",
+        "ps_container": "657bcaa14d58515317e042e8922db259a1eae1bea5a4977d3936a4f5504dfbfa",
+        "rm_revenue_sources": "a3b38dd4bcb7a2140de85bb053bce90b4a972db062b1073a0f7f45b6e769402b",
+        "scale_company_revenue": "d66b5b7ab82d051424e2063ce56e0a04e7e0802a224fb997e8d55440374ac5c8",
+        "scale_oil_tanker": "de4b3056c8dfe1e38ba9e115584bf957531570535ebdd350199ffbd469c6b801",
+        "scale_dry_bulk": "f168ce1d3399faa65603204c1c924d2840548da8736bfd077f466ec1f6a84937",
+        "scale_container": "bb2ced8e4a82c3aafc5a6efe7476a68c267593e6a7d2ac610c7ebdc1f5ccbef2",
+        "scale_roro": "c52bad2226b1e6b749a5d26eaa6023382df13bffb4e5701d3090f104cb8122b6",
+        "scale_lng": "32e4d847701205c450529108753c375dd8324d363cf8652eb98e4d9af3edf9b3",
+        "scale_fleet": "7c065fea64775db280c6a54e298fc33d05816fde910f192c6409d8166f066354",
+        "ops_modes_inputs": "97d1d603a201f9e0949d8ba401d376429142e63f03a73e3376d812347a81d913",
+        "cust_oil_tanker": "0478f9ecbe5375609670f3ea38e7726b2585e4cab9f8f43be5fb3060fcb432e2",
+        "cust_container": "52d86d143725824171d726b4e8a8734d14d66d9c82b54d5579d38612b0e7f8fc",
+        "cust_roro": "7e2cbfb977a25c297f1f3aba506149855bbe44840dc85fefb2d35b9153da45ea",
+        "drv_revenue_cost": "2bea4ec0443037db4ab2835f6527192e84ab7b0589ea3e94082b1a4435d8f9e5",
+        "drv_oil_tanker": "ac9d68509d05fee925276b214d1eb25d03226cc69eee7b9d3c417a0fb7cf99c1",
+        "drv_dry_bulk": "a24939061c64504231d4a506d38147581717a313e60f52c6d2de48e9774e23ad",
+        "drv_container": "12a3dccfbfec6a249485363189dd3cff6feca73878369c3993d57fd9ebbe4eaa",
+        "chg_fleet": "cb371eef8f1293acdfdd7c839c2089c1ea5e861dbc06a702fed97cf4006ba391"
+      },
+      "metric_limit_policy": "source_review_exact_metric_limits.v1"
+    },
+    "standardization_notes": [
+      "程序显示说明：scale_company_revenue正文281.77亿元为营业收入（合并）28,177,211,131.95元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+    ]
+  },
+  "workpaper_receipts": [
+    {
+      "request_id": "bp-work-c5f9ab4bd5ad7613874faf67:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "96af42fad176d1d384aa3f4e3e0d97c48b3d3c67665e95c2fd878ad45b51bc29",
+      "response_hash": "e59b2eac8ae0abb78865ab16c5f08078b1e87bcc67012fca0b2bbdba2220ed6f",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0025\",\"section-0040\",\"section-0045\",\"section-0058\",\"section-0072\",\"section-0076\"],\"rationale\":\"所选章节共同覆盖公司业务与产品、船队经营、当期经营结果及收入成本结构。section-0025提供近三年主要会计数据和财务指标，形成总量规模与同比基线；section-0040说明公司从事的业务、主要产品/服务及用途；section-0045为经营情况讨论与分析，覆盖船队发展及各油轮、干散货、散杂货、LNG、滚装、集装箱船队经营，解释经营角色、资源投入和本期变化；section-0058为主要经营情况，含利润表/现金流变动及收入成本分析，说明盈利来源和当期经营结果；section-0072与section-0076保留分行业收入成本表的表头与延续，提供主要业务收入权重和结构。以上均为公司层面实质经营内容，且未同时选择存在祖父子关系的条目。\",\"deferred\":[\"行业背景（第二节行业情况及第六节市场展望）仅作次级参考，未纳入；已选经营讨论可解释公司层面影响。\",\"公司治理、股东与股本、债券、关联交易及财务报表附注等未纳入；当前目标是业务与收入结构，不扩展到全文财务报告。\",\"主要客户/供应商及未来计划/风险仅属可选或前瞻信息，现有章节已覆盖主要经营与本期变化，故暂缓。\"],\"stop_reason\":\"已形成从业务与产品、船队经营、主要经营结果到收入成本分行业结构的闭环，足以回答业务结构、产品服务、收入来源、规模与主要权重及本期经营变化；继续扩展只会进入行业背景、治理或附注明细，边际解释力较低。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0025",
+          "section-0040",
+          "section-0045",
+          "section-0058",
+          "section-0072",
+          "section-0076"
+        ],
+        "rationale": "所选章节共同覆盖公司业务与产品、船队经营、当期经营结果及收入成本结构。section-0025提供近三年主要会计数据和财务指标，形成总量规模与同比基线；section-0040说明公司从事的业务、主要产品/服务及用途；section-0045为经营情况讨论与分析，覆盖船队发展及各油轮、干散货、散杂货、LNG、滚装、集装箱船队经营，解释经营角色、资源投入和本期变化；section-0058为主要经营情况，含利润表/现金流变动及收入成本分析，说明盈利来源和当期经营结果；section-0072与section-0076保留分行业收入成本表的表头与延续，提供主要业务收入权重和结构。以上均为公司层面实质经营内容，且未同时选择存在祖父子关系的条目。",
+        "deferred": [
+          "行业背景（第二节行业情况及第六节市场展望）仅作次级参考，未纳入；已选经营讨论可解释公司层面影响。",
+          "公司治理、股东与股本、债券、关联交易及财务报表附注等未纳入；当前目标是业务与收入结构，不扩展到全文财务报告。",
+          "主要客户/供应商及未来计划/风险仅属可选或前瞻信息，现有章节已覆盖主要经营与本期变化，故暂缓。"
+        ],
+        "stop_reason": "已形成从业务与产品、船队经营、主要经营结果到收入成本分行业结构的闭环，足以回答业务结构、产品服务、收入来源、规模与主要权重及本期经营变化；继续扩展只会进入行业背景、治理或附注明细，边际解释力较低。"
+      },
+      "usage": {
+        "input_tokens": 23891,
+        "output_tokens": 8030,
+        "total_tokens": 31921
+      },
+      "receipt_origin": "retained_receipt"
+    },
+    {
+      "request_id": "bp-work-c5f9ab4bd5ad7613874faf67:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "6acf789b2f0b317e0f2e8d410beaee67b5e2cba70116234fb5ce3181ce3ca0ae",
+      "response_hash": "e51c35d99efe030773bca91ef8cf5b1c0e417d5d521918b96b1b200309936206",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\n  \"schema_version\": \"company_profile_workpaper_draft.v1\",\n  \"elements\": {\n    \"business_structure\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"bs_overall\",\n          \"text\": \"公司为专注于国际货物运输的专业航运公司，以油气运输、干散货运输为双核心主业，集装箱、汽车滚装等其他运输为有机补充，市场覆盖和货源种类较齐全。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0003\"\n          ]\n        }\n      ],\n      \"limitations\": []\n    },\n    \"products_services\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"ps_oil\",\n          \"text\": \"油轮船队提供油气/能源运输服务，着力加强VLCC与Aframax协同经营，并拓展DPST穿梭油轮新业务；VLCC船队推进全球化、规模化运营。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0003\"\n          ]\n        },\n        {\n          \"fact_id\": \"ps_dry_bulk_breakbulk\",\n          \"text\": \"干散货船队经营VLOC、Capesize、Panamax、Ultramax、Supramax、Handysize、Kamsarmax等船型，并依托VLOC船队服务战略客户；多用途船队深耕新能源等产业运输，62K多用途船出口承运风电项目、重型机械设备、厂房模块、储能设备，回程承运纸浆、粮食、矿石等。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0004\",\n            \"source-0007\"\n          ]\n        },\n        {\n          \"fact_id\": \"ps_lng\",\n          \"text\": \"气体运输业务通过招商气运（CMLNG）与CLNG等平台，为全球客户提供LNG运输解决方案，聚焦大客户、大项目并参与国际LNG运输项目投标。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0004\",\n            \"source-0007\"\n          ]\n        },\n        {\n          \"fact_id\": \"ps_roro\",\n          \"text\": \"招商滚装提供汽车滚装运输，覆盖内贸、长江及外贸，推进江海洋一体化运营；2025年全球首批甲醇双燃料动力滚装船“港荣”轮、“深荣”轮交付并完成全球首次滚装船甲醇燃料加注。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0004\",\n            \"source-0008\"\n          ]\n        },\n        {\n          \"fact_id\": \"ps_container\",\n          \"text\": \"中外运集运提供集装箱班轮运输，并依托航线网络提供江海联运、海铁联运、集卡直通等多式联运服务，拓展香港冷链物流业务。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0004\",\n            \"source-0008\"\n          ]\n        }\n      ],\n      \"limitations\": []\n    },\n    \"revenue_model\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"rm_revenue_sources\",\n          \"text\": \"公司营业收入主要由运费及船舶租金收入构成，按油轮、散货、集装箱、滚装、LNG等业务板块核算。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0011\"\n          ]\n        }\n      ],\n      \"limitations\": []\n    },\n    \"scale_and_mix\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"scale_company_revenue\",\n          \"text\": \"2025年公司合并营业收入为281.77亿元，精确值见下。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0001\",\n            \"source-0010\"\n          ],\n          \"metrics\": [\n            {\n              \"name\": \"营业收入（合并）\",\n              \"raw_value\": \"28,177,211,131.95\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"value\": \"28177211131.95\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"scale_oil_tanker\",\n          \"text\": \"油轮运输板块2025年营业收入、营业成本及毛利率如下。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0011\",\n            \"source-0012\"\n          ],\n          \"metrics\": [\n            {\n              \"name\": \"油轮运输营业收入\",\n              \"raw_value\": \"10,289,276,515.57\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"value\": \"10289276515.57\"\n            },\n            {\n              \"name\": \"油轮运输营业成本\",\n              \"raw_value\": \"6,183,185,067.42\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"value\": \"6183185067.42\"\n            },\n            {\n              \"name\": \"油轮运输毛利率\",\n              \"raw_value\": \"39.91\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"value\": \"39.91\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"scale_dry_bulk\",\n          \"text\": \"散货船运输板块2025年营业收入、营业成本及毛利率如下。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0011\",\n            \"source-0012\"\n          ],\n          \"metrics\": [\n            {\n              \"name\": \"散货船运输营业收入\",\n              \"raw_value\": \"8,769,388,393.77\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"value\": \"8769388393.77\"\n            },\n            {\n              \"name\": \"散货船运输营业成本\",\n              \"raw_value\": \"7,301,344,253.81\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"value\": \"7301344253.81\"\n            },\n            {\n              \"name\": \"散货船运输毛利率\",\n              \"raw_value\": \"16.74\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"value\": \"16.74\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"scale_container\",\n          \"text\": \"集装箱运输板块2025年营业收入、营业成本及毛利率如下。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0011\",\n            \"source-0012\"\n          ],\n          \"metrics\": [\n            {\n              \"name\": \"集装箱运输营业收入\",\n              \"raw_value\": \"6,149,215,176.25\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"value\": \"6149215176.25\"\n            },\n            {\n              \"name\": \"集装箱运输营业成本\",\n              \"raw_value\": \"4,770,483,686.04\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"value\": \"4770483686.04\"\n            },\n            {\n              \"name\": \"集装箱运输毛利率\",\n              \"raw_value\": \"22.42\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"value\": \"22.42\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"scale_roro\",\n          \"text\": \"滚装船运输板块2025年营业收入、营业成本及毛利率如下。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0011\",\n            \"source-0012\"\n          ],\n          \"metrics\": [\n            {\n              \"name\": \"滚装船运输营业收入\",\n              \"raw_value\": \"1,690,427,764.64\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"value\": \"1690427764.64\"\n            },\n            {\n              \"name\": \"滚装船运输营业成本\",\n              \"raw_value\": \"1,273,259,244.68\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"value\": \"1273259244.68\"\n            },\n            {\n              \"name\": \"滚装船运输毛利率\",\n              \"raw_value\": \"24.68\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"value\": \"24.68\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"scale_lng\",\n          \"text\": \"LNG运输板块2025年营业收入、营业成本及毛利率如下。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0011\",\n            \"source-0012\"\n          ],\n          \"metrics\": [\n            {\n              \"name\": \"LNG运输营业收入\",\n              \"raw_value\": \"54,949,095.27\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"value\": \"54949095.27\"\n            },\n            {\n              \"name\": \"LNG运输营业成本\",\n              \"raw_value\": \"39,085,391.28\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"currency\": \"人民币\",\n              \"source_unit\": \"元\",\n              \"unit\": \"元\",\n              \"value\": \"39085391.28\"\n            },\n            {\n              \"name\": \"LNG运输毛利率\",\n              \"raw_value\": \"28.87\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"value\": \"28.87\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"scale_fleet\",\n          \"text\": \"截至2025年末，公司自有船舶235艘，总载重量3884.59万吨；手持订单64艘，总载重量788.02万吨；另有租入船69艘，总载重量465.14万吨。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年末\",\n          \"evidence_ids\": [\n            \"source-0005\",\n            \"source-0006\"\n          ],\n          \"metrics\": [\n            {\n              \"name\": \"自有船舶艘数\",\n              \"raw_value\": \"235\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年末\",\n              \"source_unit\": \"艘\",\n              \"unit\": \"艘\",\n              \"value\": \"235\"\n            },\n            {\n              \"name\": \"自有船总载重量\",\n              \"raw_value\": \"3884.59\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年末\",\n              \"source_unit\": \"万吨\",\n              \"unit\": \"万吨\",\n              \"value\": \"3884.59\"\n            },\n            {\n              \"name\": \"手持订单船舶艘数\",\n              \"raw_value\": \"64\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年末\",\n              \"source_unit\": \"艘\",\n              \"unit\": \"艘\",\n              \"value\": \"64\"\n            },\n            {\n              \"name\": \"手持订单总载重量\",\n              \"raw_value\": \"788.02\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年末\",\n              \"source_unit\": \"万吨\",\n              \"unit\": \"万吨\",\n              \"value\": \"788.02\"\n            },\n            {\n              \"name\": \"租入船艘数\",\n              \"raw_value\": \"69\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年末\",\n              \"source_unit\": \"艘\",\n              \"unit\": \"艘\",\n              \"value\": \"69\"\n            },\n            {\n              \"name\": \"租入船总载重量\",\n              \"raw_value\": \"465.14\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年末\",\n              \"source_unit\": \"万吨\",\n              \"unit\": \"万吨\",\n              \"value\": \"465.14\"\n            }\n          ]\n        }\n      ],\n      \"limitations\": [\n        \"分行业表未直接列示各业务收入占比，本稿未自行计算占比。\",\n        \"分行业收入合计与公司合并营业收入存在差异，选定章节未提供其他业务/抵销明细，本稿未自行计算或填补差额。\",\n        \"主要业务板块表与主营业务分行业表在散货船营业成本上存在差异，本稿采用主营业务分行业表金额，未混合两个口径。\"\n      ]\n    },\n    \"operations_and_inputs\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"ops_modes_inputs\",\n          \"text\": \"公司作为航运承运人组织国际货物运输，采用自有与租入运力、即期与期租、长期协议与大客户项目等多种经营方式，干散货推进租造并举和轻资产运营；营业成本主要由燃料费、港口使费、船员人工成本、折旧成本和租金成本等构成。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0004\",\n            \"source-0007\",\n            \"source-0011\"\n          ]\n        }\n      ],\n      \"limitations\": [\n        \"未获取具体主要供应商名称及采购金额。\"\n      ]\n    },\n    \"customers_channels_markets\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"cust_oil_tanker\",\n          \"text\": \"油轮船队以央企石油公司、贸易商及民营独立炼厂等中资客户为基础货源，积极拓展国际大石油公司（oil major）和贸易商，推行航线全球化、客户多元化、服务专业化。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0003\"\n          ]\n        },\n        {\n          \"fact_id\": \"cust_container\",\n          \"text\": \"集装箱班轮服务网络覆盖中国沿海主要港口至日本、韩国、菲律宾、越南、泰国、马来西亚、澳大利亚、印度、墨西哥、新加坡、斯里兰卡、巴基斯坦，以及中国大陆至中国台湾、内地至中国香港；日本航线和两岸航线处于市场领先。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0004\"\n          ]\n        },\n        {\n          \"fact_id\": \"cust_roro\",\n          \"text\": \"滚装船队外贸网络覆盖全球滚装主要区域，稳固内贸核心客户并推进江海洋一体化；报告期开发小鹏、中联重科、金龙、零跑等新客户。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0004\",\n            \"source-0008\"\n          ]\n        }\n      ],\n      \"limitations\": [\n        \"公司船舶运输为全球承运，客户、起运地、目的地跨国家和地区，难以分地区列示营业收入；未获取具体主要客户名单及销售金额。\"\n      ]\n    },\n    \"operating_drivers\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"drv_revenue_cost\",\n          \"text\": \"2025年营业收入变动比例为9.22%，营业成本变动比例为12.19%；收入增长主要系油轮运输船队抢抓市场上行机遇、干散货船队轻资产运营规模扩大、集装箱船队新开航线价量齐升；成本增长主要系自有及租入船规模扩大、货运量增加，船舶折旧及租金、装卸费、港口费等费用同比增加。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0010\"\n          ],\n          \"metrics\": [\n            {\n              \"name\": \"营业收入变动比例\",\n              \"raw_value\": \"9.22\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"value\": \"9.22\",\n              \"comparison_basis\": \"本期比上年同期\"\n            },\n            {\n              \"name\": \"营业成本变动比例\",\n              \"raw_value\": \"12.19\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"value\": \"12.19\",\n              \"comparison_basis\": \"本期比上年同期\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"drv_oil_tanker\",\n          \"text\": \"油轮船队深入贯彻客户多元化和经营全球化，巩固与国际、国内大型石油公司战略合作，拓展新客户和新货源，强化全球大三角航线；VLCC船队TCE水平（含即期及期租租出）再次跑赢指数，即期经营TCE跑赢几乎所有大型VLCC船队同行。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0006\",\n            \"source-0007\"\n          ]\n        },\n        {\n          \"fact_id\": \"drv_dry_bulk\",\n          \"text\": \"干散货船队租造并举扩大经营规模、优化运力配置，接收Kamsarmax新船并签约Newcastlemax光船租赁；VLOC项目依托全球规模第一的VLOC船队实施精细化成本管控；好望角型、巴拿马型、灵便型船队根据市场波动调整运力与航线，总体跑赢指数。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0004\",\n            \"source-0007\"\n          ]\n        },\n        {\n          \"fact_id\": \"drv_container\",\n          \"text\": \"2025年集运船队累计承运重箱122万TEU，同比增加18.4%；在SCFI下降、成本上升背景下，公司出口单箱收入基本持平，进口单箱收入略降，经营盈利基本保持稳定。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0008\"\n          ],\n          \"metrics\": [\n            {\n              \"name\": \"集装箱船队承运重箱量\",\n              \"raw_value\": \"122\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"source_unit\": \"万TEU\",\n              \"unit\": \"万TEU\",\n              \"value\": \"122\"\n            },\n            {\n              \"name\": \"集装箱船队承运重箱量同比变化\",\n              \"raw_value\": \"增加18.4%\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年度\",\n              \"source_unit\": \"%\",\n              \"unit\": \"%\",\n              \"value\": null,\n              \"qualifier\": \"exact\",\n              \"comparison_basis\": \"同比\",\n              \"uncertainty_reason\": \"源文以“同比增加18.4%”表述，保留方向词，未转换为带符号数值。\"\n            }\n          ]\n        }\n      ],\n      \"limitations\": []\n    },\n    \"material_changes\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"chg_fleet\",\n          \"text\": \"报告期内共接收16艘新船，包括VLCC、LNG船、Kamsarmax散货船、重吊多用途船和滚装船等；完成处置5艘老龄和非节能型船，船队结构进一步优化。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年度\",\n          \"evidence_ids\": [\n            \"source-0005\"\n          ],\n          \"metrics\": [\n            {\n              \"name\": \"接收新船艘数\",\n              \"raw_value\": \"16\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"source_unit\": \"艘\",\n              \"unit\": \"艘\",\n              \"value\": \"16\"\n            },\n            {\n              \"name\": \"处置老龄和非节能型船艘数\",\n              \"raw_value\": \"5\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年度\",\n              \"source_unit\": \"艘\",\n              \"unit\": \"艘\",\n              \"value\": \"5\"\n            }\n          ]\n        }\n      ],\n      \"limitations\": []\n    }\n  },\n  \"limitations\": [\n    \"仅基于选定章节，未覆盖行业背景、公司治理、股东与股本、债券、关联交易及财务报表附注；主要客户/供应商具体名单与金额未获取。\"\n  ]\n}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "bs_overall",
+                "text": "公司为专注于国际货物运输的专业航运公司，以油气运输、干散货运输为双核心主业，集装箱、汽车滚装等其他运输为有机补充，市场覆盖和货源种类较齐全。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "ps_oil",
+                "text": "油轮船队提供油气/能源运输服务，着力加强VLCC与Aframax协同经营，并拓展DPST穿梭油轮新业务；VLCC船队推进全球化、规模化运营。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              },
+              {
+                "fact_id": "ps_dry_bulk_breakbulk",
+                "text": "干散货船队经营VLOC、Capesize、Panamax、Ultramax、Supramax、Handysize、Kamsarmax等船型，并依托VLOC船队服务战略客户；多用途船队深耕新能源等产业运输，62K多用途船出口承运风电项目、重型机械设备、厂房模块、储能设备，回程承运纸浆、粮食、矿石等。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004",
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "ps_lng",
+                "text": "气体运输业务通过招商气运（CMLNG）与CLNG等平台，为全球客户提供LNG运输解决方案，聚焦大客户、大项目并参与国际LNG运输项目投标。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004",
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "ps_roro",
+                "text": "招商滚装提供汽车滚装运输，覆盖内贸、长江及外贸，推进江海洋一体化运营；2025年全球首批甲醇双燃料动力滚装船“港荣”轮、“深荣”轮交付并完成全球首次滚装船甲醇燃料加注。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004",
+                  "source-0008"
+                ]
+              },
+              {
+                "fact_id": "ps_container",
+                "text": "中外运集运提供集装箱班轮运输，并依托航线网络提供江海联运、海铁联运、集卡直通等多式联运服务，拓展香港冷链物流业务。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004",
+                  "source-0008"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "rm_revenue_sources",
+                "text": "公司营业收入主要由运费及船舶租金收入构成，按油轮、散货、集装箱、滚装、LNG等业务板块核算。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "scale_company_revenue",
+                "text": "2025年公司合并营业收入为281.77亿元，精确值见下。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入（合并）",
+                    "raw_value": "28,177,211,131.95",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "value": "28177211131.95"
+                  }
+                ]
+              },
+              {
+                "fact_id": "scale_oil_tanker",
+                "text": "油轮运输板块2025年营业收入、营业成本及毛利率如下。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011",
+                  "source-0012"
+                ],
+                "metrics": [
+                  {
+                    "name": "油轮运输营业收入",
+                    "raw_value": "10,289,276,515.57",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "value": "10289276515.57"
+                  },
+                  {
+                    "name": "油轮运输营业成本",
+                    "raw_value": "6,183,185,067.42",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "value": "6183185067.42"
+                  },
+                  {
+                    "name": "油轮运输毛利率",
+                    "raw_value": "39.91",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "source_unit": "%",
+                    "unit": "%",
+                    "value": "39.91"
+                  }
+                ]
+              },
+              {
+                "fact_id": "scale_dry_bulk",
+                "text": "散货船运输板块2025年营业收入、营业成本及毛利率如下。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011",
+                  "source-0012"
+                ],
+                "metrics": [
+                  {
+                    "name": "散货船运输营业收入",
+                    "raw_value": "8,769,388,393.77",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "value": "8769388393.77"
+                  },
+                  {
+                    "name": "散货船运输营业成本",
+                    "raw_value": "7,301,344,253.81",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "value": "7301344253.81"
+                  },
+                  {
+                    "name": "散货船运输毛利率",
+                    "raw_value": "16.74",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "source_unit": "%",
+                    "unit": "%",
+                    "value": "16.74"
+                  }
+                ]
+              },
+              {
+                "fact_id": "scale_container",
+                "text": "集装箱运输板块2025年营业收入、营业成本及毛利率如下。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011",
+                  "source-0012"
+                ],
+                "metrics": [
+                  {
+                    "name": "集装箱运输营业收入",
+                    "raw_value": "6,149,215,176.25",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "value": "6149215176.25"
+                  },
+                  {
+                    "name": "集装箱运输营业成本",
+                    "raw_value": "4,770,483,686.04",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "value": "4770483686.04"
+                  },
+                  {
+                    "name": "集装箱运输毛利率",
+                    "raw_value": "22.42",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "source_unit": "%",
+                    "unit": "%",
+                    "value": "22.42"
+                  }
+                ]
+              },
+              {
+                "fact_id": "scale_roro",
+                "text": "滚装船运输板块2025年营业收入、营业成本及毛利率如下。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011",
+                  "source-0012"
+                ],
+                "metrics": [
+                  {
+                    "name": "滚装船运输营业收入",
+                    "raw_value": "1,690,427,764.64",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "value": "1690427764.64"
+                  },
+                  {
+                    "name": "滚装船运输营业成本",
+                    "raw_value": "1,273,259,244.68",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "value": "1273259244.68"
+                  },
+                  {
+                    "name": "滚装船运输毛利率",
+                    "raw_value": "24.68",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "source_unit": "%",
+                    "unit": "%",
+                    "value": "24.68"
+                  }
+                ]
+              },
+              {
+                "fact_id": "scale_lng",
+                "text": "LNG运输板块2025年营业收入、营业成本及毛利率如下。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011",
+                  "source-0012"
+                ],
+                "metrics": [
+                  {
+                    "name": "LNG运输营业收入",
+                    "raw_value": "54,949,095.27",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "value": "54949095.27"
+                  },
+                  {
+                    "name": "LNG运输营业成本",
+                    "raw_value": "39,085,391.28",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "source_unit": "元",
+                    "unit": "元",
+                    "value": "39085391.28"
+                  },
+                  {
+                    "name": "LNG运输毛利率",
+                    "raw_value": "28.87",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "source_unit": "%",
+                    "unit": "%",
+                    "value": "28.87"
+                  }
+                ]
+              },
+              {
+                "fact_id": "scale_fleet",
+                "text": "截至2025年末，公司自有船舶235艘，总载重量3884.59万吨；手持订单64艘，总载重量788.02万吨；另有租入船69艘，总载重量465.14万吨。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "evidence_ids": [
+                  "source-0005",
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "自有船舶艘数",
+                    "raw_value": "235",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "source_unit": "艘",
+                    "unit": "艘",
+                    "value": "235"
+                  },
+                  {
+                    "name": "自有船总载重量",
+                    "raw_value": "3884.59",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "source_unit": "万吨",
+                    "unit": "万吨",
+                    "value": "3884.59"
+                  },
+                  {
+                    "name": "手持订单船舶艘数",
+                    "raw_value": "64",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "source_unit": "艘",
+                    "unit": "艘",
+                    "value": "64"
+                  },
+                  {
+                    "name": "手持订单总载重量",
+                    "raw_value": "788.02",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "source_unit": "万吨",
+                    "unit": "万吨",
+                    "value": "788.02"
+                  },
+                  {
+                    "name": "租入船艘数",
+                    "raw_value": "69",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "source_unit": "艘",
+                    "unit": "艘",
+                    "value": "69"
+                  },
+                  {
+                    "name": "租入船总载重量",
+                    "raw_value": "465.14",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "source_unit": "万吨",
+                    "unit": "万吨",
+                    "value": "465.14"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "分行业表未直接列示各业务收入占比，本稿未自行计算占比。",
+              "分行业收入合计与公司合并营业收入存在差异，选定章节未提供其他业务/抵销明细，本稿未自行计算或填补差额。",
+              "主要业务板块表与主营业务分行业表在散货船营业成本上存在差异，本稿采用主营业务分行业表金额，未混合两个口径。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "ops_modes_inputs",
+                "text": "公司作为航运承运人组织国际货物运输，采用自有与租入运力、即期与期租、长期协议与大客户项目等多种经营方式，干散货推进租造并举和轻资产运营；营业成本主要由燃料费、港口使费、船员人工成本、折旧成本和租金成本等构成。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004",
+                  "source-0007",
+                  "source-0011"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取具体主要供应商名称及采购金额。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "cust_oil_tanker",
+                "text": "油轮船队以央企石油公司、贸易商及民营独立炼厂等中资客户为基础货源，积极拓展国际大石油公司（oil major）和贸易商，推行航线全球化、客户多元化、服务专业化。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              },
+              {
+                "fact_id": "cust_container",
+                "text": "集装箱班轮服务网络覆盖中国沿海主要港口至日本、韩国、菲律宾、越南、泰国、马来西亚、澳大利亚、印度、墨西哥、新加坡、斯里兰卡、巴基斯坦，以及中国大陆至中国台湾、内地至中国香港；日本航线和两岸航线处于市场领先。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ]
+              },
+              {
+                "fact_id": "cust_roro",
+                "text": "滚装船队外贸网络覆盖全球滚装主要区域，稳固内贸核心客户并推进江海洋一体化；报告期开发小鹏、中联重科、金龙、零跑等新客户。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004",
+                  "source-0008"
+                ]
+              }
+            ],
+            "limitations": [
+              "公司船舶运输为全球承运，客户、起运地、目的地跨国家和地区，难以分地区列示营业收入；未获取具体主要客户名单及销售金额。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "drv_revenue_cost",
+                "text": "2025年营业收入变动比例为9.22%，营业成本变动比例为12.19%；收入增长主要系油轮运输船队抢抓市场上行机遇、干散货船队轻资产运营规模扩大、集装箱船队新开航线价量齐升；成本增长主要系自有及租入船规模扩大、货运量增加，船舶折旧及租金、装卸费、港口费等费用同比增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入变动比例",
+                    "raw_value": "9.22",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "source_unit": "%",
+                    "unit": "%",
+                    "value": "9.22",
+                    "comparison_basis": "本期比上年同期"
+                  },
+                  {
+                    "name": "营业成本变动比例",
+                    "raw_value": "12.19",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "source_unit": "%",
+                    "unit": "%",
+                    "value": "12.19",
+                    "comparison_basis": "本期比上年同期"
+                  }
+                ]
+              },
+              {
+                "fact_id": "drv_oil_tanker",
+                "text": "油轮船队深入贯彻客户多元化和经营全球化，巩固与国际、国内大型石油公司战略合作，拓展新客户和新货源，强化全球大三角航线；VLCC船队TCE水平（含即期及期租租出）再次跑赢指数，即期经营TCE跑赢几乎所有大型VLCC船队同行。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006",
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "drv_dry_bulk",
+                "text": "干散货船队租造并举扩大经营规模、优化运力配置，接收Kamsarmax新船并签约Newcastlemax光船租赁；VLOC项目依托全球规模第一的VLOC船队实施精细化成本管控；好望角型、巴拿马型、灵便型船队根据市场波动调整运力与航线，总体跑赢指数。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004",
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "drv_container",
+                "text": "2025年集运船队累计承运重箱122万TEU，同比增加18.4%；在SCFI下降、成本上升背景下，公司出口单箱收入基本持平，进口单箱收入略降，经营盈利基本保持稳定。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "集装箱船队承运重箱量",
+                    "raw_value": "122",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "source_unit": "万TEU",
+                    "unit": "万TEU",
+                    "value": "122"
+                  },
+                  {
+                    "name": "集装箱船队承运重箱量同比变化",
+                    "raw_value": "增加18.4%",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "source_unit": "%",
+                    "unit": "%",
+                    "value": null,
+                    "qualifier": "exact",
+                    "comparison_basis": "同比",
+                    "uncertainty_reason": "源文以“同比增加18.4%”表述，保留方向词，未转换为带符号数值。"
+                  }
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "chg_fleet",
+                "text": "报告期内共接收16艘新船，包括VLCC、LNG船、Kamsarmax散货船、重吊多用途船和滚装船等；完成处置5艘老龄和非节能型船，船队结构进一步优化。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": [
+                  {
+                    "name": "接收新船艘数",
+                    "raw_value": "16",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "source_unit": "艘",
+                    "unit": "艘",
+                    "value": "16"
+                  },
+                  {
+                    "name": "处置老龄和非节能型船艘数",
+                    "raw_value": "5",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "source_unit": "艘",
+                    "unit": "艘",
+                    "value": "5"
+                  }
+                ]
+              }
+            ],
+            "limitations": []
+          }
+        },
+        "limitations": [
+          "仅基于选定章节，未覆盖行业背景、公司治理、股东与股本、债券、关联交易及财务报表附注；主要客户/供应商具体名单与金额未获取。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 15174,
+        "output_tokens": 27692,
+        "total_tokens": 42866
+      },
+      "receipt_origin": "retained_receipt"
+    },
+    {
+      "request_id": "bp-work-a62efc2b380d6db237e8a489:workpaper:review",
+      "purpose": "review_profile_workpaper",
+      "request_hash": "d07ad10e032652b83cce603d3ffad941615478eef141ec9e5761c21074fd175b",
+      "response_hash": "6425e05b3f03726321324c32aa049d2ff80a99b311706a66fd5799c4dba701cd",
+      "finish_reason": "stop",
+      "source_label": "scorpio:grok-4.7",
+      "model": "grok-4.7",
+      "selected_profile": "semantic_extraction__scorpio_grok",
+      "logical_profile": "semantic_extraction__scorpio_grok",
+      "reasoning_effort": "high",
+      "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+      "contract_status": "accepted",
+      "raw_content": "{\"reviewed_fact_ids\":[\"bs_overall\",\"ps_oil\",\"ps_dry_bulk_breakbulk\",\"ps_lng\",\"ps_roro\",\"ps_container\",\"rm_revenue_sources\",\"scale_company_revenue\",\"scale_oil_tanker\",\"scale_dry_bulk\",\"scale_container\",\"scale_roro\",\"scale_lng\",\"scale_fleet\",\"ops_modes_inputs\",\"cust_oil_tanker\",\"cust_container\",\"cust_roro\",\"drv_revenue_cost\",\"drv_oil_tanker\",\"drv_dry_bulk\",\"drv_container\",\"chg_fleet\"],\"findings\":[{\"finding_id\":\"omit_segment_net_profit\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0010\"],\"explanation\":\"合并报表主要业务板块已列示分部净利润，但草稿仅有分行业营业收入、营业成本及毛利率，未反映利润结构。源表单位为亿元：油轮船队净利润41.91、同比增59.06%；干散货船队11.35、同比降26.69%；集装箱船队13.59、同比增3.46%；滚装船队2.29、同比降31.91%；LNG船队6.71、同比增11.08%。干散货收入规模居前但利润明显回落；LNG营业收入仅约0.55亿元，分部净利润却为6.71亿元，不能由毛利率推知。该差异会改变对盈利来源和主业组合的理解。应沿用分部表原生类别单独补充各板块净利润及同比方向，不要与主营业务分行业收入成本口径混用，也不要把公司利润总额或未列明的收入差额并入同一修补目标。\"},{\"finding_id\":\"omit_fleet_freight_volume\",\"element\":\"operations_and_inputs\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0006\"],\"explanation\":\"船队经营概况已给出各船队货运量：油轮8,162万吨、干散货11,419万吨、LNG 2,467万吨、滚装664万吨、集装箱109万TEU。草稿未收录这些实物量。已记录的122万TEU是中外运集运承运重箱，不能替代集装箱货运量109万TEU。周转量原文数字排版不清，不应据以补数。此为经营规模补充，不否定已支持的收入与船队规模事实。\"}]}",
+      "response_payload": {
+        "reviewed_fact_ids": [
+          "bs_overall",
+          "ps_oil",
+          "ps_dry_bulk_breakbulk",
+          "ps_lng",
+          "ps_roro",
+          "ps_container",
+          "rm_revenue_sources",
+          "scale_company_revenue",
+          "scale_oil_tanker",
+          "scale_dry_bulk",
+          "scale_container",
+          "scale_roro",
+          "scale_lng",
+          "scale_fleet",
+          "ops_modes_inputs",
+          "cust_oil_tanker",
+          "cust_container",
+          "cust_roro",
+          "drv_revenue_cost",
+          "drv_oil_tanker",
+          "drv_dry_bulk",
+          "drv_container",
+          "chg_fleet"
+        ],
+        "findings": [
+          {
+            "finding_id": "omit_segment_net_profit",
+            "element": "scale_and_mix",
+            "severity": "material",
+            "issue_type": "material_omission",
+            "action": "possible_omission",
+            "affected_fact_id": null,
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "explanation": "合并报表主要业务板块已列示分部净利润，但草稿仅有分行业营业收入、营业成本及毛利率，未反映利润结构。源表单位为亿元：油轮船队净利润41.91、同比增59.06%；干散货船队11.35、同比降26.69%；集装箱船队13.59、同比增3.46%；滚装船队2.29、同比降31.91%；LNG船队6.71、同比增11.08%。干散货收入规模居前但利润明显回落；LNG营业收入仅约0.55亿元，分部净利润却为6.71亿元，不能由毛利率推知。该差异会改变对盈利来源和主业组合的理解。应沿用分部表原生类别单独补充各板块净利润及同比方向，不要与主营业务分行业收入成本口径混用，也不要把公司利润总额或未列明的收入差额并入同一修补目标。"
+          },
+          {
+            "finding_id": "omit_fleet_freight_volume",
+            "element": "operations_and_inputs",
+            "severity": "minor",
+            "issue_type": "material_omission",
+            "action": "possible_omission",
+            "affected_fact_id": null,
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "explanation": "船队经营概况已给出各船队货运量：油轮8,162万吨、干散货11,419万吨、LNG 2,467万吨、滚装664万吨、集装箱109万TEU。草稿未收录这些实物量。已记录的122万TEU是中外运集运承运重箱，不能替代集装箱货运量109万TEU。周转量原文数字排版不清，不应据以补数。此为经营规模补充，不否定已支持的收入与船队规模事实。"
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 21293,
+        "output_tokens": 589,
+        "total_tokens": 48813
+      }
+    },
+    {
+      "request_id": "bp-work-a62efc2b380d6db237e8a489:workpaper:repair",
+      "purpose": "repair_profile_workpaper",
+      "request_hash": "eaf433d23b2fee531a2b1d4f58a7b4c134e99c9d001b761c6a875127edd1ee96",
+      "response_hash": "5e5c00f99f2c22dfe5547fd8446d6a1a0d0b9118ec554e9f66adf8a6c1cbf515",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:omit_segment_net_profit\",\"text\":\"报告期公司合并报表主要业务板块分部净利润（单位：亿元，币种：人民币）：油轮船队41.91（同比变动59.06%）、干散货船队11.35（同比变动-26.69%）、集装箱船队13.59（同比变动3.46%）、滚装船队2.29（同比变动-31.91%）、LNG船队6.71（同比变动11.08%）。\",\"subject_scope\":\"business_segment\",\"period\":\"2025\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"油轮船队净利润\",\"raw_value\":\"41.91\",\"value\":\"41.91\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比变动59.06%\",\"uncertainty_reason\":null},{\"name\":\"干散货船队净利润\",\"raw_value\":\"11.35\",\"value\":\"11.35\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比变动-26.69%\",\"uncertainty_reason\":null},{\"name\":\"集装箱船队净利润\",\"raw_value\":\"13.59\",\"value\":\"13.59\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比变动3.46%\",\"uncertainty_reason\":null},{\"name\":\"滚装船队净利润\",\"raw_value\":\"2.29\",\"value\":\"2.29\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比变动-31.91%\",\"uncertainty_reason\":null},{\"name\":\"LNG船队净利润\",\"raw_value\":\"6.71\",\"value\":\"6.71\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比变动11.08%\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+      "response_payload": {
+        "repaired_facts": [
+          {
+            "fact_id": "review-add:omit_segment_net_profit",
+            "text": "报告期公司合并报表主要业务板块分部净利润（单位：亿元，币种：人民币）：油轮船队41.91（同比变动59.06%）、干散货船队11.35（同比变动-26.69%）、集装箱船队13.59（同比变动3.46%）、滚装船队2.29（同比变动-31.91%）、LNG船队6.71（同比变动11.08%）。",
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "油轮船队净利润",
+                "raw_value": "41.91",
+                "value": "41.91",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "period": "2025",
+                "subject_scope": "business_segment",
+                "qualifier": "exact",
+                "comparison_basis": "同比变动59.06%",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "干散货船队净利润",
+                "raw_value": "11.35",
+                "value": "11.35",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "period": "2025",
+                "subject_scope": "business_segment",
+                "qualifier": "exact",
+                "comparison_basis": "同比变动-26.69%",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "集装箱船队净利润",
+                "raw_value": "13.59",
+                "value": "13.59",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "period": "2025",
+                "subject_scope": "business_segment",
+                "qualifier": "exact",
+                "comparison_basis": "同比变动3.46%",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "滚装船队净利润",
+                "raw_value": "2.29",
+                "value": "2.29",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "period": "2025",
+                "subject_scope": "business_segment",
+                "qualifier": "exact",
+                "comparison_basis": "同比变动-31.91%",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "LNG船队净利润",
+                "raw_value": "6.71",
+                "value": "6.71",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "period": "2025",
+                "subject_scope": "business_segment",
+                "qualifier": "exact",
+                "comparison_basis": "同比变动11.08%",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 11719,
+        "output_tokens": 3396,
+        "total_tokens": 15115
+      }
+    },
+    {
+      "request_id": "bp-work-a62efc2b380d6db237e8a489:workpaper:repair-verify",
+      "purpose": "verify_profile_workpaper_repair",
+      "request_hash": "d0c5bbc22fc4f6e7c4c961edd3b4ac40a45c001ebd60669603e1ea231f1ac443",
+      "response_hash": "d2c15023e024c4748802806f51c2fd4c975520c3dca11c4ec703674f7948d981",
+      "finish_reason": "stop",
+      "source_label": "scorpio:grok-4.7",
+      "model": "grok-4.7",
+      "selected_profile": "semantic_extraction__scorpio_grok",
+      "logical_profile": "semantic_extraction__scorpio_grok",
+      "reasoning_effort": "high",
+      "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+      "contract_status": "accepted",
+      "raw_content": "{\"checked_fact_ids\":[\"review-add:omit_segment_net_profit\"],\"checks\":[{\"fact_id\":\"review-add:omit_segment_net_profit\",\"accepted\":true,\"evidence_ids\":[\"source-0010\"],\"explanation\":\"候选事实按source-0010合并报表主要业务板块分部表的原生类别，准确补入净利润列及同比变动：油轮船队41.91亿元、同比59.06%，干散货船队11.35亿元、同比-26.69%，集装箱船队13.59亿元、同比3.46%，滚装船队2.29亿元、同比-31.91%，LNG船队6.71亿元、同比11.08%。期间为2025年报告期，单位为亿元人民币，财务列、正负方向和业务板块主体均与源表一致；未与主营业务分行业收入成本口径混用，也未并入公司利润总额或未列明差额。\"}]}",
+      "response_payload": {
+        "checked_fact_ids": [
+          "review-add:omit_segment_net_profit"
+        ],
+        "checks": [
+          {
+            "fact_id": "review-add:omit_segment_net_profit",
+            "accepted": true,
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "explanation": "候选事实按source-0010合并报表主要业务板块分部表的原生类别，准确补入净利润列及同比变动：油轮船队41.91亿元、同比59.06%，干散货船队11.35亿元、同比-26.69%，集装箱船队13.59亿元、同比3.46%，滚装船队2.29亿元、同比-31.91%，LNG船队6.71亿元、同比11.08%。期间为2025年报告期，单位为亿元人民币，财务列、正负方向和业务板块主体均与源表一致；未与主营业务分行业收入成本口径混用，也未并入公司利润总额或未列明差额。"
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 14399,
+        "output_tokens": 212,
+        "total_tokens": 17190
+      }
+    }
+  ]
+}

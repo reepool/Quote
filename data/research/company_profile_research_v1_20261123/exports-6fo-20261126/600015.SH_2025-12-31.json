@@ -1,0 +1,4006 @@
+{
+  "schema_version": "company_profile_common_core_profile.v3",
+  "production_authorization": "not_authorized",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "work_id": "bp-work-e686d859a2cafd7acc9ab1e4",
+  "instrument_id": "600015.SH",
+  "report": {
+    "instrument_id": "600015.SH",
+    "report_id": "asset_2aae592305458d4f705a76a316b62b0c",
+    "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-30T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "freshness": {
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-30T16:00:00+00:00",
+    "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+    "knowledge_time": "2026-03-30T16:00:00+00:00"
+  },
+  "core_complete": false,
+  "dimensions": [
+    {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    {
+      "dimension_id": "products_services",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    }
+  ],
+  "accepted_facts": [],
+  "gaps": [],
+  "evidence_gap_codes": [],
+  "commodity_exposure": {
+    "assessment": {
+      "schema_version": "company_profile_commodity_exposure.v1",
+      "production_authorization": "not_authorized",
+      "report": {
+        "instrument_id": "600015.SH",
+        "report_id": "asset_2aae592305458d4f705a76a316b62b0c",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "assessment_status": "not_assessed",
+      "checked_evidence_ids": [],
+      "exposures": []
+    },
+    "reported_period": "2025-12-31",
+    "knowledge_time": "2026-03-30T16:00:00+00:00",
+    "consumer_authorization": {
+      "dcf": false,
+      "trading": false,
+      "price_sensitivity": false
+    }
+  },
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "llm_generated",
+    "report": {
+      "instrument_id": "600015.SH",
+      "report_id": "asset_2aae592305458d4f705a76a316b62b0c",
+      "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-30T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0104",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "3.12 业务回顾"
+          ],
+          "start_page": 41,
+          "end_page": 42,
+          "rationale": "本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。"
+        },
+        {
+          "section_id": "section-0110",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "投资银行业务",
+            "3.12.2 零售金融业务"
+          ],
+          "start_page": 44,
+          "end_page": 44,
+          "rationale": "本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。"
+        },
+        {
+          "section_id": "section-0111",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "个人存款业务"
+          ],
+          "start_page": 44,
+          "end_page": 45,
+          "rationale": "本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。"
+        },
+        {
+          "section_id": "section-0112",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "财富管理与私人银行业务"
+          ],
+          "start_page": 45,
+          "end_page": 45,
+          "rationale": "本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。"
+        },
+        {
+          "section_id": "section-0113",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "个人贷款业务"
+          ],
+          "start_page": 45,
+          "end_page": 46,
+          "rationale": "本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。"
+        },
+        {
+          "section_id": "section-0114",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "收单支付业务"
+          ],
+          "start_page": 46,
+          "end_page": 46,
+          "rationale": "本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。"
+        },
+        {
+          "section_id": "section-0115",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "信用卡业务"
+          ],
+          "start_page": 46,
+          "end_page": 48,
+          "rationale": "本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。"
+        },
+        {
+          "section_id": "section-0121",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "资产托管业务",
+            "3.12.4 数字化经营"
+          ],
+          "start_page": 51,
+          "end_page": 53,
+          "rationale": "本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。"
+        }
+      ],
+      "unread_or_deferred": [
+        "section-0030 管理层讨论与分析整章：范围过大，仅取零售相关子节即可满足定向问题",
+        "section-0116/0117 金融市场业务、section-0119 资产管理、section-0120 资产托管：非零售客户规模主题，暂不扩读",
+        "section-0071 及贷款质量明细、section-0122 风险管理：属资产质量与风险范畴，与客户规模披露关联弱",
+        "第七节财务报告及附注（如分部报告 section-0731/0739）：仅在正文零售客户数量存在实质缺口时再定向补充，本次不扩读"
+      ],
+      "selection_rationale": "本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。",
+      "stop_reason": "已覆盖零售客户与经营规模的正文披露来源（业务回顾总览、零售各业务子节及数字化渠道），可回答客户数量、类别、期间与计量单位并区分正文与脚注；剩余为风险、财务附注等非本定向主题，继续扩读收益低，故在此停止。",
+      "transcription_version": "shared-pdf-pypdf-layout.structured-notes.v1"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次为定向补充阅读，未针对业务结构进行阅读，不生成相关内容。"
+        ]
+      },
+      "products_services": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次为定向补充阅读，未针对产品与服务进行阅读，不生成相关内容。"
+        ]
+      },
+      "revenue_model": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次为定向补充阅读，未针对收入模式进行阅读，不生成相关内容。"
+        ]
+      },
+      "scale_and_mix": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次为定向补充阅读，未针对规模与结构进行阅读，不生成相关内容。"
+        ]
+      },
+      "operations_and_inputs": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次为定向补充阅读，未针对经营与投入进行阅读，不生成相关内容。"
+        ]
+      },
+      "customers_channels_markets": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-RETAIL-CUST-TOTAL",
+            "text": "截至报告期末，本行零售客户总数[注4]4,012.44万户；脚注4说明零售客户总数包含借记卡和信用卡客户数量，并去重。",
+            "subject_scope": "consolidated_group",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0003",
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "零售客户总数[注4]",
+                "raw_value": "4,012.44",
+                "value": "4012.44",
+                "unit": "万户",
+                "source_unit": "万户",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-RETAIL-PRIVATE-CUST",
+            "text": "截至报告期末，本行私人银行客户[注5]2.02万户，比上年末增长21.71%；脚注5说明私人银行客户指上月AUM月日均大于等于600万元人民币或等值外币资产的客户。",
+            "subject_scope": "consolidated_group",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0003",
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "私人银行客户[注5]",
+                "raw_value": "2.02",
+                "value": "2.02",
+                "unit": "万户",
+                "source_unit": "万户",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "比上年末",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "私人银行客户[注5]比上年末增长率",
+                "raw_value": "21.71",
+                "value": "21.71",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "比上年末",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-RETAIL-ACQUIRING-CUST",
+            "text": "截至报告期末，本行收单支付客户74.86万户，比上年末增长6.80%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "收单支付客户",
+                "raw_value": "74.86",
+                "value": "74.86",
+                "unit": "万户",
+                "source_unit": "万户",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "比上年末",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "收单支付客户比上年末增长率",
+                "raw_value": "6.80",
+                "value": "6.80",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "比上年末",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-CREDIT-CARD-ISSUED",
+            "text": "截至报告期末，本行信用卡累计发卡4,332.23万张，比上年末增长3.20%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0011"
+            ],
+            "metrics": [
+              {
+                "name": "信用卡累计发卡",
+                "raw_value": "4,332.23",
+                "value": "4332.23",
+                "unit": "万张",
+                "source_unit": "万张",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "比上年末",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "信用卡累计发卡比上年末增长率",
+                "raw_value": "3.20",
+                "value": "3.20",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "比上年末",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-CREDIT-CARD-APP-USERS",
+            "text": "截至报告期末，信用卡华彩生活APP注册用户2,399.39万户，比上年末增长8.19%；其中月活跃用户（MAU）364.18万户，同比下降7.55%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0011"
+            ],
+            "metrics": [
+              {
+                "name": "信用卡华彩生活APP注册用户",
+                "raw_value": "2,399.39",
+                "value": "2399.39",
+                "unit": "万户",
+                "source_unit": "万户",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "比上年末",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "信用卡华彩生活APP注册用户比上年末增长率",
+                "raw_value": "8.19",
+                "value": "8.19",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "比上年末",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "信用卡华彩生活APP月活跃用户（MAU）",
+                "raw_value": "364.18",
+                "value": "364.18",
+                "unit": "万户",
+                "source_unit": "万户",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "信用卡华彩生活APP月活跃用户（MAU）同比变动率",
+                "raw_value": "-7.55",
+                "value": "-7.55",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-MOBILE-BANK-USERS",
+            "text": "截至报告期末，本行手机银行签约客户3,130.93万，比上年末增长8.03%，月活跃用户（MAU）626.14万，同比增长24.70%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0011"
+            ],
+            "metrics": [
+              {
+                "name": "手机银行签约客户",
+                "raw_value": "3,130.93",
+                "value": "3130.93",
+                "unit": "万",
+                "source_unit": "万",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "比上年末",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "手机银行签约客户比上年末增长率",
+                "raw_value": "8.03",
+                "value": "8.03",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "比上年末",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "手机银行月活跃用户（MAU）",
+                "raw_value": "626.14",
+                "value": "626.14",
+                "unit": "万",
+                "source_unit": "万",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "手机银行月活跃用户（MAU）同比增长率",
+                "raw_value": "24.70",
+                "value": "24.70",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-RETAIL-AUM",
+            "text": "截至报告期末，本行个人客户金融资产总量达11,148.08亿元，比上年末增长11.28%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "个人客户金融资产总量",
+                "raw_value": "11,148.08",
+                "value": "11148.08",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "比上年末",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "个人客户金融资产总量比上年末增长率",
+                "raw_value": "11.28",
+                "value": "11.28",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "比上年末",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-PERSONAL-DEPOSIT-BALANCE",
+            "text": "截至报告期末，本行个人存款余额5,997.81亿元，比上年末增长9.01%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "个人存款余额",
+                "raw_value": "5,997.81",
+                "value": "5997.81",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "比上年末",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "个人存款余额比上年末增长率",
+                "raw_value": "9.01",
+                "value": "9.01",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": "比上年末",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-WEALTH-FEE-INCOME",
+            "text": "报告期内，本行实现财富管理手续费及佣金收入11.17亿元，同比增长16.48%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "财富管理手续费及佣金收入",
+                "raw_value": "11.17",
+                "value": "11.17",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "财富管理手续费及佣金收入同比增长率",
+                "raw_value": "16.48",
+                "value": "16.48",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-CREDIT-CARD-REVENUE",
+            "text": "报告期内，本行实现信用卡业务收入144.59亿元，同比下降15.65%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0011"
+            ],
+            "metrics": [
+              {
+                "name": "信用卡业务收入",
+                "raw_value": "144.59",
+                "value": "144.59",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "信用卡业务收入同比变动率",
+                "raw_value": "-15.65",
+                "value": "-15.65",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "本次仅阅读零售相关章节，未覆盖对公客户、同业客户等其他客户类别的完整披露。",
+          "零售客户总数、私人银行客户、消费信贷客户均带脚注标记，其口径以脚注4、5、6为准；正文未披露零售客户总数的同比变动率。",
+          "线上渠道全年服务客户仅表述为“突破千万”，未给出精确数值与计量单位，已按不确定处理。",
+          "收单支付业务章节未披露收单商户数、交易金额等经营规模指标，仅披露收单支付客户数。",
+          "未获取零售客户按地区、渠道或产品细分的完整数量分布。",
+          "指标格式隔离：事实F-KPL-COBRAND-CARDS未作为结论采用；metrics.0: Value error, metric qualifier must match original raw value；原内容保留在模型回执。",
+          "指标格式隔离：事实F-ONLINE-CHANNEL-SERVICE未作为结论采用；metrics.0: Value error, metric qualifier must match original raw value；原内容保留在模型回执。",
+          "事实F-RETAIL-CONSUMER-CREDIT-CUST已隔离，未作为结论采用：metric number is absent from cited source: 消费信贷客户[注6]比上年末变动率",
+          "事实F-PERSONAL-LOAN-BALANCE已隔离，未作为结论采用：metric number is absent from cited source: 个人贷款（不含信用卡）余额比上年末变动率",
+          "事实F-CREDIT-CARD-LOAN-AND-TXN已隔离，未作为结论采用：metric number is absent from cited source: 信用卡贷款余额比上年末变动率"
+        ]
+      },
+      "operating_drivers": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次为定向补充阅读，未针对经营驱动因素进行阅读，不生成相关内容。"
+        ]
+      },
+      "material_changes": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次为定向补充阅读，未针对重大变化进行阅读，不生成相关内容。"
+        ]
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "3.12 业务回顾"
+        ],
+        "physical_pages": [
+          41
+        ],
+        "source_spans": [
+          {
+            "page": 41,
+            "start": 4,
+            "end": 1343,
+            "quote": "3.12业务回顾\n    3.12.1公司金融业务\n    报告期内，本行坚定不移推进高质量发展，坚持“商行+投行”转型战略，建立健\n全工作机制，加快转型发展步伐，围绕“五篇大文章”、国民经济重点领域和薄弱环\n节，加强产品创新运用，加大支持服务实体经济力度，不断完善客户分层分类经营体\n系，做实做细客户经营，提升专业化、综合化和数字化经营能力，高质量发展取得积\n极成效。\n    公司客户\n    全面树立“以客户为中心”的经营发展核心理念，完善客户增长机制，持续加强\n融资客群、机构客群、无贷客群分类经营体系建设，推进对公基础客群和有效客群开\n发，不断改进产品、服务和流程，强化集团化协同和前中后台协同，提升客户服务能\n力，做大客户规模，优化客户结构，提升客户质效。聚焦有效户增长，实施“客户倍\n增计划”，开展“新开发基础客户”“零日均客户激活”和“低效户提升”专项活动，\n大力推广新开户“1+1+N”结算产品签约，强化基础结算服务活客、黏客。截至报告\n期末，本行对公客户          73.05万户，比上年末增长          6.72%。\n    持续提升对总行级战略客户及重点客户的整体营销与综合服务，不断优化综合经\n营管理体系和服务机制，定制综合金融服务方案并推动实施。统筹开展与总行级战略\n客户和央企客户的高层对接，总分支一体化推进客户系统开发与综合服务。与中国电\n子信息产业集团有限公司、北京市基础设施投资有限公司、北京市石景山区人民政府\n等 32 家重点企业及政府机构签署战略合作协议，深化与客户的整体合作。截至报告期\n末，本行总行级战略客户           155 户，比上年末增加        12 户；上述客户对公存款余额            2,204.84\n亿元，比上年末增长          16.47%；对公存款日均        2,161.26亿元，比上年末增长          8.95%；对\n公贷款余额     2,326.56亿元，比上年末增长          22.69%。\n    专栏  2：主动服务首都经济发展，实施“京华行动”，打造“北京主场”优势\n    启动实施“京华行动”，围绕首都“四个中心”功能建设与“五子联动”发展布\n局，充分调度各类资源，强化北京地区重点客群的整体营销与开发，全力打造“北京\n主场”优势，积极融入首都高质量发展新格局。\n    首都国企服务能力持续提升。加强与北京市属国企的“总对总”对接，举办“华\n夏银行服务首都国企高质量发展大会”，全年与                       21 家市属国企签署战略合作协议，\n实现对   37 家市属国企服务全覆盖。总分支三级联动，分层开展客户服务对接，拓展\n京内外成员企业合作。加强条线协同，强化服务方案制定、产品推广运用、系统建设\n等方面的专业协作与支撑，综合利用科技金融、绿色金融、供应链金融、跨境金融等\n产品和服务，打造专业化、综合化的金融服务生态。\n    市区委办局业务深入推进。加大市区两级财政、公积金、医保等委办局金融服务\n\n\n\n\n                                     38"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "3.12 业务回顾"
+        ],
+        "physical_pages": [
+          42
+        ],
+        "source_spans": [
+          {
+            "page": 42,
+            "start": 0,
+            "end": 482,
+            "quote": "力度，成功获得北京市财政专项债券项目资金监管银行、市医保直接结算合作银行、\n市公积金综合代办网点等多项市区两级业务资格，开立首个医保直结资金监管账户。\n与北京市医疗保险事务管理中心签订医银合作协议，开办                          2 家医银合作网点，成为北\n京市医保局首批医银网点合作银行。\n    积极支持首都重点项目建设。积极对接“3                    个 100”等重点项目，建立业务“绿\n色通道”，给予差异化定价政策，不断提升服务质效；围绕轨道交通、基础设施、民\n生工程等重点领域，积极支持              M101 数字港、“湾里”商业综合体、故宫周边腾退等\n标志性项目；依托项目主体，积极为上下游客户提供链式金融服务。\n    首都重点区域合作不断深化。报告期内，与多个区政府签署战略合作协议，开展\n合作会谈。围绕区属企业、重点项目、地方债、国库集中支付、三代社保卡等领域，\n积极提供专业化金融服务。积极参与政银企对接会、促消费活动以及各类赛事，持续\n提升本行在北京地区的知名度和影响力。\n    "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "投资银行业务",
+          "3.12.2 零售金融业务"
+        ],
+        "physical_pages": [
+          44
+        ],
+        "source_spans": [
+          {
+            "page": 44,
+            "start": 400,
+            "end": 1228,
+            "quote": "3.12.2零售金融业务\n    报告期内，本行持续深化零售战略，坚持深耕客户与市场，积极服务于社会民生\n与实体经济，切实推动零售产品服务体系不断完善、数字化转型加速推进、综合化服\n务能力持续增强、生态场景建设逐步成熟。\n    零售客户\n    推动零售客户经营体系全面升级，持续构建分层管理、分群经营、生态融合的零\n售客户综合化经营体系，致力于打破服务边界，为广大客户提供一站式、多元化、整\n合式的优质金融服务。一是完善分层管理，深度推进数字化客户经营。持续构建零售\n客群分层服务体系，实现“线上化+场景化”服务大众客户、“专业化+标准化”服务\n财富客户、“综合化+集中化”服务私行客户，持续提升“线上+线下”全渠道服务水\n平和服务效能。二是强化分群经营，全面提升客户精细化服务水平。细分特色客群，\n差异化定制全生命周期客户服务策略，聚焦青年客群，推出“华夏梦卡”、专属理财\n等青年特色产品，加强年轻化品牌建设，适配年轻客户金融需求；聚焦车主客群，推\n出华夏畅行车主卡、电池租赁贷等服务，构建“金融+车生态”服务体系。三是加快生\n态建设，多维升级场景服务能力。落实国家关于试点消费新业态新模式新场景的政策\n部署，以“生态项目制”创新打造“金融+场景”新型服务业态，深化“华夏                                      KPL  王\n者梦之队”联名双卡项目全国推广，打造政务、消费、文旅、宠物、教育等各具特色\n的属地零售生态。截至报告期末，本行零售客户群体稳中有进，零售客户总数[注4]4,012.44\n万户。其中，私人银行客户[注5]2.02             万户，比上年末增长          21.71%；消费信贷客户[注6]56.11         万\n户，比上年末下降         0.71%；收单支付客户         74.86万户，比上年末增长           6.80%。\n    "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "个人存款业务"
+        ],
+        "physical_pages": [
+          44
+        ],
+        "source_spans": [
+          {
+            "page": 44,
+            "start": 1228,
+            "end": 1424,
+            "quote": "个人存款业务\n    加大产品创新赋能，升级营销组织管理，推动个人存款高质量增长。着力完善以\n\n\n\n\n\n4零售客户总数包含借记卡和信用卡客户数量，并去重。\n5私人银行客户指上月      AUM 月日均大于等于    600万元人民币或等值外币资产的客户。\n\n6消费信贷客户统计口径为非平台类消费信贷客户。\n\n\n                                      41"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "个人存款业务"
+        ],
+        "physical_pages": [
+          45
+        ],
+        "source_spans": [
+          {
+            "page": 45,
+            "start": 0,
+            "end": 309,
+            "quote": "客户为中心的产品体系，围绕客户教育金、养老金、薪金规划需求推出“月享存”等\n创新产品，持续优化产品线上购买体验，加速推动个人存款产品线上化、客群化、场\n景化转型。持续推进多元化的场景布局，延伸代发、收单等重点传统业务场景，同步\n拓展文旅出行、消费购物等生态场景布局，以客户增长带动客户资金沉淀，打造“传\n统渠道+生态场景”双轮增存新模式。深化重点平台模式搭建，聚焦校园缴费、批发采\n购等高频资金往来场景，精准对接平台方、入驻商户的多元金融需求，公私协同打造\n一体化解决方案，以优质综合服务促进客户资金留存。截至报告期末，本行个人存款\n余额  5,997.81亿元，比上年末增长          9.01%。\n    "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "财富管理与私人银行业务"
+        ],
+        "physical_pages": [
+          45
+        ],
+        "source_spans": [
+          {
+            "page": 45,
+            "start": 309,
+            "end": 1096,
+            "quote": "财富管理与私人银行业务\n    通过服务升级、产品创新与数智赋能，为客户持续创造价值。一是专业服务持续\n优化，分层分类服务升级。加速私人银行中心布局落地，加强私行客户精细化管理，\n整合行内外专家资源打造“汇智管家”专家库，切实提升私行客户专业服务质效。聚\n焦各类特色财私客群专属需求，配置差异化金融产品及服务组合，提升客群综合服务\n能力。通过开展“好友荟聚             好运加倍”专项转介活动，完成财私会员与                     C+会员体系\n的全链路贯通与权益货架整合，构建分层分频的精准触达与服务体系，增强客户黏性\n与价值认同。二是产品创新赋能实体，合作生态迭代创新。联合各类头部合作机构，\n聚焦“五篇大文章”，打造开放式、全品类的产品货架。新上线商业养老金保险产品，\n实现商养各期限产品全覆盖。依托睿诚、睿夏等产品系列，落地                              A 股 2025 年最大规\n模个人大股东定增融资、行业首单               25 年期绿色电力私募股权信托等标杆创新产品。成\n功举办首届财富伙伴生态大会，发布五大核心产品品牌，筑牢共赢生态格局。三是财\n智科技双轮驱动，服务效能全面提升。推动“投研配产服”机制传导落地，健全投研\n报告体系，为客户提供全流程资产配置和顾问式陪伴服务。手机银行财私店铺正式运\n营，推出“财富节”“新客理财星期二”等特色活动，新增“黄金+”“指数宝”专区\n及多项财私会员权益。截至报告期末，本行个人客户金融资产总量达                               11,148.08亿元，\n比上年末增长      11.28%；实现财富管理手续费及佣金收入                11.17亿元，同比增长       16.48%。\n    "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "个人贷款业务"
+        ],
+        "physical_pages": [
+          45
+        ],
+        "source_spans": [
+          {
+            "page": 45,
+            "start": 1096,
+            "end": 1543,
+            "quote": "个人贷款业务\n    坚决贯彻落实党中央、国务院关于提振和扩大消费摆在优先位置的决策部署，着\n力推进个人贷款业务向场景化、线上化、智能化、数字化转型。坚持金融服务与消费\n场景融合，持续拓展商业、民生等消费场景，大力推广消费贷款贴息，依托科技手段\n提高对新型消费场景的服务渗透率，拓展线上消费渠道，提供便捷高效的消费金融支\n持。一是数字化服务提速，数字化产能提升，数字化风控升级。聚焦数字化产品和服\n务创新，持续优化升级重点产品“龙                 e贷”，产品竞争力大幅提升，授信快速增长，\n有力支持消费升级。生态化获客和场景营销取得新突破，上线首个全线上化“龙                                    e贷”\n能源场景项目，加大多元化生态场景建设，提供多样化的个人消费信贷金融服务，在\n扩内需、促消费、稳增长中发挥持续、积极的推动作用。二是围绕消费行业经营主体\n\n\n\n                                     42"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "个人贷款业务"
+        ],
+        "physical_pages": [
+          46
+        ],
+        "source_spans": [
+          {
+            "page": 46,
+            "start": 0,
+            "end": 450,
+            "quote": "持续开展信贷产品创新优化。聚焦“园、圈、链”生态，升级“龙商贷”，为个体工\n商客户提供数字化、智能化、专业化、特色化的金融服务，进一步提升客户服务能力。\n三是大力支持房地产市场企稳。严格落实国家首付款比例及利率要求，因城施策实施\n差异化住房信贷政策，全面整合按揭业务线上流程，提速智能化办理。四是高效落实\n国家政策，保障广大居民消费权益落实。全面落实国家提振消费系列政策，快速完成\n消费贷款贴息政策落地。全面推进一次性信用修复政策实施，制定清收纾困工作方案，\n及时回应市场关切，做好应急预案，加快政策落地实施。上线零售贷款资金实时监控\n功能，首次构建贷款资金全流程溯源整改，精准防控信贷资金违规转向限制性领域，\n有效防范资金挪用风险、保障信贷资产安全。截至报告期末，本行个人贷款（不含信\n用卡）余额     5,330.20亿元，比上年末下降          1.96%，其中，个人消费贷款余额              1,116.64\n亿元，比上年末增长         0.40%。\n    "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "收单支付业务"
+        ],
+        "physical_pages": [
+          46
+        ],
+        "source_spans": [
+          {
+            "page": 46,
+            "start": 450,
+            "end": 714,
+            "quote": "收单支付业务\n    立足“支付为民”理念，以服务实体经济为导向，持续优化支付服务供给，全力\n满足社会公众多样化支付需求。持续优化支付结算服务体系，打造“华夏                                  e收银”收\n单产品品牌，加快推进“数字收单”建设，完善线上支付业务风控规则，坚持为商户\n和消费者提供安全、便捷的综合支付服务。深化便民惠民利民服务，加大北京市第三\n代社保卡换发和“普惠健康保”推广力度，推进网点与政务服务平台深度融合，全力\n支持北京医保移动支付结算，切实推动支付服务社会民生。\n    "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0010",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "信用卡业务"
+        ],
+        "physical_pages": [
+          46
+        ],
+        "source_spans": [
+          {
+            "page": 46,
+            "start": 714,
+            "end": 1436,
+            "quote": "信用卡业务\n    坚定落实国家提振消费要求，锚定服务实体经济目标，以金融力量赋能消费升级，\n精做增量客户开发，深耕存量客户经营，推动业务持续发展。\n    一是丰富产品矩阵，构筑多元用卡体验。面向高净值客户及优质企事业单位高层\n管理人群推出美国运通巅峰信用卡和                 Safari信用卡，提供星级酒店、贵宾出行、跨境\n返现、全家同享等全方位高端服务，提升高品质消费意愿。联合故宫相关                                 IP“宫里的\n世界”发行华夏       UP 卡（宫里的世界），激发文旅消费活力，以国潮文化推动“金融+\n文化”生态融合。服务刚性消费需求，发行华润通联名信用卡，通过消费赠礼、支付\n满减等权益，打造零售场景“金融+生活”服务。\n    二是深耕民生场景，织密生态消费网络。结合客户标签和画像，配套差异化营销\n策略与品牌活动，持续改善交易结构，加快多倍积分、积分抵现等场景拓展，提升积\n分使用体验与价值感。坚持促消费、惠民生，打造多元化用卡环境，推进垂直场景生\n态环境，开展电商购物、外卖、机酒出行等多平台优惠活动，提升消费让利政策覆盖\n面。消费贷款升级数字化运营模式，持续打磨“菁英易达”等拳头产品，对接以旧换\n新、政府补贴等项目，开展刷卡促销、免息分期活动。\n    三是优化核心功能，提升用户操作体验。华彩生活                       APP 全新升级至      5.0版本，融\n合金融、生活、消费为一体，通过智能算法实现个性化推荐，优化线上用卡服务全流\n\n\n\n                                     43"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0011",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "信用卡业务"
+        ],
+        "physical_pages": [
+          47
+        ],
+        "source_spans": [
+          {
+            "page": 47,
+            "start": 0,
+            "end": 1701,
+            "quote": "程体验。积极响应国产化生态布局，正式推出鸿蒙系统专属版本，拓宽服务覆盖范围，\n提升使用流畅性。截至报告期末，信用卡华彩生活                        APP  注册用户     2,399.39万户，比上\n年末增长    8.19%；其中月活跃用户（MAU）364.18              万户，同比下降         7.55%。\n    截至报告期末，本行信用卡累计发卡                   4,332.23万张，比上年末增长          3.20%；信用\n卡贷款余额      1,510.86亿元，比上年末下降         10.75%。报告期内，信用卡交易总额               7,103.26\n亿元，同比下降        14.29%，实现信用卡业务收入            144.59亿元，同比下降         15.65%。\n    零售业务数字化转型\n    升级全域触客渠道矩阵，客户连接广度与深度显著增强。正式推出企业微信服务\n网络，实现与手机银行、短信、AI                外呼、人工外呼线上核心渠道的全面打通与协同，\n线上渠道全年服务客户突破千万，实现从单点接触到立体化、伴随式客户交互的转变。\n    夯实数据驱动与智能决策能力，经营智慧化水平稳步提升。加快推进零售数据中\n台建设，实现数据资产的统一治理和高效迭代；企业级数字化客户经营平台全面升级，\n初步建成覆盖客户全生命周期的数字化支撑体系；依托智谋（MA）平台，实现跨业务\n场景、分客群特征的自动化经营策略配置与闭环执行；组建专注于策略模型与算法优\n化的“策略大脑”团队，为数字化经营持续创新与迭代提供核心智力支撑，共同推动\n客户经营从“经验驱动”向“数据与智能驱动”深刻转型。\n    系统性推进手机银行能力升级，线上“主阵地”服务效能全面提升。推进手机银\n行全面运营，创新超级店铺运营模式，高效协同推动客户体验改善，打造线上“第二\n银行”。上线覆盖全客层的             C+会员体系，通过“权益、活动、任务”一体化运营，实\n现客户分级服务与精准触达。截至报告期末，本行手机银行签约客户                                  3,130.93万，比\n上年末增长      8.03%，月活跃用户（MAU）626.14           万，同比增长       24.70%。\n    专栏   3：“金融+生态”融合发展，绘就民生服务新画卷\n    在数字经济与新型消费蓬勃发展的背景下，本行锚定电子竞技新蓝海，与拥有“亿\n级流量、千万粉丝”的王者荣耀                KPL 职业联赛开展跨界合作，着力构建“金融+赛事\n+消费”生态融合体系，推动金融服务向多元潮流场景延伸，生态价值持续释放。\n    权益活动共建，链接年轻客群。华夏                   KPL 王者梦之队电竞联名借记卡和信用卡\n自推出以来，以定制化卡面设计和全周期权益矩阵精准锁定年轻客群，基于梦之队选\n手粉丝见面会等稀缺资源，共同打造“金融+电竞”爆款活动，成功吸引了热衷于文\n化消费的    Z 世代用户。截至报告期末，双卡发行突破                     70 万张。\n    多维场景融合，激发消费活力。线上构建电竞生态，同步推出手机银行“电竞专\n区”，整合活动、资讯、社交、办卡等七大板块，形成“支付工具-消费场景-金融服\n务”闭环生态。线下深化“文商旅体展+金融”布局，2025                         年  11月作为唯一金融合作\n伙伴亮相     KPL 鸟巢总决赛，发放餐饮、文旅等信用卡消费券，打造票根经济样板，\n激发消费活力。该场比赛创造了“现场观众人数最多的单场电竞赛事”吉尼斯世界纪\n录，带动首都“夜经济”“文旅经济”发展。\n\n\n                                      44"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0012",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "信用卡业务"
+        ],
+        "physical_pages": [
+          48
+        ],
+        "source_spans": [
+          {
+            "page": 48,
+            "start": 0,
+            "end": 298,
+            "quote": "    金融服务升级，拓宽服务边界。持续拓宽“线上+线下”服务边界，以                                KPL  合作\n为起点，不断强化金融服务对民生消费领域的支撑。发行电竞客群专属理财，满足年\n轻客群理财需求；上线“大美华夏”餐饮娱乐满减活动，联合昌平文旅推出热门景点\n购票等折扣；联动“焕新贷”“菁英贷”等消费信贷产品，加强新能源汽车、绿色出\n行场景优惠力度。\n    从电竞破局到生态扩容，通过稀缺权益与金融服务深度融合，逐步构建“金融+\n文商旅体展”生态矩阵，积极探索“金融+”到“生态共生”的升维实践，不断为民\n生服务注入新活力。\n\n\n    3.12.3"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0013",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "资产托管业务",
+          "3.12.4 数字化经营"
+        ],
+        "physical_pages": [
+          51
+        ],
+        "source_spans": [
+          {
+            "page": 51,
+            "start": 4,
+            "end": 1343,
+            "quote": "3.12.4数字化经营\n    报告期内，本行积极推进数字化、智能化转型，持续深化业技融合，不断增强智\n慧运营、科技支撑与数据应用能力，支持业务高质量发展。\n    数智化建设提速增效。圆满完成数字科技转型五年规划，数字化能力显著提升，\n数字化产品服务更加普及，客户经营体系日趋完善。全面重构财私系统，实现理财、\n基金等业务系统重建及公共服务统一管理。焕新升级手机银行                            APP，创新试点“我的\n家”特色场景，优化智能交互体验。打造绿色金融管理系统，实现绿色认定、环境风\n险监控判定及客户        ESG  评价，赋能绿色信贷服务提质增效。升级财资云平台，落地“敞\n口银承”线上化等功能，提升企业财资管理效能与风控能力。完善养老金融服务体系，\n上线商业养老保险与个人养老理财代销功能，推出个人养老金按月自动缴存与自动领\n取功能，多渠道优化客户服务体验。\n    智慧运营效能持续提升。深化网点数字化转型，迭代厅堂管家系统，拓展智慧屏\n应用场景，以数据赋能驱动网点运营质效与生态圈融合双提升。升级运营管理数字驾\n驶舱，构建数字指标全生命周期管控机制，推动运营管理向数字化、精细化转变。推\n广企业预约开户信息识别和收集流程自动化，实现风险识别前置、关键节点自动通知\n及智能填单处理，有效提升服务效率与客户体验。深化核算管理数字化，实现集团全\n量会计科目全流程线上化管控，搭建账户、凭证及档案的多维度可视化管理视图，提\n升数字化管控水平。推进账务监督及核对流程数字化建设，基于整合数据搭建线上监\n督流程，引入      RPA 技术自动核验重点账户日终余额，推动账务风控智能化升级。\n    科技支撑能力稳步增强。报告期内，本集团信息科技投入                          39.43亿元，占营业收\n入 4.29%。建立    ITBP（IT 业务合作伙伴）机制，畅通业务技术衔接链路，保障业务需\n求快速投产。全力攻坚新一代核心系统建设，系统主体开发基本完成，外围改造同步\n推进，夯实稳健运营技术根基。打造“华夏在线”统一办公平台，整合多系统访问与\n待办事项为统一入口，提升办公效率。上线“华夏之声”平台，建立接诉即办机制，\n高效响应基层诉求。建成“一云双栈、一云多芯”企业级云平台，实现供应链稳定互\n备，信息系统整体上云率超            97%。建成分行中间业务云平台同城双活架构集群，实现\n全量公共服务双活部署，保障云平台关键服务连续性。落地新一代数据中心网络架构，\n实现数据高速转发与流量智能调度，提升关键网络资源利用效能。\n    数据资产价值有效释放。体系化开展专项数据治理与安全管控，数据资产质量与\n风险防御能力显著提升。升级重构数据智能服务生态，高效支撑全行经营决策与精细\n化管理的可视化、敏捷化需求。数据分析建模体系深度赋能风险防控、客户经营等核\n心业务领域，价值创造能力持续释放。强化外部数据资源的集约化运营与数据中台建\n设，有效压降数据引入成本、提升应用效率，为高质量发展筑牢数据根基。\n\n\n\n\n\n\n                                    48"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0014",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "资产托管业务",
+          "3.12.4 数字化经营"
+        ],
+        "physical_pages": [
+          52
+        ],
+        "source_spans": [
+          {
+            "page": 52,
+            "start": 0,
+            "end": 1281,
+            "quote": "    专栏  7：数智化运营赋能高质量发展\n    深化机器人流程自动化（RPA）技术应用。持续挖掘高价值业务场景，以                                  RPA\n技术替代重复性、流程化人工操作，实现内部运营效率提升、人力成本优化、业务处\n理精准度提高的核心目标。截至报告期末，全行在线场景总数达                             2,528 个，全年累计\n节约等效人工工时        61.36万小时，节约人工成本           5,533.68万元。\n    深化智慧运营体系建设。持续拓展远程银行智能服务场景，加强智能导航、智能\n问答、智能分析等智能运用，提升服务质效与客户体验。报告期内，累计节约等效人\n工工时约    86.22万小时，降本增效效果显著。\n    完善企业级业务参数管理体系。扩展参数管理平台贯标参数种类及系统覆盖范\n围，强化“一点配置、全网穿透”智能化服务能力，打造分行端业务参数“一站式”\n服务模式，推进业务参数自动化运营，落地                    16 个自动化配置场景，实现提质增效与\n风险可控，为业务高质量发展夯实基础。\n    强化运营风险防控。推动跨系统数据整合，基于“业务+风险”视角深挖预警数\n据价值，构建运营风险监测全景视图，实现运营风险数据分布可视化展现，有效识别\n潜在风险，增强数字化风控能力。\n\n\n    专栏  8：AI与量子双擎驱动，加速金融科技融合创新\n    智能平台建设提速落地。推动算力基础设施建设，升级算力服务能力，夯实大模\n型应用底层支撑。构建大模型智能体平台，作为AI应用开发核心载体，支撑大模型广\n泛应用。打造语言用户界面，统一大模型应用入口，提升应用便捷性。牵头搭建量子\n金融云平台，获评        2025“金科之声”十大成果。\n    AI与量子技术深度融合。构建龙智·康熙量子基础大模型，有效降低大模型训练\n成本。开展量子BERT等模型研发，提升算法准确性、精简模型参数量。探索量子模\n型创新应用，在智能客服运营、贷款催收合规识别场景试点应用，相关成果荣获长三\n角金融科技创新大赛“金融机构最佳创新奖”。推进量子科技与人工智能融合创新，\n为金融科技智能化发展筑牢核心技术支撑。\n    新技术场景应用成效显著。推动人工智能技术在精准营销、智能风控、合规运营、\n辅助研发等领域落地，三项典型成果斩获北京市金融职工大模型技能大赛大满贯。各\n场景智能化效能凸显，智能风控授信报告生成效率、智能营销顾问对话满意度、合规\n运营违规话术识别准确率、辅助研发测试案例采纳率等均实现有效提升，技术赋能价\n值充分释放。\n    筑牢大模型安全治理防线。推进大模型安全治理能力建设，强化应用统一规划与\n全流程管理，健全智能体应用全生命周期管理规范。开展大模型输入输出内容安全防\n控项目，全面提升大模型应用风险防范与安全管控能力。\n\n\n\n\n                                     49"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "limitations": [
+      "本次为定向补充阅读，仅回答零售客户及相关经营规模的披露数量、类别、期间与计量单位问题，未对报告其他部分进行系统阅读，不构成对报告完整性的判断。",
+      "非目标要素未阅读，不生成事实，相关状态为 not_read_for_this_task。"
+    ],
+    "supply_chain": null,
+    "generation": {
+      "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+      "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+      "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+      "selection": {
+        "purpose": "select_profile_sections",
+        "request_id": "bf781f310e49f8316f8e089d38b2f3348ef07d9174fb8b1bc0e1f6512602074d",
+        "request_hash": null,
+        "response_hash": "bb7041307fee412f88a19150e59759853867be81393a644c9986d681f75c7f01",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": null,
+        "route_fingerprint": null,
+        "finish_reason": "stop",
+        "reasoning_effort": null,
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 22835,
+          "output_tokens": 429,
+          "total_tokens": 23264
+        },
+        "scope_kind": "report_heading_index",
+        "heading_count": 842,
+        "section_ids": [
+          "section-0001",
+          "section-0002",
+          "section-0003",
+          "section-0004",
+          "section-0005",
+          "section-0006",
+          "section-0007",
+          "section-0008",
+          "section-0009",
+          "section-0010",
+          "section-0011",
+          "section-0012",
+          "section-0013",
+          "section-0014",
+          "section-0015",
+          "section-0016",
+          "section-0017",
+          "section-0018",
+          "section-0019",
+          "section-0020",
+          "section-0021",
+          "section-0022",
+          "section-0023",
+          "section-0024",
+          "section-0025",
+          "section-0026",
+          "section-0027",
+          "section-0028",
+          "section-0029",
+          "section-0030",
+          "section-0031",
+          "section-0032",
+          "section-0033",
+          "section-0034",
+          "section-0035",
+          "section-0036",
+          "section-0037",
+          "section-0038",
+          "section-0039",
+          "section-0040",
+          "section-0041",
+          "section-0042",
+          "section-0043",
+          "section-0044",
+          "section-0045",
+          "section-0046",
+          "section-0047",
+          "section-0048",
+          "section-0049",
+          "section-0050",
+          "section-0051",
+          "section-0052",
+          "section-0053",
+          "section-0054",
+          "section-0055",
+          "section-0056",
+          "section-0057",
+          "section-0058",
+          "section-0059",
+          "section-0060",
+          "section-0061",
+          "section-0062",
+          "section-0063",
+          "section-0064",
+          "section-0065",
+          "section-0066",
+          "section-0067",
+          "section-0068",
+          "section-0069",
+          "section-0070",
+          "section-0071",
+          "section-0072",
+          "section-0073",
+          "section-0074",
+          "section-0075",
+          "section-0076",
+          "section-0077",
+          "section-0078",
+          "section-0079",
+          "section-0080",
+          "section-0081",
+          "section-0082",
+          "section-0083",
+          "section-0084",
+          "section-0085",
+          "section-0086",
+          "section-0087",
+          "section-0088",
+          "section-0089",
+          "section-0090",
+          "section-0091",
+          "section-0092",
+          "section-0093",
+          "section-0094",
+          "section-0095",
+          "section-0096",
+          "section-0097",
+          "section-0098",
+          "section-0099",
+          "section-0100",
+          "section-0101",
+          "section-0102",
+          "section-0103",
+          "section-0104",
+          "section-0105",
+          "section-0106",
+          "section-0107",
+          "section-0108",
+          "section-0109",
+          "section-0110",
+          "section-0111",
+          "section-0112",
+          "section-0113",
+          "section-0114",
+          "section-0115",
+          "section-0116",
+          "section-0117",
+          "section-0118",
+          "section-0119",
+          "section-0120",
+          "section-0121",
+          "section-0122",
+          "section-0123",
+          "section-0124",
+          "section-0125",
+          "section-0126",
+          "section-0127",
+          "section-0128",
+          "section-0129",
+          "section-0130",
+          "section-0131",
+          "section-0132",
+          "section-0133",
+          "section-0134",
+          "section-0135",
+          "section-0136",
+          "section-0137",
+          "section-0138",
+          "section-0139",
+          "section-0140",
+          "section-0141",
+          "section-0142",
+          "section-0143",
+          "section-0144",
+          "section-0145",
+          "section-0146",
+          "section-0147",
+          "section-0148",
+          "section-0149",
+          "section-0150",
+          "section-0151",
+          "section-0152",
+          "section-0153",
+          "section-0154",
+          "section-0155",
+          "section-0156",
+          "section-0157",
+          "section-0158",
+          "section-0159",
+          "section-0160",
+          "section-0161",
+          "section-0162",
+          "section-0163",
+          "section-0164",
+          "section-0165",
+          "section-0166",
+          "section-0167",
+          "section-0168",
+          "section-0169",
+          "section-0170",
+          "section-0171",
+          "section-0172",
+          "section-0173",
+          "section-0174",
+          "section-0175",
+          "section-0176",
+          "section-0177",
+          "section-0178",
+          "section-0179",
+          "section-0180",
+          "section-0181",
+          "section-0182",
+          "section-0183",
+          "section-0184",
+          "section-0185",
+          "section-0186",
+          "section-0187",
+          "section-0188",
+          "section-0189",
+          "section-0190",
+          "section-0191",
+          "section-0192",
+          "section-0193",
+          "section-0194",
+          "section-0195",
+          "section-0196",
+          "section-0197",
+          "section-0198",
+          "section-0199",
+          "section-0200",
+          "section-0201",
+          "section-0202",
+          "section-0203",
+          "section-0204",
+          "section-0205",
+          "section-0206",
+          "section-0207",
+          "section-0208",
+          "section-0209",
+          "section-0210",
+          "section-0211",
+          "section-0212",
+          "section-0213",
+          "section-0214",
+          "section-0215",
+          "section-0216",
+          "section-0217",
+          "section-0218",
+          "section-0219",
+          "section-0220",
+          "section-0221",
+          "section-0222",
+          "section-0223",
+          "section-0224",
+          "section-0225",
+          "section-0226",
+          "section-0227",
+          "section-0228",
+          "section-0229",
+          "section-0230",
+          "section-0231",
+          "section-0232",
+          "section-0233",
+          "section-0234",
+          "section-0235",
+          "section-0236",
+          "section-0237",
+          "section-0238",
+          "section-0239",
+          "section-0240",
+          "section-0241",
+          "section-0242",
+          "section-0243",
+          "section-0244",
+          "section-0245",
+          "section-0246",
+          "section-0247",
+          "section-0248",
+          "section-0249",
+          "section-0250",
+          "section-0251",
+          "section-0252",
+          "section-0253",
+          "section-0254",
+          "section-0255",
+          "section-0256",
+          "section-0257",
+          "section-0258",
+          "section-0259",
+          "section-0260",
+          "section-0261",
+          "section-0262",
+          "section-0263",
+          "section-0264",
+          "section-0265",
+          "section-0266",
+          "section-0267",
+          "section-0268",
+          "section-0269",
+          "section-0270",
+          "section-0271",
+          "section-0272",
+          "section-0273",
+          "section-0274",
+          "section-0275",
+          "section-0276",
+          "section-0277",
+          "section-0278",
+          "section-0279",
+          "section-0280",
+          "section-0281",
+          "section-0282",
+          "section-0283",
+          "section-0284",
+          "section-0285",
+          "section-0286",
+          "section-0287",
+          "section-0288",
+          "section-0289",
+          "section-0290",
+          "section-0291",
+          "section-0292",
+          "section-0293",
+          "section-0294",
+          "section-0295",
+          "section-0296",
+          "section-0297",
+          "section-0298",
+          "section-0299",
+          "section-0300",
+          "section-0301",
+          "section-0302",
+          "section-0303",
+          "section-0304",
+          "section-0305",
+          "section-0306",
+          "section-0307",
+          "section-0308",
+          "section-0309",
+          "section-0310",
+          "section-0311",
+          "section-0315",
+          "section-0319",
+          "section-0320",
+          "section-0321",
+          "section-0322",
+          "section-0323",
+          "section-0324",
+          "section-0325",
+          "section-0326",
+          "section-0327",
+          "section-0328",
+          "section-0329",
+          "section-0330",
+          "section-0331",
+          "section-0332",
+          "section-0333",
+          "section-0334",
+          "section-0335",
+          "section-0336",
+          "section-0337",
+          "section-0338",
+          "section-0339",
+          "section-0340",
+          "section-0341",
+          "section-0342",
+          "section-0343",
+          "section-0344",
+          "section-0345",
+          "section-0346",
+          "section-0347",
+          "section-0348",
+          "section-0349",
+          "section-0350",
+          "section-0351",
+          "section-0352",
+          "section-0353",
+          "section-0354",
+          "section-0355",
+          "section-0356",
+          "section-0357",
+          "section-0358",
+          "section-0359",
+          "section-0360",
+          "section-0361",
+          "section-0362",
+          "section-0363",
+          "section-0364",
+          "section-0365",
+          "section-0366",
+          "section-0367",
+          "section-0368",
+          "section-0369",
+          "section-0370",
+          "section-0371",
+          "section-0372",
+          "section-0373",
+          "section-0374",
+          "section-0375",
+          "section-0376",
+          "section-0377",
+          "section-0378",
+          "section-0379",
+          "section-0380",
+          "section-0381",
+          "section-0382",
+          "section-0383",
+          "section-0384",
+          "section-0385",
+          "section-0386",
+          "section-0387",
+          "section-0388",
+          "section-0389",
+          "section-0390",
+          "section-0391",
+          "section-0392",
+          "section-0393",
+          "section-0394",
+          "section-0395",
+          "section-0396",
+          "section-0397",
+          "section-0398",
+          "section-0399",
+          "section-0400",
+          "section-0401",
+          "section-0402",
+          "section-0403",
+          "section-0404",
+          "section-0405",
+          "section-0406",
+          "section-0407",
+          "section-0408",
+          "section-0409",
+          "section-0410",
+          "section-0411",
+          "section-0412",
+          "section-0413",
+          "section-0414",
+          "section-0416",
+          "section-0417",
+          "section-0418",
+          "section-0419",
+          "section-0423",
+          "section-0424",
+          "section-0425",
+          "section-0430",
+          "section-0431",
+          "section-0432",
+          "section-0433",
+          "section-0434",
+          "section-0435",
+          "section-0436",
+          "section-0437",
+          "section-0438",
+          "section-0439",
+          "section-0440",
+          "section-0441",
+          "section-0442",
+          "section-0443",
+          "section-0447",
+          "section-0448",
+          "section-0449",
+          "section-0450",
+          "section-0454",
+          "section-0455",
+          "section-0456",
+          "section-0457",
+          "section-0461",
+          "section-0462",
+          "section-0463",
+          "section-0464",
+          "section-0465",
+          "section-0466",
+          "section-0467",
+          "section-0468",
+          "section-0469",
+          "section-0470",
+          "section-0474",
+          "section-0475",
+          "section-0476",
+          "section-0477",
+          "section-0482",
+          "section-0483",
+          "section-0484",
+          "section-0485",
+          "section-0486",
+          "section-0487",
+          "section-0488",
+          "section-0489",
+          "section-0490",
+          "section-0491",
+          "section-0492",
+          "section-0493",
+          "section-0494",
+          "section-0495",
+          "section-0496",
+          "section-0497",
+          "section-0498",
+          "section-0499",
+          "section-0502",
+          "section-0503",
+          "section-0507",
+          "section-0508",
+          "section-0513",
+          "section-0514",
+          "section-0515",
+          "section-0516",
+          "section-0517",
+          "section-0518",
+          "section-0519",
+          "section-0520",
+          "section-0521",
+          "section-0522",
+          "section-0523",
+          "section-0524",
+          "section-0525",
+          "section-0526",
+          "section-0527",
+          "section-0528",
+          "section-0529",
+          "section-0530",
+          "section-0531",
+          "section-0532",
+          "section-0533",
+          "section-0534",
+          "section-0538",
+          "section-0539",
+          "section-0540",
+          "section-0541",
+          "section-0542",
+          "section-0543",
+          "section-0547",
+          "section-0548",
+          "section-0549",
+          "section-0550",
+          "section-0551",
+          "section-0552",
+          "section-0553",
+          "section-0554",
+          "section-0555",
+          "section-0556",
+          "section-0557",
+          "section-0558",
+          "section-0560",
+          "section-0561",
+          "section-0564",
+          "section-0565",
+          "section-0567",
+          "section-0568",
+          "section-0570",
+          "section-0571",
+          "section-0575",
+          "section-0576",
+          "section-0577",
+          "section-0578",
+          "section-0579",
+          "section-0580",
+          "section-0581",
+          "section-0582",
+          "section-0583",
+          "section-0584",
+          "section-0585",
+          "section-0586",
+          "section-0587",
+          "section-0588",
+          "section-0589",
+          "section-0590",
+          "section-0591",
+          "section-0592",
+          "section-0593",
+          "section-0594",
+          "section-0595",
+          "section-0596",
+          "section-0599",
+          "section-0600",
+          "section-0601",
+          "section-0602",
+          "section-0603",
+          "section-0604",
+          "section-0605",
+          "section-0608",
+          "section-0609",
+          "section-0610",
+          "section-0611",
+          "section-0612",
+          "section-0613",
+          "section-0614",
+          "section-0615",
+          "section-0616",
+          "section-0617",
+          "section-0618",
+          "section-0619",
+          "section-0621",
+          "section-0622",
+          "section-0624",
+          "section-0625",
+          "section-0627",
+          "section-0628",
+          "section-0630",
+          "section-0631",
+          "section-0634",
+          "section-0635",
+          "section-0636",
+          "section-0637",
+          "section-0639",
+          "section-0640",
+          "section-0641",
+          "section-0642",
+          "section-0643",
+          "section-0644",
+          "section-0645",
+          "section-0646",
+          "section-0648",
+          "section-0649",
+          "section-0650",
+          "section-0651",
+          "section-0652",
+          "section-0653",
+          "section-0654",
+          "section-0655",
+          "section-0657",
+          "section-0658",
+          "section-0660",
+          "section-0661",
+          "section-0665",
+          "section-0666",
+          "section-0667",
+          "section-0668",
+          "section-0669",
+          "section-0670",
+          "section-0671",
+          "section-0672",
+          "section-0673",
+          "section-0674",
+          "section-0675",
+          "section-0676",
+          "section-0677",
+          "section-0678",
+          "section-0682",
+          "section-0686",
+          "section-0687",
+          "section-0691",
+          "section-0692",
+          "section-0697",
+          "section-0698",
+          "section-0699",
+          "section-0700",
+          "section-0703",
+          "section-0704",
+          "section-0705",
+          "section-0706",
+          "section-0707",
+          "section-0708",
+          "section-0709",
+          "section-0710",
+          "section-0713",
+          "section-0714",
+          "section-0715",
+          "section-0716",
+          "section-0717",
+          "section-0718",
+          "section-0719",
+          "section-0720",
+          "section-0721",
+          "section-0722",
+          "section-0723",
+          "section-0724",
+          "section-0725",
+          "section-0726",
+          "section-0727",
+          "section-0728",
+          "section-0729",
+          "section-0730",
+          "section-0731",
+          "section-0739",
+          "section-0740",
+          "section-0741",
+          "section-0742",
+          "section-0743",
+          "section-0744",
+          "section-0745",
+          "section-0746",
+          "section-0747",
+          "section-0748",
+          "section-0752",
+          "section-0753",
+          "section-0755",
+          "section-0756",
+          "section-0758",
+          "section-0759",
+          "section-0763",
+          "section-0764",
+          "section-0765",
+          "section-0766",
+          "section-0767",
+          "section-0768",
+          "section-0769",
+          "section-0770",
+          "section-0773",
+          "section-0774",
+          "section-0775",
+          "section-0778",
+          "section-0779",
+          "section-0780",
+          "section-0781",
+          "section-0782",
+          "section-0783",
+          "section-0784",
+          "section-0785",
+          "section-0786",
+          "section-0787",
+          "section-0788",
+          "section-0789",
+          "section-0790",
+          "section-0791",
+          "section-0792",
+          "section-0793",
+          "section-0794",
+          "section-0795",
+          "section-0796",
+          "section-0797",
+          "section-0798",
+          "section-0799",
+          "section-0800",
+          "section-0801",
+          "section-0802",
+          "section-0803",
+          "section-0804",
+          "section-0805",
+          "section-0806",
+          "section-0807",
+          "section-0811",
+          "section-0812",
+          "section-0813",
+          "section-0814",
+          "section-0815",
+          "section-0816",
+          "section-0817",
+          "section-0818",
+          "section-0819",
+          "section-0820",
+          "section-0821",
+          "section-0822",
+          "section-0823",
+          "section-0824",
+          "section-0825",
+          "section-0826",
+          "section-0828",
+          "section-0829",
+          "section-0830",
+          "section-0832",
+          "section-0833",
+          "section-0834",
+          "section-0837",
+          "section-0838",
+          "section-0839",
+          "section-0842",
+          "section-0843",
+          "section-0844",
+          "section-0846",
+          "section-0847",
+          "section-0848",
+          "section-0850",
+          "section-0851",
+          "section-0852",
+          "section-0854",
+          "section-0855",
+          "section-0856",
+          "section-0857",
+          "section-0858",
+          "section-0859",
+          "section-0860",
+          "section-0861",
+          "section-0862",
+          "section-0863",
+          "section-0864",
+          "section-0865",
+          "section-0866",
+          "section-0867",
+          "section-0868",
+          "section-0869",
+          "section-0871",
+          "section-0872",
+          "section-0873",
+          "section-0875",
+          "section-0876",
+          "section-0877",
+          "section-0879",
+          "section-0880",
+          "section-0881",
+          "section-0883",
+          "section-0884",
+          "section-0885",
+          "section-0887",
+          "section-0888",
+          "section-0889",
+          "section-0891",
+          "section-0892",
+          "section-0893",
+          "section-0895",
+          "section-0896",
+          "section-0897",
+          "section-0899",
+          "section-0900",
+          "section-0901",
+          "section-0902",
+          "section-0903",
+          "section-0904",
+          "section-0905",
+          "section-0906",
+          "section-0907",
+          "section-0908",
+          "section-0909",
+          "section-0910",
+          "section-0911",
+          "section-0912",
+          "section-0913",
+          "section-0914",
+          "section-0915",
+          "section-0916",
+          "section-0917",
+          "section-0918",
+          "section-0919",
+          "section-0920",
+          "section-0921",
+          "section-0922",
+          "section-0923",
+          "section-0924",
+          "section-0925",
+          "section-0926",
+          "section-0927",
+          "section-0928",
+          "section-0929",
+          "section-0930",
+          "section-0931",
+          "section-0932",
+          "section-0933",
+          "section-0934",
+          "section-0935",
+          "section-0936",
+          "section-0937",
+          "section-0938",
+          "section-0939",
+          "section-0940",
+          "section-0941",
+          "section-0942",
+          "section-0943",
+          "section-0944",
+          "section-0945",
+          "section-0946",
+          "section-0947",
+          "section-0948",
+          "section-0949",
+          "section-0950",
+          "section-0951",
+          "section-0952",
+          "section-0953",
+          "section-0954",
+          "section-0955",
+          "section-0956",
+          "section-0957",
+          "section-0958",
+          "section-0959",
+          "section-0960",
+          "section-0961",
+          "section-0962",
+          "section-0963",
+          "section-0964",
+          "section-0965",
+          "section-0966",
+          "section-0967",
+          "section-0968"
+        ],
+        "physical_pages": []
+      },
+      "extraction": {
+        "purpose": "extract_profile_workpaper",
+        "request_id": "f9426b96fe85f014cab8c6f0b399b591ed76afa8711db45a9ce881cf5d5a9cad",
+        "request_hash": null,
+        "response_hash": "5787af354cc3f43848c41181697ba517bf86333d8df87d63b7c3171c52836165",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": null,
+        "route_fingerprint": null,
+        "finish_reason": "stop",
+        "reasoning_effort": null,
+        "contract_status": "rejected",
+        "usage": {
+          "input_tokens": 12259,
+          "output_tokens": 4447,
+          "total_tokens": 16706
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0104",
+          "section-0110",
+          "section-0111",
+          "section-0112",
+          "section-0113",
+          "section-0114",
+          "section-0115",
+          "section-0121"
+        ],
+        "physical_pages": [
+          41,
+          42,
+          44,
+          45,
+          46,
+          47,
+          48,
+          51,
+          52
+        ]
+      },
+      "local_schema_normalization": {
+        "policy": "enrichment_empty_unread_status.v1",
+        "original_content_sha256": "5787af354cc3f43848c41181697ba517bf86333d8df87d63b7c3171c52836165",
+        "normalized_object_sha256": "fef9614d58e16da3a60ef4df2c0cd33ba455a4b4e28575a11a682364674615ee",
+        "target_elements": [
+          "customers_channels_markets"
+        ],
+        "normalized_elements": [
+          "business_structure",
+          "products_services",
+          "revenue_model",
+          "scale_and_mix",
+          "operations_and_inputs",
+          "operating_drivers",
+          "material_changes"
+        ]
+      }
+    },
+    "quality_review": {
+      "status": "completed_with_open_findings",
+      "policy_version": "company_profile_workpaper_review.v12",
+      "original_draft_hash": "7b9ce9561b5cd24dde0bf0cede786879c430e1febe9b64e8e578b4a54ffdbc4d",
+      "findings": [
+        {
+          "finding_id": "OM-CONSUMER-CREDIT-CUST",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "explanation": "定向问题要求补齐零售客户类别、数量、期间、计量单位并区分脚注。原文与私人银行客户、收单支付客户同一句披露：截至报告期末，消费信贷客户[注6]56.11万户，比上年末下降0.71%；脚注6载明口径为非平台类消费信贷客户。已采用事实未包含该类别及脚注。隔离说明称变动率未见于引文，与原文不符，不能据此省略。应补记报告期末户数、下降幅度及脚注口径，下降不得记为未披露或零。",
+          "resolution": "repair_rejected",
+          "original_fact": null,
+          "revised_fact": null
+        },
+        {
+          "finding_id": "OM-PERSONAL-LOAN-SCALE",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "explanation": "定向问题包含零售相关经营规模。原文披露截至报告期末本行个人贷款（不含信用卡）余额5,330.20亿元，比上年末下降1.96%，其中个人消费贷款余额1,116.64亿元，比上年末增长0.40%。已采用事实有个人存款与金融资产，但缺少上述贷款规模。隔离说明与source-0008不符。总额与其中项应一并按期末余额、亿元及各自增减方向补记，不得把下降写成缺失。",
+          "resolution": "repair_rejected",
+          "original_fact": null,
+          "revised_fact": null
+        },
+        {
+          "finding_id": "OM-CC-LOAN-BALANCE",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "explanation": "定向问题要求补充零售相关经营规模。原文披露截至报告期末本行信用卡贷款余额1,510.86亿元，比上年末下降10.75%。已采用事实仅有累计发卡与业务收入，未含该期末贷款存量。隔离说明称变动率未见于引文，与原文不符。应单独按报告期末、亿元及下降方向补记，不得与报告期内交易额或收入混为同一比较基础。",
+          "resolution": "repair_rejected",
+          "original_fact": null,
+          "revised_fact": null
+        },
+        {
+          "finding_id": "OM-CC-TXN-VOLUME",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "explanation": "原文另披露报告期内信用卡交易总额7,103.26亿元，同比下降14.29%。该数为报告期内流量，比较基础为同比，与期末信用卡贷款余额的存量口径不同，已采用事实未包含。应单独补记期间、亿元及下降方向，不得因同属信用卡业务而并入贷款余额或把下降记为未披露。",
+          "resolution": "repair_rejected",
+          "original_fact": null,
+          "revised_fact": null
+        }
+      ],
+      "checked_fact_ids": [
+        "F-RETAIL-CUST-TOTAL",
+        "F-RETAIL-PRIVATE-CUST",
+        "F-RETAIL-ACQUIRING-CUST",
+        "F-CREDIT-CARD-ISSUED",
+        "F-CREDIT-CARD-APP-USERS",
+        "F-MOBILE-BANK-USERS",
+        "F-RETAIL-AUM",
+        "F-PERSONAL-DEPOSIT-BALANCE",
+        "F-WEALTH-FEE-INCOME",
+        "F-CREDIT-CARD-REVENUE"
+      ],
+      "calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-e686d859a2cafd7acc9ab1e4:workpaper:review",
+          "request_hash": "bcb86bca4ea42247e959d81831d7b1faec0b52b93c439917d3a20c5b9ff34be5",
+          "response_hash": "c1a3773042e6767c2e589bdf7c7d7826adf87aa337bdfdae7031bf6f5980d876",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 14821,
+            "output_tokens": 797,
+            "total_tokens": 33658
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0104",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0121"
+          ],
+          "physical_pages": [
+            41,
+            42,
+            44,
+            45,
+            46,
+            47,
+            48,
+            51,
+            52
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-e686d859a2cafd7acc9ab1e4:workpaper:repair",
+          "request_hash": "2d55b5bcbed602bc114d1daaca7cd49c705f025680fbdab4fda20b502fff786a",
+          "response_hash": "2761eafc91756051efa73bbe59be2d2c9d0a2859afbc0aa93322d72b4470431a",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 8859,
+            "output_tokens": 1117,
+            "total_tokens": 9976
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0104",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0121"
+          ],
+          "physical_pages": [
+            41,
+            42,
+            44,
+            45,
+            46,
+            47,
+            48,
+            51,
+            52
+          ]
+        }
+      ],
+      "retained_request_ids": [],
+      "locally_revalidated_request_ids": [],
+      "error": null,
+      "checked_fact_hashes": {
+        "F-RETAIL-CUST-TOTAL": "1c63b5e9b007e138054000b0dbc47dfa5026af4fded864248e2b264293166000",
+        "F-RETAIL-PRIVATE-CUST": "aa25f24f0e0f5c4c97e88b28bece79735676aa3482db3a7d349cdfb01bee2f02",
+        "F-RETAIL-ACQUIRING-CUST": "f829ca839318b269f1351dd0246a8f501dee10e0826844cb3cd6095087dbbbbe",
+        "F-CREDIT-CARD-ISSUED": "3881196950de8c7e7bb736859230f35baf5ea7f1ea11e2ca27d02ebc890297ac",
+        "F-CREDIT-CARD-APP-USERS": "e7126b754b6beff4ecd62f2773d8e7d2db6bfd7a94b58528295aa4115c41d890",
+        "F-MOBILE-BANK-USERS": "cf914a81b53ee907a5232d2a4c5d65bc0ed74b119cc73b6de66fc8ffb465a9f1",
+        "F-RETAIL-AUM": "aad742c78d107ecb8d8dc495bf185c8b0cac30d65d9a977175033405da60d65a",
+        "F-PERSONAL-DEPOSIT-BALANCE": "e4c5d105e1377f7b4a11613b7aed03bbf97158d1f1fc42c0f64e1c7f3a543135",
+        "F-WEALTH-FEE-INCOME": "2efc7f75f4b80eb00d6f13b0b2fe79bc66342177122e3baaea8e860bce223ef8",
+        "F-CREDIT-CARD-REVENUE": "cd748422d0c8b0f797334165a7227eb8e38b84f92796163d3c9277b5662d440d"
+      },
+      "metric_limit_policy": "source_review_exact_metric_limits.v1"
+    },
+    "standardization_notes": [
+      "指标格式隔离：事实F-KPL-COBRAND-CARDS未作为结论采用；metrics.0: Value error, metric qualifier must match original raw value；原内容保留在模型回执。",
+      "指标格式隔离：事实F-ONLINE-CHANNEL-SERVICE未作为结论采用；metrics.0: Value error, metric qualifier must match original raw value；原内容保留在模型回执。",
+      "事实F-RETAIL-CONSUMER-CREDIT-CUST已隔离，未作为结论采用：metric number is absent from cited source: 消费信贷客户[注6]比上年末变动率",
+      "事实F-PERSONAL-LOAN-BALANCE已隔离，未作为结论采用：metric number is absent from cited source: 个人贷款（不含信用卡）余额比上年末变动率",
+      "事实F-CREDIT-CARD-LOAN-AND-TXN已隔离，未作为结论采用：metric number is absent from cited source: 信用卡贷款余额比上年末变动率",
+      "修订源检查隔离：review-add:OM-CONSUMER-CREDIT-CUST未进入最终再核或正文；ValidationError: 1 validation error for WorkpaperFact\nmetrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '消费信贷客...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error",
+      "修订源检查隔离：review-add:OM-PERSONAL-LOAN-SCALE未进入最终再核或正文；ValidationError: 2 validation errors for WorkpaperFact\nmetrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '个人贷款（...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error\nmetrics.3\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '个人消费贷...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error",
+      "修订源检查隔离：review-add:OM-CC-LOAN-BALANCE未进入最终再核或正文；ValidationError: 1 validation error for WorkpaperFact\nmetrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '信用卡贷款...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error",
+      "修订源检查隔离：review-add:OM-CC-TXN-VOLUME未进入最终再核或正文；ValidationError: 1 validation error for WorkpaperFact\nmetrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '信用卡交易...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error"
+    ],
+    "use_review": {
+      "report": {
+        "instrument_id": "600015.SH",
+        "report_id": "asset_2aae592305458d4f705a76a316b62b0c",
+        "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reviewer": "program:inherited-use-decisions (not a new source review)",
+      "reference": "review-recovery-parent:bp-work-c144725bfcfff1bceadc5849",
+      "reference_sha256": "d9fe3d7759066ca22ccee2388c12f81e416bf577589a2e8836951d408414b796",
+      "decisions": [
+        {
+          "fact_id": "F-WEALTH-FEE-INCOME",
+          "fact_sha256": "2efc7f75f4b80eb00d6f13b0b2fe79bc66342177122e3baaea8e860bce223ef8",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。",
+          "limitation": "业务收入原句可限用；该业务的可靠标准化主体口径仍待后续取得，不作为全行或集团总收入计算。",
+          "metric_restrictions": [
+            {
+              "metric_index": 0,
+              "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+            },
+            {
+              "metric_index": 1,
+              "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+            }
+          ]
+        },
+        {
+          "fact_id": "F-CREDIT-CARD-REVENUE",
+          "fact_sha256": "cd748422d0c8b0f797334165a7227eb8e38b84f92796163d3c9277b5662d440d",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。",
+          "limitation": "业务收入原句可限用；该业务的可靠标准化主体口径仍待后续取得，不作为全行或集团总收入计算。",
+          "metric_restrictions": [
+            {
+              "metric_index": 0,
+              "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+            },
+            {
+              "metric_index": 1,
+              "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "workpaper_raw_for_audit": true,
+  "workpaper_delivery": {
+    "policy_version": "company_profile_research_delivery.v1",
+    "research_only": true,
+    "formal_acceptance": "not_assessed",
+    "production_authorization": "not_authorized",
+    "information_gaps": [
+      {
+        "element": "business_structure",
+        "status": "unclear",
+        "reasons": [
+          "本次为定向补充阅读，未针对业务结构进行阅读，不生成相关内容。"
+        ]
+      },
+      {
+        "element": "products_services",
+        "status": "unclear",
+        "reasons": [
+          "本次为定向补充阅读，未针对产品与服务进行阅读，不生成相关内容。"
+        ]
+      },
+      {
+        "element": "revenue_model",
+        "status": "unclear",
+        "reasons": [
+          "本次为定向补充阅读，未针对收入模式进行阅读，不生成相关内容。"
+        ]
+      },
+      {
+        "element": "scale_and_mix",
+        "status": "unclear",
+        "reasons": [
+          "本次为定向补充阅读，未针对规模与结构进行阅读，不生成相关内容。"
+        ]
+      },
+      {
+        "element": "operations_and_inputs",
+        "status": "unclear",
+        "reasons": [
+          "本次为定向补充阅读，未针对经营与投入进行阅读，不生成相关内容。"
+        ]
+      },
+      {
+        "element": "customers_channels_markets",
+        "status": "observed",
+        "reasons": [
+          "本次仅阅读零售相关章节，未覆盖对公客户、同业客户等其他客户类别的完整披露。",
+          "零售客户总数、私人银行客户、消费信贷客户均带脚注标记，其口径以脚注4、5、6为准；正文未披露零售客户总数的同比变动率。",
+          "线上渠道全年服务客户仅表述为“突破千万”，未给出精确数值与计量单位，已按不确定处理。",
+          "收单支付业务章节未披露收单商户数、交易金额等经营规模指标，仅披露收单支付客户数。",
+          "未获取零售客户按地区、渠道或产品细分的完整数量分布。",
+          "指标格式隔离：事实F-KPL-COBRAND-CARDS未作为结论采用；metrics.0: Value error, metric qualifier must match original raw value；原内容保留在模型回执。",
+          "指标格式隔离：事实F-ONLINE-CHANNEL-SERVICE未作为结论采用；metrics.0: Value error, metric qualifier must match original raw value；原内容保留在模型回执。",
+          "事实F-RETAIL-CONSUMER-CREDIT-CUST已隔离，未作为结论采用：metric number is absent from cited source: 消费信贷客户[注6]比上年末变动率",
+          "事实F-PERSONAL-LOAN-BALANCE已隔离，未作为结论采用：metric number is absent from cited source: 个人贷款（不含信用卡）余额比上年末变动率",
+          "事实F-CREDIT-CARD-LOAN-AND-TXN已隔离，未作为结论采用：metric number is absent from cited source: 信用卡贷款余额比上年末变动率"
+        ]
+      },
+      {
+        "element": "operating_drivers",
+        "status": "unclear",
+        "reasons": [
+          "本次为定向补充阅读，未针对经营驱动因素进行阅读，不生成相关内容。"
+        ]
+      },
+      {
+        "element": "material_changes",
+        "status": "unclear",
+        "reasons": [
+          "本次为定向补充阅读，未针对重大变化进行阅读，不生成相关内容。"
+        ]
+      },
+      {
+        "element": "customers_channels_markets",
+        "fact_id": "F-WEALTH-FEE-INCOME",
+        "status": "unclear",
+        "metric_indices": [
+          0,
+          1
+        ],
+        "metric_names": [
+          "财富管理手续费及佣金收入",
+          "财富管理手续费及佣金收入同比增长率"
+        ],
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "reasons": [
+          "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。",
+          "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+        ],
+        "suggested_reading": "建议定向精读该事实的原业务章节，核对指标主体、方向、期间和表头；不推断替代值。"
+      },
+      {
+        "element": "customers_channels_markets",
+        "fact_id": "F-CREDIT-CARD-REVENUE",
+        "status": "unclear",
+        "metric_indices": [
+          0,
+          1
+        ],
+        "metric_names": [
+          "信用卡业务收入",
+          "信用卡业务收入同比变动率"
+        ],
+        "evidence_ids": [
+          "source-0011"
+        ],
+        "reasons": [
+          "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。",
+          "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+        ],
+        "suggested_reading": "建议定向精读该事实的原业务章节，核对指标主体、方向、期间和表头；不推断替代值。"
+      }
+    ],
+    "suggested_acquisitions": [
+      {
+        "finding_id": "OM-CONSUMER-CREDIT-CUST",
+        "element": "customers_channels_markets",
+        "severity": "material",
+        "reason": "定向问题要求补齐零售客户类别、数量、期间、计量单位并区分脚注。原文与私人银行客户、收单支付客户同一句披露：截至报告期末，消费信贷客户[注6]56.11万户，比上年末下降0.71%；脚注6载明口径为非平台类消费信贷客户。已采用事实未包含该类别及脚注。隔离说明称变动率未见于引文，与原文不符，不能据此省略。应补记报告期末户数、下降幅度及脚注口径，下降不得记为未披露或零。",
+        "evidence_ids": [
+          "source-0003",
+          "source-0004"
+        ]
+      },
+      {
+        "finding_id": "OM-PERSONAL-LOAN-SCALE",
+        "element": "customers_channels_markets",
+        "severity": "material",
+        "reason": "定向问题包含零售相关经营规模。原文披露截至报告期末本行个人贷款（不含信用卡）余额5,330.20亿元，比上年末下降1.96%，其中个人消费贷款余额1,116.64亿元，比上年末增长0.40%。已采用事实有个人存款与金融资产，但缺少上述贷款规模。隔离说明与source-0008不符。总额与其中项应一并按期末余额、亿元及各自增减方向补记，不得把下降写成缺失。",
+        "evidence_ids": [
+          "source-0008"
+        ]
+      },
+      {
+        "finding_id": "OM-CC-LOAN-BALANCE",
+        "element": "customers_channels_markets",
+        "severity": "material",
+        "reason": "定向问题要求补充零售相关经营规模。原文披露截至报告期末本行信用卡贷款余额1,510.86亿元，比上年末下降10.75%。已采用事实仅有累计发卡与业务收入，未含该期末贷款存量。隔离说明称变动率未见于引文，与原文不符。应单独按报告期末、亿元及下降方向补记，不得与报告期内交易额或收入混为同一比较基础。",
+        "evidence_ids": [
+          "source-0011"
+        ]
+      },
+      {
+        "finding_id": "OM-CC-TXN-VOLUME",
+        "element": "customers_channels_markets",
+        "severity": "material",
+        "reason": "原文另披露报告期内信用卡交易总额7,103.26亿元，同比下降14.29%。该数为报告期内流量，比较基础为同比，与期末信用卡贷款余额的存量口径不同，已采用事实未包含。应单独补记期间、亿元及下降方向，不得因同属信用卡业务而并入贷款余额或把下降记为未披露。",
+        "evidence_ids": [
+          "source-0011"
+        ]
+      },
+      {
+        "element": "customers_channels_markets",
+        "fact_id": "F-WEALTH-FEE-INCOME",
+        "metric_indices": [
+          0,
+          1
+        ],
+        "metric_names": [
+          "财富管理手续费及佣金收入",
+          "财富管理手续费及佣金收入同比增长率"
+        ],
+        "severity": "material",
+        "reason": "建议定向精读该事实的原业务章节，核对指标主体、方向、期间和表头；不推断替代值。 原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。；原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。",
+        "evidence_ids": [
+          "source-0006"
+        ]
+      },
+      {
+        "element": "customers_channels_markets",
+        "fact_id": "F-CREDIT-CARD-REVENUE",
+        "metric_indices": [
+          0,
+          1
+        ],
+        "metric_names": [
+          "信用卡业务收入",
+          "信用卡业务收入同比变动率"
+        ],
+        "severity": "material",
+        "reason": "建议定向精读该事实的原业务章节，核对指标主体、方向、期间和表头；不推断替代值。 原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。；原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。",
+        "evidence_ids": [
+          "source-0011"
+        ]
+      }
+    ],
+    "counts": {
+      "reviewed": 8,
+      "pending": 0,
+      "limited": 2,
+      "source_only": 0,
+      "withheld": 0,
+      "duplicate": 0
+    },
+    "labels": {
+      "reviewed": "已核（研究用途，非正式接受）",
+      "pending": "待核（无其他限用）",
+      "limited": "保真限用",
+      "source_only": "仅源参考／解释",
+      "withheld": "已隔离",
+      "duplicate": "重复未再展示"
+    },
+    "pending_review_count": 0,
+    "facts": [
+      {
+        "fact_id": "F-RETAIL-CUST-TOTAL",
+        "element": "customers_channels_markets",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0003",
+          "source-0004"
+        ],
+        "fact": {
+          "fact_id": "F-RETAIL-CUST-TOTAL",
+          "text": "截至报告期末，本行零售客户总数[注4]4,012.44万户；脚注4说明零售客户总数包含借记卡和信用卡客户数量，并去重。",
+          "subject_scope": "consolidated_group",
+          "period": "2025-12-31",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "零售客户总数[注4]",
+              "raw_value": "4,012.44",
+              "value": "4012.44",
+              "unit": "万户",
+              "source_unit": "万户",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-RETAIL-PRIVATE-CUST",
+        "element": "customers_channels_markets",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0003",
+          "source-0004"
+        ],
+        "fact": {
+          "fact_id": "F-RETAIL-PRIVATE-CUST",
+          "text": "截至报告期末，本行私人银行客户[注5]2.02万户，比上年末增长21.71%；脚注5说明私人银行客户指上月AUM月日均大于等于600万元人民币或等值外币资产的客户。",
+          "subject_scope": "consolidated_group",
+          "period": "2025-12-31",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "私人银行客户[注5]",
+              "raw_value": "2.02",
+              "value": "2.02",
+              "unit": "万户",
+              "source_unit": "万户",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "比上年末",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "私人银行客户[注5]比上年末增长率",
+              "raw_value": "21.71",
+              "value": "21.71",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "比上年末",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-RETAIL-ACQUIRING-CUST",
+        "element": "customers_channels_markets",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "fact": {
+          "fact_id": "F-RETAIL-ACQUIRING-CUST",
+          "text": "截至报告期末，本行收单支付客户74.86万户，比上年末增长6.80%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025-12-31",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [
+            {
+              "name": "收单支付客户",
+              "raw_value": "74.86",
+              "value": "74.86",
+              "unit": "万户",
+              "source_unit": "万户",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "比上年末",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "收单支付客户比上年末增长率",
+              "raw_value": "6.80",
+              "value": "6.80",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "比上年末",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-CREDIT-CARD-ISSUED",
+        "element": "customers_channels_markets",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0011"
+        ],
+        "fact": {
+          "fact_id": "F-CREDIT-CARD-ISSUED",
+          "text": "截至报告期末，本行信用卡累计发卡4,332.23万张，比上年末增长3.20%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025-12-31",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "metrics": [
+            {
+              "name": "信用卡累计发卡",
+              "raw_value": "4,332.23",
+              "value": "4332.23",
+              "unit": "万张",
+              "source_unit": "万张",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "比上年末",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "信用卡累计发卡比上年末增长率",
+              "raw_value": "3.20",
+              "value": "3.20",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "比上年末",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-CREDIT-CARD-APP-USERS",
+        "element": "customers_channels_markets",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0011"
+        ],
+        "fact": {
+          "fact_id": "F-CREDIT-CARD-APP-USERS",
+          "text": "截至报告期末，信用卡华彩生活APP注册用户2,399.39万户，比上年末增长8.19%；其中月活跃用户（MAU）364.18万户，同比下降7.55%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025-12-31",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "metrics": [
+            {
+              "name": "信用卡华彩生活APP注册用户",
+              "raw_value": "2,399.39",
+              "value": "2399.39",
+              "unit": "万户",
+              "source_unit": "万户",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "比上年末",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "信用卡华彩生活APP注册用户比上年末增长率",
+              "raw_value": "8.19",
+              "value": "8.19",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "比上年末",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "信用卡华彩生活APP月活跃用户（MAU）",
+              "raw_value": "364.18",
+              "value": "364.18",
+              "unit": "万户",
+              "source_unit": "万户",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "同比",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "信用卡华彩生活APP月活跃用户（MAU）同比变动率",
+              "raw_value": "-7.55",
+              "value": "-7.55",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "同比",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-MOBILE-BANK-USERS",
+        "element": "customers_channels_markets",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0011"
+        ],
+        "fact": {
+          "fact_id": "F-MOBILE-BANK-USERS",
+          "text": "截至报告期末，本行手机银行签约客户3,130.93万，比上年末增长8.03%，月活跃用户（MAU）626.14万，同比增长24.70%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025-12-31",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "metrics": [
+            {
+              "name": "手机银行签约客户",
+              "raw_value": "3,130.93",
+              "value": "3130.93",
+              "unit": "万",
+              "source_unit": "万",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "比上年末",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "手机银行签约客户比上年末增长率",
+              "raw_value": "8.03",
+              "value": "8.03",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "比上年末",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "手机银行月活跃用户（MAU）",
+              "raw_value": "626.14",
+              "value": "626.14",
+              "unit": "万",
+              "source_unit": "万",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "同比",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "手机银行月活跃用户（MAU）同比增长率",
+              "raw_value": "24.70",
+              "value": "24.70",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "同比",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-RETAIL-AUM",
+        "element": "customers_channels_markets",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "fact": {
+          "fact_id": "F-RETAIL-AUM",
+          "text": "截至报告期末，本行个人客户金融资产总量达11,148.08亿元，比上年末增长11.28%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025-12-31",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "个人客户金融资产总量",
+              "raw_value": "11,148.08",
+              "value": "11148.08",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "比上年末",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "个人客户金融资产总量比上年末增长率",
+              "raw_value": "11.28",
+              "value": "11.28",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "比上年末",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-PERSONAL-DEPOSIT-BALANCE",
+        "element": "customers_channels_markets",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "fact": {
+          "fact_id": "F-PERSONAL-DEPOSIT-BALANCE",
+          "text": "截至报告期末，本行个人存款余额5,997.81亿元，比上年末增长9.01%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025-12-31",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "metrics": [
+            {
+              "name": "个人存款余额",
+              "raw_value": "5,997.81",
+              "value": "5997.81",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "比上年末",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "个人存款余额比上年末增长率",
+              "raw_value": "9.01",
+              "value": "9.01",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": "比上年末",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-WEALTH-FEE-INCOME",
+        "element": "customers_channels_markets",
+        "state": "limited",
+        "label": "保真限用／独立源核",
+        "review_basis": "independent_source_check",
+        "model_review_stage": null,
+        "reasons": [
+          "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。",
+          "业务收入原句可限用；该业务的可靠标准化主体口径仍待后续取得，不作为全行或集团总收入计算。",
+          "独立源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。"
+        ],
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "fact": {
+          "fact_id": "F-WEALTH-FEE-INCOME",
+          "text": "报告期内，本行实现财富管理手续费及佣金收入11.17亿元，同比增长16.48%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        "metric_gaps": [
+          {
+            "metric_index": 0,
+            "name": "财富管理手续费及佣金收入",
+            "state": "withheld",
+            "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+          },
+          {
+            "metric_index": 1,
+            "name": "财富管理手续费及佣金收入同比增长率",
+            "state": "withheld",
+            "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+          }
+        ],
+        "metric_source_indices": []
+      },
+      {
+        "fact_id": "F-CREDIT-CARD-REVENUE",
+        "element": "customers_channels_markets",
+        "state": "limited",
+        "label": "保真限用／独立源核",
+        "review_basis": "independent_source_check",
+        "model_review_stage": null,
+        "reasons": [
+          "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。",
+          "业务收入原句可限用；该业务的可靠标准化主体口径仍待后续取得，不作为全行或集团总收入计算。",
+          "独立源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。"
+        ],
+        "evidence_ids": [
+          "source-0011"
+        ],
+        "fact": {
+          "fact_id": "F-CREDIT-CARD-REVENUE",
+          "text": "报告期内，本行实现信用卡业务收入144.59亿元，同比下降15.65%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0011"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        "metric_gaps": [
+          {
+            "metric_index": 0,
+            "name": "信用卡业务收入",
+            "state": "withheld",
+            "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+          },
+          {
+            "metric_index": 1,
+            "name": "信用卡业务收入同比变动率",
+            "state": "withheld",
+            "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+          }
+        ],
+        "metric_source_indices": []
+      }
+    ]
+  },
+  "workpaper_markdown": "# 600015.SH｜2025-12-31 公司画像底稿\n\n真实模型底稿（待核，不代表正式公司可用）\n\n来源版本：`d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3`。发布时点：2026-03-30T16:00:00+00:00。\n\n研究分级不等于正式可信发布；以下普通正文不含隔离、仅源参考或重复对象。原底稿及后文复核记录保留审计。\n\n已核（研究用途，非正式接受） 8；待核（无其他限用） 0；保真限用 2；仅源参考／解释 0；已隔离 0；重复未再展示 0\n待核合计（含限用中的待核）：0。\n\n独立使用审核：program:inherited-use-decisions (not a new source review)；依据：review-recovery-parent:bp-work-c144725bfcfff1bceadc5849；hash `d9fe3d7759066ca22ccee2388c12f81e416bf577589a2e8836951d408414b796`。\n\n## 业务结构\n\n- 限制：本次为定向补充阅读，未针对业务结构进行阅读，不生成相关内容。\n\n## 产品、服务及用途\n\n- 限制：本次为定向补充阅读，未针对产品与服务进行阅读，不生成相关内容。\n\n## 怎么赚钱\n\n- 限制：本次为定向补充阅读，未针对收入模式进行阅读，不生成相关内容。\n\n## 规模与业务权重\n\n- 限制：本次为定向补充阅读，未针对规模与结构进行阅读，不生成相关内容。\n\n## 经营方式与关键投入\n\n- 限制：本次为定向补充阅读，未针对经营与投入进行阅读，不生成相关内容。\n\n## 客户、渠道与市场\n\n- 【已核（研究用途，非正式接受）／模型源核】截至报告期末，本行零售客户总数[注4]4,012.44万户；脚注4说明零售客户总数包含借记卡和信用卡客户数量，并去重。（[source-0003](#source-0003)、[source-0004](#source-0004)）\n  - 零售客户总数[注4]：4,012.44 万户；2025-12-31，consolidated_group。\n- 【已核（研究用途，非正式接受）／模型源核】截至报告期末，本行私人银行客户[注5]2.02万户，比上年末增长21.71%；脚注5说明私人银行客户指上月AUM月日均大于等于600万元人民币或等值外币资产的客户。（[source-0003](#source-0003)、[source-0004](#source-0004)）\n  - 私人银行客户[注5]：2.02 万户；2025-12-31，consolidated_group。\n  - 私人银行客户[注5]比上年末增长率：21.71 %；2025-12-31，consolidated_group。\n- 【已核（研究用途，非正式接受）／模型源核】截至报告期末，本行收单支付客户74.86万户，比上年末增长6.80%。（[source-0003](#source-0003)）\n  - 收单支付客户：74.86 万户；2025-12-31，consolidated_group。\n  - 收单支付客户比上年末增长率：6.80 %；2025-12-31，consolidated_group。\n- 【已核（研究用途，非正式接受）／模型源核】截至报告期末，本行信用卡累计发卡4,332.23万张，比上年末增长3.20%。（[source-0011](#source-0011)）\n  - 信用卡累计发卡：4,332.23 万张；2025-12-31，consolidated_group。\n  - 信用卡累计发卡比上年末增长率：3.20 %；2025-12-31，consolidated_group。\n- 【已核（研究用途，非正式接受）／模型源核】截至报告期末，信用卡华彩生活APP注册用户2,399.39万户，比上年末增长8.19%；其中月活跃用户（MAU）364.18万户，同比下降7.55%。（[source-0011](#source-0011)）\n  - 信用卡华彩生活APP注册用户：2,399.39 万户；2025-12-31，consolidated_group。\n  - 信用卡华彩生活APP注册用户比上年末增长率：8.19 %；2025-12-31，consolidated_group。\n  - 信用卡华彩生活APP月活跃用户（MAU）：364.18 万户；2025-12-31，consolidated_group。\n  - 信用卡华彩生活APP月活跃用户（MAU）同比变动率：-7.55 %；2025-12-31，consolidated_group。\n- 【已核（研究用途，非正式接受）／模型源核】截至报告期末，本行手机银行签约客户3,130.93万，比上年末增长8.03%，月活跃用户（MAU）626.14万，同比增长24.70%。（[source-0011](#source-0011)）\n  - 手机银行签约客户：3,130.93 万；2025-12-31，consolidated_group。\n  - 手机银行签约客户比上年末增长率：8.03 %；2025-12-31，consolidated_group。\n  - 手机银行月活跃用户（MAU）：626.14 万；2025-12-31，consolidated_group。\n  - 手机银行月活跃用户（MAU）同比增长率：24.70 %；2025-12-31，consolidated_group。\n- 【已核（研究用途，非正式接受）／模型源核】截至报告期末，本行个人客户金融资产总量达11,148.08亿元，比上年末增长11.28%。（[source-0006](#source-0006)）\n  - 个人客户金融资产总量：11,148.08 亿元；2025-12-31，consolidated_group。\n  - 个人客户金融资产总量比上年末增长率：11.28 %；2025-12-31，consolidated_group。\n- 【已核（研究用途，非正式接受）／模型源核】截至报告期末，本行个人存款余额5,997.81亿元，比上年末增长9.01%。（[source-0005](#source-0005)）\n  - 个人存款余额：5,997.81 亿元；2025-12-31，consolidated_group。\n  - 个人存款余额比上年末增长率：9.01 %；2025-12-31，consolidated_group。\n- 【保真限用／独立源核】报告期内，本行实现财富管理手续费及佣金收入11.17亿元，同比增长16.48%。（[source-0006](#source-0006)）\n  - 使用限制：原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。；业务收入原句可限用；该业务的可靠标准化主体口径仍待后续取得，不作为全行或集团总收入计算。；独立源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。\n- 【保真限用／独立源核】报告期内，本行实现信用卡业务收入144.59亿元，同比下降15.65%。（[source-0011](#source-0011)）\n  - 使用限制：原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。；业务收入原句可限用；该业务的可靠标准化主体口径仍待后续取得，不作为全行或集团总收入计算。；独立源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。\n- 限制：本次仅阅读零售相关章节，未覆盖对公客户、同业客户等其他客户类别的完整披露。\n- 限制：零售客户总数、私人银行客户、消费信贷客户均带脚注标记，其口径以脚注4、5、6为准；正文未披露零售客户总数的同比变动率。\n- 限制：线上渠道全年服务客户仅表述为“突破千万”，未给出精确数值与计量单位，已按不确定处理。\n- 限制：收单支付业务章节未披露收单商户数、交易金额等经营规模指标，仅披露收单支付客户数。\n- 限制：未获取零售客户按地区、渠道或产品细分的完整数量分布。\n- 限制：指标格式隔离：事实F-KPL-COBRAND-CARDS未作为结论采用；metrics.0: Value error, metric qualifier must match original raw value；原内容保留在模型回执。\n- 限制：指标格式隔离：事实F-ONLINE-CHANNEL-SERVICE未作为结论采用；metrics.0: Value error, metric qualifier must match original raw value；原内容保留在模型回执。\n- 限制：事实F-RETAIL-CONSUMER-CREDIT-CUST已隔离，未作为结论采用：metric number is absent from cited source: 消费信贷客户[注6]比上年末变动率\n- 限制：事实F-PERSONAL-LOAN-BALANCE已隔离，未作为结论采用：metric number is absent from cited source: 个人贷款（不含信用卡）余额比上年末变动率\n- 限制：事实F-CREDIT-CARD-LOAN-AND-TXN已隔离，未作为结论采用：metric number is absent from cited source: 信用卡贷款余额比上年末变动率\n\n## 关键经营影响因素\n\n- 限制：本次为定向补充阅读，未针对经营驱动因素进行阅读，不生成相关内容。\n\n## 近期重要变化\n\n- 限制：本次为定向补充阅读，未针对重大变化进行阅读，不生成相关内容。\n\n## 建议获取（不阻塞画像交付）\n\n- 客户、渠道与市场：定向问题要求补齐零售客户类别、数量、期间、计量单位并区分脚注。原文与私人银行客户、收单支付客户同一句披露：截至报告期末，消费信贷客户[注6]56.11万户，比上年末下降0.71%；脚注6载明口径为非平台类消费信贷客户。已采用事实未包含该类别及脚注。隔离说明称变动率未见于引文，与原文不符，不能据此省略。应补记报告期末户数、下降幅度及脚注口径，下降不得记为未披露或零。\n- 客户、渠道与市场：定向问题包含零售相关经营规模。原文披露截至报告期末本行个人贷款（不含信用卡）余额5,330.20亿元，比上年末下降1.96%，其中个人消费贷款余额1,116.64亿元，比上年末增长0.40%。已采用事实有个人存款与金融资产，但缺少上述贷款规模。隔离说明与source-0008不符。总额与其中项应一并按期末余额、亿元及各自增减方向补记，不得把下降写成缺失。\n- 客户、渠道与市场：定向问题要求补充零售相关经营规模。原文披露截至报告期末本行信用卡贷款余额1,510.86亿元，比上年末下降10.75%。已采用事实仅有累计发卡与业务收入，未含该期末贷款存量。隔离说明称变动率未见于引文，与原文不符。应单独按报告期末、亿元及下降方向补记，不得与报告期内交易额或收入混为同一比较基础。\n- 客户、渠道与市场：原文另披露报告期内信用卡交易总额7,103.26亿元，同比下降14.29%。该数为报告期内流量，比较基础为同比，与期末信用卡贷款余额的存量口径不同，已采用事实未包含。应单独补记期间、亿元及下降方向，不得因同属信用卡业务而并入贷款余额或把下降记为未披露。\n- 客户、渠道与市场：建议定向精读该事实的原业务章节，核对指标主体、方向、期间和表头；不推断替代值。 原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。；原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。\n- 客户、渠道与市场：建议定向精读该事实的原业务章节，核对指标主体、方向、期间和表头；不推断替代值。 原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。；原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。\n\n## 阅读范围与取舍\n\n本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。\n\n- 第三节 管理层讨论与分析 / 3.12 业务回顾，物理页41—42：本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。\n- 第三节 管理层讨论与分析 / 投资银行业务 / 3.12.2 零售金融业务，物理页44—44：本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。\n- 第三节 管理层讨论与分析 / 个人存款业务，物理页44—45：本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。\n- 第三节 管理层讨论与分析 / 财富管理与私人银行业务，物理页45—45：本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。\n- 第三节 管理层讨论与分析 / 个人贷款业务，物理页45—46：本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。\n- 第三节 管理层讨论与分析 / 收单支付业务，物理页46—46：本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。\n- 第三节 管理层讨论与分析 / 信用卡业务，物理页46—48：本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。\n- 第三节 管理层讨论与分析 / 资产托管业务 / 3.12.4 数字化经营，物理页51—53：本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。\n\n停止理由：已覆盖零售客户与经营规模的正文披露来源（业务回顾总览、零售各业务子节及数字化渠道），可回答客户数量、类别、期间与计量单位并区分正文与脚注；剩余为风险、财务附注等非本定向主题，继续扩读收益低，故在此停止。\n\n- 未读/后置：section-0030 管理层讨论与分析整章：范围过大，仅取零售相关子节即可满足定向问题\n- 未读/后置：section-0116/0117 金融市场业务、section-0119 资产管理、section-0120 资产托管：非零售客户规模主题，暂不扩读\n- 未读/后置：section-0071 及贷款质量明细、section-0122 风险管理：属资产质量与风险范畴，与客户规模披露关联弱\n- 未读/后置：第七节财务报告及附注（如分部报告 section-0731/0739）：仅在正文零售客户数量存在实质缺口时再定向补充，本次不扩读\n- 限制：本次为定向补充阅读，仅回答零售客户及相关经营规模的披露数量、类别、期间与计量单位问题，未对报告其他部分进行系统阅读，不构成对报告完整性的判断。\n- 限制：非目标要素未阅读，不生成事实，相关状态为 not_read_for_this_task。\n\n## 模型处理记录\n\n- 选章：deepseek-flash（deepseek:deepseek-flash，semantic_extraction__deepseek），报告标题索引（842个候选章节）；输入/输出/合计 22835/429/23264；finish=stop。\n- 正文抽取：deepseek-flash（deepseek:deepseek-flash，semantic_extraction__deepseek），章节 section-0104, section-0110, section-0111, section-0112, section-0113, section-0114, section-0115, section-0121；物理页 41,42,44,45,46,47,48,51,52；输入/输出/合计 12259/4447/16706；finish=stop。\n- 提示版本：`company_profile_workpaper.2026-11-19.independent-assertions.v21`；预处理：`toc_sections_native_layout.v8.structured-note-markers`。\n\n## 原文复核（开发结果仍待正式核验）\n\n复核状态：`completed_with_open_findings`。\n- 已检查原事实：10条；范围限于本次所选原文，不是全报告完整性保证。\n- 原始底稿哈希：`7b9ce9561b5cd24dde0bf0cede786879c430e1febe9b64e8e578b4a54ffdbc4d`。\n- review_profile_workpaper：grok-4.7（scorpio:grok-4.7）；requested_reasoning=high；usage=33658；本次调用。\n- repair_profile_workpaper：deepseek-flash（deepseek:deepseek-flash）；requested_reasoning=high；usage=9976；本次调用。\n- material / material_omission / repair_rejected：定向问题要求补齐零售客户类别、数量、期间、计量单位并区分脚注。原文与私人银行客户、收单支付客户同一句披露：截至报告期末，消费信贷客户[注6]56.11万户，比上年末下降0.71%；脚注6载明口径为非平台类消费信贷客户。已采用事实未包含该类别及脚注。隔离说明称变动率未见于引文，与原文不符，不能据此省略。应补记报告期末户数、下降幅度及脚注口径，下降不得记为未披露或零。（[source-0003](#source-0003)、[source-0004](#source-0004)）\n- material / material_omission / repair_rejected：定向问题包含零售相关经营规模。原文披露截至报告期末本行个人贷款（不含信用卡）余额5,330.20亿元，比上年末下降1.96%，其中个人消费贷款余额1,116.64亿元，比上年末增长0.40%。已采用事实有个人存款与金融资产，但缺少上述贷款规模。隔离说明与source-0008不符。总额与其中项应一并按期末余额、亿元及各自增减方向补记，不得把下降写成缺失。（[source-0008](#source-0008)）\n- material / material_omission / repair_rejected：定向问题要求补充零售相关经营规模。原文披露截至报告期末本行信用卡贷款余额1,510.86亿元，比上年末下降10.75%。已采用事实仅有累计发卡与业务收入，未含该期末贷款存量。隔离说明称变动率未见于引文，与原文不符。应单独按报告期末、亿元及下降方向补记，不得与报告期内交易额或收入混为同一比较基础。（[source-0011](#source-0011)）\n- material / material_omission / repair_rejected：原文另披露报告期内信用卡交易总额7,103.26亿元，同比下降14.29%。该数为报告期内流量，比较基础为同比，与期末信用卡贷款余额的存量口径不同，已采用事实未包含。应单独补记期间、亿元及下降方向，不得因同属信用卡业务而并入贷款余额或把下降记为未披露。（[source-0011](#source-0011)）\n\n## 程序处理说明\n\n- 指标格式隔离：事实F-KPL-COBRAND-CARDS未作为结论采用；metrics.0: Value error, metric qualifier must match original raw value；原内容保留在模型回执。\n- 指标格式隔离：事实F-ONLINE-CHANNEL-SERVICE未作为结论采用；metrics.0: Value error, metric qualifier must match original raw value；原内容保留在模型回执。\n- 事实F-RETAIL-CONSUMER-CREDIT-CUST已隔离，未作为结论采用：metric number is absent from cited source: 消费信贷客户[注6]比上年末变动率\n- 事实F-PERSONAL-LOAN-BALANCE已隔离，未作为结论采用：metric number is absent from cited source: 个人贷款（不含信用卡）余额比上年末变动率\n- 事实F-CREDIT-CARD-LOAN-AND-TXN已隔离，未作为结论采用：metric number is absent from cited source: 信用卡贷款余额比上年末变动率\n- 修订源检查隔离：review-add:OM-CONSUMER-CREDIT-CUST未进入最终再核或正文；ValidationError: 1 validation error for WorkpaperFact\nmetrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '消费信贷客...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error\n- 修订源检查隔离：review-add:OM-PERSONAL-LOAN-SCALE未进入最终再核或正文；ValidationError: 2 validation errors for WorkpaperFact\nmetrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '个人贷款（...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error\nmetrics.3\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '个人消费贷...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error\n- 修订源检查隔离：review-add:OM-CC-LOAN-BALANCE未进入最终再核或正文；ValidationError: 1 validation error for WorkpaperFact\nmetrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '信用卡贷款...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error\n- 修订源检查隔离：review-add:OM-CC-TXN-VOLUME未进入最终再核或正文；ValidationError: 1 validation error for WorkpaperFact\nmetrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '信用卡交易...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error\n\n## 来源\n\n### source-0001\n\n第三节 管理层讨论与分析 / 3.12 业务回顾\n\n物理页41，字符4—1343：\n\n> 3.12业务回顾 3.12.1公司金融业务 报告期内，本行坚定不移推进高质量发展，坚持“商行+投行”转型战略，建立健 全工作机制，加快转型发展步伐，围绕“五篇大文章”、国民经济重点领域和薄弱环 节，加强产品创新运用，加大支持服务实体经济力度，不断完善客户分层分类经营体 系，做实做细客户经营，提升专业化、综合化和数字化经营能力，高质量发展取得积 极成效。 公司客户 全面树立“以客户为中心”的经营发展核心理念，完善客户增长机制，持续加强 融资客群、机构客群、无贷客群分类经营体系建设，推进对公基础客群和有效客群开 发，不断改进产品、服务和流程，强化集团化协同和前中后台协同，提升客户服务能 力，做大客户规模，优化客户结构，提升客户质效。聚焦有效户增长，实施“客户倍 增计划”，开展“新开发基础客户”“零日均客户激活”和“低效户提升”专项活动， 大力推广新开户“1+1+N”结算产品签约，强化基础结算服务活客、黏客。截至报告 期末，本行对公客户 73.05万户，比上年末增长 6.72%。 持续提升对总行级战略客户及重点客户的整体营销与综合服务，不断优化综合经 营管理体系和服务机制，定制综合金融服务方案并推动实施。统筹开展与总行级战略 客户和央企客户的高层对接，总分支一体化推进客户系统开发与综合服务。与中国电 子信息产业集团有限公司、北京市基础设施投资有限公司、北京市石景山区人民政府 等 32 家重点企业及政府机构签署战略合作协议，深化与客户的整体合作。截至报告期 末，本行总行级战略客户 155 户，比上年末增加 12 户；上述客户对公存款余额 2,204.84 亿元，比上年末增长 16.47%；对公存款日均 2,161.26亿元，比上年末增长 8.95%；对 公贷款余额 2,326.56亿元，比上年末增长 22.69%。 专栏 2：主动服务首都经济发展，实施“京华行动”，打造“北京主场”优势 启动实施“京华行动”，围绕首都“四个中心”功能建设与“五子联动”发展布 局，充分调度各类资源，强化北京地区重点客群的整体营销与开发，全力打造“北京 主场”优势，积极融入首都高质量发展新格局。 首都国企服务能力持续提升。加强与北京市属国企的“总对总”对接，举办“华 夏银行服务首都国企高质量发展大会”，全年与 21 家市属国企签署战略合作协议， 实现对 37 家市属国企服务全覆盖。总分支三级联动，分层开展客户服务对接，拓展 京内外成员企业合作。加强条线协同，强化服务方案制定、产品推广运用、系统建设 等方面的专业协作与支撑，综合利用科技金融、绿色金融、供应链金融、跨境金融等 产品和服务，打造专业化、综合化的金融服务生态。 市区委办局业务深入推进。加大市区两级财政、公积金、医保等委办局金融服务 38\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0002\n\n第三节 管理层讨论与分析 / 3.12 业务回顾\n\n物理页42，字符0—482：\n\n> 力度，成功获得北京市财政专项债券项目资金监管银行、市医保直接结算合作银行、 市公积金综合代办网点等多项市区两级业务资格，开立首个医保直结资金监管账户。 与北京市医疗保险事务管理中心签订医银合作协议，开办 2 家医银合作网点，成为北 京市医保局首批医银网点合作银行。 积极支持首都重点项目建设。积极对接“3 个 100”等重点项目，建立业务“绿 色通道”，给予差异化定价政策，不断提升服务质效；围绕轨道交通、基础设施、民 生工程等重点领域，积极支持 M101 数字港、“湾里”商业综合体、故宫周边腾退等 标志性项目；依托项目主体，积极为上下游客户提供链式金融服务。 首都重点区域合作不断深化。报告期内，与多个区政府签署战略合作协议，开展 合作会谈。围绕区属企业、重点项目、地方债、国库集中支付、三代社保卡等领域， 积极提供专业化金融服务。积极参与政银企对接会、促消费活动以及各类赛事，持续 提升本行在北京地区的知名度和影响力。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0003\n\n第三节 管理层讨论与分析 / 投资银行业务 / 3.12.2 零售金融业务\n\n物理页44，字符400—1228：\n\n> 3.12.2零售金融业务 报告期内，本行持续深化零售战略，坚持深耕客户与市场，积极服务于社会民生 与实体经济，切实推动零售产品服务体系不断完善、数字化转型加速推进、综合化服 务能力持续增强、生态场景建设逐步成熟。 零售客户 推动零售客户经营体系全面升级，持续构建分层管理、分群经营、生态融合的零 售客户综合化经营体系，致力于打破服务边界，为广大客户提供一站式、多元化、整 合式的优质金融服务。一是完善分层管理，深度推进数字化客户经营。持续构建零售 客群分层服务体系，实现“线上化+场景化”服务大众客户、“专业化+标准化”服务 财富客户、“综合化+集中化”服务私行客户，持续提升“线上+线下”全渠道服务水 平和服务效能。二是强化分群经营，全面提升客户精细化服务水平。细分特色客群， 差异化定制全生命周期客户服务策略，聚焦青年客群，推出“华夏梦卡”、专属理财 等青年特色产品，加强年轻化品牌建设，适配年轻客户金融需求；聚焦车主客群，推 出华夏畅行车主卡、电池租赁贷等服务，构建“金融+车生态”服务体系。三是加快生 态建设，多维升级场景服务能力。落实国家关于试点消费新业态新模式新场景的政策 部署，以“生态项目制”创新打造“金融+场景”新型服务业态，深化“华夏 KPL 王 者梦之队”联名双卡项目全国推广，打造政务、消费、文旅、宠物、教育等各具特色 的属地零售生态。截至报告期末，本行零售客户群体稳中有进，零售客户总数[注4]4,012.44 万户。其中，私人银行客户[注5]2.02 万户，比上年末增长 21.71%；消费信贷客户[注6]56.11 万 户，比上年末下降 0.71%；收单支付客户 74.86万户，比上年末增长 6.80%。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0004\n\n第三节 管理层讨论与分析 / 个人存款业务\n\n物理页44，字符1228—1424：\n\n> 个人存款业务 加大产品创新赋能，升级营销组织管理，推动个人存款高质量增长。着力完善以 4零售客户总数包含借记卡和信用卡客户数量，并去重。 5私人银行客户指上月 AUM 月日均大于等于 600万元人民币或等值外币资产的客户。 6消费信贷客户统计口径为非平台类消费信贷客户。 41\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0005\n\n第三节 管理层讨论与分析 / 个人存款业务\n\n物理页45，字符0—309：\n\n> 客户为中心的产品体系，围绕客户教育金、养老金、薪金规划需求推出“月享存”等 创新产品，持续优化产品线上购买体验，加速推动个人存款产品线上化、客群化、场 景化转型。持续推进多元化的场景布局，延伸代发、收单等重点传统业务场景，同步 拓展文旅出行、消费购物等生态场景布局，以客户增长带动客户资金沉淀，打造“传 统渠道+生态场景”双轮增存新模式。深化重点平台模式搭建，聚焦校园缴费、批发采 购等高频资金往来场景，精准对接平台方、入驻商户的多元金融需求，公私协同打造 一体化解决方案，以优质综合服务促进客户资金留存。截至报告期末，本行个人存款 余额 5,997.81亿元，比上年末增长 9.01%。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0006\n\n第三节 管理层讨论与分析 / 财富管理与私人银行业务\n\n物理页45，字符309—1096：\n\n> 财富管理与私人银行业务 通过服务升级、产品创新与数智赋能，为客户持续创造价值。一是专业服务持续 优化，分层分类服务升级。加速私人银行中心布局落地，加强私行客户精细化管理， 整合行内外专家资源打造“汇智管家”专家库，切实提升私行客户专业服务质效。聚 焦各类特色财私客群专属需求，配置差异化金融产品及服务组合，提升客群综合服务 能力。通过开展“好友荟聚 好运加倍”专项转介活动，完成财私会员与 C+会员体系 的全链路贯通与权益货架整合，构建分层分频的精准触达与服务体系，增强客户黏性 与价值认同。二是产品创新赋能实体，合作生态迭代创新。联合各类头部合作机构， 聚焦“五篇大文章”，打造开放式、全品类的产品货架。新上线商业养老金保险产品， 实现商养各期限产品全覆盖。依托睿诚、睿夏等产品系列，落地 A 股 2025 年最大规 模个人大股东定增融资、行业首单 25 年期绿色电力私募股权信托等标杆创新产品。成 功举办首届财富伙伴生态大会，发布五大核心产品品牌，筑牢共赢生态格局。三是财 智科技双轮驱动，服务效能全面提升。推动“投研配产服”机制传导落地，健全投研 报告体系，为客户提供全流程资产配置和顾问式陪伴服务。手机银行财私店铺正式运 营，推出“财富节”“新客理财星期二”等特色活动，新增“黄金+”“指数宝”专区 及多项财私会员权益。截至报告期末，本行个人客户金融资产总量达 11,148.08亿元， 比上年末增长 11.28%；实现财富管理手续费及佣金收入 11.17亿元，同比增长 16.48%。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0007\n\n第三节 管理层讨论与分析 / 个人贷款业务\n\n物理页45，字符1096—1543：\n\n> 个人贷款业务 坚决贯彻落实党中央、国务院关于提振和扩大消费摆在优先位置的决策部署，着 力推进个人贷款业务向场景化、线上化、智能化、数字化转型。坚持金融服务与消费 场景融合，持续拓展商业、民生等消费场景，大力推广消费贷款贴息，依托科技手段 提高对新型消费场景的服务渗透率，拓展线上消费渠道，提供便捷高效的消费金融支 持。一是数字化服务提速，数字化产能提升，数字化风控升级。聚焦数字化产品和服 务创新，持续优化升级重点产品“龙 e贷”，产品竞争力大幅提升，授信快速增长， 有力支持消费升级。生态化获客和场景营销取得新突破，上线首个全线上化“龙 e贷” 能源场景项目，加大多元化生态场景建设，提供多样化的个人消费信贷金融服务，在 扩内需、促消费、稳增长中发挥持续、积极的推动作用。二是围绕消费行业经营主体 42\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0008\n\n第三节 管理层讨论与分析 / 个人贷款业务\n\n物理页46，字符0—450：\n\n> 持续开展信贷产品创新优化。聚焦“园、圈、链”生态，升级“龙商贷”，为个体工 商客户提供数字化、智能化、专业化、特色化的金融服务，进一步提升客户服务能力。 三是大力支持房地产市场企稳。严格落实国家首付款比例及利率要求，因城施策实施 差异化住房信贷政策，全面整合按揭业务线上流程，提速智能化办理。四是高效落实 国家政策，保障广大居民消费权益落实。全面落实国家提振消费系列政策，快速完成 消费贷款贴息政策落地。全面推进一次性信用修复政策实施，制定清收纾困工作方案， 及时回应市场关切，做好应急预案，加快政策落地实施。上线零售贷款资金实时监控 功能，首次构建贷款资金全流程溯源整改，精准防控信贷资金违规转向限制性领域， 有效防范资金挪用风险、保障信贷资产安全。截至报告期末，本行个人贷款（不含信 用卡）余额 5,330.20亿元，比上年末下降 1.96%，其中，个人消费贷款余额 1,116.64 亿元，比上年末增长 0.40%。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0009\n\n第三节 管理层讨论与分析 / 收单支付业务\n\n物理页46，字符450—714：\n\n> 收单支付业务 立足“支付为民”理念，以服务实体经济为导向，持续优化支付服务供给，全力 满足社会公众多样化支付需求。持续优化支付结算服务体系，打造“华夏 e收银”收 单产品品牌，加快推进“数字收单”建设，完善线上支付业务风控规则，坚持为商户 和消费者提供安全、便捷的综合支付服务。深化便民惠民利民服务，加大北京市第三 代社保卡换发和“普惠健康保”推广力度，推进网点与政务服务平台深度融合，全力 支持北京医保移动支付结算，切实推动支付服务社会民生。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0010\n\n第三节 管理层讨论与分析 / 信用卡业务\n\n物理页46，字符714—1436：\n\n> 信用卡业务 坚定落实国家提振消费要求，锚定服务实体经济目标，以金融力量赋能消费升级， 精做增量客户开发，深耕存量客户经营，推动业务持续发展。 一是丰富产品矩阵，构筑多元用卡体验。面向高净值客户及优质企事业单位高层 管理人群推出美国运通巅峰信用卡和 Safari信用卡，提供星级酒店、贵宾出行、跨境 返现、全家同享等全方位高端服务，提升高品质消费意愿。联合故宫相关 IP“宫里的 世界”发行华夏 UP 卡（宫里的世界），激发文旅消费活力，以国潮文化推动“金融+ 文化”生态融合。服务刚性消费需求，发行华润通联名信用卡，通过消费赠礼、支付 满减等权益，打造零售场景“金融+生活”服务。 二是深耕民生场景，织密生态消费网络。结合客户标签和画像，配套差异化营销 策略与品牌活动，持续改善交易结构，加快多倍积分、积分抵现等场景拓展，提升积 分使用体验与价值感。坚持促消费、惠民生，打造多元化用卡环境，推进垂直场景生 态环境，开展电商购物、外卖、机酒出行等多平台优惠活动，提升消费让利政策覆盖 面。消费贷款升级数字化运营模式，持续打磨“菁英易达”等拳头产品，对接以旧换 新、政府补贴等项目，开展刷卡促销、免息分期活动。 三是优化核心功能，提升用户操作体验。华彩生活 APP 全新升级至 5.0版本，融 合金融、生活、消费为一体，通过智能算法实现个性化推荐，优化线上用卡服务全流 43\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0011\n\n第三节 管理层讨论与分析 / 信用卡业务\n\n物理页47，字符0—1701：\n\n> 程体验。积极响应国产化生态布局，正式推出鸿蒙系统专属版本，拓宽服务覆盖范围， 提升使用流畅性。截至报告期末，信用卡华彩生活 APP 注册用户 2,399.39万户，比上 年末增长 8.19%；其中月活跃用户（MAU）364.18 万户，同比下降 7.55%。 截至报告期末，本行信用卡累计发卡 4,332.23万张，比上年末增长 3.20%；信用 卡贷款余额 1,510.86亿元，比上年末下降 10.75%。报告期内，信用卡交易总额 7,103.26 亿元，同比下降 14.29%，实现信用卡业务收入 144.59亿元，同比下降 15.65%。 零售业务数字化转型 升级全域触客渠道矩阵，客户连接广度与深度显著增强。正式推出企业微信服务 网络，实现与手机银行、短信、AI 外呼、人工外呼线上核心渠道的全面打通与协同， 线上渠道全年服务客户突破千万，实现从单点接触到立体化、伴随式客户交互的转变。 夯实数据驱动与智能决策能力，经营智慧化水平稳步提升。加快推进零售数据中 台建设，实现数据资产的统一治理和高效迭代；企业级数字化客户经营平台全面升级， 初步建成覆盖客户全生命周期的数字化支撑体系；依托智谋（MA）平台，实现跨业务 场景、分客群特征的自动化经营策略配置与闭环执行；组建专注于策略模型与算法优 化的“策略大脑”团队，为数字化经营持续创新与迭代提供核心智力支撑，共同推动 客户经营从“经验驱动”向“数据与智能驱动”深刻转型。 系统性推进手机银行能力升级，线上“主阵地”服务效能全面提升。推进手机银 行全面运营，创新超级店铺运营模式，高效协同推动客户体验改善，打造线上“第二 银行”。上线覆盖全客层的 C+会员体系，通过“权益、活动、任务”一体化运营，实 现客户分级服务与精准触达。截至报告期末，本行手机银行签约客户 3,130.93万，比 上年末增长 8.03%，月活跃用户（MAU）626.14 万，同比增长 24.70%。 专栏 3：“金融+生态”融合发展，绘就民生服务新画卷 在数字经济与新型消费蓬勃发展的背景下，本行锚定电子竞技新蓝海，与拥有“亿 级流量、千万粉丝”的王者荣耀 KPL 职业联赛开展跨界合作，着力构建“金融+赛事 +消费”生态融合体系，推动金融服务向多元潮流场景延伸，生态价值持续释放。 权益活动共建，链接年轻客群。华夏 KPL 王者梦之队电竞联名借记卡和信用卡 自推出以来，以定制化卡面设计和全周期权益矩阵精准锁定年轻客群，基于梦之队选 手粉丝见面会等稀缺资源，共同打造“金融+电竞”爆款活动，成功吸引了热衷于文 化消费的 Z 世代用户。截至报告期末，双卡发行突破 70 万张。 多维场景融合，激发消费活力。线上构建电竞生态，同步推出手机银行“电竞专 区”，整合活动、资讯、社交、办卡等七大板块，形成“支付工具-消费场景-金融服 务”闭环生态。线下深化“文商旅体展+金融”布局，2025 年 11月作为唯一金融合作 伙伴亮相 KPL 鸟巢总决赛，发放餐饮、文旅等信用卡消费券，打造票根经济样板， 激发消费活力。该场比赛创造了“现场观众人数最多的单场电竞赛事”吉尼斯世界纪 录，带动首都“夜经济”“文旅经济”发展。 44\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0012\n\n第三节 管理层讨论与分析 / 信用卡业务\n\n物理页48，字符0—298：\n\n> 金融服务升级，拓宽服务边界。持续拓宽“线上+线下”服务边界，以 KPL 合作 为起点，不断强化金融服务对民生消费领域的支撑。发行电竞客群专属理财，满足年 轻客群理财需求；上线“大美华夏”餐饮娱乐满减活动，联合昌平文旅推出热门景点 购票等折扣；联动“焕新贷”“菁英贷”等消费信贷产品，加强新能源汽车、绿色出 行场景优惠力度。 从电竞破局到生态扩容，通过稀缺权益与金融服务深度融合，逐步构建“金融+ 文商旅体展”生态矩阵，积极探索“金融+”到“生态共生”的升维实践，不断为民 生服务注入新活力。 3.12.3\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0013\n\n第三节 管理层讨论与分析 / 资产托管业务 / 3.12.4 数字化经营\n\n物理页51，字符4—1343：\n\n> 3.12.4数字化经营 报告期内，本行积极推进数字化、智能化转型，持续深化业技融合，不断增强智 慧运营、科技支撑与数据应用能力，支持业务高质量发展。 数智化建设提速增效。圆满完成数字科技转型五年规划，数字化能力显著提升， 数字化产品服务更加普及，客户经营体系日趋完善。全面重构财私系统，实现理财、 基金等业务系统重建及公共服务统一管理。焕新升级手机银行 APP，创新试点“我的 家”特色场景，优化智能交互体验。打造绿色金融管理系统，实现绿色认定、环境风 险监控判定及客户 ESG 评价，赋能绿色信贷服务提质增效。升级财资云平台，落地“敞 口银承”线上化等功能，提升企业财资管理效能与风控能力。完善养老金融服务体系， 上线商业养老保险与个人养老理财代销功能，推出个人养老金按月自动缴存与自动领 取功能，多渠道优化客户服务体验。 智慧运营效能持续提升。深化网点数字化转型，迭代厅堂管家系统，拓展智慧屏 应用场景，以数据赋能驱动网点运营质效与生态圈融合双提升。升级运营管理数字驾 驶舱，构建数字指标全生命周期管控机制，推动运营管理向数字化、精细化转变。推 广企业预约开户信息识别和收集流程自动化，实现风险识别前置、关键节点自动通知 及智能填单处理，有效提升服务效率与客户体验。深化核算管理数字化，实现集团全 量会计科目全流程线上化管控，搭建账户、凭证及档案的多维度可视化管理视图，提 升数字化管控水平。推进账务监督及核对流程数字化建设，基于整合数据搭建线上监 督流程，引入 RPA 技术自动核验重点账户日终余额，推动账务风控智能化升级。 科技支撑能力稳步增强。报告期内，本集团信息科技投入 39.43亿元，占营业收 入 4.29%。建立 ITBP（IT 业务合作伙伴）机制，畅通业务技术衔接链路，保障业务需 求快速投产。全力攻坚新一代核心系统建设，系统主体开发基本完成，外围改造同步 推进，夯实稳健运营技术根基。打造“华夏在线”统一办公平台，整合多系统访问与 待办事项为统一入口，提升办公效率。上线“华夏之声”平台，建立接诉即办机制， 高效响应基层诉求。建成“一云双栈、一云多芯”企业级云平台，实现供应链稳定互 备，信息系统整体上云率超 97%。建成分行中间业务云平台同城双活架构集群，实现 全量公共服务双活部署，保障云平台关键服务连续性。落地新一代数据中心网络架构， 实现数据高速转发与流量智能调度，提升关键网络资源利用效能。 数据资产价值有效释放。体系化开展专项数据治理与安全管控，数据资产质量与 风险防御能力显著提升。升级重构数据智能服务生态，高效支撑全行经营决策与精细 化管理的可视化、敏捷化需求。数据分析建模体系深度赋能风险防控、客户经营等核 心业务领域，价值创造能力持续释放。强化外部数据资源的集约化运营与数据中台建 设，有效压降数据引入成本、提升应用效率，为高质量发展筑牢数据根基。 48\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0014\n\n第三节 管理层讨论与分析 / 资产托管业务 / 3.12.4 数字化经营\n\n物理页52，字符0—1281：\n\n> 专栏 7：数智化运营赋能高质量发展 深化机器人流程自动化（RPA）技术应用。持续挖掘高价值业务场景，以 RPA 技术替代重复性、流程化人工操作，实现内部运营效率提升、人力成本优化、业务处 理精准度提高的核心目标。截至报告期末，全行在线场景总数达 2,528 个，全年累计 节约等效人工工时 61.36万小时，节约人工成本 5,533.68万元。 深化智慧运营体系建设。持续拓展远程银行智能服务场景，加强智能导航、智能 问答、智能分析等智能运用，提升服务质效与客户体验。报告期内，累计节约等效人 工工时约 86.22万小时，降本增效效果显著。 完善企业级业务参数管理体系。扩展参数管理平台贯标参数种类及系统覆盖范 围，强化“一点配置、全网穿透”智能化服务能力，打造分行端业务参数“一站式” 服务模式，推进业务参数自动化运营，落地 16 个自动化配置场景，实现提质增效与 风险可控，为业务高质量发展夯实基础。 强化运营风险防控。推动跨系统数据整合，基于“业务+风险”视角深挖预警数 据价值，构建运营风险监测全景视图，实现运营风险数据分布可视化展现，有效识别 潜在风险，增强数字化风控能力。 专栏 8：AI与量子双擎驱动，加速金融科技融合创新 智能平台建设提速落地。推动算力基础设施建设，升级算力服务能力，夯实大模 型应用底层支撑。构建大模型智能体平台，作为AI应用开发核心载体，支撑大模型广 泛应用。打造语言用户界面，统一大模型应用入口，提升应用便捷性。牵头搭建量子 金融云平台，获评 2025“金科之声”十大成果。 AI与量子技术深度融合。构建龙智·康熙量子基础大模型，有效降低大模型训练 成本。开展量子BERT等模型研发，提升算法准确性、精简模型参数量。探索量子模 型创新应用，在智能客服运营、贷款催收合规识别场景试点应用，相关成果荣获长三 角金融科技创新大赛“金融机构最佳创新奖”。推进量子科技与人工智能融合创新， 为金融科技智能化发展筑牢核心技术支撑。 新技术场景应用成效显著。推动人工智能技术在精准营销、智能风控、合规运营、 辅助研发等领域落地，三项典型成果斩获北京市金融职工大模型技能大赛大满贯。各 场景智能化效能凸显，智能风控授信报告生成效率、智能营销顾问对话满意度、合规 运营违规话术识别准确率、辅助研发测试案例采纳率等均实现有效提升，技术赋能价 值充分释放。 筑牢大模型安全治理防线。推进大模型安全治理能力建设，强化应用统一规划与 全流程管理，健全智能体应用全生命周期管理规范。开展大模型输入输出内容安全防 控项目，全面提升大模型应用风险防范与安全管控能力。 49\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n",
+  "workpaper_status": "review_limited_pending_verification",
+  "workpaper_receipts": [
+    {
+      "purpose": "select_profile_sections",
+      "request_id": "bf781f310e49f8316f8e089d38b2f3348ef07d9174fb8b1bc0e1f6512602074d",
+      "contract_status": "accepted",
+      "finish_reason": "stop",
+      "raw_content": "{\"selected_section_ids\":[\"section-0104\",\"section-0110\",\"section-0111\",\"section-0112\",\"section-0113\",\"section-0114\",\"section-0115\",\"section-0121\"],\"rationale\":\"本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。\",\"deferred\":[\"section-0030 管理层讨论与分析整章：范围过大，仅取零售相关子节即可满足定向问题\",\"section-0116/0117 金融市场业务、section-0119 资产管理、section-0120 资产托管：非零售客户规模主题，暂不扩读\",\"section-0071 及贷款质量明细、section-0122 风险管理：属资产质量与风险范畴，与客户规模披露关联弱\",\"第七节财务报告及附注（如分部报告 section-0731/0739）：仅在正文零售客户数量存在实质缺口时再定向补充，本次不扩读\"],\"stop_reason\":\"已覆盖零售客户与经营规模的正文披露来源（业务回顾总览、零售各业务子节及数字化渠道），可回答客户数量、类别、期间与计量单位并区分正文与脚注；剩余为风险、财务附注等非本定向主题，继续扩读收益低，故在此停止。\"}",
+      "response_hash": "bb7041307fee412f88a19150e59759853867be81393a644c9986d681f75c7f01",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0104",
+          "section-0110",
+          "section-0111",
+          "section-0112",
+          "section-0113",
+          "section-0114",
+          "section-0115",
+          "section-0121"
+        ],
+        "rationale": "本次为定向补充阅读，目标是零售客户及相关经营规模（客户数、渠道、市场）的披露数量、类别、期间与计量单位。3.12 业务回顾（section-0104）为业务板块总览，其下零售金融业务（section-0110）及个人存款（section-0111）、财富管理与私人银行（section-0112）、个人贷款（section-0113）、收单支付（section-0114）、信用卡（section-0115）为零售客户规模、渠道与产品的主要正文来源，含客户数、卡量、AUM等指标及期间口径；数字化经营（section-0121）补充线上渠道与客户触达规模。这些子节均为完整可读正文，避免仅取标题存根，且不与其父节重复选择。",
+        "deferred": [
+          "section-0030 管理层讨论与分析整章：范围过大，仅取零售相关子节即可满足定向问题",
+          "section-0116/0117 金融市场业务、section-0119 资产管理、section-0120 资产托管：非零售客户规模主题，暂不扩读",
+          "section-0071 及贷款质量明细、section-0122 风险管理：属资产质量与风险范畴，与客户规模披露关联弱",
+          "第七节财务报告及附注（如分部报告 section-0731/0739）：仅在正文零售客户数量存在实质缺口时再定向补充，本次不扩读"
+        ],
+        "stop_reason": "已覆盖零售客户与经营规模的正文披露来源（业务回顾总览、零售各业务子节及数字化渠道），可回答客户数量、类别、期间与计量单位并区分正文与脚注；剩余为风险、财务附注等非本定向主题，继续扩读收益低，故在此停止。"
+      },
+      "model": "deepseek-flash",
+      "source_label": "deepseek:deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "usage": {
+        "input_tokens": 22835,
+        "output_tokens": 429,
+        "total_tokens": 23264
+      },
+      "receipt_origin": "retained_receipt"
+    },
+    {
+      "purpose": "extract_profile_workpaper",
+      "request_id": "f9426b96fe85f014cab8c6f0b399b591ed76afa8711db45a9ce881cf5d5a9cad",
+      "response_hash": "5787af354cc3f43848c41181697ba517bf86333d8df87d63b7c3171c52836165",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "finish_reason": "stop",
+      "contract_status": "rejected",
+      "usage": {
+        "input_tokens": 12259,
+        "output_tokens": 4447,
+        "total_tokens": 16706
+      },
+      "scope_kind": "selected_source_sections",
+      "section_ids": [
+        "section-0104",
+        "section-0110",
+        "section-0111",
+        "section-0112",
+        "section-0113",
+        "section-0114",
+        "section-0115",
+        "section-0121"
+      ],
+      "physical_pages": [
+        41,
+        42,
+        44,
+        45,
+        46,
+        47,
+        48,
+        51,
+        52
+      ],
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"not_read_for_this_task\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，未针对业务结构进行阅读，不生成相关内容。\"]},\"products_services\":{\"status\":\"not_read_for_this_task\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，未针对产品与服务进行阅读，不生成相关内容。\"]},\"revenue_model\":{\"status\":\"not_read_for_this_task\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，未针对收入模式进行阅读，不生成相关内容。\"]},\"scale_and_mix\":{\"status\":\"not_read_for_this_task\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，未针对规模与结构进行阅读，不生成相关内容。\"]},\"operations_and_inputs\":{\"status\":\"not_read_for_this_task\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，未针对经营与投入进行阅读，不生成相关内容。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RETAIL-CUST-TOTAL\",\"text\":\"截至报告期末，本行零售客户总数[注4]4,012.44万户；脚注4说明零售客户总数包含借记卡和信用卡客户数量，并去重。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"metrics\":[{\"name\":\"零售客户总数[注4]\",\"raw_value\":\"4,012.44\",\"value\":\"4012.44\",\"unit\":\"万户\",\"source_unit\":\"万户\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":null,\"uncertainty_reason\":null}]},{\"fact_id\":\"F-RETAIL-PRIVATE-CUST\",\"text\":\"截至报告期末，本行私人银行客户[注5]2.02万户，比上年末增长21.71%；脚注5说明私人银行客户指上月AUM月日均大于等于600万元人民币或等值外币资产的客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"metrics\":[{\"name\":\"私人银行客户[注5]\",\"raw_value\":\"2.02\",\"value\":\"2.02\",\"unit\":\"万户\",\"source_unit\":\"万户\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"私人银行客户[注5]比上年末增长率\",\"raw_value\":\"21.71\",\"value\":\"21.71\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null}]},{\"fact_id\":\"F-RETAIL-CONSUMER-CREDIT-CUST\",\"text\":\"截至报告期末，本行消费信贷客户[注6]56.11万户，比上年末下降0.71%；脚注6说明消费信贷客户统计口径为非平台类消费信贷客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"metrics\":[{\"name\":\"消费信贷客户[注6]\",\"raw_value\":\"56.11\",\"value\":\"56.11\",\"unit\":\"万户\",\"source_unit\":\"万户\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"消费信贷客户[注6]比上年末变动率\",\"raw_value\":\"-0.71\",\"value\":\"-0.71\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null}]},{\"fact_id\":\"F-RETAIL-ACQUIRING-CUST\",\"text\":\"截至报告期末，本行收单支付客户74.86万户，比上年末增长6.80%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"收单支付客户\",\"raw_value\":\"74.86\",\"value\":\"74.86\",\"unit\":\"万户\",\"source_unit\":\"万户\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"收单支付客户比上年末增长率\",\"raw_value\":\"6.80\",\"value\":\"6.80\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null}]},{\"fact_id\":\"F-CREDIT-CARD-ISSUED\",\"text\":\"截至报告期末，本行信用卡累计发卡4,332.23万张，比上年末增长3.20%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"信用卡累计发卡\",\"raw_value\":\"4,332.23\",\"value\":\"4332.23\",\"unit\":\"万张\",\"source_unit\":\"万张\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"信用卡累计发卡比上年末增长率\",\"raw_value\":\"3.20\",\"value\":\"3.20\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null}]},{\"fact_id\":\"F-CREDIT-CARD-APP-USERS\",\"text\":\"截至报告期末，信用卡华彩生活APP注册用户2,399.39万户，比上年末增长8.19%；其中月活跃用户（MAU）364.18万户，同比下降7.55%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"信用卡华彩生活APP注册用户\",\"raw_value\":\"2,399.39\",\"value\":\"2399.39\",\"unit\":\"万户\",\"source_unit\":\"万户\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"信用卡华彩生活APP注册用户比上年末增长率\",\"raw_value\":\"8.19\",\"value\":\"8.19\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"信用卡华彩生活APP月活跃用户（MAU）\",\"raw_value\":\"364.18\",\"value\":\"364.18\",\"unit\":\"万户\",\"source_unit\":\"万户\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\",\"uncertainty_reason\":null},{\"name\":\"信用卡华彩生活APP月活跃用户（MAU）同比变动率\",\"raw_value\":\"-7.55\",\"value\":\"-7.55\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\",\"uncertainty_reason\":null}]},{\"fact_id\":\"F-MOBILE-BANK-USERS\",\"text\":\"截至报告期末，本行手机银行签约客户3,130.93万，比上年末增长8.03%，月活跃用户（MAU）626.14万，同比增长24.70%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"手机银行签约客户\",\"raw_value\":\"3,130.93\",\"value\":\"3130.93\",\"unit\":\"万\",\"source_unit\":\"万\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"手机银行签约客户比上年末增长率\",\"raw_value\":\"8.03\",\"value\":\"8.03\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"手机银行月活跃用户（MAU）\",\"raw_value\":\"626.14\",\"value\":\"626.14\",\"unit\":\"万\",\"source_unit\":\"万\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\",\"uncertainty_reason\":null},{\"name\":\"手机银行月活跃用户（MAU）同比增长率\",\"raw_value\":\"24.70\",\"value\":\"24.70\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\",\"uncertainty_reason\":null}]},{\"fact_id\":\"F-KPL-COBRAND-CARDS\",\"text\":\"截至报告期末，华夏KPL王者梦之队电竞联名借记卡和信用卡双卡发行突破70万张。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"华夏KPL王者梦之队电竞联名借记卡和信用卡双卡发行量\",\"raw_value\":\"70\",\"value\":\"70\",\"unit\":\"万张\",\"source_unit\":\"万张\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"greater_than\",\"comparison_basis\":null,\"uncertainty_reason\":null}]},{\"fact_id\":\"F-ONLINE-CHANNEL-SERVICE\",\"text\":\"报告期内，本行线上渠道全年服务客户突破千万。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"线上渠道全年服务客户数\",\"raw_value\":\"千万\",\"value\":null,\"unit\":null,\"source_unit\":null,\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"greater_than\",\"comparison_basis\":null,\"uncertainty_reason\":\"原文仅表述“突破千万”，未给出精确数值与计量单位，无法安全归一化。\"}]},{\"fact_id\":\"F-RETAIL-AUM\",\"text\":\"截至报告期末，本行个人客户金融资产总量达11,148.08亿元，比上年末增长11.28%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"个人客户金融资产总量\",\"raw_value\":\"11,148.08\",\"value\":\"11148.08\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"个人客户金融资产总量比上年末增长率\",\"raw_value\":\"11.28\",\"value\":\"11.28\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null}]},{\"fact_id\":\"F-PERSONAL-DEPOSIT-BALANCE\",\"text\":\"截至报告期末，本行个人存款余额5,997.81亿元，比上年末增长9.01%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"个人存款余额\",\"raw_value\":\"5,997.81\",\"value\":\"5997.81\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"个人存款余额比上年末增长率\",\"raw_value\":\"9.01\",\"value\":\"9.01\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null}]},{\"fact_id\":\"F-PERSONAL-LOAN-BALANCE\",\"text\":\"截至报告期末，本行个人贷款（不含信用卡）余额5,330.20亿元，比上年末下降1.96%；其中个人消费贷款余额1,116.64亿元，比上年末增长0.40%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"个人贷款（不含信用卡）余额\",\"raw_value\":\"5,330.20\",\"value\":\"5330.20\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"个人贷款（不含信用卡）余额比上年末变动率\",\"raw_value\":\"-1.96\",\"value\":\"-1.96\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"个人消费贷款余额\",\"raw_value\":\"1,116.64\",\"value\":\"1116.64\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"个人消费贷款余额比上年末增长率\",\"raw_value\":\"0.40\",\"value\":\"0.40\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null}]},{\"fact_id\":\"F-CREDIT-CARD-LOAN-AND-TXN\",\"text\":\"截至报告期末，本行信用卡贷款余额1,510.86亿元，比上年末下降10.75%；报告期内信用卡交易总额7,103.26亿元，同比下降14.29%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"信用卡贷款余额\",\"raw_value\":\"1,510.86\",\"value\":\"1510.86\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"信用卡贷款余额比上年末变动率\",\"raw_value\":\"-10.75\",\"value\":\"-10.75\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"信用卡交易总额\",\"raw_value\":\"7,103.26\",\"value\":\"7103.26\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\",\"uncertainty_reason\":null},{\"name\":\"信用卡交易总额同比变动率\",\"raw_value\":\"-14.29\",\"value\":\"-14.29\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\",\"uncertainty_reason\":null}]},{\"fact_id\":\"F-WEALTH-FEE-INCOME\",\"text\":\"报告期内，本行实现财富管理手续费及佣金收入11.17亿元，同比增长16.48%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"财富管理手续费及佣金收入\",\"raw_value\":\"11.17\",\"value\":\"11.17\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\",\"uncertainty_reason\":null},{\"name\":\"财富管理手续费及佣金收入同比增长率\",\"raw_value\":\"16.48\",\"value\":\"16.48\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\",\"uncertainty_reason\":null}]},{\"fact_id\":\"F-CREDIT-CARD-REVENUE\",\"text\":\"报告期内，本行实现信用卡业务收入144.59亿元，同比下降15.65%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"信用卡业务收入\",\"raw_value\":\"144.59\",\"value\":\"144.59\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\",\"uncertainty_reason\":null},{\"name\":\"信用卡业务收入同比变动率\",\"raw_value\":\"-15.65\",\"value\":\"-15.65\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\",\"uncertainty_reason\":null}]}],\"limitations\":[\"本次仅阅读零售相关章节，未覆盖对公客户、同业客户等其他客户类别的完整披露。\",\"零售客户总数、私人银行客户、消费信贷客户均带脚注标记，其口径以脚注4、5、6为准；正文未披露零售客户总数的同比变动率。\",\"线上渠道全年服务客户仅表述为“突破千万”，未给出精确数值与计量单位，已按不确定处理。\",\"收单支付业务章节未披露收单商户数、交易金额等经营规模指标，仅披露收单支付客户数。\",\"未获取零售客户按地区、渠道或产品细分的完整数量分布。\"]},\"operating_drivers\":{\"status\":\"not_read_for_this_task\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，未针对经营驱动因素进行阅读，不生成相关内容。\"]},\"material_changes\":{\"status\":\"not_read_for_this_task\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，未针对重大变化进行阅读，不生成相关内容。\"]}},\"supply_chain\":null,\"company_features\":null,\"limitations\":[\"本次为定向补充阅读，仅回答零售客户及相关经营规模的披露数量、类别、期间与计量单位问题，未对报告其他部分进行系统阅读，不构成对报告完整性的判断。\",\"非目标要素未阅读，不生成事实，相关状态为 not_read_for_this_task。\"]}",
+      "receipt_origin": "retained_receipt",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "not_read_for_this_task",
+            "facts": [],
+            "limitations": [
+              "本次为定向补充阅读，未针对业务结构进行阅读，不生成相关内容。"
+            ]
+          },
+          "products_services": {
+            "status": "not_read_for_this_task",
+            "facts": [],
+            "limitations": [
+              "本次为定向补充阅读，未针对产品与服务进行阅读，不生成相关内容。"
+            ]
+          },
+          "revenue_model": {
+            "status": "not_read_for_this_task",
+            "facts": [],
+            "limitations": [
+              "本次为定向补充阅读，未针对收入模式进行阅读，不生成相关内容。"
+            ]
+          },
+          "scale_and_mix": {
+            "status": "not_read_for_this_task",
+            "facts": [],
+            "limitations": [
+              "本次为定向补充阅读，未针对规模与结构进行阅读，不生成相关内容。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "not_read_for_this_task",
+            "facts": [],
+            "limitations": [
+              "本次为定向补充阅读，未针对经营与投入进行阅读，不生成相关内容。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-RETAIL-CUST-TOTAL",
+                "text": "截至报告期末，本行零售客户总数[注4]4,012.44万户；脚注4说明零售客户总数包含借记卡和信用卡客户数量，并去重。",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0003",
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "零售客户总数[注4]",
+                    "raw_value": "4,012.44",
+                    "value": "4012.44",
+                    "unit": "万户",
+                    "source_unit": "万户",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": null,
+                    "uncertainty_reason": null
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-RETAIL-PRIVATE-CUST",
+                "text": "截至报告期末，本行私人银行客户[注5]2.02万户，比上年末增长21.71%；脚注5说明私人银行客户指上月AUM月日均大于等于600万元人民币或等值外币资产的客户。",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0003",
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "私人银行客户[注5]",
+                    "raw_value": "2.02",
+                    "value": "2.02",
+                    "unit": "万户",
+                    "source_unit": "万户",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "私人银行客户[注5]比上年末增长率",
+                    "raw_value": "21.71",
+                    "value": "21.71",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-RETAIL-CONSUMER-CREDIT-CUST",
+                "text": "截至报告期末，本行消费信贷客户[注6]56.11万户，比上年末下降0.71%；脚注6说明消费信贷客户统计口径为非平台类消费信贷客户。",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0003",
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "消费信贷客户[注6]",
+                    "raw_value": "56.11",
+                    "value": "56.11",
+                    "unit": "万户",
+                    "source_unit": "万户",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "消费信贷客户[注6]比上年末变动率",
+                    "raw_value": "-0.71",
+                    "value": "-0.71",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-RETAIL-ACQUIRING-CUST",
+                "text": "截至报告期末，本行收单支付客户74.86万户，比上年末增长6.80%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": [
+                  {
+                    "name": "收单支付客户",
+                    "raw_value": "74.86",
+                    "value": "74.86",
+                    "unit": "万户",
+                    "source_unit": "万户",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "收单支付客户比上年末增长率",
+                    "raw_value": "6.80",
+                    "value": "6.80",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-CREDIT-CARD-ISSUED",
+                "text": "截至报告期末，本行信用卡累计发卡4,332.23万张，比上年末增长3.20%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "信用卡累计发卡",
+                    "raw_value": "4,332.23",
+                    "value": "4332.23",
+                    "unit": "万张",
+                    "source_unit": "万张",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "信用卡累计发卡比上年末增长率",
+                    "raw_value": "3.20",
+                    "value": "3.20",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-CREDIT-CARD-APP-USERS",
+                "text": "截至报告期末，信用卡华彩生活APP注册用户2,399.39万户，比上年末增长8.19%；其中月活跃用户（MAU）364.18万户，同比下降7.55%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "信用卡华彩生活APP注册用户",
+                    "raw_value": "2,399.39",
+                    "value": "2399.39",
+                    "unit": "万户",
+                    "source_unit": "万户",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "信用卡华彩生活APP注册用户比上年末增长率",
+                    "raw_value": "8.19",
+                    "value": "8.19",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "信用卡华彩生活APP月活跃用户（MAU）",
+                    "raw_value": "364.18",
+                    "value": "364.18",
+                    "unit": "万户",
+                    "source_unit": "万户",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "信用卡华彩生活APP月活跃用户（MAU）同比变动率",
+                    "raw_value": "-7.55",
+                    "value": "-7.55",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比",
+                    "uncertainty_reason": null
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-MOBILE-BANK-USERS",
+                "text": "截至报告期末，本行手机银行签约客户3,130.93万，比上年末增长8.03%，月活跃用户（MAU）626.14万，同比增长24.70%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "手机银行签约客户",
+                    "raw_value": "3,130.93",
+                    "value": "3130.93",
+                    "unit": "万",
+                    "source_unit": "万",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "手机银行签约客户比上年末增长率",
+                    "raw_value": "8.03",
+                    "value": "8.03",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "手机银行月活跃用户（MAU）",
+                    "raw_value": "626.14",
+                    "value": "626.14",
+                    "unit": "万",
+                    "source_unit": "万",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "手机银行月活跃用户（MAU）同比增长率",
+                    "raw_value": "24.70",
+                    "value": "24.70",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比",
+                    "uncertainty_reason": null
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-KPL-COBRAND-CARDS",
+                "text": "截至报告期末，华夏KPL王者梦之队电竞联名借记卡和信用卡双卡发行突破70万张。",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "华夏KPL王者梦之队电竞联名借记卡和信用卡双卡发行量",
+                    "raw_value": "70",
+                    "value": "70",
+                    "unit": "万张",
+                    "source_unit": "万张",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "greater_than",
+                    "comparison_basis": null,
+                    "uncertainty_reason": null
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-ONLINE-CHANNEL-SERVICE",
+                "text": "报告期内，本行线上渠道全年服务客户突破千万。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "线上渠道全年服务客户数",
+                    "raw_value": "千万",
+                    "value": null,
+                    "unit": null,
+                    "source_unit": null,
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "greater_than",
+                    "comparison_basis": null,
+                    "uncertainty_reason": "原文仅表述“突破千万”，未给出精确数值与计量单位，无法安全归一化。"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-RETAIL-AUM",
+                "text": "截至报告期末，本行个人客户金融资产总量达11,148.08亿元，比上年末增长11.28%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "个人客户金融资产总量",
+                    "raw_value": "11,148.08",
+                    "value": "11148.08",
+                    "unit": "亿元",
+                    "source_unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "个人客户金融资产总量比上年末增长率",
+                    "raw_value": "11.28",
+                    "value": "11.28",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-PERSONAL-DEPOSIT-BALANCE",
+                "text": "截至报告期末，本行个人存款余额5,997.81亿元，比上年末增长9.01%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": [
+                  {
+                    "name": "个人存款余额",
+                    "raw_value": "5,997.81",
+                    "value": "5997.81",
+                    "unit": "亿元",
+                    "source_unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "个人存款余额比上年末增长率",
+                    "raw_value": "9.01",
+                    "value": "9.01",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-PERSONAL-LOAN-BALANCE",
+                "text": "截至报告期末，本行个人贷款（不含信用卡）余额5,330.20亿元，比上年末下降1.96%；其中个人消费贷款余额1,116.64亿元，比上年末增长0.40%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "个人贷款（不含信用卡）余额",
+                    "raw_value": "5,330.20",
+                    "value": "5330.20",
+                    "unit": "亿元",
+                    "source_unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "个人贷款（不含信用卡）余额比上年末变动率",
+                    "raw_value": "-1.96",
+                    "value": "-1.96",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "个人消费贷款余额",
+                    "raw_value": "1,116.64",
+                    "value": "1116.64",
+                    "unit": "亿元",
+                    "source_unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "个人消费贷款余额比上年末增长率",
+                    "raw_value": "0.40",
+                    "value": "0.40",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-CREDIT-CARD-LOAN-AND-TXN",
+                "text": "截至报告期末，本行信用卡贷款余额1,510.86亿元，比上年末下降10.75%；报告期内信用卡交易总额7,103.26亿元，同比下降14.29%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "信用卡贷款余额",
+                    "raw_value": "1,510.86",
+                    "value": "1510.86",
+                    "unit": "亿元",
+                    "source_unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "信用卡贷款余额比上年末变动率",
+                    "raw_value": "-10.75",
+                    "value": "-10.75",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025-12-31",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "比上年末",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "信用卡交易总额",
+                    "raw_value": "7,103.26",
+                    "value": "7103.26",
+                    "unit": "亿元",
+                    "source_unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "信用卡交易总额同比变动率",
+                    "raw_value": "-14.29",
+                    "value": "-14.29",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比",
+                    "uncertainty_reason": null
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-WEALTH-FEE-INCOME",
+                "text": "报告期内，本行实现财富管理手续费及佣金收入11.17亿元，同比增长16.48%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "财富管理手续费及佣金收入",
+                    "raw_value": "11.17",
+                    "value": "11.17",
+                    "unit": "亿元",
+                    "source_unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "财富管理手续费及佣金收入同比增长率",
+                    "raw_value": "16.48",
+                    "value": "16.48",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比",
+                    "uncertainty_reason": null
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-CREDIT-CARD-REVENUE",
+                "text": "报告期内，本行实现信用卡业务收入144.59亿元，同比下降15.65%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "信用卡业务收入",
+                    "raw_value": "144.59",
+                    "value": "144.59",
+                    "unit": "亿元",
+                    "source_unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比",
+                    "uncertainty_reason": null
+                  },
+                  {
+                    "name": "信用卡业务收入同比变动率",
+                    "raw_value": "-15.65",
+                    "value": "-15.65",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比",
+                    "uncertainty_reason": null
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "本次仅阅读零售相关章节，未覆盖对公客户、同业客户等其他客户类别的完整披露。",
+              "零售客户总数、私人银行客户、消费信贷客户均带脚注标记，其口径以脚注4、5、6为准；正文未披露零售客户总数的同比变动率。",
+              "线上渠道全年服务客户仅表述为“突破千万”，未给出精确数值与计量单位，已按不确定处理。",
+              "收单支付业务章节未披露收单商户数、交易金额等经营规模指标，仅披露收单支付客户数。",
+              "未获取零售客户按地区、渠道或产品细分的完整数量分布。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "not_read_for_this_task",
+            "facts": [],
+            "limitations": [
+              "本次为定向补充阅读，未针对经营驱动因素进行阅读，不生成相关内容。"
+            ]
+          },
+          "material_changes": {
+            "status": "not_read_for_this_task",
+            "facts": [],
+            "limitations": [
+              "本次为定向补充阅读，未针对重大变化进行阅读，不生成相关内容。"
+            ]
+          }
+        },
+        "supply_chain": null,
+        "company_features": null,
+        "limitations": [
+          "本次为定向补充阅读，仅回答零售客户及相关经营规模的披露数量、类别、期间与计量单位问题，未对报告其他部分进行系统阅读，不构成对报告完整性的判断。",
+          "非目标要素未阅读，不生成事实，相关状态为 not_read_for_this_task。"
+        ]
+      }
+    },
+    {
+      "request_id": "bp-work-e686d859a2cafd7acc9ab1e4:workpaper:review",
+      "purpose": "review_profile_workpaper",
+      "request_hash": "bcb86bca4ea42247e959d81831d7b1faec0b52b93c439917d3a20c5b9ff34be5",
+      "response_hash": "c1a3773042e6767c2e589bdf7c7d7826adf87aa337bdfdae7031bf6f5980d876",
+      "finish_reason": "stop",
+      "source_label": "scorpio:grok-4.7",
+      "model": "grok-4.7",
+      "selected_profile": "semantic_extraction__scorpio_grok",
+      "logical_profile": "semantic_extraction__scorpio_grok",
+      "reasoning_effort": "high",
+      "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+      "contract_status": "accepted",
+      "raw_content": "{\"findings\":[{\"finding_id\":\"OM-CONSUMER-CREDIT-CUST\",\"element\":\"customers_channels_markets\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"explanation\":\"定向问题要求补齐零售客户类别、数量、期间、计量单位并区分脚注。原文与私人银行客户、收单支付客户同一句披露：截至报告期末，消费信贷客户[注6]56.11万户，比上年末下降0.71%；脚注6载明口径为非平台类消费信贷客户。已采用事实未包含该类别及脚注。隔离说明称变动率未见于引文，与原文不符，不能据此省略。应补记报告期末户数、下降幅度及脚注口径，下降不得记为未披露或零。\"},{\"finding_id\":\"OM-PERSONAL-LOAN-SCALE\",\"element\":\"customers_channels_markets\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0008\"],\"explanation\":\"定向问题包含零售相关经营规模。原文披露截至报告期末本行个人贷款（不含信用卡）余额5,330.20亿元，比上年末下降1.96%，其中个人消费贷款余额1,116.64亿元，比上年末增长0.40%。已采用事实有个人存款与金融资产，但缺少上述贷款规模。隔离说明与source-0008不符。总额与其中项应一并按期末余额、亿元及各自增减方向补记，不得把下降写成缺失。\"},{\"finding_id\":\"OM-CC-LOAN-BALANCE\",\"element\":\"customers_channels_markets\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0011\"],\"explanation\":\"定向问题要求补充零售相关经营规模。原文披露截至报告期末本行信用卡贷款余额1,510.86亿元，比上年末下降10.75%。已采用事实仅有累计发卡与业务收入，未含该期末贷款存量。隔离说明称变动率未见于引文，与原文不符。应单独按报告期末、亿元及下降方向补记，不得与报告期内交易额或收入混为同一比较基础。\"},{\"finding_id\":\"OM-CC-TXN-VOLUME\",\"element\":\"customers_channels_markets\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0011\"],\"explanation\":\"原文另披露报告期内信用卡交易总额7,103.26亿元，同比下降14.29%。该数为报告期内流量，比较基础为同比，与期末信用卡贷款余额的存量口径不同，已采用事实未包含。应单独补记期间、亿元及下降方向，不得因同属信用卡业务而并入贷款余额或把下降记为未披露。\"}],\"reviewed_fact_ids\":[\"F-RETAIL-CUST-TOTAL\",\"F-RETAIL-PRIVATE-CUST\",\"F-RETAIL-ACQUIRING-CUST\",\"F-CREDIT-CARD-ISSUED\",\"F-CREDIT-CARD-APP-USERS\",\"F-MOBILE-BANK-USERS\",\"F-RETAIL-AUM\",\"F-PERSONAL-DEPOSIT-BALANCE\",\"F-WEALTH-FEE-INCOME\",\"F-CREDIT-CARD-REVENUE\"]}",
+      "response_payload": {
+        "findings": [
+          {
+            "finding_id": "OM-CONSUMER-CREDIT-CUST",
+            "element": "customers_channels_markets",
+            "severity": "material",
+            "issue_type": "material_omission",
+            "action": "possible_omission",
+            "affected_fact_id": null,
+            "evidence_ids": [
+              "source-0003",
+              "source-0004"
+            ],
+            "explanation": "定向问题要求补齐零售客户类别、数量、期间、计量单位并区分脚注。原文与私人银行客户、收单支付客户同一句披露：截至报告期末，消费信贷客户[注6]56.11万户，比上年末下降0.71%；脚注6载明口径为非平台类消费信贷客户。已采用事实未包含该类别及脚注。隔离说明称变动率未见于引文，与原文不符，不能据此省略。应补记报告期末户数、下降幅度及脚注口径，下降不得记为未披露或零。"
+          },
+          {
+            "finding_id": "OM-PERSONAL-LOAN-SCALE",
+            "element": "customers_channels_markets",
+            "severity": "material",
+            "issue_type": "material_omission",
+            "action": "possible_omission",
+            "affected_fact_id": null,
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "explanation": "定向问题包含零售相关经营规模。原文披露截至报告期末本行个人贷款（不含信用卡）余额5,330.20亿元，比上年末下降1.96%，其中个人消费贷款余额1,116.64亿元，比上年末增长0.40%。已采用事实有个人存款与金融资产，但缺少上述贷款规模。隔离说明与source-0008不符。总额与其中项应一并按期末余额、亿元及各自增减方向补记，不得把下降写成缺失。"
+          },
+          {
+            "finding_id": "OM-CC-LOAN-BALANCE",
+            "element": "customers_channels_markets",
+            "severity": "material",
+            "issue_type": "material_omission",
+            "action": "possible_omission",
+            "affected_fact_id": null,
+            "evidence_ids": [
+              "source-0011"
+            ],
+            "explanation": "定向问题要求补充零售相关经营规模。原文披露截至报告期末本行信用卡贷款余额1,510.86亿元，比上年末下降10.75%。已采用事实仅有累计发卡与业务收入，未含该期末贷款存量。隔离说明称变动率未见于引文，与原文不符。应单独按报告期末、亿元及下降方向补记，不得与报告期内交易额或收入混为同一比较基础。"
+          },
+          {
+            "finding_id": "OM-CC-TXN-VOLUME",
+            "element": "customers_channels_markets",
+            "severity": "material",
+            "issue_type": "material_omission",
+            "action": "possible_omission",
+            "affected_fact_id": null,
+            "evidence_ids": [
+              "source-0011"
+            ],
+            "explanation": "原文另披露报告期内信用卡交易总额7,103.26亿元，同比下降14.29%。该数为报告期内流量，比较基础为同比，与期末信用卡贷款余额的存量口径不同，已采用事实未包含。应单独补记期间、亿元及下降方向，不得因同属信用卡业务而并入贷款余额或把下降记为未披露。"
+          }
+        ],
+        "reviewed_fact_ids": [
+          "F-RETAIL-CUST-TOTAL",
+          "F-RETAIL-PRIVATE-CUST",
+          "F-RETAIL-ACQUIRING-CUST",
+          "F-CREDIT-CARD-ISSUED",
+          "F-CREDIT-CARD-APP-USERS",
+          "F-MOBILE-BANK-USERS",
+          "F-RETAIL-AUM",
+          "F-PERSONAL-DEPOSIT-BALANCE",
+          "F-WEALTH-FEE-INCOME",
+          "F-CREDIT-CARD-REVENUE"
+        ]
+      },
+      "usage": {
+        "input_tokens": 14821,
+        "output_tokens": 797,
+        "total_tokens": 33658
+      }
+    },
+    {
+      "request_id": "bp-work-e686d859a2cafd7acc9ab1e4:workpaper:repair",
+      "purpose": "repair_profile_workpaper",
+      "request_hash": "2d55b5bcbed602bc114d1daaca7cd49c705f025680fbdab4fda20b502fff786a",
+      "response_hash": "2761eafc91756051efa73bbe59be2d2c9d0a2859afbc0aa93322d72b4470431a",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+      "contract_status": "accepted",
+      "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:OM-CONSUMER-CREDIT-CUST\",\"text\":\"截至报告期末，本行消费信贷客户[注6]56.11万户，比上年末下降0.71%；注6：消费信贷客户统计口径为非平台类消费信贷客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"metrics\":[{\"name\":\"消费信贷客户数\",\"raw_value\":\"56.11万户\",\"value\":\"56.11\",\"unit\":\"万户\",\"source_unit\":\"万户\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"消费信贷客户数变动率\",\"raw_value\":\"下降0.71%\",\"value\":\"-0.71\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null}]},{\"fact_id\":\"review-add:OM-PERSONAL-LOAN-SCALE\",\"text\":\"截至报告期末，本行个人贷款（不含信用卡）余额5,330.20亿元，比上年末下降1.96%，其中，个人消费贷款余额1,116.64亿元，比上年末增长0.40%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"个人贷款（不含信用卡）余额\",\"raw_value\":\"5,330.20亿元\",\"value\":\"5330.20\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"个人贷款（不含信用卡）余额变动率\",\"raw_value\":\"下降1.96%\",\"value\":\"-1.96\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"个人消费贷款余额\",\"raw_value\":\"1,116.64亿元\",\"value\":\"1116.64\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"个人消费贷款余额变动率\",\"raw_value\":\"增长0.40%\",\"value\":\"0.40\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null}]},{\"fact_id\":\"review-add:OM-CC-LOAN-BALANCE\",\"text\":\"截至报告期末，本行信用卡贷款余额1,510.86亿元，比上年末下降10.75%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"信用卡贷款余额\",\"raw_value\":\"1,510.86亿元\",\"value\":\"1510.86\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null},{\"name\":\"信用卡贷款余额变动率\",\"raw_value\":\"下降10.75%\",\"value\":\"-10.75\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"比上年末\",\"uncertainty_reason\":null}]},{\"fact_id\":\"review-add:OM-CC-TXN-VOLUME\",\"text\":\"报告期内，信用卡交易总额7,103.26亿元，同比下降14.29%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"信用卡交易总额\",\"raw_value\":\"7,103.26亿元\",\"value\":\"7103.26\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比下降\",\"uncertainty_reason\":null},{\"name\":\"信用卡交易总额变动率\",\"raw_value\":\"同比下降14.29%\",\"value\":\"-14.29\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025-12-31\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比下降\",\"uncertainty_reason\":null}]}]}",
+      "response_payload": {
+        "repaired_facts": [
+          {
+            "fact_id": "review-add:OM-CONSUMER-CREDIT-CUST",
+            "text": "截至报告期末，本行消费信贷客户[注6]56.11万户，比上年末下降0.71%；注6：消费信贷客户统计口径为非平台类消费信贷客户。",
+            "subject_scope": "consolidated_group",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0003",
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "消费信贷客户数",
+                "raw_value": "56.11万户",
+                "value": "56.11",
+                "unit": "万户",
+                "source_unit": "万户",
+                "currency": null,
+                "period": "2025-12-31",
+                "subject_scope": "consolidated_group",
+                "qualifier": "exact",
+                "comparison_basis": "比上年末",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "消费信贷客户数变动率",
+                "raw_value": "下降0.71%",
+                "value": "-0.71",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "period": "2025-12-31",
+                "subject_scope": "consolidated_group",
+                "qualifier": "exact",
+                "comparison_basis": "比上年末",
+                "uncertainty_reason": null
+              }
+            ]
+          },
+          {
+            "fact_id": "review-add:OM-PERSONAL-LOAN-SCALE",
+            "text": "截至报告期末，本行个人贷款（不含信用卡）余额5,330.20亿元，比上年末下降1.96%，其中，个人消费贷款余额1,116.64亿元，比上年末增长0.40%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "个人贷款（不含信用卡）余额",
+                "raw_value": "5,330.20亿元",
+                "value": "5330.20",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "period": "2025-12-31",
+                "subject_scope": "consolidated_group",
+                "qualifier": "exact",
+                "comparison_basis": "比上年末",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "个人贷款（不含信用卡）余额变动率",
+                "raw_value": "下降1.96%",
+                "value": "-1.96",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "period": "2025-12-31",
+                "subject_scope": "consolidated_group",
+                "qualifier": "exact",
+                "comparison_basis": "比上年末",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "个人消费贷款余额",
+                "raw_value": "1,116.64亿元",
+                "value": "1116.64",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "period": "2025-12-31",
+                "subject_scope": "consolidated_group",
+                "qualifier": "exact",
+                "comparison_basis": "比上年末",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "个人消费贷款余额变动率",
+                "raw_value": "增长0.40%",
+                "value": "0.40",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "period": "2025-12-31",
+                "subject_scope": "consolidated_group",
+                "qualifier": "exact",
+                "comparison_basis": "比上年末",
+                "uncertainty_reason": null
+              }
+            ]
+          },
+          {
+            "fact_id": "review-add:OM-CC-LOAN-BALANCE",
+            "text": "截至报告期末，本行信用卡贷款余额1,510.86亿元，比上年末下降10.75%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0011"
+            ],
+            "metrics": [
+              {
+                "name": "信用卡贷款余额",
+                "raw_value": "1,510.86亿元",
+                "value": "1510.86",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "period": "2025-12-31",
+                "subject_scope": "consolidated_group",
+                "qualifier": "exact",
+                "comparison_basis": "比上年末",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "信用卡贷款余额变动率",
+                "raw_value": "下降10.75%",
+                "value": "-10.75",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "period": "2025-12-31",
+                "subject_scope": "consolidated_group",
+                "qualifier": "exact",
+                "comparison_basis": "比上年末",
+                "uncertainty_reason": null
+              }
+            ]
+          },
+          {
+            "fact_id": "review-add:OM-CC-TXN-VOLUME",
+            "text": "报告期内，信用卡交易总额7,103.26亿元，同比下降14.29%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0011"
+            ],
+            "metrics": [
+              {
+                "name": "信用卡交易总额",
+                "raw_value": "7,103.26亿元",
+                "value": "7103.26",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "period": "2025-12-31",
+                "subject_scope": "consolidated_group",
+                "qualifier": "exact",
+                "comparison_basis": "同比下降",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "信用卡交易总额变动率",
+                "raw_value": "同比下降14.29%",
+                "value": "-14.29",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "period": "2025-12-31",
+                "subject_scope": "consolidated_group",
+                "qualifier": "exact",
+                "comparison_basis": "同比下降",
+                "uncertainty_reason": null
+              }
+            ]
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 8859,
+        "output_tokens": 1117,
+        "total_tokens": 9976
+      }
+    }
+  ],
+  "workpaper_summary": {
+    "origin": "llm_generated",
+    "business_description": "",
+    "fact_count": 10,
+    "metric_count": 19,
+    "element_fact_counts": {
+      "business_structure": 0,
+      "products_services": 0,
+      "revenue_model": 0,
+      "scale_and_mix": 0,
+      "operations_and_inputs": 0,
+      "customers_channels_markets": 10,
+      "operating_drivers": 0,
+      "material_changes": 0
+    },
+    "review_status": "completed_with_open_findings",
+    "open_finding_count": 4,
+    "extraction_model": "deepseek-flash",
+    "review_model": "grok-4.7",
+    "delivery_counts": {
+      "reviewed": 8,
+      "pending": 0,
+      "limited": 2,
+      "source_only": 0,
+      "withheld": 0,
+      "duplicate": 0
+    },
+    "delivery_pending_review_count": 0,
+    "delivery_reviewed_count": 8,
+    "delivery_pending_count": 0,
+    "delivery_limited_count": 2,
+    "delivery_source_only_count": 0,
+    "delivery_withheld_count": 0,
+    "delivery_duplicate_count": 0,
+    "metric_gaps": [
+      {
+        "fact_id": "F-WEALTH-FEE-INCOME",
+        "element": "customers_channels_markets",
+        "metric_index": 0,
+        "name": "财富管理手续费及佣金收入",
+        "state": "withheld",
+        "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+      },
+      {
+        "fact_id": "F-WEALTH-FEE-INCOME",
+        "element": "customers_channels_markets",
+        "metric_index": 1,
+        "name": "财富管理手续费及佣金收入同比增长率",
+        "state": "withheld",
+        "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+      },
+      {
+        "fact_id": "F-CREDIT-CARD-REVENUE",
+        "element": "customers_channels_markets",
+        "metric_index": 0,
+        "name": "信用卡业务收入",
+        "state": "withheld",
+        "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+      },
+      {
+        "fact_id": "F-CREDIT-CARD-REVENUE",
+        "element": "customers_channels_markets",
+        "metric_index": 1,
+        "name": "信用卡业务收入同比变动率",
+        "state": "withheld",
+        "reason": "原正文的业务名称、金额与同比方向有本行年报原文支持；该业务收入及其变动率不是集团总体收入指标，原metric误标consolidated_group。保留原描述，仅隔离两个口径不可靠的标准化指标，不改写scope或数值。"
+      }
+    ]
+  }
+}

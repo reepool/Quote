@@ -1,0 +1,3734 @@
+{
+  "schema_version": "company_profile_common_core_profile.v3",
+  "production_authorization": "not_authorized",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "work_id": "bp-work-5189881c12bb58c6aa019be1",
+  "instrument_id": "600859.SH",
+  "report": {
+    "instrument_id": "600859.SH",
+    "report_id": "asset_c549dbec8c1cbf02b27df868e1cdd8bd",
+    "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-22T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "freshness": {
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-22T16:00:00+00:00",
+    "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+    "knowledge_time": "2026-04-22T16:00:00+00:00"
+  },
+  "core_complete": false,
+  "dimensions": [
+    {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    {
+      "dimension_id": "products_services",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    }
+  ],
+  "accepted_facts": [],
+  "gaps": [],
+  "evidence_gap_codes": [],
+  "commodity_exposure": {
+    "assessment": {
+      "schema_version": "company_profile_commodity_exposure.v1",
+      "production_authorization": "not_authorized",
+      "report": {
+        "instrument_id": "600859.SH",
+        "report_id": "asset_c549dbec8c1cbf02b27df868e1cdd8bd",
+        "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "assessment_status": "not_assessed",
+      "checked_evidence_ids": [],
+      "exposures": []
+    },
+    "reported_period": "2025-12-31",
+    "knowledge_time": "2026-04-22T16:00:00+00:00",
+    "consumer_authorization": {
+      "dcf": false,
+      "trading": false,
+      "price_sensitivity": false
+    }
+  },
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "llm_generated",
+    "report": {
+      "instrument_id": "600859.SH",
+      "report_id": "asset_c549dbec8c1cbf02b27df868e1cdd8bd",
+      "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-22T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0044",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 11,
+          "end_page": 13,
+          "rationale": "选择“报告期内公司从事的业务情况”用于明确主要业态、经营角色与运营模式；选择“零售行业经营性信息分析”完整覆盖报告期末已开业门店分布、面积口径及自有/租赁/托管等运营方式，并保留其“其他说明”对购物中心租赁经营等特点的解释。两者合并可直接回答截至2025年末主要业态网点构成、经营规模和运营方式，且不将不同口径业态简单加总。"
+        },
+        {
+          "section_id": "section-0096",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "零售行业经营性信息分析"
+          ],
+          "start_page": 24,
+          "end_page": 29,
+          "rationale": "选择“报告期内公司从事的业务情况”用于明确主要业态、经营角色与运营模式；选择“零售行业经营性信息分析”完整覆盖报告期末已开业门店分布、面积口径及自有/租赁/托管等运营方式，并保留其“其他说明”对购物中心租赁经营等特点的解释。两者合并可直接回答截至2025年末主要业态网点构成、经营规模和运营方式，且不将不同口径业态简单加总。"
+        }
+      ],
+      "unread_or_deferred": [
+        "未选主营业务分行业、分地区、分销售模式及财务报表收入附注：本次目标为网点构成、规模与运营方式，收入拆分属于另一问题。",
+        "未扩展到报告期后免税新店或单店明细：若原文门店分布表未纳入该等口径，则不将其与期末已开业网点合并为公司统一总数。"
+      ],
+      "selection_rationale": "选择“报告期内公司从事的业务情况”用于明确主要业态、经营角色与运营模式；选择“零售行业经营性信息分析”完整覆盖报告期末已开业门店分布、面积口径及自有/租赁/托管等运营方式，并保留其“其他说明”对购物中心租赁经营等特点的解释。两者合并可直接回答截至2025年末主要业态网点构成、经营规模和运营方式，且不将不同口径业态简单加总。",
+      "stop_reason": "业务概述与零售行业经营性信息中的门店分布及说明已覆盖目标所需的主要业态、期末网点、面积和运营方式；继续读取财务收入拆分或门店明细只会补充收入结构或单店信息，不能改变本次运营网络问题的结论，故在此停止，不声称覆盖全报告。",
+      "transcription_version": "shared-pdf-pypdf-layout.structured-notes.v1"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+        ]
+      },
+      "products_services": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+        ]
+      },
+      "revenue_model": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+        ]
+      },
+      "scale_and_mix": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+        ]
+      },
+      "operations_and_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "ops-001",
+            "text": "截至2025年末，公司在全国37个城市共运营78家大型综合有税零售门店，涉及奥特莱斯、购物中心、百货业态；同时管理运营免税门店，并拥有专业店及线上业务。",
+            "subject_scope": "consolidated_group",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [
+              {
+                "name": "大型综合有税零售门店数量",
+                "raw_value": "78",
+                "value": "78",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "覆盖城市数量",
+                "raw_value": "37",
+                "value": "37",
+                "unit": "个",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ops-002",
+            "text": "奥莱业态分为名品奥莱及城市奥莱两条业务主线，主营业务收入为商品零售收入，经营模式包括联营、自营和租赁，以联营为主；截至报告期末共拥有19家奥莱门店。",
+            "subject_scope": "business_segment",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [
+              {
+                "name": "奥莱门店数量",
+                "raw_value": "19",
+                "value": "19",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ops-003",
+            "text": "购物中心业态主营业务收入为租金收入，经营模式以租赁为主；报告期内关闭1家、新增2家，截至报告期末共拥有37家购物中心门店。",
+            "subject_scope": "business_segment",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [
+              {
+                "name": "购物中心门店数量",
+                "raw_value": "37",
+                "value": "37",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "购物中心报告期新增门店数量",
+                "raw_value": "2",
+                "value": "2",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "购物中心报告期关闭门店数量",
+                "raw_value": "1",
+                "value": "1",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ops-004",
+            "text": "百货业态主营业务收入为商品零售收入，经营模式包括联营、自营和租赁，以联营为主；报告期内关闭4家，截至报告期末共拥有21家百货门店。",
+            "subject_scope": "business_segment",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [
+              {
+                "name": "百货门店数量",
+                "raw_value": "21",
+                "value": "21",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "百货报告期关闭门店数量",
+                "raw_value": "4",
+                "value": "4",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ops-005",
+            "text": "业务概述前段称，公司同时管理运营2家口岸免税店、2家市内免税店及1家离岛免税门店。",
+            "subject_scope": "business_segment",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [
+              {
+                "name": "口岸免税店数量（业务概述前段口径）",
+                "raw_value": "2",
+                "value": "2",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "市内免税店数量（业务概述前段口径）",
+                "raw_value": "2",
+                "value": "2",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "离岛免税店数量（业务概述前段口径）",
+                "raw_value": "1",
+                "value": "1",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "同节后段对口岸免税店数量披露为1家，存在前后表述不一致。"
+          },
+          {
+            "fact_id": "ops-006",
+            "text": "同节后段称，截至本报告期末，公司共拥有离岛免税店1家、口岸免税店1家、市内免税店2家。",
+            "subject_scope": "business_segment",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [
+              {
+                "name": "离岛免税店数量（业务概述后段口径）",
+                "raw_value": "1",
+                "value": "1",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "口岸免税店数量（业务概述后段口径）",
+                "raw_value": "1",
+                "value": "1",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "市内免税店数量（业务概述后段口径）",
+                "raw_value": "2",
+                "value": "2",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "口岸免税店数量与业务概述前段的2家不一致。"
+          },
+          {
+            "fact_id": "ops-007",
+            "text": "2026年2月，公司旗下王府井免税北京首都机场T2航站楼免税店对外营业；该门店为报告期后事项。",
+            "subject_scope": "business_segment",
+            "period": "2026-02",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ops-010",
+            "text": "《其他说明》表列示，报告期内购物中心/百货/奥特莱斯合计新开门店3家、建筑面积/租赁面积51.1万平方米，关闭门店5家、建筑面积/租赁面积23.2万平方米。",
+            "subject_scope": "business_segment",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "购物中心/百货/奥特莱斯报告期新开门店数量",
+                "raw_value": "3",
+                "value": "3",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "购物中心/百货/奥特莱斯报告期新开门店面积",
+                "raw_value": "51.1",
+                "value": "51.1",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "购物中心/百货/奥特莱斯报告期关闭门店数量",
+                "raw_value": "5",
+                "value": "5",
+                "unit": "家",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "购物中心/百货/奥特莱斯报告期关闭门店面积",
+                "raw_value": "23.2",
+                "value": "23.2",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "该表合计栏仅列购物中心/百货/奥特莱斯，不含免税，口径与含免税的分布表不能直接视为同一总数。"
+          },
+          {
+            "fact_id": "ops-012",
+            "text": "熙地港（郑州）购物中心建筑面积22.6万平方米，其中包含郑州王府井百货熙地港店租赁面积2.4万平方米；郑州枫华商业管理有限公司持有该购物中心产权，本公司合并持有其51%股权。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "熙地港（郑州）购物中心建筑面积",
+                "raw_value": "22.6",
+                "value": "22.6",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "郑州王府井百货熙地港店租赁面积",
+                "raw_value": "2.4",
+                "value": "2.4",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "本公司合并持有郑州枫华商业管理有限公司股权比例",
+                "raw_value": "51",
+                "value": "51",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "购物中心建筑面积包含同一建筑内百货租赁面积，不能与其他独立门店面积简单相加。"
+          },
+          {
+            "fact_id": "ops-013",
+            "text": "佛山王府井紫薇港购物中心建筑面积20.9万平方米，佛山市王府商业置业有限公司持有该购物中心产权，本公司持有其50%股权。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "佛山王府井紫薇港购物中心建筑面积",
+                "raw_value": "20.9",
+                "value": "20.9",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "本公司持有佛山市王府商业置业有限公司股权比例",
+                "raw_value": "50",
+                "value": "50",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "产权方为非全资持股公司，建筑面积不等于公司完全权益面积。"
+          },
+          {
+            "fact_id": "ops-014",
+            "text": "湾里王府井WellTown由北京环汇置业有限公司委托公司旗下北京王府井奥莱企业管理有限公司管理运营，项目总建筑面积18.7万平方米，委托经营期限15年；该门店于2025年12月26日对外营业。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0007",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "湾里王府井WellTown项目总建筑面积",
+                "raw_value": "18.7",
+                "value": "18.7",
+                "unit": "万平方米",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "湾里王府井WellTown委托经营期限",
+                "raw_value": "15",
+                "value": "15",
+                "unit": "年",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "review-add:omit-ops-ending-area",
+            "text": "截至2025年末，按《其他说明》期末合计：门店78家，建筑面积/租赁面积567.2万平方米；该表合计行经营业态栏写「购物中心/百货/奥特莱斯」，但分地区行含免税。门店清单（含免税门店）面积合计亦为567.2万平方米。原文注明因四舍五入，分项与合计可能不等。",
+            "subject_scope": "unclear",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0007",
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "《其他说明》期末合计（合计行业态：购物中心/百货/奥特莱斯；分地区含免税）门店数量",
+                "raw_value": "78",
+                "value": "78",
+                "unit": "家",
+                "source_unit": "家",
+                "currency": null,
+                "subject_scope": "unclear",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "表内合计行业态标签与分地区行含免税的口径不完全一致。"
+              },
+              {
+                "name": "《其他说明》期末合计（合计行业态：购物中心/百货/奥特莱斯；分地区含免税）建筑面积/租赁面积",
+                "raw_value": "567.2",
+                "value": "567.2",
+                "unit": "万平方米",
+                "source_unit": "万平方米",
+                "currency": null,
+                "subject_scope": "unclear",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "面积栏为建筑面积/租赁面积混合口径；原文注明四舍五入可能使分项与合计不等。"
+              },
+              {
+                "name": "门店清单（含免税门店）面积合计",
+                "raw_value": "567.2",
+                "value": "567.2",
+                "unit": "万平方米",
+                "source_unit": "万平方米",
+                "currency": null,
+                "subject_scope": "unclear",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "该清单包含免税门店，且与《其他说明》合计并非纯有税门店建筑面积口径。"
+              }
+            ],
+            "uncertainty_reason": "表内合计行业态栏为购物中心/百货/奥特莱斯，但分地区行含免税；面积栏为建筑面积/租赁面积混合口径，且原文注明四舍五入可能使分项与合计不等。"
+          }
+        ],
+        "limitations": [
+          "本次仅定向回答运营网点构成、规模与物业方式，未覆盖收入拆分、单店经营明细及线上业务明细。",
+          "业务概述分业态门店数与公司总数、门店分布表合计数存在差异，原文未解释，故并列保留，未作调整或加总。",
+          "口岸免税店数量在业务概述前后段表述不一致，原文未解释；本回复分别列示。",
+          "门店分布表的经营业态栏含免税，而《其他说明》合计栏仅列购物中心/百货/奥特莱斯，二者口径不同，不能直接视为同一总数。",
+          "租赁/托管物业在分布表中合并列示，无法拆分租赁与托管各自的门店数和面积。",
+          "部分购物中心建筑面积包含同一建筑内百货门店租赁面积，且产权方存在非全资持股，面积口径不能简单相加。",
+          "专业店333家为独立业态，未并入78家大型综合有税零售门店总数。",
+          "2026年2月首都机场T2航站楼免税店为报告期后事项，未并入2025年末门店数。",
+          "事实ops-008已隔离，未作为结论采用：metric number is absent from cited source: 专业店门店数量",
+          "事实ops-009已隔离，未作为结论采用：metric number is absent from cited source: 已开业门店合计数量",
+          "事实ops-011已隔离，未作为结论采用：metric number is absent from cited source: 熙地港（西安）购物中心建筑面积"
+        ]
+      },
+      "customers_channels_markets": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+        ]
+      },
+      "operating_drivers": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+        ]
+      },
+      "material_changes": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+        ]
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          11
+        ],
+        "source_spans": [
+          {
+            "page": 11,
+            "start": 1043,
+            "end": 2420,
+            "quote": "一、报告期内公司从事的业务情况\n            公司营业收入主要来自于旗下各门店的商品销售收入以及租金收入。截至本报告期末，公司\n       在全国七大经济区域            37 个城市共运营        78 家大型综合有税零售门店，涉及奥特莱斯、购物中心、\n       百货业态，同时管理运营               2家口岸免税店、2          家市内免税店及         1 家离岛免税门店。此外，公司还\n       涉及专业店以及线上业务，目前共有各类专业店                           333 家。\n            奥莱业态：公司目前在营的奥莱项目分为名品奥莱及城市奥莱两条业务主线。名品奥莱是以\n       销售国际及国内知名品牌折扣商品为主，同时配套餐饮、娱乐、休闲等服务项目和设施的零售业\n       态。门店位置一般在城市边缘地区或城郊，单店面积一般在                                6 万-10  万平米，经营商品品类主要包\n       括服装服饰、运动鞋帽、家居儿童用品等。城市奥莱是由公司原有的百货门店转型调整而来，一\n       般位于城市中心或副中心区域，交通便利，单店面积一般在                                 2 万-6  万平米，以销售品牌折扣商品\n       为主，同时配套部分餐饮、娱乐、休闲等服务项目和设施的零售业态。主营业务收入为商品零售\n       收入，经营模式包括联营、自营和租赁，以联营为主。公司旗下奥莱业态以“赋能城市价值，匠\n       筑美好生活”为使命，通过持续的创新迭代锻造核心经营能力，实现长期、健康、可持续发展，\n       现已成为公司业绩的新基石和未来发展的战略新引擎。面对快速变化的消费市场，奥莱业态紧紧\n       围绕“人货铺场圈”五要素能力建设，转变项目生态模式，注重于打造集人流、商品和服务于一\n       体的生态圈，持续强化核心商品力、丰富多元消费场景、深化会员运营与私域建设，不断满足消\n       费者多样化的需求。报告期内，公司打造的湾里王府井                              Welltown  对外营业。截至报告期末，公司\n       共拥有     19家奥莱门店。\n            购物中心业态：是由多种零售店铺、服务设施集中在一个建筑物内或区域内，向消费者提供\n       综合服务的商业集合体。门店位置可在城市或区域商业中心、城市边缘地区的交通要道附近，单\n       店面积一般在        8 万-20  万平米。经营品类包括时尚类商品、各种专业店、专卖店、食品店、杂品店\n       以及各种文化教育和服务娱乐设施等。主营业务收入为租金收入，经营模式以租赁为主。王府井\n       购物中心目前已打造多条成熟产品线，构建了                          3大标准产品线与多元化非标产品，形成了覆盖城\n\n                                                    11/257"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          12
+        ],
+        "source_spans": [
+          {
+            "page": 12,
+            "start": 0,
+            "end": 2167,
+            "quote": "                          王府井集团股份有限公司2025         年年度报告\n\n\n市级、区域级、社区级及创新型、文商旅型的全场景布局，旨在为广大消费者提供国内、国际一\n流品质的优雅舒适环境，让他们愉悦购物、畅享美食、领略时尚、乐娱身心、感受卓越服务。报\n告期内，公司关闭        1 家购物中心门店，新增          2 家购物中心门店，截至报告期末，公司共拥有                     37 家\n购物中心门店。\n    百货业态：是以时尚类商品销售为主，同时配套餐饮、娱乐、休闲等服务项目和设施的综合\n零售业态。门店位置一般在城市或区域商业中心，单店面积一般在                              2 万-6 万平米。主要满足消费\n者时尚化、个性化的消费需求，经营商品品类主要包括服装服饰、化妆品、运动鞋帽、珠宝饰品、\n家居家电、儿童用品等。主营业务收入为商品零售收入，经营模式包括联营、自营和租赁，以联\n营为主。王府井积累了丰富的百货运营经验，近年来，公司旗下百货业态围绕消费者需求一店一\n策实施转型调整，力争满足不同地区不同市场环境下的消费者差异化需求。公司已形成包括都市\n百货店、都市生活店、品质社区店、大众社区店在内的多条细分产品线，旨在通过不同的产品细\n分定位丰富消费者选择，为消费者带来美好生活。报告期内，公司关闭                                 4家百货门店，截至报告\n期末，公司共拥有        21 家百货门店。\n    免税业务：免税品经营是向特定消费者销售免征关税、进口环节税的进口商品和实行退（免）\n税进入免税店销售的国产商品的零售业务，商品主要包括香化、烟酒、食品、精品等品类。免税\n品经营渠道主要包括口岸店、海南离岛店、市内店以及其他类型免税店，其中口岸店又分为口岸\n出境免税店和口岸进境免税店。根据我国现行监管政策，从事免税品经营的公司需取得国务院或\n其授权部门批准的经营资质。各类免税店的数量、经营面积及设立，需要按照有关法律法规规定，\n履行相应的审批后方可开设。公司于                 2020 年 6 月取得免税品经营资质。2023            年  1月，公司旗下\n首个免税项目王府井国际免税港对外营业。公司立足自身资源与行业实际，稳健推进免税业务布\n局，持续巩固并强化优势渠道运营能力与市场竞争力，同时根据行业政策与市场环境动态优化业\n务结构，积极响应政策导向引入优质国产品牌，助力国潮品牌通过免税渠道实现出海回流，不断\n夯实核心竞争基础，推动免税业务高质量、可持续发展。报告期内，哈尔滨机场王府井免税店、\n武汉、长沙市内免税店对外营业，实现了免税主要业务类型全覆盖。截至本报告期末，公司共拥\n有离岛免税店      1 家，口岸免税店        1家，市内免税店        2家。2026   年  2月，公司旗下王府井免税北京\n首都机场    T2 航站楼免税店对外营业。\n    专业店：专业店是经营某一大类商品为主，并且具备有丰富专业知识的销售人员和提供适当\n售后服务的零售业态。目前公司已经形成了以买手制潮奢品牌集合店为经营内容的                                      Luxemporium\n睿锦尚品，和以运动品牌为经营内容的法雅商贸两条专业店业务主线。睿锦尚品通过沉浸式的购\n物空间打造，独有的特色品牌，灵活多变的商品组合方式，赢得了最具消费活力的潮流时尚人士\n的青睐，逐渐形成自己独特经营特色。法雅商贸是国际运动品牌代理专营专卖实体企业，目前是\n阿迪达斯、耐克两大运动品牌的区域战略客户。截至报告期末，睿锦尚品共有                                   33家门店（含      3 家\n快闪店），法雅商贸共有店铺              300家（其中自营店铺         108 家，加盟店铺      190 家，卖场     2家）。\n    线上业务：线上线下深度融合是公司长期坚持的核心战略之一。公司坚持以“同一个消费者，\n同一个王府井”为统领，统筹线上商城、新媒体传播、短视频内容与直播电商等多元业态，构建\n全域贯通、场景互联的全渠道经营体系，实现线上线下资源协同、服务协同、营销协同。在数据\n资产平台、数字支付平台、消费场景数字化应用等方面持续深耕，积极运用                                  AI智能客服、智能导\n购、精准营销、智能运营分析等技术能力，全面提升服务响应效率与消费体验；同步推进全渠道\n深度融合，实现公私域贯通。同时加快智慧门店落地，推动经营管理与顾客服务智慧化升级，为\n消费者提供更优质、更智能、更便捷的一站式购物体验。全年实现线上销售                                   18.6亿元。\n\n报告期内公司新增重要非主营业务的说明\n□适用    √不适用\n\n\n\n                                        12/257"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          13
+        ],
+        "source_spans": [
+          {
+            "page": 13,
+            "start": 0,
+            "end": 57,
+            "quote": "                          王府井集团股份有限公司2025        年年度报告\n\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "零售行业经营性信息分析"
+        ],
+        "physical_pages": [
+          24
+        ],
+        "source_spans": [
+          {
+            "page": 24,
+            "start": 668,
+            "end": 3788,
+            "quote": "零售行业经营性信息分析\n\n          1、   报告期末已开业门店分布情况\n          √适用      □不适用\n\n                                                                  自有物业门店                          租赁/托管物业门店\n     地区                       经营业态                        门店数量             建筑面积             门店数量             建筑面积\n                                                                           (万平米)                              (万平米)\n 华北地区          购物中心/百货/奥特莱斯                                       11                54.9            15                106.2\n 华中地区          购物中心/百货/奥特莱斯/免税                                     3                  36             6                 35.0\n 华南地区          购物中心/免税                                             2                31.2             1                  6.7\n 西南地区          购物中心/百货/奥特莱斯                                        2                 8.7            19                 125\n 西北地区          购物中心/百货/奥特莱斯                                        3                38.0             9                 49.5\n 华东地区          购物中心                                                1                 1.9             3                 37.1\n 东北地区          购物中心/奥特莱斯/免税                                        3                  37             0                   0\n 合计            购物中心/百货/奥特莱斯/免税                                    25               207.7            53                359.5\n\n          （2）门店情况\n门                                                                                                 建筑面积/               租赁期\n店            门店名称                                 地址                        开业时间          区域      租赁面积         物业       限\n类                                                                                                 （万平方         权属     （年）\n型                                                                                                    米）\n           北京西单商场                    北京市西城区西单北大街             120号         1930 年  12月     华北         6.5       自有        -\n          北京市百货大楼                  北京市东城区王府井大街             253-255号        1955年  9 月     华北         13.2      自有        -\n\n             友谊商店                   北京市朝阳区建国门外大街              17 号        1964 年  12月     华北         2.5       自有        -\n         北京燕莎友谊商城                     北京市朝阳区亮马桥路            52 号           1992年  6 月     华北         4.1       租赁        -\n百          北京双安商场                    北京市海淀区北三环西路             38 号          1994年  8 月     华北         4.7       自有        -\n货          北京东安市场                    北京市东城区王府井大街             138号          1998年  1 月     华北         1.1       租赁      长期\n\n       包头王府井百货昆区店                内蒙古自治区包头市昆区钢铁大街                  69号     2002 年  12月     华北         3.6       租赁       25\n          太原王府井百货                   山西省太原市小店区亲贤街              99 号         2010年  5 月     华北         11.5      租赁       20\n        鄂尔多斯王府井百货                内蒙古自治区鄂尔多斯市东胜区伊金霍洛                        2011年  9 月     华北         6.3       自有        -\n                                         西街太古国际广场         B 区\n\n                                                           24/257"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "零售行业经营性信息分析"
+        ],
+        "physical_pages": [
+          25
+        ],
+        "source_spans": [
+          {
+            "page": 25,
+            "start": 0,
+            "end": 5752,
+            "quote": "                                               王府井集团股份有限公司2025                 年年度报告\n\n\n           长沙王府井百货                     湖南省长沙市天心区黄兴中路                   27号         2004 年  12 月      华中           8        部分          -\n                                                                                                                           自有\n           洛阳王府井百货                     河南省洛阳市西工区中州中路                  429 号        2004 年  12 月      华中           6        租赁         30\n      郑州王府井百货熙地港店                       河南省郑州市郑东新区地坤街                  8 号         2017 年  3 月       华中          2.4       租赁        长期\n\n       西宁王府井百货西门店                       青海省西宁市城中区西大街                 40 号          2006 年  11 月      西北          5.9       租赁         26\n           兰州王府井百货                    甘肃省兰州市城关区东岗东路                  1999  号       2010 年  11 月      西北          5.1       租赁         20\n\n           银川王府井百货                    宁夏银川市兴庆区新华东街东方红广场                            2016 年  2 月       西北          8.3       租赁         20\n      西安王府井百货熙地港店                       陕西省西安市未央区未央路                 170 号         2016 年  4 月       西北          2.8       租赁        长期\n\n           成都王府井百货                      四川省成都市锦江区总府街                 15 号          1999 年  12 月      西南          7.3       自有          -\n          贵阳国贸广场总店                      贵州省贵阳市云岩区中华北路                  1 号         2002 年  9 月       西南          2.8       部分          -\n                                                                                                                           自有\n           西单商场成都店                     四川省成都市青羊区苏坡东路                   12号         2005 年  1 月       西南          3.4       租赁         23\n\n           昆明王府井百货                       云南省昆明市五华区沿河路                 7 号          2009 年  9 月       西南          2.2       租赁         20\n           金阳国贸      Tpmall            贵州省贵阳市观山湖区金阳南路                   6 号        2011 年  9 月       西南          4.2       租赁         20\n\n            北京长安商场                         北京市西城区复外大街              15 号            1990 年  5 月       华北          3.3       自有          -\n       北京贵友大厦建国门店                       北京市朝阳区建国门外大街甲                  5 号         1990 年  9 月       华北          1.8       自有          -\n\n          西单商场天通苑店                  北京市昌平区东小口镇天通苑五区商业楼                             2002 年  11 月      华北          1.5       自有          -\n       包头王府井百货青山店                   内蒙古自治区包头市青山区幸福路甲                       3号      2008 年  4 月       华北          3.7       租赁         26\n\n         北京贵友大厦通州店                         北京市通州区云景东路               1号             2008 年  7 月       华北          3.5       租赁         27\n     北京右安门王府井购物中心                          北京市西城区万博苑             7 号楼              2015 年  12 月      华北           2        自有          -\n\n         王府井喜悦购物中心                       北京市东城区王府井大街                301 号          2023 年  12 月      华北          7.8       租赁         10\n      临汾王府井尚城          UPTOWN          山西省临汾市经济开发区河汾路                   8 号        2025 年  4 月       华北         10.4       租赁         20\n              购物中心\n       哈尔滨王府井购物中心                   黑龙江省哈尔滨市道里区景江东路                     899 号      2017 年  9 月       东北         12.8       自有          -\n      厦门巴黎春天百货中山店                     福建省厦门市思明区中山路                 76-132 号        1998 年  12 月      华东          1.9       自有          -\n\n         南昌王府井购物中心                     江西省南昌市青云谱区洪城路                  158 号        2019 年  6 月       华东         13.7       租赁         20\n         莱西王府井购物中心                    山东省青岛市莱西市水集街道北京中路                            2024 年  12 月      华东         15.4       租赁         20\n购                                                     118 号\n物        苏州王府井购物中心                  江苏省苏州市相城区相城大道与嘉元路交                             2024 年  12 月      华东           8        租赁         20\n中                                               叉处嘉元路        188 号\n心         佛山王府井紫薇港                   广东省佛山市佛山禅城区季华四路                     70 号      2020 年  12 月      华南         20.9       自有          -\n\n      王府井海垦广场购物中心                      海南省海口市龙华区海秀中路                   71号         2023 年  10 月      华南          6.7       租赁         20\n         洛阳王府井购物中心                      河南省洛阳市涧西区南昌路                 139 号         2015 年  5 月       华中          8.2       租赁         20\n\n         长沙王府井购物中心                     湖南省长沙市岳麓区金星中路                  383 号        2016 年  6 月       华中          6.3       租赁         20\n      熙地港（郑州）购物中心                     河南省郑州市郑东新区农业东路                    15 号       2017 年  3 月       华中         22.6       自有          -\n      西安王府井百货永宁门店                    陕西省西安市碑林区南关正街                  88 号长安         2006 年  9 月       西北          8.4       租赁        长期\n                                                     国际中心\n      熙地港（西安）购物中心                       陕西省西安市未央区凤城七路                  8 号         2016 年  4 月       西北         20.6       自有          -\n     西宁王府井生活广场新千店                     青海省西宁市城东区东关大街建国南路                            2019 年  12 月      西北          7.4       租赁         20\n                                                       65 号\n          西宁王府井大象城                     青海省西宁市城西区五四西路                   68号         2020 年  10 月      西北          5.1       租赁         19\n          南国花锦购物中心                     贵州省贵阳市云岩区中华北路                  108 号        2008 年  1 月       西南          2.3       租赁        长期\n\n         成都王府井购物中心                      四川省成都市武侯区科华中路                  2 号         2011 年  12 月      西南          9.1       租赁         23\n          遵义国贸购物中心                    贵州省遵义市汇川区珠海路                1 号附   1 号       2013 年  3 月       西南          7.4       租赁         22\n                                                                  25/257"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "零售行业经营性信息分析"
+        ],
+        "physical_pages": [
+          26
+        ],
+        "source_spans": [
+          {
+            "page": 26,
+            "start": 0,
+            "end": 5386,
+            "quote": "                                               王府井集团股份有限公司2025                 年年度报告\n\n\n\n         国贸逸天城购物中心                          贵州省贵阳市解放路            257  号            2014  年  9月       西南          4.9       租赁         20\n         乐山王府井购物中心                      四川省乐山市市中区天星路                 118 号         2015  年  9月       西南          4.8       租赁         20\n\n         南充王府井购物中心                       四川省南充市江东大道中路                 5 段          2016 年  12 月      西南          9.4       租赁         20\n\n          凯里国贸购物广场                         贵州省凯里市北京西路              21 号            2017  年  3月       西南          8.2       租赁         23\n         巴中王府井购物中心                    四川省巴中市巴州区秦巴大道西段                     2 号      2019 年  12 月      西南          9.1       租赁         20\n          安顺国贸购物中心                   贵州省安顺市西秀区西街街道市西路                       87     2020  年  9月       西南           3        租赁         20\n                                                    号塔山广场\n         玖福城生活购物中心                   贵州省贵阳市观山湖区金阳乾图中心广场                            2020 年  12 月      西南          5.5       租赁         20\n                                                     裙楼商场\n        成都王府井        Discovery        四川省成都市成华区北二环四段                    33 号       2021  年  6月       西南          2.4       租赁         20\n\n         绵阳王府井购物中心                          四川省绵阳市嘉来南河广场                           2022  年  5月       西南         10.7       租赁         20\n      贵阳新印      1950Discovery  购        贵州省贵阳市云岩区友谊路                 230 号         2024  年  5月       西南          3.5       租赁         15\n                物中心\n      贵阳国贸      CCPARK    购物中         贵州省贵阳市观山湖区林城东路                   155  号      2024  年  9月       西南          4.6       租赁         10\n                  心\n         拉萨王府井购物中心                   西藏自治区拉萨市柳梧新区北京大道                       10     2025  年  5月       西南         22.0       租赁         20\n                                                         号\n            北京燕莎奥莱                        北京市朝阳区东四环南路                9 号           2002 年  12 月      华北          9.7       租赁         30\n      王府井奥莱呼市中山路店                    内蒙古自治区呼和浩特市回民区中山西路                            2004 年  12 月      华北          3.2       租赁         23\n\n      王府井奥莱北京香江小镇                          北京市朝阳区香江北路              28 号            2009  年  7月       华北          4.3       自有          -\n     王府井奥莱天津新燕莎小镇                         天津空港经济区环河北路               98 号           2013 年  12 月      华北          8.8       自有          -\n\n         太原王府井城市奥莱                       山西省太原市迎泽开化寺街                 42 号         2015  年  9月       华北           2        租赁        长期\n      王府井奥莱呼市如意小镇                    内蒙古自治区呼和浩特市新城区如意开发                            2021 年  12 月      华北          8.1       租赁         15\n                                                         区\n          太原王府井晋阳里                     山西省太原市晋源区新晋祠路                  521 号        2022  年  1月       华北          3.5       租赁         20\n      北京王府井奥莱          UPTOWN        北京市大兴区久敬庄路与德贤路交汇处西                            2023 年  12 月      华北         15.3       租赁         20\n                                                       南角\n奥       湾里王府井       WellTown            北京市通州区颐瑞东路              66 号  1号楼          2025 年  12 月      华北         18.7       托管         15\n\n特    王府井奥莱沈阳棋盘山小镇                        辽宁省沈阳市东陵区双园路                 36 号         2012  年  8月       东北         13.1       自有          -\n莱                                    吉林省长春市净月经济开发区永顺路                      388\n斯     王府井奥莱长春净月小镇                                        号                         2018 年  12 月      东北         11.1       自有          -\n\n         郑州王府井城市奥莱                      河南省郑州市中原区棉纺西路                  36 号        2012 年  12 月      华中          4.8       租赁         20\n\n         焦作王府井城市奥莱                      河南省焦作市解放区人民路                 669 号         2014  年  9月       华中          5.4       租赁         20\n      王府井奥莱新乡平原小镇                    河南省新乡市平原示范区长江大道                     22 号      2021 年  11 月      华中          9.7       自有          -\n\n         西宁王府井城市奥莱                      青海省西宁市城西区五四西路                  1 号         2013  年  5月       西北          3.7       租赁         20\n          王府井奥莱银川店                    宁夏回族自治区银川市金凤区正源北街                            2016 年  10 月      西北          5.6       租赁         15\n                                                       303 号\n      王府井奥莱西安临潼小镇                       陕西省西安市临潼区凤凰大道                  11 号        2016 年  12 月      西北          8.5       自有          -\n      王府井奥莱咸阳西咸小镇                    陕西省西咸新区秦汉新城周陵街办迎宾大                            2016 年  12 月      西北          8.9       自有          -\n                                                   道王府井奥莱\n      王府井奥莱昆明滇池小镇                    云南省昆明市官渡区滇池国际会展中心东                            2019  年  9月       西南          6.9       租赁         20\n                                                    区一至三层\n免         王府井国际免税港                          海南省万宁市莲兴大道              1 号            2022  年  7月       华南         10.3       自有          -\n税\n                                     合计                                                                         567.2        --        --\n\n           注：\n                     熙地港（西安）购物中心建筑面积                           20.6 万平方米，其中包含西安王府井百货熙地店租赁\n                                                                  26/257"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "零售行业经营性信息分析"
+        ],
+        "physical_pages": [
+          27
+        ],
+        "source_spans": [
+          {
+            "page": 27,
+            "start": 0,
+            "end": 3129,
+            "quote": "                                     王府井集团股份有限公司2025           年年度报告\n\n\n      面积    2.8万平方米。西安王府井商业运营管理有限公司持有该购物中心产权，本公司持有西安王\n      府井商业运营管理有限公司                 50%股权。\n               熙地港（郑州）购物中心建筑面积                    22.6万平方米，其中包含郑州王府井百货熙地港店租\n      赁面积     2.4万平方米。郑州枫华商业管理有限公司持有该购物中心产权，本公司合并持有郑州枫\n      华商业管理有限公司             51%股权。\n               佛山王府井紫薇港购物中心建筑面积                     20.9 万平方米，佛山市王府商业置业有限公司持有\n      该购物中心产权，本公司持有佛山市王府商业置业有限公司                                   50%股权。\n               湾里王府井       WellTown  由北京环汇置业有限公司委托公司旗下北京王府井奥莱企业管理\n      有限公司管理运营，项目总建筑面积                      18.7 万平方米，委托经营期限               15年。\n               报告期内，公司与北京王府井奥莱                    UPTOWN     产权方就项目租赁面积达成一致意见，退\n      租  3.96 万平方米。\n               报告期内，经公司第十一届董事会第二十三次会议审议通过，同意新燕莎控股及燕莎商\n      城与燕莎中心签署租赁合同及续租协议，续租期限自                               2023 年  1 月  1 日至   2023 年  8 月 31 日。\n               报告期内，公司与遵义国贸购物中心产权方就项目租赁面积达成一致意见，退租                                               0.7万\n      平方米。\n               公司在签署门店租赁合同时，均约定了优先续租权。对于租赁合同临近到期的门店，公\n      司在评估门店经营情况和增长潜力后，对优质门店将在合同到期前与物业出租方沟通续约事宜。\n               因数据四舍五入，存在分项与合计不等情况。\n           （3）报告期内续租情况\n序号                 项目名称                         业态类型                      区域                    续租期限\n 1            北京燕莎友谊商城                            百货                      华北                      10 年\n 2         王府井奥莱呼市中山路店                          奥特莱斯                      华北                       3年\n 3          西宁王府井百货西门店                            百货                      西北                       6年\n      2、   其他说明\n      √适用       □不适用\n\n\n                                               新开门店                   关闭门店                    期末门店\n\n    地区               经营业态                门店      建筑面积/租         门店     建筑面积/租赁         门店      建筑面积/租赁\n                                         家数         赁面积         家数         面积          家数           面积\n                                                 （万平方米）                （万平方米）                   （万平方米）\n  华北地区        购物中心/百货/奥特莱斯                 2         29.1        3         18.2         26         161.1\n\n  华中地区        购物中心/百货/奥特莱斯                 0          0          0           0           9          71.0\n  华南地区        购物中心/奥特莱斯/免税                 0          0          0           0           3          37.9\n\n  西南地区             购物中心/百货                 1         22.0        1          1.4         21         133.7\n  西北地区        购物中心/百货/奥特莱斯                 0          0          1          3.6         12          87.5\n\n  华东地区             购物中心/百货                 0          0          0           0           4          39.0\n  东北地区        购物中心/百货/奥特莱斯                 0          0          0           0           3          37.0\n\n    合计        购物中心/百货/奥特莱斯                 3         51.1        5         23.2         78         567.2\n      注：\n      （1）2025    年  4 月  30 日，公司旗下临汾王府井尚城                 UPTOWN     购物中心对外营业。临汾王府井尚\n      城  UPTOWN     位于山西省临汾市经济开发区河汾路                     8 号，项目总建筑面积            10.4 万平方米，租赁期\n      限  20 年。\n\n\n                                                    27/257"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "零售行业经营性信息分析"
+        ],
+        "physical_pages": [
+          28
+        ],
+        "source_spans": [
+          {
+            "page": 28,
+            "start": 0,
+            "end": 970,
+            "quote": "                             王府井集团股份有限公司2025          年年度报告\n\n\n（2）2025   年  5 月 1 日，公司旗下拉萨王府井购物中心对外营业。拉萨王府井购物中心位于西藏\n自治区拉萨市柳梧新区北京大道                 10 号，项目总建筑面积约             22 万平方米，租赁期限           20 年。\n（3）2025   年  12月  26 日，公司旗下湾里王府井              WellTown  对外营业。湾里王府井             WellTown  位于\n北京市通州区颐瑞东路            66 号  1 号楼，湾里文旅商融合发展综合体内，项目总建筑面积约                               18.7 万\n平方米，委托经营期限            15 年。\n（4）报告期内，公司旗下攀枝花王府井购物中心试营业。攀枝花王府井购物中心位于攀枝花市仁\n和区三线大道       150 号，项目面积约         5.9 万平方米，租赁期限           20 年。\n（5）报告期内，因租赁合同到期，北京金源新燕莎                          MALL、北京燕莎友谊商城金源店及北京贵友\n大厦金源店自       2025 年  4 月  1日起停止经营。\n（6）报告期内，根据公司战略转型需要，综合考虑门店租赁合同履约时间、经营业绩、发展前景\n等因素，公司决定关闭西单商场兰州店及六盘水国贸广场                              2 家百货门店，上述门店分别于                2025 年\n7月  31 日、2025   年  9 月 30 日停止营业。\n（7）报告期内，公司旗下北京西单商场停业改建，预计                              2028 年末施工完成。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                            28/257"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "零售行业经营性信息分析"
+        ],
+        "physical_pages": [
+          29
+        ],
+        "source_spans": [
+          {
+            "page": 29,
+            "start": 0,
+            "end": 75,
+            "quote": "                            王府井集团股份有限公司2025          年年度报告\n\n\n\n(五)  投资状况分析\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "limitations": [],
+    "supply_chain": null,
+    "generation": {
+      "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+      "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+      "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+      "selection": {
+        "purpose": "select_profile_sections",
+        "request_id": "bp-work-5189881c12bb58c6aa019be1:workpaper:sections",
+        "request_hash": "39dbedae925cabbe6f784e0712e6a470b2261da6d57f804c84a1effb91c4ffb2",
+        "response_hash": "eeea0c87f32ee6675963a1151cd5c9f1d5e9f2f47f016f4da37720e2694bda6a",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 27116,
+          "output_tokens": 1830,
+          "total_tokens": 28946
+        },
+        "scope_kind": "report_heading_index",
+        "heading_count": 966,
+        "section_ids": [
+          "section-0001",
+          "section-0002",
+          "section-0003",
+          "section-0004",
+          "section-0005",
+          "section-0006",
+          "section-0007",
+          "section-0008",
+          "section-0009",
+          "section-0010",
+          "section-0011",
+          "section-0012",
+          "section-0013",
+          "section-0014",
+          "section-0015",
+          "section-0016",
+          "section-0017",
+          "section-0018",
+          "section-0019",
+          "section-0020",
+          "section-0021",
+          "section-0022",
+          "section-0023",
+          "section-0027",
+          "section-0028",
+          "section-0029",
+          "section-0030",
+          "section-0031",
+          "section-0032",
+          "section-0033",
+          "section-0034",
+          "section-0035",
+          "section-0036",
+          "section-0037",
+          "section-0038",
+          "section-0039",
+          "section-0040",
+          "section-0041",
+          "section-0042",
+          "section-0043",
+          "section-0044",
+          "section-0045",
+          "section-0046",
+          "section-0047",
+          "section-0048",
+          "section-0049",
+          "section-0050",
+          "section-0051",
+          "section-0052",
+          "section-0053",
+          "section-0054",
+          "section-0055",
+          "section-0056",
+          "section-0057",
+          "section-0058",
+          "section-0059",
+          "section-0060",
+          "section-0061",
+          "section-0062",
+          "section-0063",
+          "section-0064",
+          "section-0065",
+          "section-0066",
+          "section-0068",
+          "section-0069",
+          "section-0073",
+          "section-0077",
+          "section-0078",
+          "section-0081",
+          "section-0086",
+          "section-0087",
+          "section-0088",
+          "section-0089",
+          "section-0090",
+          "section-0093",
+          "section-0094",
+          "section-0095",
+          "section-0096",
+          "section-0097",
+          "section-0100",
+          "section-0108",
+          "section-0109",
+          "section-0110",
+          "section-0111",
+          "section-0112",
+          "section-0113",
+          "section-0114",
+          "section-0115",
+          "section-0116",
+          "section-0117",
+          "section-0118",
+          "section-0119",
+          "section-0120",
+          "section-0121",
+          "section-0122",
+          "section-0123",
+          "section-0124",
+          "section-0125",
+          "section-0126",
+          "section-0127",
+          "section-0128",
+          "section-0129",
+          "section-0130",
+          "section-0131",
+          "section-0132",
+          "section-0133",
+          "section-0134",
+          "section-0135",
+          "section-0136",
+          "section-0137",
+          "section-0138",
+          "section-0139",
+          "section-0140",
+          "section-0141",
+          "section-0142",
+          "section-0143",
+          "section-0144",
+          "section-0145",
+          "section-0146",
+          "section-0147",
+          "section-0148",
+          "section-0149",
+          "section-0150",
+          "section-0151",
+          "section-0152",
+          "section-0153",
+          "section-0154",
+          "section-0155",
+          "section-0156",
+          "section-0157",
+          "section-0158",
+          "section-0159",
+          "section-0160",
+          "section-0161",
+          "section-0162",
+          "section-0163",
+          "section-0164",
+          "section-0165",
+          "section-0166",
+          "section-0167",
+          "section-0168",
+          "section-0169",
+          "section-0170",
+          "section-0171",
+          "section-0172",
+          "section-0173",
+          "section-0174",
+          "section-0175",
+          "section-0176",
+          "section-0177",
+          "section-0178",
+          "section-0179",
+          "section-0180",
+          "section-0181",
+          "section-0182",
+          "section-0183",
+          "section-0184",
+          "section-0185",
+          "section-0186",
+          "section-0187",
+          "section-0188",
+          "section-0189",
+          "section-0190",
+          "section-0191",
+          "section-0192",
+          "section-0193",
+          "section-0194",
+          "section-0195",
+          "section-0196",
+          "section-0197",
+          "section-0198",
+          "section-0199",
+          "section-0200",
+          "section-0201",
+          "section-0202",
+          "section-0203",
+          "section-0204",
+          "section-0205",
+          "section-0206",
+          "section-0207",
+          "section-0208",
+          "section-0209",
+          "section-0210",
+          "section-0211",
+          "section-0212",
+          "section-0213",
+          "section-0214",
+          "section-0215",
+          "section-0216",
+          "section-0217",
+          "section-0218",
+          "section-0219",
+          "section-0220",
+          "section-0221",
+          "section-0222",
+          "section-0223",
+          "section-0224",
+          "section-0225",
+          "section-0226",
+          "section-0227",
+          "section-0228",
+          "section-0229",
+          "section-0230",
+          "section-0231",
+          "section-0232",
+          "section-0233",
+          "section-0234",
+          "section-0235",
+          "section-0236",
+          "section-0237",
+          "section-0238",
+          "section-0239",
+          "section-0240",
+          "section-0241",
+          "section-0242",
+          "section-0243",
+          "section-0244",
+          "section-0245",
+          "section-0246",
+          "section-0247",
+          "section-0248",
+          "section-0249",
+          "section-0250",
+          "section-0251",
+          "section-0252",
+          "section-0253",
+          "section-0254",
+          "section-0255",
+          "section-0256",
+          "section-0257",
+          "section-0258",
+          "section-0259",
+          "section-0260",
+          "section-0261",
+          "section-0262",
+          "section-0263",
+          "section-0264",
+          "section-0266",
+          "section-0267",
+          "section-0268",
+          "section-0269",
+          "section-0272",
+          "section-0273",
+          "section-0274",
+          "section-0275",
+          "section-0276",
+          "section-0277",
+          "section-0278",
+          "section-0279",
+          "section-0280",
+          "section-0281",
+          "section-0282",
+          "section-0283",
+          "section-0284",
+          "section-0285",
+          "section-0286",
+          "section-0287",
+          "section-0288",
+          "section-0289",
+          "section-0290",
+          "section-0291",
+          "section-0292",
+          "section-0293",
+          "section-0294",
+          "section-0295",
+          "section-0296",
+          "section-0297",
+          "section-0298",
+          "section-0299",
+          "section-0300",
+          "section-0301",
+          "section-0302",
+          "section-0303",
+          "section-0304",
+          "section-0305",
+          "section-0306",
+          "section-0307",
+          "section-0308",
+          "section-0310",
+          "section-0312",
+          "section-0314",
+          "section-0316",
+          "section-0318",
+          "section-0320",
+          "section-0321",
+          "section-0322",
+          "section-0323",
+          "section-0324",
+          "section-0326",
+          "section-0327",
+          "section-0328",
+          "section-0329",
+          "section-0330",
+          "section-0331",
+          "section-0332",
+          "section-0333",
+          "section-0334",
+          "section-0335",
+          "section-0336",
+          "section-0337",
+          "section-0338",
+          "section-0339",
+          "section-0340",
+          "section-0341",
+          "section-0342",
+          "section-0343",
+          "section-0344",
+          "section-0345",
+          "section-0346",
+          "section-0347",
+          "section-0348",
+          "section-0349",
+          "section-0350",
+          "section-0351",
+          "section-0352",
+          "section-0353",
+          "section-0354",
+          "section-0355",
+          "section-0356",
+          "section-0357",
+          "section-0358",
+          "section-0359",
+          "section-0360",
+          "section-0361",
+          "section-0362",
+          "section-0363",
+          "section-0364",
+          "section-0365",
+          "section-0366",
+          "section-0367",
+          "section-0368",
+          "section-0369",
+          "section-0370",
+          "section-0371",
+          "section-0372",
+          "section-0373",
+          "section-0374",
+          "section-0375",
+          "section-0376",
+          "section-0377",
+          "section-0378",
+          "section-0379",
+          "section-0380",
+          "section-0381",
+          "section-0382",
+          "section-0383",
+          "section-0384",
+          "section-0385",
+          "section-0386",
+          "section-0387",
+          "section-0388",
+          "section-0389",
+          "section-0390",
+          "section-0391",
+          "section-0392",
+          "section-0393",
+          "section-0394",
+          "section-0395",
+          "section-0396",
+          "section-0397",
+          "section-0398",
+          "section-0399",
+          "section-0400",
+          "section-0406",
+          "section-0407",
+          "section-0408",
+          "section-0416",
+          "section-0417",
+          "section-0418",
+          "section-0425",
+          "section-0426",
+          "section-0427",
+          "section-0434",
+          "section-0435",
+          "section-0436",
+          "section-0437",
+          "section-0438",
+          "section-0439",
+          "section-0440",
+          "section-0441",
+          "section-0442",
+          "section-0443",
+          "section-0444",
+          "section-0445",
+          "section-0446",
+          "section-0447",
+          "section-0448",
+          "section-0449",
+          "section-0450",
+          "section-0451",
+          "section-0452",
+          "section-0453",
+          "section-0458",
+          "section-0466",
+          "section-0467",
+          "section-0468",
+          "section-0469",
+          "section-0470",
+          "section-0471",
+          "section-0472",
+          "section-0473",
+          "section-0474",
+          "section-0475",
+          "section-0476",
+          "section-0477",
+          "section-0478",
+          "section-0479",
+          "section-0480",
+          "section-0481",
+          "section-0482",
+          "section-0483",
+          "section-0484",
+          "section-0485",
+          "section-0486",
+          "section-0487",
+          "section-0488",
+          "section-0489",
+          "section-0490",
+          "section-0491",
+          "section-0492",
+          "section-0493",
+          "section-0494",
+          "section-0495",
+          "section-0496",
+          "section-0497",
+          "section-0498",
+          "section-0499",
+          "section-0500",
+          "section-0501",
+          "section-0502",
+          "section-0503",
+          "section-0504",
+          "section-0505",
+          "section-0506",
+          "section-0507",
+          "section-0508",
+          "section-0509",
+          "section-0510",
+          "section-0511",
+          "section-0512",
+          "section-0513",
+          "section-0514",
+          "section-0515",
+          "section-0516",
+          "section-0517",
+          "section-0518",
+          "section-0519",
+          "section-0520",
+          "section-0521",
+          "section-0522",
+          "section-0523",
+          "section-0524",
+          "section-0525",
+          "section-0526",
+          "section-0527",
+          "section-0528",
+          "section-0529",
+          "section-0530",
+          "section-0531",
+          "section-0532",
+          "section-0533",
+          "section-0534",
+          "section-0535",
+          "section-0536",
+          "section-0537",
+          "section-0538",
+          "section-0539",
+          "section-0540",
+          "section-0541",
+          "section-0542",
+          "section-0543",
+          "section-0544",
+          "section-0545",
+          "section-0546",
+          "section-0547",
+          "section-0548",
+          "section-0549",
+          "section-0550",
+          "section-0551",
+          "section-0552",
+          "section-0553",
+          "section-0554",
+          "section-0555",
+          "section-0556",
+          "section-0557",
+          "section-0558",
+          "section-0559",
+          "section-0560",
+          "section-0561",
+          "section-0562",
+          "section-0563",
+          "section-0564",
+          "section-0565",
+          "section-0566",
+          "section-0567",
+          "section-0568",
+          "section-0569",
+          "section-0570",
+          "section-0571",
+          "section-0572",
+          "section-0573",
+          "section-0574",
+          "section-0575",
+          "section-0576",
+          "section-0577",
+          "section-0578",
+          "section-0579",
+          "section-0580",
+          "section-0581",
+          "section-0582",
+          "section-0583",
+          "section-0584",
+          "section-0585",
+          "section-0586",
+          "section-0587",
+          "section-0588",
+          "section-0589",
+          "section-0590",
+          "section-0591",
+          "section-0592",
+          "section-0593",
+          "section-0594",
+          "section-0595",
+          "section-0596",
+          "section-0597",
+          "section-0598",
+          "section-0599",
+          "section-0600",
+          "section-0601",
+          "section-0602",
+          "section-0603",
+          "section-0604",
+          "section-0605",
+          "section-0606",
+          "section-0607",
+          "section-0608",
+          "section-0609",
+          "section-0610",
+          "section-0611",
+          "section-0612",
+          "section-0613",
+          "section-0614",
+          "section-0615",
+          "section-0616",
+          "section-0617",
+          "section-0618",
+          "section-0619",
+          "section-0620",
+          "section-0621",
+          "section-0622",
+          "section-0623",
+          "section-0624",
+          "section-0625",
+          "section-0626",
+          "section-0627",
+          "section-0628",
+          "section-0630",
+          "section-0631",
+          "section-0632",
+          "section-0633",
+          "section-0634",
+          "section-0635",
+          "section-0644",
+          "section-0645",
+          "section-0646",
+          "section-0647",
+          "section-0648",
+          "section-0653",
+          "section-0654",
+          "section-0655",
+          "section-0656",
+          "section-0658",
+          "section-0661",
+          "section-0664",
+          "section-0665",
+          "section-0666",
+          "section-0667",
+          "section-0670",
+          "section-0673",
+          "section-0674",
+          "section-0675",
+          "section-0680",
+          "section-0681",
+          "section-0682",
+          "section-0683",
+          "section-0686",
+          "section-0690",
+          "section-0691",
+          "section-0692",
+          "section-0695",
+          "section-0699",
+          "section-0700",
+          "section-0701",
+          "section-0702",
+          "section-0703",
+          "section-0704",
+          "section-0705",
+          "section-0710",
+          "section-0711",
+          "section-0712",
+          "section-0715",
+          "section-0716",
+          "section-0717",
+          "section-0724",
+          "section-0729",
+          "section-0731",
+          "section-0737",
+          "section-0738",
+          "section-0745",
+          "section-0748",
+          "section-0751",
+          "section-0758",
+          "section-0765",
+          "section-0776",
+          "section-0782",
+          "section-0783",
+          "section-0785",
+          "section-0789",
+          "section-0790",
+          "section-0791",
+          "section-0793",
+          "section-0797",
+          "section-0798",
+          "section-0800",
+          "section-0804",
+          "section-0805",
+          "section-0811",
+          "section-0812",
+          "section-0814",
+          "section-0815",
+          "section-0817",
+          "section-0820",
+          "section-0821",
+          "section-0823",
+          "section-0824",
+          "section-0825",
+          "section-0830",
+          "section-0833",
+          "section-0834",
+          "section-0835",
+          "section-0836",
+          "section-0839",
+          "section-0842",
+          "section-0843",
+          "section-0844",
+          "section-0845",
+          "section-0847",
+          "section-0850",
+          "section-0851",
+          "section-0852",
+          "section-0853",
+          "section-0856",
+          "section-0858",
+          "section-0859",
+          "section-0860",
+          "section-0865",
+          "section-0868",
+          "section-0869",
+          "section-0870",
+          "section-0871",
+          "section-0875",
+          "section-0878",
+          "section-0879",
+          "section-0880",
+          "section-0881",
+          "section-0883",
+          "section-0885",
+          "section-0886",
+          "section-0887",
+          "section-0888",
+          "section-0893",
+          "section-0899",
+          "section-0903",
+          "section-0906",
+          "section-0908",
+          "section-0909",
+          "section-0910",
+          "section-0913",
+          "section-0916",
+          "section-0917",
+          "section-0918",
+          "section-0919",
+          "section-0922",
+          "section-0925",
+          "section-0926",
+          "section-0927",
+          "section-0928",
+          "section-0930",
+          "section-0932",
+          "section-0933",
+          "section-0934",
+          "section-0935",
+          "section-0937",
+          "section-0938",
+          "section-0939",
+          "section-0941",
+          "section-0942",
+          "section-0943",
+          "section-0948",
+          "section-0951",
+          "section-0952",
+          "section-0953",
+          "section-0954",
+          "section-0958",
+          "section-0961",
+          "section-0962",
+          "section-0963",
+          "section-0964",
+          "section-0966",
+          "section-0968",
+          "section-0969",
+          "section-0970",
+          "section-0971",
+          "section-0975",
+          "section-0980",
+          "section-0981",
+          "section-0982",
+          "section-0983",
+          "section-0984",
+          "section-0985",
+          "section-0986",
+          "section-0987",
+          "section-0988",
+          "section-0989",
+          "section-0990",
+          "section-0991",
+          "section-0993",
+          "section-0994",
+          "section-1000",
+          "section-1005",
+          "section-1006",
+          "section-1007",
+          "section-1010",
+          "section-1011",
+          "section-1012",
+          "section-1014",
+          "section-1017",
+          "section-1021",
+          "section-1025",
+          "section-1027",
+          "section-1028",
+          "section-1029",
+          "section-1030",
+          "section-1032",
+          "section-1033",
+          "section-1034",
+          "section-1035",
+          "section-1036",
+          "section-1037",
+          "section-1038",
+          "section-1039",
+          "section-1041",
+          "section-1042",
+          "section-1043",
+          "section-1044",
+          "section-1045",
+          "section-1050",
+          "section-1051",
+          "section-1052",
+          "section-1053",
+          "section-1054",
+          "section-1057",
+          "section-1059",
+          "section-1064",
+          "section-1065",
+          "section-1066",
+          "section-1069",
+          "section-1071",
+          "section-1072",
+          "section-1073",
+          "section-1075",
+          "section-1077",
+          "section-1085",
+          "section-1086",
+          "section-1089",
+          "section-1092",
+          "section-1093",
+          "section-1096",
+          "section-1097",
+          "section-1098",
+          "section-1099",
+          "section-1100",
+          "section-1101",
+          "section-1102",
+          "section-1103",
+          "section-1104",
+          "section-1110",
+          "section-1111",
+          "section-1112",
+          "section-1113",
+          "section-1114",
+          "section-1115",
+          "section-1116",
+          "section-1117",
+          "section-1118",
+          "section-1119",
+          "section-1120",
+          "section-1121",
+          "section-1122",
+          "section-1123",
+          "section-1124",
+          "section-1125",
+          "section-1126",
+          "section-1127",
+          "section-1128",
+          "section-1129",
+          "section-1130",
+          "section-1131",
+          "section-1132",
+          "section-1133",
+          "section-1134",
+          "section-1135",
+          "section-1136",
+          "section-1137",
+          "section-1138",
+          "section-1139",
+          "section-1142",
+          "section-1143",
+          "section-1144",
+          "section-1145",
+          "section-1149",
+          "section-1152",
+          "section-1154",
+          "section-1155",
+          "section-1156",
+          "section-1160",
+          "section-1161",
+          "section-1162",
+          "section-1165",
+          "section-1166",
+          "section-1169",
+          "section-1173",
+          "section-1174",
+          "section-1175",
+          "section-1176",
+          "section-1177",
+          "section-1178",
+          "section-1179",
+          "section-1180",
+          "section-1181",
+          "section-1182",
+          "section-1183",
+          "section-1184",
+          "section-1186",
+          "section-1187",
+          "section-1188",
+          "section-1189",
+          "section-1190",
+          "section-1192",
+          "section-1193",
+          "section-1194",
+          "section-1195",
+          "section-1196",
+          "section-1197",
+          "section-1198",
+          "section-1199",
+          "section-1200",
+          "section-1201",
+          "section-1202",
+          "section-1203",
+          "section-1205",
+          "section-1206",
+          "section-1207",
+          "section-1208",
+          "section-1209",
+          "section-1214",
+          "section-1215",
+          "section-1217",
+          "section-1218",
+          "section-1228",
+          "section-1229",
+          "section-1230",
+          "section-1231",
+          "section-1232",
+          "section-1233",
+          "section-1234",
+          "section-1235",
+          "section-1236",
+          "section-1238",
+          "section-1242",
+          "section-1246",
+          "section-1247",
+          "section-1248",
+          "section-1249",
+          "section-1250",
+          "section-1254",
+          "section-1257",
+          "section-1258",
+          "section-1259",
+          "section-1260",
+          "section-1261",
+          "section-1262",
+          "section-1263",
+          "section-1264",
+          "section-1265",
+          "section-1266",
+          "section-1267",
+          "section-1268",
+          "section-1269",
+          "section-1270",
+          "section-1271",
+          "section-1272",
+          "section-1273",
+          "section-1274",
+          "section-1275",
+          "section-1276",
+          "section-1277",
+          "section-1278",
+          "section-1279",
+          "section-1280",
+          "section-1281",
+          "section-1282",
+          "section-1283",
+          "section-1284",
+          "section-1285",
+          "section-1294",
+          "section-1298",
+          "section-1301",
+          "section-1302",
+          "section-1303",
+          "section-1306",
+          "section-1307",
+          "section-1308",
+          "section-1309",
+          "section-1310",
+          "section-1311",
+          "section-1312",
+          "section-1316",
+          "section-1320",
+          "section-1322",
+          "section-1323",
+          "section-1324",
+          "section-1325",
+          "section-1326",
+          "section-1327",
+          "section-1328",
+          "section-1329",
+          "section-1330",
+          "section-1331",
+          "section-1334",
+          "section-1335",
+          "section-1336",
+          "section-1341",
+          "section-1342",
+          "section-1343",
+          "section-1344",
+          "section-1349",
+          "section-1351",
+          "section-1358",
+          "section-1365",
+          "section-1373",
+          "section-1376",
+          "section-1377",
+          "section-1380",
+          "section-1381",
+          "section-1382",
+          "section-1383",
+          "section-1384",
+          "section-1386",
+          "section-1392",
+          "section-1393",
+          "section-1394",
+          "section-1395",
+          "section-1396",
+          "section-1397",
+          "section-1398"
+        ],
+        "physical_pages": []
+      },
+      "extraction": {
+        "purpose": "extract_profile_workpaper",
+        "request_id": "bp-work-5189881c12bb58c6aa019be1:workpaper:extract",
+        "request_hash": "e0e213f62baabd6a03cd921672ff3eb9c1aceaf183a9b00817e4bb154a9fe3e8",
+        "response_hash": "dea175f6222e9096d13d260524d8192762fa9df6510ed31711e9cabead8c6d6e",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 11801,
+          "output_tokens": 17820,
+          "total_tokens": 29621
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0044",
+          "section-0096"
+        ],
+        "physical_pages": [
+          11,
+          12,
+          13,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ]
+      }
+    },
+    "quality_review": {
+      "status": "completed_with_open_findings",
+      "policy_version": "company_profile_workpaper_review.v13",
+      "original_draft_hash": "23a346ff9ebebf2ed77af4c24e05338e6bf426115666961a80270f5e6b84e036",
+      "findings": [
+        {
+          "finding_id": "omit-ops-property-tenure",
+          "element": "operations_and_inputs",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0004",
+            "source-0007"
+          ],
+          "explanation": "定向问题要求分别说明截至报告期末的自有、租赁、托管运营方式。source-0004已开业门店分布表已列明自有物业门店合计25家、建筑面积207.7万平米，租赁/托管物业门店合计53家、建筑面积359.5万平米；租赁与托管在同一列，原文不能拆开。该表合计经营业态为「购物中心/百货/奥特莱斯/免税」，与业务概述的78家大型综合有税零售门店未经原文解释为同一口径。草稿只在限制中说明无法拆分，未列示上述可直接读取的门店数和面积。应按该表自身栏目单独补入，不得改记为有税门店拆分，也不得把租赁与托管拆成两个数。",
+          "resolution": "repair_rejected",
+          "original_fact": null,
+          "revised_fact": null
+        },
+        {
+          "finding_id": "omit-ops-ending-area",
+          "element": "operations_and_inputs",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0006",
+            "source-0007",
+            "source-0004"
+          ],
+          "explanation": "定向问题要求经营规模并保留面积口径。source-0007《其他说明》期末合计为78家、建筑面积/租赁面积567.2万平方米，合计业态栏写「购物中心/百货/奥特莱斯」，但分地区行含免税；source-0006门店清单面积合计亦为567.2万平方米，且清单包含免税门店。原文另注分项与合计可能因四舍五入不等。草稿有叙事口径的78家及新开、关闭面积，但未列示该期末面积。补入时应直接采用表内合计，保留「建筑面积/租赁面积」混合栏目和各表业态标签，不得当成78家有税门店的纯建筑面积或完全权益面积，也不得自行加总替换。",
+          "resolution": "corrected_pending_trust",
+          "original_fact": null,
+          "revised_fact": {
+            "fact_id": "review-add:omit-ops-ending-area",
+            "text": "截至2025年末，按《其他说明》期末合计：门店78家，建筑面积/租赁面积567.2万平方米；该表合计行经营业态栏写「购物中心/百货/奥特莱斯」，但分地区行含免税。门店清单（含免税门店）面积合计亦为567.2万平方米。原文注明因四舍五入，分项与合计可能不等。",
+            "subject_scope": "unclear",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0007",
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "《其他说明》期末合计（合计行业态：购物中心/百货/奥特莱斯；分地区含免税）门店数量",
+                "raw_value": "78",
+                "value": "78",
+                "unit": "家",
+                "source_unit": "家",
+                "currency": null,
+                "subject_scope": "unclear",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "表内合计行业态标签与分地区行含免税的口径不完全一致。"
+              },
+              {
+                "name": "《其他说明》期末合计（合计行业态：购物中心/百货/奥特莱斯；分地区含免税）建筑面积/租赁面积",
+                "raw_value": "567.2",
+                "value": "567.2",
+                "unit": "万平方米",
+                "source_unit": "万平方米",
+                "currency": null,
+                "subject_scope": "unclear",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "面积栏为建筑面积/租赁面积混合口径；原文注明四舍五入可能使分项与合计不等。"
+              },
+              {
+                "name": "门店清单（含免税门店）面积合计",
+                "raw_value": "567.2",
+                "value": "567.2",
+                "unit": "万平方米",
+                "source_unit": "万平方米",
+                "currency": null,
+                "subject_scope": "unclear",
+                "period": "2025-12-31",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "该清单包含免税门店，且与《其他说明》合计并非纯有税门店建筑面积口径。"
+              }
+            ],
+            "uncertainty_reason": "表内合计行业态栏为购物中心/百货/奥特莱斯，但分地区行含免税；面积栏为建筑面积/租赁面积混合口径，且原文注明四舍五入可能使分项与合计不等。"
+          }
+        },
+        {
+          "finding_id": "omit-ops-specialty-stores",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "explanation": "专业店是同节单独列示的网点业态，且定向问题要求不要并入公司统一总数。source-0001写明各类专业店333家；source-0002进一步列明睿锦尚品33家（含3家快闪店）、法雅商贸300家（自营店铺108家、加盟店铺190家、卖场2家）。限制仅提及333家未并入78家，两条主线及其自营、加盟口径未形成已采用事实。建议按专业店自身口径补入，不要并入大型综合有税零售门店总数。",
+          "resolution": "omission_candidate",
+          "original_fact": null,
+          "revised_fact": null
+        }
+      ],
+      "checked_fact_ids": [
+        "ops-001",
+        "ops-002",
+        "ops-003",
+        "ops-004",
+        "ops-005",
+        "ops-006",
+        "ops-007",
+        "ops-010",
+        "ops-012",
+        "ops-013",
+        "ops-014"
+      ],
+      "calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-5189881c12bb58c6aa019be1:workpaper:review",
+          "request_hash": "80fba1256d1d36306413fda346cc2428cfcb7c5a064c4cd4bc7fb7fe13b31a47",
+          "response_hash": "eea7f0ee65d5bd63155a1eda9db3254dc361a4b03a901a6f9efd4517c4e7afd4",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 17668,
+            "output_tokens": 759,
+            "total_tokens": 43973
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0044",
+            "section-0096"
+          ],
+          "physical_pages": [
+            11,
+            12,
+            13,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-5189881c12bb58c6aa019be1:workpaper:repair",
+          "request_hash": "8a96de4eb31674b29b949409f3a01ee400c25197725938523b0c1963280f9465",
+          "response_hash": "2f53a2e9c355e9d608da15fd1352d82e84af8d023a54b1d349d0b7be8decbd58",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 9697,
+            "output_tokens": 9069,
+            "total_tokens": 18766
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0044",
+            "section-0096"
+          ],
+          "physical_pages": [
+            11,
+            12,
+            13,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ]
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "request_id": "bp-work-5189881c12bb58c6aa019be1:workpaper:repair-verify",
+          "request_hash": "7836261de08c377f006051f1c5d859b5873d59c11d515d4de8375cd4fbefc062",
+          "response_hash": "33e88bc5daad218a2427626aa6a1dcee56b89130d109f5ab2b88eed81d6d7f4f",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 12387,
+            "output_tokens": 221,
+            "total_tokens": 19919
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0044",
+            "section-0096"
+          ],
+          "physical_pages": [
+            11,
+            12,
+            13,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ]
+        }
+      ],
+      "retained_request_ids": [],
+      "locally_revalidated_request_ids": [],
+      "error": null,
+      "checked_fact_hashes": {
+        "ops-001": "14f67b44930beefc2695aa18222c8e52c2efff0137b7b6470801886b7a9d7d95",
+        "ops-002": "8fbc854b59195aef899e588031f2e76e6b4131f96fe9cba96d584ce9f7ba79ea",
+        "ops-003": "a0d5869cca2f35424c6a6438b7e83fff0df19191242b76c5cf007cc513a0933d",
+        "ops-004": "92e3f9e02db73f79368cca11d996274818227c5f593f8f32ead7c2ccf7ab1f3f",
+        "ops-005": "35575e4e21b1e3bc7ac05b3d7f540fd6bc533e6eaa9fa992605f70e816692533",
+        "ops-006": "4ab890bfba5bce1006e5c321fec5a56a21a5e703caaebe096b94611f0ba2f1d2",
+        "ops-007": "b2cfcb67d7fa8cc9a9cfb947e016bc51a0fc070ab6400665669cfe873699d9a0",
+        "ops-010": "9f1216637c4dc107f3918119ab481f9b19683f8aeba404d8270377868c71d9e0",
+        "ops-012": "2c7b0249fda6deefc64d17b107810bf4885842557ca48f189177515514928ac1",
+        "ops-013": "6b72d7311970e25ee7b1334f39d9aa0c44afa8ac758857786025eb78cbf40795",
+        "ops-014": "f1e67825fd84101436b5ffa7bc0ad651c97a171f9cbb957daea3919bbb575120"
+      },
+      "metric_limit_policy": "source_review_exact_metric_limits.v1"
+    },
+    "standardization_notes": [
+      "事实ops-008已隔离，未作为结论采用：metric number is absent from cited source: 专业店门店数量",
+      "事实ops-009已隔离，未作为结论采用：metric number is absent from cited source: 已开业门店合计数量",
+      "事实ops-011已隔离，未作为结论采用：metric number is absent from cited source: 熙地港（西安）购物中心建筑面积",
+      "修订源检查隔离：review-add:omit-ops-property-tenure未进入最终再核或正文；ValidationError: 2 validation errors for WorkpaperFact\nmetrics.1\n  Value error, source_unit cannot relabel a numeric magnitude [type=value_error, input_value={'name': '合计行（购...urce_unit': '万平米'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error\nmetrics.3\n  Value error, source_unit cannot relabel a numeric magnitude [type=value_error, input_value={'name': '合计行（购...urce_unit': '万平米'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error"
+    ],
+    "use_review": {
+      "report": {
+        "instrument_id": "600859.SH",
+        "report_id": "asset_c549dbec8c1cbf02b27df868e1cdd8bd",
+        "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reviewer": "A main, independent original-PDF reading; model agreement is not the source verdict",
+      "reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-http-research-use-20261125/a-content-review.json",
+      "reference_sha256": "dca9c2bf003192d6abfcbd5de3bfa2798a16f5576511849c0762dec38d9a627b",
+      "decisions": [
+        {
+          "fact_id": "ops-010",
+          "fact_sha256": "9f1216637c4dc107f3918119ab481f9b19683f8aeba404d8270377868c71d9e0",
+          "disposition": "source_only",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "reason": "Displayed counts3/5and51.1/23.2match the table, but its uncertainty metadata definitively says duty-free is excluded while the same table's regional rows include duty-free. Keep source reference; do not assert a reconciled uniform business range.",
+          "limitation": "仅源参考；主体或范围尚不能安全结构化，不改写原值或主体。"
+        },
+        {
+          "fact_id": "ops-012",
+          "fact_sha256": "2c7b0249fda6deefc64d17b107810bf4885842557ca48f189177515514928ac1",
+          "disposition": "source_only",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "reason": "Source gives named shopping-centre/store areas and ownership51% in a named company. Project/store area is not established as a legal subsidiary's whole-company metric; current fact/metric named_subsidiary labels lack a safe common subject. Keep source-only without guessing replacement scope.",
+          "limitation": "仅源参考；主体或范围尚不能安全结构化，不改写原值或主体。"
+        },
+        {
+          "fact_id": "ops-013",
+          "fact_sha256": "6b72d7311970e25ee7b1334f39d9aa0c44afa8ac758857786025eb78cbf40795",
+          "disposition": "source_only",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "reason": "Source gives project area20.9and50%ownership of a named property company, but does not establish that project area as a controlled subsidiary-wide metric. Keep literal source-only rather than guessing control or replacement scope.",
+          "limitation": "仅源参考；主体或范围尚不能安全结构化，不改写原值或主体。"
+        },
+        {
+          "fact_id": "ops-014",
+          "fact_sha256": "f1e67825fd84101436b5ffa7bc0ad651c97a171f9cbb957daea3919bbb575120",
+          "disposition": "source_only",
+          "evidence_ids": [
+            "source-0007",
+            "source-0008"
+          ],
+          "reason": "Source expressly describes a third-party-owned entrusted project with18.7area/15-yearterm and a named managing subsidiary. Project characteristics cannot safely be treated as that subsidiary's whole-company metrics. Keep source-only; the entrusted-management narrative remains auditable.",
+          "limitation": "仅源参考；主体或范围尚不能安全结构化，不改写原值或主体。"
+        }
+      ]
+    }
+  },
+  "workpaper_raw_for_audit": true,
+  "workpaper_delivery": {
+    "policy_version": "company_profile_research_delivery.v1",
+    "research_only": true,
+    "formal_acceptance": "not_assessed",
+    "production_authorization": "not_authorized",
+    "information_gaps": [
+      {
+        "element": "business_structure",
+        "status": "unclear",
+        "reasons": [
+          "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+        ]
+      },
+      {
+        "element": "products_services",
+        "status": "unclear",
+        "reasons": [
+          "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+        ]
+      },
+      {
+        "element": "revenue_model",
+        "status": "unclear",
+        "reasons": [
+          "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+        ]
+      },
+      {
+        "element": "scale_and_mix",
+        "status": "unclear",
+        "reasons": [
+          "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+        ]
+      },
+      {
+        "element": "operations_and_inputs",
+        "status": "observed",
+        "reasons": [
+          "本次仅定向回答运营网点构成、规模与物业方式，未覆盖收入拆分、单店经营明细及线上业务明细。",
+          "业务概述分业态门店数与公司总数、门店分布表合计数存在差异，原文未解释，故并列保留，未作调整或加总。",
+          "口岸免税店数量在业务概述前后段表述不一致，原文未解释；本回复分别列示。",
+          "门店分布表的经营业态栏含免税，而《其他说明》合计栏仅列购物中心/百货/奥特莱斯，二者口径不同，不能直接视为同一总数。",
+          "租赁/托管物业在分布表中合并列示，无法拆分租赁与托管各自的门店数和面积。",
+          "部分购物中心建筑面积包含同一建筑内百货门店租赁面积，且产权方存在非全资持股，面积口径不能简单相加。",
+          "专业店333家为独立业态，未并入78家大型综合有税零售门店总数。",
+          "2026年2月首都机场T2航站楼免税店为报告期后事项，未并入2025年末门店数。",
+          "事实ops-008已隔离，未作为结论采用：metric number is absent from cited source: 专业店门店数量",
+          "事实ops-009已隔离，未作为结论采用：metric number is absent from cited source: 已开业门店合计数量",
+          "事实ops-011已隔离，未作为结论采用：metric number is absent from cited source: 熙地港（西安）购物中心建筑面积"
+        ]
+      },
+      {
+        "element": "customers_channels_markets",
+        "status": "unclear",
+        "reasons": [
+          "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+        ]
+      },
+      {
+        "element": "operating_drivers",
+        "status": "unclear",
+        "reasons": [
+          "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+        ]
+      },
+      {
+        "element": "material_changes",
+        "status": "unclear",
+        "reasons": [
+          "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+        ]
+      }
+    ],
+    "suggested_acquisitions": [
+      {
+        "finding_id": "omit-ops-property-tenure",
+        "element": "operations_and_inputs",
+        "severity": "material",
+        "reason": "定向问题要求分别说明截至报告期末的自有、租赁、托管运营方式。source-0004已开业门店分布表已列明自有物业门店合计25家、建筑面积207.7万平米，租赁/托管物业门店合计53家、建筑面积359.5万平米；租赁与托管在同一列，原文不能拆开。该表合计经营业态为「购物中心/百货/奥特莱斯/免税」，与业务概述的78家大型综合有税零售门店未经原文解释为同一口径。草稿只在限制中说明无法拆分，未列示上述可直接读取的门店数和面积。应按该表自身栏目单独补入，不得改记为有税门店拆分，也不得把租赁与托管拆成两个数。",
+        "evidence_ids": [
+          "source-0004",
+          "source-0007"
+        ]
+      },
+      {
+        "finding_id": "omit-ops-specialty-stores",
+        "element": "operations_and_inputs",
+        "severity": "minor",
+        "reason": "专业店是同节单独列示的网点业态，且定向问题要求不要并入公司统一总数。source-0001写明各类专业店333家；source-0002进一步列明睿锦尚品33家（含3家快闪店）、法雅商贸300家（自营店铺108家、加盟店铺190家、卖场2家）。限制仅提及333家未并入78家，两条主线及其自营、加盟口径未形成已采用事实。建议按专业店自身口径补入，不要并入大型综合有税零售门店总数。",
+        "evidence_ids": [
+          "source-0001",
+          "source-0002"
+        ]
+      }
+    ],
+    "counts": {
+      "reviewed": 5,
+      "pending": 0,
+      "limited": 3,
+      "source_only": 4,
+      "withheld": 0,
+      "duplicate": 0
+    },
+    "labels": {
+      "reviewed": "已核（研究用途，非正式接受）",
+      "pending": "待核（无其他限用）",
+      "limited": "保真限用",
+      "source_only": "仅源参考／解释",
+      "withheld": "已隔离",
+      "duplicate": "重复未再展示"
+    },
+    "pending_review_count": 0,
+    "facts": [
+      {
+        "fact_id": "ops-001",
+        "element": "operations_and_inputs",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "ops-001",
+          "text": "截至2025年末，公司在全国37个城市共运营78家大型综合有税零售门店，涉及奥特莱斯、购物中心、百货业态；同时管理运营免税门店，并拥有专业店及线上业务。",
+          "subject_scope": "consolidated_group",
+          "period": "2025-12-31",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [
+            {
+              "name": "大型综合有税零售门店数量",
+              "raw_value": "78",
+              "value": "78",
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "覆盖城市数量",
+              "raw_value": "37",
+              "value": "37",
+              "unit": "个",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "ops-002",
+        "element": "operations_and_inputs",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "ops-002",
+          "text": "奥莱业态分为名品奥莱及城市奥莱两条业务主线，主营业务收入为商品零售收入，经营模式包括联营、自营和租赁，以联营为主；截至报告期末共拥有19家奥莱门店。",
+          "subject_scope": "business_segment",
+          "period": "2025-12-31",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [
+            {
+              "name": "奥莱门店数量",
+              "raw_value": "19",
+              "value": "19",
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "ops-003",
+        "element": "operations_and_inputs",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "fact": {
+          "fact_id": "ops-003",
+          "text": "购物中心业态主营业务收入为租金收入，经营模式以租赁为主；报告期内关闭1家、新增2家，截至报告期末共拥有37家购物中心门店。",
+          "subject_scope": "business_segment",
+          "period": "2025-12-31",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [
+            {
+              "name": "购物中心门店数量",
+              "raw_value": "37",
+              "value": "37",
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "购物中心报告期新增门店数量",
+              "raw_value": "2",
+              "value": "2",
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "购物中心报告期关闭门店数量",
+              "raw_value": "1",
+              "value": "1",
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "ops-004",
+        "element": "operations_and_inputs",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "fact": {
+          "fact_id": "ops-004",
+          "text": "百货业态主营业务收入为商品零售收入，经营模式包括联营、自营和租赁，以联营为主；报告期内关闭4家，截至报告期末共拥有21家百货门店。",
+          "subject_scope": "business_segment",
+          "period": "2025-12-31",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [
+            {
+              "name": "百货门店数量",
+              "raw_value": "21",
+              "value": "21",
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "百货报告期关闭门店数量",
+              "raw_value": "4",
+              "value": "4",
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "ops-005",
+        "element": "operations_and_inputs",
+        "state": "limited",
+        "label": "保真限用／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [
+          "同节后段对口岸免税店数量披露为1家，存在前后表述不一致。"
+        ],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "ops-005",
+          "text": "业务概述前段称，公司同时管理运营2家口岸免税店、2家市内免税店及1家离岛免税门店。",
+          "subject_scope": "business_segment",
+          "period": "2025-12-31",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [
+            {
+              "name": "口岸免税店数量（业务概述前段口径）",
+              "raw_value": "2",
+              "value": "2",
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "市内免税店数量（业务概述前段口径）",
+              "raw_value": "2",
+              "value": "2",
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "离岛免税店数量（业务概述前段口径）",
+              "raw_value": "1",
+              "value": "1",
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "同节后段对口岸免税店数量披露为1家，存在前后表述不一致。"
+        }
+      },
+      {
+        "fact_id": "ops-006",
+        "element": "operations_and_inputs",
+        "state": "limited",
+        "label": "保真限用／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [
+          "口岸免税店数量与业务概述前段的2家不一致。"
+        ],
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "fact": {
+          "fact_id": "ops-006",
+          "text": "同节后段称，截至本报告期末，公司共拥有离岛免税店1家、口岸免税店1家、市内免税店2家。",
+          "subject_scope": "business_segment",
+          "period": "2025-12-31",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [
+            {
+              "name": "离岛免税店数量（业务概述后段口径）",
+              "raw_value": "1",
+              "value": "1",
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "口岸免税店数量（业务概述后段口径）",
+              "raw_value": "1",
+              "value": "1",
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "市内免税店数量（业务概述后段口径）",
+              "raw_value": "2",
+              "value": "2",
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": "口岸免税店数量与业务概述前段的2家不一致。"
+        }
+      },
+      {
+        "fact_id": "ops-007",
+        "element": "operations_and_inputs",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "fact": {
+          "fact_id": "ops-007",
+          "text": "2026年2月，公司旗下王府井免税北京首都机场T2航站楼免税店对外营业；该门店为报告期后事项。",
+          "subject_scope": "business_segment",
+          "period": "2026-02",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "ops-010",
+        "element": "operations_and_inputs",
+        "state": "source_only",
+        "label": "仅源参考／解释／独立源核",
+        "review_basis": "independent_source_check",
+        "model_review_stage": null,
+        "reasons": [
+          "Displayed counts3/5and51.1/23.2match the table, but its uncertainty metadata definitively says duty-free is excluded while the same table's regional rows include duty-free. Keep source reference; do not assert a reconciled uniform business range."
+        ],
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "fact": null
+      },
+      {
+        "fact_id": "ops-012",
+        "element": "operations_and_inputs",
+        "state": "source_only",
+        "label": "仅源参考／解释／独立源核",
+        "review_basis": "independent_source_check",
+        "model_review_stage": null,
+        "reasons": [
+          "Source gives named shopping-centre/store areas and ownership51% in a named company. Project/store area is not established as a legal subsidiary's whole-company metric; current fact/metric named_subsidiary labels lack a safe common subject. Keep source-only without guessing replacement scope."
+        ],
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "fact": null
+      },
+      {
+        "fact_id": "ops-013",
+        "element": "operations_and_inputs",
+        "state": "source_only",
+        "label": "仅源参考／解释／独立源核",
+        "review_basis": "independent_source_check",
+        "model_review_stage": null,
+        "reasons": [
+          "Source gives project area20.9and50%ownership of a named property company, but does not establish that project area as a controlled subsidiary-wide metric. Keep literal source-only rather than guessing control or replacement scope."
+        ],
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "fact": null
+      },
+      {
+        "fact_id": "ops-014",
+        "element": "operations_and_inputs",
+        "state": "source_only",
+        "label": "仅源参考／解释／独立源核",
+        "review_basis": "independent_source_check",
+        "model_review_stage": null,
+        "reasons": [
+          "Source expressly describes a third-party-owned entrusted project with18.7area/15-yearterm and a named managing subsidiary. Project characteristics cannot safely be treated as that subsidiary's whole-company metrics. Keep source-only; the entrusted-management narrative remains auditable."
+        ],
+        "evidence_ids": [
+          "source-0007",
+          "source-0008"
+        ],
+        "fact": null
+      },
+      {
+        "fact_id": "review-add:omit-ops-ending-area",
+        "element": "operations_and_inputs",
+        "state": "limited",
+        "label": "保真限用／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "final",
+        "reasons": [
+          "表内合计行业态栏为购物中心/百货/奥特莱斯，但分地区行含免税；面积栏为建筑面积/租赁面积混合口径，且原文注明四舍五入可能使分项与合计不等。"
+        ],
+        "evidence_ids": [
+          "source-0007",
+          "source-0006"
+        ],
+        "fact": {
+          "fact_id": "review-add:omit-ops-ending-area",
+          "text": "截至2025年末，按《其他说明》期末合计：门店78家，建筑面积/租赁面积567.2万平方米；该表合计行经营业态栏写「购物中心/百货/奥特莱斯」，但分地区行含免税。门店清单（含免税门店）面积合计亦为567.2万平方米。原文注明因四舍五入，分项与合计可能不等。",
+          "subject_scope": "unclear",
+          "period": "2025-12-31",
+          "evidence_ids": [
+            "source-0007",
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "《其他说明》期末合计（合计行业态：购物中心/百货/奥特莱斯；分地区含免税）门店数量",
+              "raw_value": "78",
+              "value": "78",
+              "unit": "家",
+              "source_unit": "家",
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "表内合计行业态标签与分地区行含免税的口径不完全一致。"
+            },
+            {
+              "name": "《其他说明》期末合计（合计行业态：购物中心/百货/奥特莱斯；分地区含免税）建筑面积/租赁面积",
+              "raw_value": "567.2",
+              "value": "567.2",
+              "unit": "万平方米",
+              "source_unit": "万平方米",
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "面积栏为建筑面积/租赁面积混合口径；原文注明四舍五入可能使分项与合计不等。"
+            },
+            {
+              "name": "门店清单（含免税门店）面积合计",
+              "raw_value": "567.2",
+              "value": "567.2",
+              "unit": "万平方米",
+              "source_unit": "万平方米",
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025-12-31",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "该清单包含免税门店，且与《其他说明》合计并非纯有税门店建筑面积口径。"
+            }
+          ],
+          "uncertainty_reason": "表内合计行业态栏为购物中心/百货/奥特莱斯，但分地区行含免税；面积栏为建筑面积/租赁面积混合口径，且原文注明四舍五入可能使分项与合计不等。"
+        }
+      }
+    ]
+  },
+  "workpaper_markdown": "# 600859.SH｜2025-12-31 公司画像底稿\n\n真实模型底稿（待核，不代表正式公司可用）\n\n来源版本：`e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca`。发布时点：2026-04-22T16:00:00+00:00。\n\n研究分级不等于正式可信发布；以下普通正文不含隔离、仅源参考或重复对象。原底稿及后文复核记录保留审计。\n\n已核（研究用途，非正式接受） 5；待核（无其他限用） 0；保真限用 3；仅源参考／解释 4；已隔离 0；重复未再展示 0\n待核合计（含限用中的待核）：0。\n\n独立使用审核：A main, independent original-PDF reading; model agreement is not the source verdict；依据：openspec/changes/restore-company-profile-llm-led-generalization/workpaper-http-research-use-20261125/a-content-review.json；hash `dca9c2bf003192d6abfcbd5de3bfa2798a16f5576511849c0762dec38d9a627b`。\n\n## 业务结构\n\n- 限制：本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。\n\n## 产品、服务及用途\n\n- 限制：本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。\n\n## 怎么赚钱\n\n- 限制：本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。\n\n## 规模与业务权重\n\n- 限制：本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。\n\n## 经营方式与关键投入\n\n- 【已核（研究用途，非正式接受）／模型源核】截至2025年末，公司在全国37个城市共运营78家大型综合有税零售门店，涉及奥特莱斯、购物中心、百货业态；同时管理运营免税门店，并拥有专业店及线上业务。（[source-0001](#source-0001)）\n  - 大型综合有税零售门店数量：78 家；2025-12-31，consolidated_group。\n  - 覆盖城市数量：37 个；2025-12-31，consolidated_group。\n- 【已核（研究用途，非正式接受）／模型源核】奥莱业态分为名品奥莱及城市奥莱两条业务主线，主营业务收入为商品零售收入，经营模式包括联营、自营和租赁，以联营为主；截至报告期末共拥有19家奥莱门店。（[source-0001](#source-0001)）\n  - 奥莱门店数量：19 家；2025-12-31，business_segment。\n- 【已核（研究用途，非正式接受）／模型源核】购物中心业态主营业务收入为租金收入，经营模式以租赁为主；报告期内关闭1家、新增2家，截至报告期末共拥有37家购物中心门店。（[source-0002](#source-0002)）\n  - 购物中心门店数量：37 家；2025-12-31，business_segment。\n  - 购物中心报告期新增门店数量：2 家；2025-12-31，business_segment。\n  - 购物中心报告期关闭门店数量：1 家；2025-12-31，business_segment。\n- 【已核（研究用途，非正式接受）／模型源核】百货业态主营业务收入为商品零售收入，经营模式包括联营、自营和租赁，以联营为主；报告期内关闭4家，截至报告期末共拥有21家百货门店。（[source-0002](#source-0002)）\n  - 百货门店数量：21 家；2025-12-31，business_segment。\n  - 百货报告期关闭门店数量：4 家；2025-12-31，business_segment。\n- 【保真限用／模型源核】【不确定：同节后段对口岸免税店数量披露为1家，存在前后表述不一致。】业务概述前段称，公司同时管理运营2家口岸免税店、2家市内免税店及1家离岛免税门店。（[source-0001](#source-0001)）\n  - 使用限制：同节后段对口岸免税店数量披露为1家，存在前后表述不一致。\n  - 口岸免税店数量（业务概述前段口径）：2 家；2025-12-31，business_segment。\n  - 市内免税店数量（业务概述前段口径）：2 家；2025-12-31，business_segment。\n  - 离岛免税店数量（业务概述前段口径）：1 家；2025-12-31，business_segment。\n- 【保真限用／模型源核】【不确定：口岸免税店数量与业务概述前段的2家不一致。】同节后段称，截至本报告期末，公司共拥有离岛免税店1家、口岸免税店1家、市内免税店2家。（[source-0002](#source-0002)）\n  - 使用限制：口岸免税店数量与业务概述前段的2家不一致。\n  - 离岛免税店数量（业务概述后段口径）：1 家；2025-12-31，business_segment。\n  - 口岸免税店数量（业务概述后段口径）：1 家；2025-12-31，business_segment。\n  - 市内免税店数量（业务概述后段口径）：2 家；2025-12-31，business_segment。\n- 【已核（研究用途，非正式接受）／模型源核】2026年2月，公司旗下王府井免税北京首都机场T2航站楼免税店对外营业；该门店为报告期后事项。（[source-0002](#source-0002)）\n- 【保真限用／模型源核】【不确定：表内合计行业态栏为购物中心/百货/奥特莱斯，但分地区行含免税；面积栏为建筑面积/租赁面积混合口径，且原文注明四舍五入可能使分项与合计不等。】截至2025年末，按《其他说明》期末合计：门店78家，建筑面积/租赁面积567.2万平方米；该表合计行经营业态栏写「购物中心/百货/奥特莱斯」，但分地区行含免税。门店清单（含免税门店）面积合计亦为567.2万平方米。原文注明因四舍五入，分项与合计可能不等。（[source-0007](#source-0007)、[source-0006](#source-0006)）\n  - 使用限制：表内合计行业态栏为购物中心/百货/奥特莱斯，但分地区行含免税；面积栏为建筑面积/租赁面积混合口径，且原文注明四舍五入可能使分项与合计不等。\n  - 《其他说明》期末合计（合计行业态：购物中心/百货/奥特莱斯；分地区含免税）门店数量：78 家（不确定：表内合计行业态标签与分地区行含免税的口径不完全一致。）；2025-12-31，unclear。\n  - 《其他说明》期末合计（合计行业态：购物中心/百货/奥特莱斯；分地区含免税）建筑面积/租赁面积：567.2 万平方米（不确定：面积栏为建筑面积/租赁面积混合口径；原文注明四舍五入可能使分项与合计不等。）；2025-12-31，unclear。\n  - 门店清单（含免税门店）面积合计：567.2 万平方米（不确定：该清单包含免税门店，且与《其他说明》合计并非纯有税门店建筑面积口径。）；2025-12-31，unclear。\n- 限制：本次仅定向回答运营网点构成、规模与物业方式，未覆盖收入拆分、单店经营明细及线上业务明细。\n- 限制：业务概述分业态门店数与公司总数、门店分布表合计数存在差异，原文未解释，故并列保留，未作调整或加总。\n- 限制：口岸免税店数量在业务概述前后段表述不一致，原文未解释；本回复分别列示。\n- 限制：门店分布表的经营业态栏含免税，而《其他说明》合计栏仅列购物中心/百货/奥特莱斯，二者口径不同，不能直接视为同一总数。\n- 限制：租赁/托管物业在分布表中合并列示，无法拆分租赁与托管各自的门店数和面积。\n- 限制：部分购物中心建筑面积包含同一建筑内百货门店租赁面积，且产权方存在非全资持股，面积口径不能简单相加。\n- 限制：专业店333家为独立业态，未并入78家大型综合有税零售门店总数。\n- 限制：2026年2月首都机场T2航站楼免税店为报告期后事项，未并入2025年末门店数。\n- 限制：事实ops-008已隔离，未作为结论采用：metric number is absent from cited source: 专业店门店数量\n- 限制：事实ops-009已隔离，未作为结论采用：metric number is absent from cited source: 已开业门店合计数量\n- 限制：事实ops-011已隔离，未作为结论采用：metric number is absent from cited source: 熙地港（西安）购物中心建筑面积\n\n## 客户、渠道与市场\n\n- 限制：本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。\n\n## 关键经营影响因素\n\n- 限制：本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。\n\n## 近期重要变化\n\n- 限制：本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。\n\n## 建议获取（不阻塞画像交付）\n\n- 经营方式与关键投入：定向问题要求分别说明截至报告期末的自有、租赁、托管运营方式。source-0004已开业门店分布表已列明自有物业门店合计25家、建筑面积207.7万平米，租赁/托管物业门店合计53家、建筑面积359.5万平米；租赁与托管在同一列，原文不能拆开。该表合计经营业态为「购物中心/百货/奥特莱斯/免税」，与业务概述的78家大型综合有税零售门店未经原文解释为同一口径。草稿只在限制中说明无法拆分，未列示上述可直接读取的门店数和面积。应按该表自身栏目单独补入，不得改记为有税门店拆分，也不得把租赁与托管拆成两个数。\n- 经营方式与关键投入：专业店是同节单独列示的网点业态，且定向问题要求不要并入公司统一总数。source-0001写明各类专业店333家；source-0002进一步列明睿锦尚品33家（含3家快闪店）、法雅商贸300家（自营店铺108家、加盟店铺190家、卖场2家）。限制仅提及333家未并入78家，两条主线及其自营、加盟口径未形成已采用事实。建议按专业店自身口径补入，不要并入大型综合有税零售门店总数。\n\n## 阅读范围与取舍\n\n选择“报告期内公司从事的业务情况”用于明确主要业态、经营角色与运营模式；选择“零售行业经营性信息分析”完整覆盖报告期末已开业门店分布、面积口径及自有/租赁/托管等运营方式，并保留其“其他说明”对购物中心租赁经营等特点的解释。两者合并可直接回答截至2025年末主要业态网点构成、经营规模和运营方式，且不将不同口径业态简单加总。\n\n- 第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况，物理页11—13：选择“报告期内公司从事的业务情况”用于明确主要业态、经营角色与运营模式；选择“零售行业经营性信息分析”完整覆盖报告期末已开业门店分布、面积口径及自有/租赁/托管等运营方式，并保留其“其他说明”对购物中心租赁经营等特点的解释。两者合并可直接回答截至2025年末主要业态网点构成、经营规模和运营方式，且不将不同口径业态简单加总。\n- 第三节 管理层讨论与分析 / 零售行业经营性信息分析，物理页24—29：选择“报告期内公司从事的业务情况”用于明确主要业态、经营角色与运营模式；选择“零售行业经营性信息分析”完整覆盖报告期末已开业门店分布、面积口径及自有/租赁/托管等运营方式，并保留其“其他说明”对购物中心租赁经营等特点的解释。两者合并可直接回答截至2025年末主要业态网点构成、经营规模和运营方式，且不将不同口径业态简单加总。\n\n停止理由：业务概述与零售行业经营性信息中的门店分布及说明已覆盖目标所需的主要业态、期末网点、面积和运营方式；继续读取财务收入拆分或门店明细只会补充收入结构或单店信息，不能改变本次运营网络问题的结论，故在此停止，不声称覆盖全报告。\n\n- 未读/后置：未选主营业务分行业、分地区、分销售模式及财务报表收入附注：本次目标为网点构成、规模与运营方式，收入拆分属于另一问题。\n- 未读/后置：未扩展到报告期后免税新店或单店明细：若原文门店分布表未纳入该等口径，则不将其与期末已开业网点合并为公司统一总数。\n\n## 限用与隔离（不作普通结论）\n\n- ops-010 / 仅源参考／解释／独立源核：Displayed counts3/5and51.1/23.2match the table, but its uncertainty metadata definitively says duty-free is excluded while the same table's regional rows include duty-free. Keep source reference; do not assert a reconciled uniform business range.\n- ops-012 / 仅源参考／解释／独立源核：Source gives named shopping-centre/store areas and ownership51% in a named company. Project/store area is not established as a legal subsidiary's whole-company metric; current fact/metric named_subsidiary labels lack a safe common subject. Keep source-only without guessing replacement scope.\n- ops-013 / 仅源参考／解释／独立源核：Source gives project area20.9and50%ownership of a named property company, but does not establish that project area as a controlled subsidiary-wide metric. Keep literal source-only rather than guessing control or replacement scope.\n- ops-014 / 仅源参考／解释／独立源核：Source expressly describes a third-party-owned entrusted project with18.7area/15-yearterm and a named managing subsidiary. Project characteristics cannot safely be treated as that subsidiary's whole-company metrics. Keep source-only; the entrusted-management narrative remains auditable.\n\n## 模型处理记录\n\n- 选章：deepseek-flash（deepseek:deepseek-flash，semantic_extraction__deepseek），报告标题索引（966个候选章节）；输入/输出/合计 27116/1830/28946；finish=stop；requested_reasoning=high。\n- 正文抽取：deepseek-flash（deepseek:deepseek-flash，semantic_extraction__deepseek），章节 section-0044, section-0096；物理页 11,12,13,24,25,26,27,28,29；输入/输出/合计 11801/17820/29621；finish=stop；requested_reasoning=high。\n- 提示版本：`company_profile_workpaper.2026-11-19.independent-assertions.v21`；预处理：`toc_sections_native_layout.v8.structured-note-markers`。\n\n## 原文复核（开发结果仍待正式核验）\n\n复核状态：`completed_with_open_findings`。\n- 已检查原事实：11条；范围限于本次所选原文，不是全报告完整性保证。\n- 原始底稿哈希：`23a346ff9ebebf2ed77af4c24e05338e6bf426115666961a80270f5e6b84e036`。\n- review_profile_workpaper：grok-4.7（scorpio:grok-4.7）；requested_reasoning=high；usage=43973；本次调用。\n- repair_profile_workpaper：deepseek-flash（deepseek:deepseek-flash）；requested_reasoning=high；usage=18766；本次调用。\n- verify_profile_workpaper_repair：grok-4.7（scorpio:grok-4.7）；requested_reasoning=high；usage=19919；本次调用。\n- material / material_omission / repair_rejected：定向问题要求分别说明截至报告期末的自有、租赁、托管运营方式。source-0004已开业门店分布表已列明自有物业门店合计25家、建筑面积207.7万平米，租赁/托管物业门店合计53家、建筑面积359.5万平米；租赁与托管在同一列，原文不能拆开。该表合计经营业态为「购物中心/百货/奥特莱斯/免税」，与业务概述的78家大型综合有税零售门店未经原文解释为同一口径。草稿只在限制中说明无法拆分，未列示上述可直接读取的门店数和面积。应按该表自身栏目单独补入，不得改记为有税门店拆分，也不得把租赁与托管拆成两个数。（[source-0004](#source-0004)、[source-0007](#source-0007)）\n- material / material_omission / corrected_pending_trust：定向问题要求经营规模并保留面积口径。source-0007《其他说明》期末合计为78家、建筑面积/租赁面积567.2万平方米，合计业态栏写「购物中心/百货/奥特莱斯」，但分地区行含免税；source-0006门店清单面积合计亦为567.2万平方米，且清单包含免税门店。原文另注分项与合计可能因四舍五入不等。草稿有叙事口径的78家及新开、关闭面积，但未列示该期末面积。补入时应直接采用表内合计，保留「建筑面积/租赁面积」混合栏目和各表业态标签，不得当成78家有税门店的纯建筑面积或完全权益面积，也不得自行加总替换。（[source-0006](#source-0006)、[source-0007](#source-0007)、[source-0004](#source-0004)）\n  - 修订候选（尚非可信发布）：截至2025年末，按《其他说明》期末合计：门店78家，建筑面积/租赁面积567.2万平方米；该表合计行经营业态栏写「购物中心/百货/奥特莱斯」，但分地区行含免税。门店清单（含免税门店）面积合计亦为567.2万平方米。原文注明因四舍五入，分项与合计可能不等。\n- minor / material_omission / omission_candidate：专业店是同节单独列示的网点业态，且定向问题要求不要并入公司统一总数。source-0001写明各类专业店333家；source-0002进一步列明睿锦尚品33家（含3家快闪店）、法雅商贸300家（自营店铺108家、加盟店铺190家、卖场2家）。限制仅提及333家未并入78家，两条主线及其自营、加盟口径未形成已采用事实。建议按专业店自身口径补入，不要并入大型综合有税零售门店总数。（[source-0001](#source-0001)、[source-0002](#source-0002)）\n\n## 程序处理说明\n\n- 事实ops-008已隔离，未作为结论采用：metric number is absent from cited source: 专业店门店数量\n- 事实ops-009已隔离，未作为结论采用：metric number is absent from cited source: 已开业门店合计数量\n- 事实ops-011已隔离，未作为结论采用：metric number is absent from cited source: 熙地港（西安）购物中心建筑面积\n- 修订源检查隔离：review-add:omit-ops-property-tenure未进入最终再核或正文；ValidationError: 2 validation errors for WorkpaperFact\nmetrics.1\n  Value error, source_unit cannot relabel a numeric magnitude [type=value_error, input_value={'name': '合计行（购...urce_unit': '万平米'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error\nmetrics.3\n  Value error, source_unit cannot relabel a numeric magnitude [type=value_error, input_value={'name': '合计行（购...urce_unit': '万平米'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error\n\n## 来源\n\n### source-0001\n\n第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况\n\n物理页11，字符1043—2420：\n\n> 一、报告期内公司从事的业务情况 公司营业收入主要来自于旗下各门店的商品销售收入以及租金收入。截至本报告期末，公司 在全国七大经济区域 37 个城市共运营 78 家大型综合有税零售门店，涉及奥特莱斯、购物中心、 百货业态，同时管理运营 2家口岸免税店、2 家市内免税店及 1 家离岛免税门店。此外，公司还 涉及专业店以及线上业务，目前共有各类专业店 333 家。 奥莱业态：公司目前在营的奥莱项目分为名品奥莱及城市奥莱两条业务主线。名品奥莱是以 销售国际及国内知名品牌折扣商品为主，同时配套餐饮、娱乐、休闲等服务项目和设施的零售业 态。门店位置一般在城市边缘地区或城郊，单店面积一般在 6 万-10 万平米，经营商品品类主要包 括服装服饰、运动鞋帽、家居儿童用品等。城市奥莱是由公司原有的百货门店转型调整而来，一 般位于城市中心或副中心区域，交通便利，单店面积一般在 2 万-6 万平米，以销售品牌折扣商品 为主，同时配套部分餐饮、娱乐、休闲等服务项目和设施的零售业态。主营业务收入为商品零售 收入，经营模式包括联营、自营和租赁，以联营为主。公司旗下奥莱业态以“赋能城市价值，匠 筑美好生活”为使命，通过持续的创新迭代锻造核心经营能力，实现长期、健康、可持续发展， 现已成为公司业绩的新基石和未来发展的战略新引擎。面对快速变化的消费市场，奥莱业态紧紧 围绕“人货铺场圈”五要素能力建设，转变项目生态模式，注重于打造集人流、商品和服务于一 体的生态圈，持续强化核心商品力、丰富多元消费场景、深化会员运营与私域建设，不断满足消 费者多样化的需求。报告期内，公司打造的湾里王府井 Welltown 对外营业。截至报告期末，公司 共拥有 19家奥莱门店。 购物中心业态：是由多种零售店铺、服务设施集中在一个建筑物内或区域内，向消费者提供 综合服务的商业集合体。门店位置可在城市或区域商业中心、城市边缘地区的交通要道附近，单 店面积一般在 8 万-20 万平米。经营品类包括时尚类商品、各种专业店、专卖店、食品店、杂品店 以及各种文化教育和服务娱乐设施等。主营业务收入为租金收入，经营模式以租赁为主。王府井 购物中心目前已打造多条成熟产品线，构建了 3大标准产品线与多元化非标产品，形成了覆盖城 11/257\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0002\n\n第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况\n\n物理页12，字符0—2167：\n\n> 王府井集团股份有限公司2025 年年度报告 市级、区域级、社区级及创新型、文商旅型的全场景布局，旨在为广大消费者提供国内、国际一 流品质的优雅舒适环境，让他们愉悦购物、畅享美食、领略时尚、乐娱身心、感受卓越服务。报 告期内，公司关闭 1 家购物中心门店，新增 2 家购物中心门店，截至报告期末，公司共拥有 37 家 购物中心门店。 百货业态：是以时尚类商品销售为主，同时配套餐饮、娱乐、休闲等服务项目和设施的综合 零售业态。门店位置一般在城市或区域商业中心，单店面积一般在 2 万-6 万平米。主要满足消费 者时尚化、个性化的消费需求，经营商品品类主要包括服装服饰、化妆品、运动鞋帽、珠宝饰品、 家居家电、儿童用品等。主营业务收入为商品零售收入，经营模式包括联营、自营和租赁，以联 营为主。王府井积累了丰富的百货运营经验，近年来，公司旗下百货业态围绕消费者需求一店一 策实施转型调整，力争满足不同地区不同市场环境下的消费者差异化需求。公司已形成包括都市 百货店、都市生活店、品质社区店、大众社区店在内的多条细分产品线，旨在通过不同的产品细 分定位丰富消费者选择，为消费者带来美好生活。报告期内，公司关闭 4家百货门店，截至报告 期末，公司共拥有 21 家百货门店。 免税业务：免税品经营是向特定消费者销售免征关税、进口环节税的进口商品和实行退（免） 税进入免税店销售的国产商品的零售业务，商品主要包括香化、烟酒、食品、精品等品类。免税 品经营渠道主要包括口岸店、海南离岛店、市内店以及其他类型免税店，其中口岸店又分为口岸 出境免税店和口岸进境免税店。根据我国现行监管政策，从事免税品经营的公司需取得国务院或 其授权部门批准的经营资质。各类免税店的数量、经营面积及设立，需要按照有关法律法规规定， 履行相应的审批后方可开设。公司于 2020 年 6 月取得免税品经营资质。2023 年 1月，公司旗下 首个免税项目王府井国际免税港对外营业。公司立足自身资源与行业实际，稳健推进免税业务布 局，持续巩固并强化优势渠道运营能力与市场竞争力，同时根据行业政策与市场环境动态优化业 务结构，积极响应政策导向引入优质国产品牌，助力国潮品牌通过免税渠道实现出海回流，不断 夯实核心竞争基础，推动免税业务高质量、可持续发展。报告期内，哈尔滨机场王府井免税店、 武汉、长沙市内免税店对外营业，实现了免税主要业务类型全覆盖。截至本报告期末，公司共拥 有离岛免税店 1 家，口岸免税店 1家，市内免税店 2家。2026 年 2月，公司旗下王府井免税北京 首都机场 T2 航站楼免税店对外营业。 专业店：专业店是经营某一大类商品为主，并且具备有丰富专业知识的销售人员和提供适当 售后服务的零售业态。目前公司已经形成了以买手制潮奢品牌集合店为经营内容的 Luxemporium 睿锦尚品，和以运动品牌为经营内容的法雅商贸两条专业店业务主线。睿锦尚品通过沉浸式的购 物空间打造，独有的特色品牌，灵活多变的商品组合方式，赢得了最具消费活力的潮流时尚人士 的青睐，逐渐形成自己独特经营特色。法雅商贸是国际运动品牌代理专营专卖实体企业，目前是 阿迪达斯、耐克两大运动品牌的区域战略客户。截至报告期末，睿锦尚品共有 33家门店（含 3 家 快闪店），法雅商贸共有店铺 300家（其中自营店铺 108 家，加盟店铺 190 家，卖场 2家）。 线上业务：线上线下深度融合是公司长期坚持的核心战略之一。公司坚持以“同一个消费者， 同一个王府井”为统领，统筹线上商城、新媒体传播、短视频内容与直播电商等多元业态，构建 全域贯通、场景互联的全渠道经营体系，实现线上线下资源协同、服务协同、营销协同。在数据 资产平台、数字支付平台、消费场景数字化应用等方面持续深耕，积极运用 AI智能客服、智能导 购、精准营销、智能运营分析等技术能力，全面提升服务响应效率与消费体验；同步推进全渠道 深度融合，实现公私域贯通。同时加快智慧门店落地，推动经营管理与顾客服务智慧化升级，为 消费者提供更优质、更智能、更便捷的一站式购物体验。全年实现线上销售 18.6亿元。 报告期内公司新增重要非主营业务的说明 □适用 √不适用 12/257\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0003\n\n第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况\n\n物理页13，字符0—57：\n\n> 王府井集团股份有限公司2025 年年度报告\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0004\n\n第三节 管理层讨论与分析 / 零售行业经营性信息分析\n\n物理页24，字符668—3788：\n\n> 零售行业经营性信息分析 1、 报告期末已开业门店分布情况 √适用 □不适用 自有物业门店 租赁/托管物业门店 地区 经营业态 门店数量 建筑面积 门店数量 建筑面积 (万平米) (万平米) 华北地区 购物中心/百货/奥特莱斯 11 54.9 15 106.2 华中地区 购物中心/百货/奥特莱斯/免税 3 36 6 35.0 华南地区 购物中心/免税 2 31.2 1 6.7 西南地区 购物中心/百货/奥特莱斯 2 8.7 19 125 西北地区 购物中心/百货/奥特莱斯 3 38.0 9 49.5 华东地区 购物中心 1 1.9 3 37.1 东北地区 购物中心/奥特莱斯/免税 3 37 0 0 合计 购物中心/百货/奥特莱斯/免税 25 207.7 53 359.5 （2）门店情况 门 建筑面积/ 租赁期 店 门店名称 地址 开业时间 区域 租赁面积 物业 限 类 （万平方 权属 （年） 型 米） 北京西单商场 北京市西城区西单北大街 120号 1930 年 12月 华北 6.5 自有 - 北京市百货大楼 北京市东城区王府井大街 253-255号 1955年 9 月 华北 13.2 自有 - 友谊商店 北京市朝阳区建国门外大街 17 号 1964 年 12月 华北 2.5 自有 - 北京燕莎友谊商城 北京市朝阳区亮马桥路 52 号 1992年 6 月 华北 4.1 租赁 - 百 北京双安商场 北京市海淀区北三环西路 38 号 1994年 8 月 华北 4.7 自有 - 货 北京东安市场 北京市东城区王府井大街 138号 1998年 1 月 华北 1.1 租赁 长期 包头王府井百货昆区店 内蒙古自治区包头市昆区钢铁大街 69号 2002 年 12月 华北 3.6 租赁 25 太原王府井百货 山西省太原市小店区亲贤街 99 号 2010年 5 月 华北 11.5 租赁 20 鄂尔多斯王府井百货 内蒙古自治区鄂尔多斯市东胜区伊金霍洛 2011年 9 月 华北 6.3 自有 - 西街太古国际广场 B 区 24/257\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0005\n\n第三节 管理层讨论与分析 / 零售行业经营性信息分析\n\n物理页25，字符0—5752：\n\n> 王府井集团股份有限公司2025 年年度报告 长沙王府井百货 湖南省长沙市天心区黄兴中路 27号 2004 年 12 月 华中 8 部分 - 自有 洛阳王府井百货 河南省洛阳市西工区中州中路 429 号 2004 年 12 月 华中 6 租赁 30 郑州王府井百货熙地港店 河南省郑州市郑东新区地坤街 8 号 2017 年 3 月 华中 2.4 租赁 长期 西宁王府井百货西门店 青海省西宁市城中区西大街 40 号 2006 年 11 月 西北 5.9 租赁 26 兰州王府井百货 甘肃省兰州市城关区东岗东路 1999 号 2010 年 11 月 西北 5.1 租赁 20 银川王府井百货 宁夏银川市兴庆区新华东街东方红广场 2016 年 2 月 西北 8.3 租赁 20 西安王府井百货熙地港店 陕西省西安市未央区未央路 170 号 2016 年 4 月 西北 2.8 租赁 长期 成都王府井百货 四川省成都市锦江区总府街 15 号 1999 年 12 月 西南 7.3 自有 - 贵阳国贸广场总店 贵州省贵阳市云岩区中华北路 1 号 2002 年 9 月 西南 2.8 部分 - 自有 西单商场成都店 四川省成都市青羊区苏坡东路 12号 2005 年 1 月 西南 3.4 租赁 23 昆明王府井百货 云南省昆明市五华区沿河路 7 号 2009 年 9 月 西南 2.2 租赁 20 金阳国贸 Tpmall 贵州省贵阳市观山湖区金阳南路 6 号 2011 年 9 月 西南 4.2 租赁 20 北京长安商场 北京市西城区复外大街 15 号 1990 年 5 月 华北 3.3 自有 - 北京贵友大厦建国门店 北京市朝阳区建国门外大街甲 5 号 1990 年 9 月 华北 1.8 自有 - 西单商场天通苑店 北京市昌平区东小口镇天通苑五区商业楼 2002 年 11 月 华北 1.5 自有 - 包头王府井百货青山店 内蒙古自治区包头市青山区幸福路甲 3号 2008 年 4 月 华北 3.7 租赁 26 北京贵友大厦通州店 北京市通州区云景东路 1号 2008 年 7 月 华北 3.5 租赁 27 北京右安门王府井购物中心 北京市西城区万博苑 7 号楼 2015 年 12 月 华北 2 自有 - 王府井喜悦购物中心 北京市东城区王府井大街 301 号 2023 年 12 月 华北 7.8 租赁 10 临汾王府井尚城 UPTOWN 山西省临汾市经济开发区河汾路 8 号 2025 年 4 月 华北 10.4 租赁 20 购物中心 哈尔滨王府井购物中心 黑龙江省哈尔滨市道里区景江东路 899 号 2017 年 9 月 东北 12.8 自有 - 厦门巴黎春天百货中山店 福建省厦门市思明区中山路 76-132 号 1998 年 12 月 华东 1.9 自有 - 南昌王府井购物中心 江西省南昌市青云谱区洪城路 158 号 2019 年 6 月 华东 13.7 租赁 20 莱西王府井购物中心 山东省青岛市莱西市水集街道北京中路 2024 年 12 月 华东 15.4 租赁 20 购 118 号 物 苏州王府井购物中心 江苏省苏州市相城区相城大道与嘉元路交 2024 年 12 月 华东 8 租赁 20 中 叉处嘉元路 188 号 心 佛山王府井紫薇港 广东省佛山市佛山禅城区季华四路 70 号 2020 年 12 月 华南 20.9 自有 - 王府井海垦广场购物中心 海南省海口市龙华区海秀中路 71号 2023 年 10 月 华南 6.7 租赁 20 洛阳王府井购物中心 河南省洛阳市涧西区南昌路 139 号 2015 年 5 月 华中 8.2 租赁 20 长沙王府井购物中心 湖南省长沙市岳麓区金星中路 383 号 2016 年 6 月 华中 6.3 租赁 20 熙地港（郑州）购物中心 河南省郑州市郑东新区农业东路 15 号 2017 年 3 月 华中 22.6 自有 - 西安王府井百货永宁门店 陕西省西安市碑林区南关正街 88 号长安 2006 年 9 月 西北 8.4 租赁 长期 国际中心 熙地港（西安）购物中心 陕西省西安市未央区凤城七路 8 号 2016 年 4 月 西北 20.6 自有 - 西宁王府井生活广场新千店 青海省西宁市城东区东关大街建国南路 2019 年 12 月 西北 7.4 租赁 20 65 号 西宁王府井大象城 青海省西宁市城西区五四西路 68号 2020 年 10 月 西北 5.1 租赁 19 南国花锦购物中心 贵州省贵阳市云岩区中华北路 108 号 2008 年 1 月 西南 2.3 租赁 长期 成都王府井购物中心 四川省成都市武侯区科华中路 2 号 2011 年 12 月 西南 9.1 租赁 23 遵义国贸购物中心 贵州省遵义市汇川区珠海路 1 号附 1 号 2013 年 3 月 西南 7.4 租赁 22 25/257\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0006\n\n第三节 管理层讨论与分析 / 零售行业经营性信息分析\n\n物理页26，字符0—5386：\n\n> 王府井集团股份有限公司2025 年年度报告 国贸逸天城购物中心 贵州省贵阳市解放路 257 号 2014 年 9月 西南 4.9 租赁 20 乐山王府井购物中心 四川省乐山市市中区天星路 118 号 2015 年 9月 西南 4.8 租赁 20 南充王府井购物中心 四川省南充市江东大道中路 5 段 2016 年 12 月 西南 9.4 租赁 20 凯里国贸购物广场 贵州省凯里市北京西路 21 号 2017 年 3月 西南 8.2 租赁 23 巴中王府井购物中心 四川省巴中市巴州区秦巴大道西段 2 号 2019 年 12 月 西南 9.1 租赁 20 安顺国贸购物中心 贵州省安顺市西秀区西街街道市西路 87 2020 年 9月 西南 3 租赁 20 号塔山广场 玖福城生活购物中心 贵州省贵阳市观山湖区金阳乾图中心广场 2020 年 12 月 西南 5.5 租赁 20 裙楼商场 成都王府井 Discovery 四川省成都市成华区北二环四段 33 号 2021 年 6月 西南 2.4 租赁 20 绵阳王府井购物中心 四川省绵阳市嘉来南河广场 2022 年 5月 西南 10.7 租赁 20 贵阳新印 1950Discovery 购 贵州省贵阳市云岩区友谊路 230 号 2024 年 5月 西南 3.5 租赁 15 物中心 贵阳国贸 CCPARK 购物中 贵州省贵阳市观山湖区林城东路 155 号 2024 年 9月 西南 4.6 租赁 10 心 拉萨王府井购物中心 西藏自治区拉萨市柳梧新区北京大道 10 2025 年 5月 西南 22.0 租赁 20 号 北京燕莎奥莱 北京市朝阳区东四环南路 9 号 2002 年 12 月 华北 9.7 租赁 30 王府井奥莱呼市中山路店 内蒙古自治区呼和浩特市回民区中山西路 2004 年 12 月 华北 3.2 租赁 23 王府井奥莱北京香江小镇 北京市朝阳区香江北路 28 号 2009 年 7月 华北 4.3 自有 - 王府井奥莱天津新燕莎小镇 天津空港经济区环河北路 98 号 2013 年 12 月 华北 8.8 自有 - 太原王府井城市奥莱 山西省太原市迎泽开化寺街 42 号 2015 年 9月 华北 2 租赁 长期 王府井奥莱呼市如意小镇 内蒙古自治区呼和浩特市新城区如意开发 2021 年 12 月 华北 8.1 租赁 15 区 太原王府井晋阳里 山西省太原市晋源区新晋祠路 521 号 2022 年 1月 华北 3.5 租赁 20 北京王府井奥莱 UPTOWN 北京市大兴区久敬庄路与德贤路交汇处西 2023 年 12 月 华北 15.3 租赁 20 南角 奥 湾里王府井 WellTown 北京市通州区颐瑞东路 66 号 1号楼 2025 年 12 月 华北 18.7 托管 15 特 王府井奥莱沈阳棋盘山小镇 辽宁省沈阳市东陵区双园路 36 号 2012 年 8月 东北 13.1 自有 - 莱 吉林省长春市净月经济开发区永顺路 388 斯 王府井奥莱长春净月小镇 号 2018 年 12 月 东北 11.1 自有 - 郑州王府井城市奥莱 河南省郑州市中原区棉纺西路 36 号 2012 年 12 月 华中 4.8 租赁 20 焦作王府井城市奥莱 河南省焦作市解放区人民路 669 号 2014 年 9月 华中 5.4 租赁 20 王府井奥莱新乡平原小镇 河南省新乡市平原示范区长江大道 22 号 2021 年 11 月 华中 9.7 自有 - 西宁王府井城市奥莱 青海省西宁市城西区五四西路 1 号 2013 年 5月 西北 3.7 租赁 20 王府井奥莱银川店 宁夏回族自治区银川市金凤区正源北街 2016 年 10 月 西北 5.6 租赁 15 303 号 王府井奥莱西安临潼小镇 陕西省西安市临潼区凤凰大道 11 号 2016 年 12 月 西北 8.5 自有 - 王府井奥莱咸阳西咸小镇 陕西省西咸新区秦汉新城周陵街办迎宾大 2016 年 12 月 西北 8.9 自有 - 道王府井奥莱 王府井奥莱昆明滇池小镇 云南省昆明市官渡区滇池国际会展中心东 2019 年 9月 西南 6.9 租赁 20 区一至三层 免 王府井国际免税港 海南省万宁市莲兴大道 1 号 2022 年 7月 华南 10.3 自有 - 税 合计 567.2 -- -- 注：  熙地港（西安）购物中心建筑面积 20.6 万平方米，其中包含西安王府井百货熙地店租赁 26/257\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0007\n\n第三节 管理层讨论与分析 / 零售行业经营性信息分析\n\n物理页27，字符0—3129：\n\n> 王府井集团股份有限公司2025 年年度报告 面积 2.8万平方米。西安王府井商业运营管理有限公司持有该购物中心产权，本公司持有西安王 府井商业运营管理有限公司 50%股权。  熙地港（郑州）购物中心建筑面积 22.6万平方米，其中包含郑州王府井百货熙地港店租 赁面积 2.4万平方米。郑州枫华商业管理有限公司持有该购物中心产权，本公司合并持有郑州枫 华商业管理有限公司 51%股权。  佛山王府井紫薇港购物中心建筑面积 20.9 万平方米，佛山市王府商业置业有限公司持有 该购物中心产权，本公司持有佛山市王府商业置业有限公司 50%股权。  湾里王府井 WellTown 由北京环汇置业有限公司委托公司旗下北京王府井奥莱企业管理 有限公司管理运营，项目总建筑面积 18.7 万平方米，委托经营期限 15年。  报告期内，公司与北京王府井奥莱 UPTOWN 产权方就项目租赁面积达成一致意见，退 租 3.96 万平方米。  报告期内，经公司第十一届董事会第二十三次会议审议通过，同意新燕莎控股及燕莎商 城与燕莎中心签署租赁合同及续租协议，续租期限自 2023 年 1 月 1 日至 2023 年 8 月 31 日。  报告期内，公司与遵义国贸购物中心产权方就项目租赁面积达成一致意见，退租 0.7万 平方米。  公司在签署门店租赁合同时，均约定了优先续租权。对于租赁合同临近到期的门店，公 司在评估门店经营情况和增长潜力后，对优质门店将在合同到期前与物业出租方沟通续约事宜。  因数据四舍五入，存在分项与合计不等情况。 （3）报告期内续租情况 序号 项目名称 业态类型 区域 续租期限 1 北京燕莎友谊商城 百货 华北 10 年 2 王府井奥莱呼市中山路店 奥特莱斯 华北 3年 3 西宁王府井百货西门店 百货 西北 6年 2、 其他说明 √适用 □不适用 新开门店 关闭门店 期末门店 地区 经营业态 门店 建筑面积/租 门店 建筑面积/租赁 门店 建筑面积/租赁 家数 赁面积 家数 面积 家数 面积 （万平方米） （万平方米） （万平方米） 华北地区 购物中心/百货/奥特莱斯 2 29.1 3 18.2 26 161.1 华中地区 购物中心/百货/奥特莱斯 0 0 0 0 9 71.0 华南地区 购物中心/奥特莱斯/免税 0 0 0 0 3 37.9 西南地区 购物中心/百货 1 22.0 1 1.4 21 133.7 西北地区 购物中心/百货/奥特莱斯 0 0 1 3.6 12 87.5 华东地区 购物中心/百货 0 0 0 0 4 39.0 东北地区 购物中心/百货/奥特莱斯 0 0 0 0 3 37.0 合计 购物中心/百货/奥特莱斯 3 51.1 5 23.2 78 567.2 注： （1）2025 年 4 月 30 日，公司旗下临汾王府井尚城 UPTOWN 购物中心对外营业。临汾王府井尚 城 UPTOWN 位于山西省临汾市经济开发区河汾路 8 号，项目总建筑面积 10.4 万平方米，租赁期 限 20 年。 27/257\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0008\n\n第三节 管理层讨论与分析 / 零售行业经营性信息分析\n\n物理页28，字符0—970：\n\n> 王府井集团股份有限公司2025 年年度报告 （2）2025 年 5 月 1 日，公司旗下拉萨王府井购物中心对外营业。拉萨王府井购物中心位于西藏 自治区拉萨市柳梧新区北京大道 10 号，项目总建筑面积约 22 万平方米，租赁期限 20 年。 （3）2025 年 12月 26 日，公司旗下湾里王府井 WellTown 对外营业。湾里王府井 WellTown 位于 北京市通州区颐瑞东路 66 号 1 号楼，湾里文旅商融合发展综合体内，项目总建筑面积约 18.7 万 平方米，委托经营期限 15 年。 （4）报告期内，公司旗下攀枝花王府井购物中心试营业。攀枝花王府井购物中心位于攀枝花市仁 和区三线大道 150 号，项目面积约 5.9 万平方米，租赁期限 20 年。 （5）报告期内，因租赁合同到期，北京金源新燕莎 MALL、北京燕莎友谊商城金源店及北京贵友 大厦金源店自 2025 年 4 月 1日起停止经营。 （6）报告期内，根据公司战略转型需要，综合考虑门店租赁合同履约时间、经营业绩、发展前景 等因素，公司决定关闭西单商场兰州店及六盘水国贸广场 2 家百货门店，上述门店分别于 2025 年 7月 31 日、2025 年 9 月 30 日停止营业。 （7）报告期内，公司旗下北京西单商场停业改建，预计 2028 年末施工完成。 28/257\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0009\n\n第三节 管理层讨论与分析 / 零售行业经营性信息分析\n\n物理页29，字符0—75：\n\n> 王府井集团股份有限公司2025 年年度报告 (五) 投资状况分析\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n",
+  "workpaper_status": "review_limited_pending_verification",
+  "workpaper_receipts": [
+    {
+      "request_id": "bp-work-5189881c12bb58c6aa019be1:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "39dbedae925cabbe6f784e0712e6a470b2261da6d57f804c84a1effb91c4ffb2",
+      "response_hash": "eeea0c87f32ee6675963a1151cd5c9f1d5e9f2f47f016f4da37720e2694bda6a",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0044\",\"section-0096\"],\"rationale\":\"选择“报告期内公司从事的业务情况”用于明确主要业态、经营角色与运营模式；选择“零售行业经营性信息分析”完整覆盖报告期末已开业门店分布、面积口径及自有/租赁/托管等运营方式，并保留其“其他说明”对购物中心租赁经营等特点的解释。两者合并可直接回答截至2025年末主要业态网点构成、经营规模和运营方式，且不将不同口径业态简单加总。\",\"deferred\":[\"未选主营业务分行业、分地区、分销售模式及财务报表收入附注：本次目标为网点构成、规模与运营方式，收入拆分属于另一问题。\",\"未扩展到报告期后免税新店或单店明细：若原文门店分布表未纳入该等口径，则不将其与期末已开业网点合并为公司统一总数。\"],\"stop_reason\":\"业务概述与零售行业经营性信息中的门店分布及说明已覆盖目标所需的主要业态、期末网点、面积和运营方式；继续读取财务收入拆分或门店明细只会补充收入结构或单店信息，不能改变本次运营网络问题的结论，故在此停止，不声称覆盖全报告。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0044",
+          "section-0096"
+        ],
+        "rationale": "选择“报告期内公司从事的业务情况”用于明确主要业态、经营角色与运营模式；选择“零售行业经营性信息分析”完整覆盖报告期末已开业门店分布、面积口径及自有/租赁/托管等运营方式，并保留其“其他说明”对购物中心租赁经营等特点的解释。两者合并可直接回答截至2025年末主要业态网点构成、经营规模和运营方式，且不将不同口径业态简单加总。",
+        "deferred": [
+          "未选主营业务分行业、分地区、分销售模式及财务报表收入附注：本次目标为网点构成、规模与运营方式，收入拆分属于另一问题。",
+          "未扩展到报告期后免税新店或单店明细：若原文门店分布表未纳入该等口径，则不将其与期末已开业网点合并为公司统一总数。"
+        ],
+        "stop_reason": "业务概述与零售行业经营性信息中的门店分布及说明已覆盖目标所需的主要业态、期末网点、面积和运营方式；继续读取财务收入拆分或门店明细只会补充收入结构或单店信息，不能改变本次运营网络问题的结论，故在此停止，不声称覆盖全报告。"
+      },
+      "usage": {
+        "input_tokens": 27116,
+        "output_tokens": 1830,
+        "total_tokens": 28946
+      }
+    },
+    {
+      "request_id": "bp-work-5189881c12bb58c6aa019be1:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "e0e213f62baabd6a03cd921672ff3eb9c1aceaf183a9b00817e4bb154a9fe3e8",
+      "response_hash": "dea175f6222e9096d13d260524d8192762fa9df6510ed31711e9cabead8c6d6e",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"unclear\",\"facts\":[],\"limitations\":[\"本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。\"]},\"products_services\":{\"status\":\"unclear\",\"facts\":[],\"limitations\":[\"本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。\"]},\"revenue_model\":{\"status\":\"unclear\",\"facts\":[],\"limitations\":[\"本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。\"]},\"scale_and_mix\":{\"status\":\"unclear\",\"facts\":[],\"limitations\":[\"本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"ops-001\",\"text\":\"截至2025年末，公司在全国37个城市共运营78家大型综合有税零售门店，涉及奥特莱斯、购物中心、百货业态；同时管理运营免税门店，并拥有专业店及线上业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"大型综合有税零售门店数量\",\"raw_value\":\"78\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"78\",\"unit\":\"家\",\"currency\":null},{\"name\":\"覆盖城市数量\",\"raw_value\":\"37\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"37\",\"unit\":\"个\",\"currency\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"ops-002\",\"text\":\"奥莱业态分为名品奥莱及城市奥莱两条业务主线，主营业务收入为商品零售收入，经营模式包括联营、自营和租赁，以联营为主；截至报告期末共拥有19家奥莱门店。\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"奥莱门店数量\",\"raw_value\":\"19\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"19\",\"unit\":\"家\",\"currency\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"ops-003\",\"text\":\"购物中心业态主营业务收入为租金收入，经营模式以租赁为主；报告期内关闭1家、新增2家，截至报告期末共拥有37家购物中心门店。\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"购物中心门店数量\",\"raw_value\":\"37\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"37\",\"unit\":\"家\",\"currency\":null},{\"name\":\"购物中心报告期新增门店数量\",\"raw_value\":\"2\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"2\",\"unit\":\"家\",\"currency\":null},{\"name\":\"购物中心报告期关闭门店数量\",\"raw_value\":\"1\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"1\",\"unit\":\"家\",\"currency\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"ops-004\",\"text\":\"百货业态主营业务收入为商品零售收入，经营模式包括联营、自营和租赁，以联营为主；报告期内关闭4家，截至报告期末共拥有21家百货门店。\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"百货门店数量\",\"raw_value\":\"21\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"21\",\"unit\":\"家\",\"currency\":null},{\"name\":\"百货报告期关闭门店数量\",\"raw_value\":\"4\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"4\",\"unit\":\"家\",\"currency\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"ops-005\",\"text\":\"业务概述前段称，公司同时管理运营2家口岸免税店、2家市内免税店及1家离岛免税门店。\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"口岸免税店数量（业务概述前段口径）\",\"raw_value\":\"2\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"2\",\"unit\":\"家\",\"currency\":null},{\"name\":\"市内免税店数量（业务概述前段口径）\",\"raw_value\":\"2\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"2\",\"unit\":\"家\",\"currency\":null},{\"name\":\"离岛免税店数量（业务概述前段口径）\",\"raw_value\":\"1\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"1\",\"unit\":\"家\",\"currency\":null}],\"uncertainty_reason\":\"同节后段对口岸免税店数量披露为1家，存在前后表述不一致。\"},{\"fact_id\":\"ops-006\",\"text\":\"同节后段称，截至本报告期末，公司共拥有离岛免税店1家、口岸免税店1家、市内免税店2家。\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"离岛免税店数量（业务概述后段口径）\",\"raw_value\":\"1\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"1\",\"unit\":\"家\",\"currency\":null},{\"name\":\"口岸免税店数量（业务概述后段口径）\",\"raw_value\":\"1\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"1\",\"unit\":\"家\",\"currency\":null},{\"name\":\"市内免税店数量（业务概述后段口径）\",\"raw_value\":\"2\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"2\",\"unit\":\"家\",\"currency\":null}],\"uncertainty_reason\":\"口岸免税店数量与业务概述前段的2家不一致。\"},{\"fact_id\":\"ops-007\",\"text\":\"2026年2月，公司旗下王府井免税北京首都机场T2航站楼免税店对外营业；该门店为报告期后事项。\",\"subject_scope\":\"business_segment\",\"period\":\"2026-02\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"ops-008\",\"text\":\"专业店为公司独立业态，截至报告期末共有333家，包括睿锦尚品和法雅商贸等，不与大型综合有税零售门店合并。\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"专业店门店数量\",\"raw_value\":\"333\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"333\",\"unit\":\"家\",\"currency\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"ops-009\",\"text\":\"报告期末已开业门店按物业权属合计：自有物业门店25家、建筑面积207.7万平方米；租赁/托管物业门店53家、建筑面积359.5万平方米；合计78家、567.2万平方米。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"自有物业门店数量\",\"raw_value\":\"25\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"25\",\"unit\":\"家\",\"currency\":null},{\"name\":\"自有物业建筑面积\",\"raw_value\":\"207.7\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"207.7\",\"unit\":\"万平方米\",\"currency\":null},{\"name\":\"租赁/托管物业门店数量\",\"raw_value\":\"53\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"53\",\"unit\":\"家\",\"currency\":null},{\"name\":\"租赁/托管物业建筑面积\",\"raw_value\":\"359.5\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"359.5\",\"unit\":\"万平方米\",\"currency\":null},{\"name\":\"已开业门店合计数量\",\"raw_value\":\"78\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"78\",\"unit\":\"家\",\"currency\":null},{\"name\":\"已开业门店合计建筑面积\",\"raw_value\":\"567.2\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"567.2\",\"unit\":\"万平方米\",\"currency\":null}],\"uncertainty_reason\":\"租赁与托管在表中合并列示，无法拆分。\"},{\"fact_id\":\"ops-010\",\"text\":\"《其他说明》表列示，报告期内购物中心/百货/奥特莱斯合计新开门店3家、建筑面积/租赁面积51.1万平方米，关闭门店5家、建筑面积/租赁面积23.2万平方米。\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"购物中心/百货/奥特莱斯报告期新开门店数量\",\"raw_value\":\"3\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"3\",\"unit\":\"家\",\"currency\":null},{\"name\":\"购物中心/百货/奥特莱斯报告期新开门店面积\",\"raw_value\":\"51.1\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"51.1\",\"unit\":\"万平方米\",\"currency\":null},{\"name\":\"购物中心/百货/奥特莱斯报告期关闭门店数量\",\"raw_value\":\"5\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"5\",\"unit\":\"家\",\"currency\":null},{\"name\":\"购物中心/百货/奥特莱斯报告期关闭门店面积\",\"raw_value\":\"23.2\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"23.2\",\"unit\":\"万平方米\",\"currency\":null}],\"uncertainty_reason\":\"该表合计栏仅列购物中心/百货/奥特莱斯，不含免税，口径与含免税的分布表不能直接视为同一总数。\"},{\"fact_id\":\"ops-011\",\"text\":\"熙地港（西安）购物中心建筑面积20.6万平方米，其中包含西安王府井百货熙地店租赁面积2.8万平方米；西安王府井商业运营管理有限公司持有该购物中心产权，本公司持有其50%股权。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"熙地港（西安）购物中心建筑面积\",\"raw_value\":\"20.6\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"20.6\",\"unit\":\"万平方米\",\"currency\":null},{\"name\":\"西安王府井百货熙地店租赁面积\",\"raw_value\":\"2.8\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"2.8\",\"unit\":\"万平方米\",\"currency\":null},{\"name\":\"本公司持有西安王府井商业运营管理有限公司股权比例\",\"raw_value\":\"50\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"50\",\"unit\":\"%\",\"currency\":null}],\"uncertainty_reason\":\"购物中心建筑面积包含同一建筑内百货租赁面积，不能与其他独立门店面积简单相加。\"},{\"fact_id\":\"ops-012\",\"text\":\"熙地港（郑州）购物中心建筑面积22.6万平方米，其中包含郑州王府井百货熙地港店租赁面积2.4万平方米；郑州枫华商业管理有限公司持有该购物中心产权，本公司合并持有其51%股权。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"熙地港（郑州）购物中心建筑面积\",\"raw_value\":\"22.6\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"22.6\",\"unit\":\"万平方米\",\"currency\":null},{\"name\":\"郑州王府井百货熙地港店租赁面积\",\"raw_value\":\"2.4\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"2.4\",\"unit\":\"万平方米\",\"currency\":null},{\"name\":\"本公司合并持有郑州枫华商业管理有限公司股权比例\",\"raw_value\":\"51\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"51\",\"unit\":\"%\",\"currency\":null}],\"uncertainty_reason\":\"购物中心建筑面积包含同一建筑内百货租赁面积，不能与其他独立门店面积简单相加。\"},{\"fact_id\":\"ops-013\",\"text\":\"佛山王府井紫薇港购物中心建筑面积20.9万平方米，佛山市王府商业置业有限公司持有该购物中心产权，本公司持有其50%股权。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"佛山王府井紫薇港购物中心建筑面积\",\"raw_value\":\"20.9\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"20.9\",\"unit\":\"万平方米\",\"currency\":null},{\"name\":\"本公司持有佛山市王府商业置业有限公司股权比例\",\"raw_value\":\"50\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"50\",\"unit\":\"%\",\"currency\":null}],\"uncertainty_reason\":\"产权方为非全资持股公司，建筑面积不等于公司完全权益面积。\"},{\"fact_id\":\"ops-014\",\"text\":\"湾里王府井WellTown由北京环汇置业有限公司委托公司旗下北京王府井奥莱企业管理有限公司管理运营，项目总建筑面积18.7万平方米，委托经营期限15年；该门店于2025年12月26日对外营业。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"metrics\":[{\"name\":\"湾里王府井WellTown项目总建筑面积\",\"raw_value\":\"18.7\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"18.7\",\"unit\":\"万平方米\",\"currency\":null},{\"name\":\"湾里王府井WellTown委托经营期限\",\"raw_value\":\"15\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"15\",\"unit\":\"年\",\"currency\":null}],\"uncertainty_reason\":null}],\"limitations\":[\"本次仅定向回答运营网点构成、规模与物业方式，未覆盖收入拆分、单店经营明细及线上业务明细。\",\"业务概述分业态门店数与公司总数、门店分布表合计数存在差异，原文未解释，故并列保留，未作调整或加总。\",\"口岸免税店数量在业务概述前后段表述不一致，原文未解释；本回复分别列示。\",\"门店分布表的经营业态栏含免税，而《其他说明》合计栏仅列购物中心/百货/奥特莱斯，二者口径不同，不能直接视为同一总数。\",\"租赁/托管物业在分布表中合并列示，无法拆分租赁与托管各自的门店数和面积。\",\"部分购物中心建筑面积包含同一建筑内百货门店租赁面积，且产权方存在非全资持股，面积口径不能简单相加。\",\"专业店333家为独立业态，未并入78家大型综合有税零售门店总数。\",\"2026年2月首都机场T2航站楼免税店为报告期后事项，未并入2025年末门店数。\"]},\"customers_channels_markets\":{\"status\":\"unclear\",\"facts\":[],\"limitations\":[\"本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。\"]},\"operating_drivers\":{\"status\":\"unclear\",\"facts\":[],\"limitations\":[\"本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。\"]},\"material_changes\":{\"status\":\"unclear\",\"facts\":[],\"limitations\":[\"本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。\"]}}}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "unclear",
+            "facts": [],
+            "limitations": [
+              "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+            ]
+          },
+          "products_services": {
+            "status": "unclear",
+            "facts": [],
+            "limitations": [
+              "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+            ]
+          },
+          "revenue_model": {
+            "status": "unclear",
+            "facts": [],
+            "limitations": [
+              "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+            ]
+          },
+          "scale_and_mix": {
+            "status": "unclear",
+            "facts": [],
+            "limitations": [
+              "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "ops-001",
+                "text": "截至2025年末，公司在全国37个城市共运营78家大型综合有税零售门店，涉及奥特莱斯、购物中心、百货业态；同时管理运营免税门店，并拥有专业店及线上业务。",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0001"
+                ],
+                "metrics": [
+                  {
+                    "name": "大型综合有税零售门店数量",
+                    "raw_value": "78",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "78",
+                    "unit": "家",
+                    "currency": null
+                  },
+                  {
+                    "name": "覆盖城市数量",
+                    "raw_value": "37",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "37",
+                    "unit": "个",
+                    "currency": null
+                  }
+                ],
+                "uncertainty_reason": null
+              },
+              {
+                "fact_id": "ops-002",
+                "text": "奥莱业态分为名品奥莱及城市奥莱两条业务主线，主营业务收入为商品零售收入，经营模式包括联营、自营和租赁，以联营为主；截至报告期末共拥有19家奥莱门店。",
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0001"
+                ],
+                "metrics": [
+                  {
+                    "name": "奥莱门店数量",
+                    "raw_value": "19",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "19",
+                    "unit": "家",
+                    "currency": null
+                  }
+                ],
+                "uncertainty_reason": null
+              },
+              {
+                "fact_id": "ops-003",
+                "text": "购物中心业态主营业务收入为租金收入，经营模式以租赁为主；报告期内关闭1家、新增2家，截至报告期末共拥有37家购物中心门店。",
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0002"
+                ],
+                "metrics": [
+                  {
+                    "name": "购物中心门店数量",
+                    "raw_value": "37",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "37",
+                    "unit": "家",
+                    "currency": null
+                  },
+                  {
+                    "name": "购物中心报告期新增门店数量",
+                    "raw_value": "2",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "2",
+                    "unit": "家",
+                    "currency": null
+                  },
+                  {
+                    "name": "购物中心报告期关闭门店数量",
+                    "raw_value": "1",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "1",
+                    "unit": "家",
+                    "currency": null
+                  }
+                ],
+                "uncertainty_reason": null
+              },
+              {
+                "fact_id": "ops-004",
+                "text": "百货业态主营业务收入为商品零售收入，经营模式包括联营、自营和租赁，以联营为主；报告期内关闭4家，截至报告期末共拥有21家百货门店。",
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0002"
+                ],
+                "metrics": [
+                  {
+                    "name": "百货门店数量",
+                    "raw_value": "21",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "21",
+                    "unit": "家",
+                    "currency": null
+                  },
+                  {
+                    "name": "百货报告期关闭门店数量",
+                    "raw_value": "4",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "4",
+                    "unit": "家",
+                    "currency": null
+                  }
+                ],
+                "uncertainty_reason": null
+              },
+              {
+                "fact_id": "ops-005",
+                "text": "业务概述前段称，公司同时管理运营2家口岸免税店、2家市内免税店及1家离岛免税门店。",
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0001"
+                ],
+                "metrics": [
+                  {
+                    "name": "口岸免税店数量（业务概述前段口径）",
+                    "raw_value": "2",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "2",
+                    "unit": "家",
+                    "currency": null
+                  },
+                  {
+                    "name": "市内免税店数量（业务概述前段口径）",
+                    "raw_value": "2",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "2",
+                    "unit": "家",
+                    "currency": null
+                  },
+                  {
+                    "name": "离岛免税店数量（业务概述前段口径）",
+                    "raw_value": "1",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "1",
+                    "unit": "家",
+                    "currency": null
+                  }
+                ],
+                "uncertainty_reason": "同节后段对口岸免税店数量披露为1家，存在前后表述不一致。"
+              },
+              {
+                "fact_id": "ops-006",
+                "text": "同节后段称，截至本报告期末，公司共拥有离岛免税店1家、口岸免税店1家、市内免税店2家。",
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0002"
+                ],
+                "metrics": [
+                  {
+                    "name": "离岛免税店数量（业务概述后段口径）",
+                    "raw_value": "1",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "1",
+                    "unit": "家",
+                    "currency": null
+                  },
+                  {
+                    "name": "口岸免税店数量（业务概述后段口径）",
+                    "raw_value": "1",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "1",
+                    "unit": "家",
+                    "currency": null
+                  },
+                  {
+                    "name": "市内免税店数量（业务概述后段口径）",
+                    "raw_value": "2",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "2",
+                    "unit": "家",
+                    "currency": null
+                  }
+                ],
+                "uncertainty_reason": "口岸免税店数量与业务概述前段的2家不一致。"
+              },
+              {
+                "fact_id": "ops-007",
+                "text": "2026年2月，公司旗下王府井免税北京首都机场T2航站楼免税店对外营业；该门店为报告期后事项。",
+                "subject_scope": "business_segment",
+                "period": "2026-02",
+                "evidence_ids": [
+                  "source-0002"
+                ],
+                "metrics": [],
+                "uncertainty_reason": null
+              },
+              {
+                "fact_id": "ops-008",
+                "text": "专业店为公司独立业态，截至报告期末共有333家，包括睿锦尚品和法雅商贸等，不与大型综合有税零售门店合并。",
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0002"
+                ],
+                "metrics": [
+                  {
+                    "name": "专业店门店数量",
+                    "raw_value": "333",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "333",
+                    "unit": "家",
+                    "currency": null
+                  }
+                ],
+                "uncertainty_reason": null
+              },
+              {
+                "fact_id": "ops-009",
+                "text": "报告期末已开业门店按物业权属合计：自有物业门店25家、建筑面积207.7万平方米；租赁/托管物业门店53家、建筑面积359.5万平方米；合计78家、567.2万平方米。",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "自有物业门店数量",
+                    "raw_value": "25",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "25",
+                    "unit": "家",
+                    "currency": null
+                  },
+                  {
+                    "name": "自有物业建筑面积",
+                    "raw_value": "207.7",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "207.7",
+                    "unit": "万平方米",
+                    "currency": null
+                  },
+                  {
+                    "name": "租赁/托管物业门店数量",
+                    "raw_value": "53",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "53",
+                    "unit": "家",
+                    "currency": null
+                  },
+                  {
+                    "name": "租赁/托管物业建筑面积",
+                    "raw_value": "359.5",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "359.5",
+                    "unit": "万平方米",
+                    "currency": null
+                  },
+                  {
+                    "name": "已开业门店合计数量",
+                    "raw_value": "78",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "78",
+                    "unit": "家",
+                    "currency": null
+                  },
+                  {
+                    "name": "已开业门店合计建筑面积",
+                    "raw_value": "567.2",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "567.2",
+                    "unit": "万平方米",
+                    "currency": null
+                  }
+                ],
+                "uncertainty_reason": "租赁与托管在表中合并列示，无法拆分。"
+              },
+              {
+                "fact_id": "ops-010",
+                "text": "《其他说明》表列示，报告期内购物中心/百货/奥特莱斯合计新开门店3家、建筑面积/租赁面积51.1万平方米，关闭门店5家、建筑面积/租赁面积23.2万平方米。",
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "购物中心/百货/奥特莱斯报告期新开门店数量",
+                    "raw_value": "3",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "3",
+                    "unit": "家",
+                    "currency": null
+                  },
+                  {
+                    "name": "购物中心/百货/奥特莱斯报告期新开门店面积",
+                    "raw_value": "51.1",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "51.1",
+                    "unit": "万平方米",
+                    "currency": null
+                  },
+                  {
+                    "name": "购物中心/百货/奥特莱斯报告期关闭门店数量",
+                    "raw_value": "5",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "5",
+                    "unit": "家",
+                    "currency": null
+                  },
+                  {
+                    "name": "购物中心/百货/奥特莱斯报告期关闭门店面积",
+                    "raw_value": "23.2",
+                    "subject_scope": "business_segment",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "23.2",
+                    "unit": "万平方米",
+                    "currency": null
+                  }
+                ],
+                "uncertainty_reason": "该表合计栏仅列购物中心/百货/奥特莱斯，不含免税，口径与含免税的分布表不能直接视为同一总数。"
+              },
+              {
+                "fact_id": "ops-011",
+                "text": "熙地港（西安）购物中心建筑面积20.6万平方米，其中包含西安王府井百货熙地店租赁面积2.8万平方米；西安王府井商业运营管理有限公司持有该购物中心产权，本公司持有其50%股权。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "熙地港（西安）购物中心建筑面积",
+                    "raw_value": "20.6",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "20.6",
+                    "unit": "万平方米",
+                    "currency": null
+                  },
+                  {
+                    "name": "西安王府井百货熙地店租赁面积",
+                    "raw_value": "2.8",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "2.8",
+                    "unit": "万平方米",
+                    "currency": null
+                  },
+                  {
+                    "name": "本公司持有西安王府井商业运营管理有限公司股权比例",
+                    "raw_value": "50",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "50",
+                    "unit": "%",
+                    "currency": null
+                  }
+                ],
+                "uncertainty_reason": "购物中心建筑面积包含同一建筑内百货租赁面积，不能与其他独立门店面积简单相加。"
+              },
+              {
+                "fact_id": "ops-012",
+                "text": "熙地港（郑州）购物中心建筑面积22.6万平方米，其中包含郑州王府井百货熙地港店租赁面积2.4万平方米；郑州枫华商业管理有限公司持有该购物中心产权，本公司合并持有其51%股权。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "熙地港（郑州）购物中心建筑面积",
+                    "raw_value": "22.6",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "22.6",
+                    "unit": "万平方米",
+                    "currency": null
+                  },
+                  {
+                    "name": "郑州王府井百货熙地港店租赁面积",
+                    "raw_value": "2.4",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "2.4",
+                    "unit": "万平方米",
+                    "currency": null
+                  },
+                  {
+                    "name": "本公司合并持有郑州枫华商业管理有限公司股权比例",
+                    "raw_value": "51",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "51",
+                    "unit": "%",
+                    "currency": null
+                  }
+                ],
+                "uncertainty_reason": "购物中心建筑面积包含同一建筑内百货租赁面积，不能与其他独立门店面积简单相加。"
+              },
+              {
+                "fact_id": "ops-013",
+                "text": "佛山王府井紫薇港购物中心建筑面积20.9万平方米，佛山市王府商业置业有限公司持有该购物中心产权，本公司持有其50%股权。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "佛山王府井紫薇港购物中心建筑面积",
+                    "raw_value": "20.9",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "20.9",
+                    "unit": "万平方米",
+                    "currency": null
+                  },
+                  {
+                    "name": "本公司持有佛山市王府商业置业有限公司股权比例",
+                    "raw_value": "50",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "50",
+                    "unit": "%",
+                    "currency": null
+                  }
+                ],
+                "uncertainty_reason": "产权方为非全资持股公司，建筑面积不等于公司完全权益面积。"
+              },
+              {
+                "fact_id": "ops-014",
+                "text": "湾里王府井WellTown由北京环汇置业有限公司委托公司旗下北京王府井奥莱企业管理有限公司管理运营，项目总建筑面积18.7万平方米，委托经营期限15年；该门店于2025年12月26日对外营业。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0007",
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "湾里王府井WellTown项目总建筑面积",
+                    "raw_value": "18.7",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "18.7",
+                    "unit": "万平方米",
+                    "currency": null
+                  },
+                  {
+                    "name": "湾里王府井WellTown委托经营期限",
+                    "raw_value": "15",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025-12-31",
+                    "qualifier": "exact",
+                    "value": "15",
+                    "unit": "年",
+                    "currency": null
+                  }
+                ],
+                "uncertainty_reason": null
+              }
+            ],
+            "limitations": [
+              "本次仅定向回答运营网点构成、规模与物业方式，未覆盖收入拆分、单店经营明细及线上业务明细。",
+              "业务概述分业态门店数与公司总数、门店分布表合计数存在差异，原文未解释，故并列保留，未作调整或加总。",
+              "口岸免税店数量在业务概述前后段表述不一致，原文未解释；本回复分别列示。",
+              "门店分布表的经营业态栏含免税，而《其他说明》合计栏仅列购物中心/百货/奥特莱斯，二者口径不同，不能直接视为同一总数。",
+              "租赁/托管物业在分布表中合并列示，无法拆分租赁与托管各自的门店数和面积。",
+              "部分购物中心建筑面积包含同一建筑内百货门店租赁面积，且产权方存在非全资持股，面积口径不能简单相加。",
+              "专业店333家为独立业态，未并入78家大型综合有税零售门店总数。",
+              "2026年2月首都机场T2航站楼免税店为报告期后事项，未并入2025年末门店数。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "unclear",
+            "facts": [],
+            "limitations": [
+              "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "unclear",
+            "facts": [],
+            "limitations": [
+              "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+            ]
+          },
+          "material_changes": {
+            "status": "unclear",
+            "facts": [],
+            "limitations": [
+              "本次仅定向阅读运营网点问题，未读取该要素相关章节，未形成事实。"
+            ]
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 11801,
+        "output_tokens": 17820,
+        "total_tokens": 29621
+      }
+    },
+    {
+      "request_id": "bp-work-5189881c12bb58c6aa019be1:workpaper:review",
+      "purpose": "review_profile_workpaper",
+      "request_hash": "80fba1256d1d36306413fda346cc2428cfcb7c5a064c4cd4bc7fb7fe13b31a47",
+      "response_hash": "eea7f0ee65d5bd63155a1eda9db3254dc361a4b03a901a6f9efd4517c4e7afd4",
+      "finish_reason": "stop",
+      "source_label": "scorpio:grok-4.7",
+      "model": "grok-4.7",
+      "selected_profile": "semantic_extraction__scorpio_grok",
+      "logical_profile": "semantic_extraction__scorpio_grok",
+      "reasoning_effort": "high",
+      "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+      "contract_status": "accepted",
+      "raw_content": "{\"findings\":[{\"finding_id\":\"omit-ops-property-tenure\",\"element\":\"operations_and_inputs\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0004\",\"source-0007\"],\"explanation\":\"定向问题要求分别说明截至报告期末的自有、租赁、托管运营方式。source-0004已开业门店分布表已列明自有物业门店合计25家、建筑面积207.7万平米，租赁/托管物业门店合计53家、建筑面积359.5万平米；租赁与托管在同一列，原文不能拆开。该表合计经营业态为「购物中心/百货/奥特莱斯/免税」，与业务概述的78家大型综合有税零售门店未经原文解释为同一口径。草稿只在限制中说明无法拆分，未列示上述可直接读取的门店数和面积。应按该表自身栏目单独补入，不得改记为有税门店拆分，也不得把租赁与托管拆成两个数。\"},{\"finding_id\":\"omit-ops-ending-area\",\"element\":\"operations_and_inputs\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0006\",\"source-0007\",\"source-0004\"],\"explanation\":\"定向问题要求经营规模并保留面积口径。source-0007《其他说明》期末合计为78家、建筑面积/租赁面积567.2万平方米，合计业态栏写「购物中心/百货/奥特莱斯」，但分地区行含免税；source-0006门店清单面积合计亦为567.2万平方米，且清单包含免税门店。原文另注分项与合计可能因四舍五入不等。草稿有叙事口径的78家及新开、关闭面积，但未列示该期末面积。补入时应直接采用表内合计，保留「建筑面积/租赁面积」混合栏目和各表业态标签，不得当成78家有税门店的纯建筑面积或完全权益面积，也不得自行加总替换。\"},{\"finding_id\":\"omit-ops-specialty-stores\",\"element\":\"operations_and_inputs\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0001\",\"source-0002\"],\"explanation\":\"专业店是同节单独列示的网点业态，且定向问题要求不要并入公司统一总数。source-0001写明各类专业店333家；source-0002进一步列明睿锦尚品33家（含3家快闪店）、法雅商贸300家（自营店铺108家、加盟店铺190家、卖场2家）。限制仅提及333家未并入78家，两条主线及其自营、加盟口径未形成已采用事实。建议按专业店自身口径补入，不要并入大型综合有税零售门店总数。\"}],\"reviewed_fact_ids\":[\"ops-001\",\"ops-002\",\"ops-003\",\"ops-004\",\"ops-005\",\"ops-006\",\"ops-007\",\"ops-010\",\"ops-012\",\"ops-013\",\"ops-014\"]}",
+      "response_payload": {
+        "findings": [
+          {
+            "finding_id": "omit-ops-property-tenure",
+            "element": "operations_and_inputs",
+            "severity": "material",
+            "issue_type": "material_omission",
+            "action": "possible_omission",
+            "affected_fact_id": null,
+            "evidence_ids": [
+              "source-0004",
+              "source-0007"
+            ],
+            "explanation": "定向问题要求分别说明截至报告期末的自有、租赁、托管运营方式。source-0004已开业门店分布表已列明自有物业门店合计25家、建筑面积207.7万平米，租赁/托管物业门店合计53家、建筑面积359.5万平米；租赁与托管在同一列，原文不能拆开。该表合计经营业态为「购物中心/百货/奥特莱斯/免税」，与业务概述的78家大型综合有税零售门店未经原文解释为同一口径。草稿只在限制中说明无法拆分，未列示上述可直接读取的门店数和面积。应按该表自身栏目单独补入，不得改记为有税门店拆分，也不得把租赁与托管拆成两个数。"
+          },
+          {
+            "finding_id": "omit-ops-ending-area",
+            "element": "operations_and_inputs",
+            "severity": "material",
+            "issue_type": "material_omission",
+            "action": "possible_omission",
+            "affected_fact_id": null,
+            "evidence_ids": [
+              "source-0006",
+              "source-0007",
+              "source-0004"
+            ],
+            "explanation": "定向问题要求经营规模并保留面积口径。source-0007《其他说明》期末合计为78家、建筑面积/租赁面积567.2万平方米，合计业态栏写「购物中心/百货/奥特莱斯」，但分地区行含免税；source-0006门店清单面积合计亦为567.2万平方米，且清单包含免税门店。原文另注分项与合计可能因四舍五入不等。草稿有叙事口径的78家及新开、关闭面积，但未列示该期末面积。补入时应直接采用表内合计，保留「建筑面积/租赁面积」混合栏目和各表业态标签，不得当成78家有税门店的纯建筑面积或完全权益面积，也不得自行加总替换。"
+          },
+          {
+            "finding_id": "omit-ops-specialty-stores",
+            "element": "operations_and_inputs",
+            "severity": "minor",
+            "issue_type": "material_omission",
+            "action": "possible_omission",
+            "affected_fact_id": null,
+            "evidence_ids": [
+              "source-0001",
+              "source-0002"
+            ],
+            "explanation": "专业店是同节单独列示的网点业态，且定向问题要求不要并入公司统一总数。source-0001写明各类专业店333家；source-0002进一步列明睿锦尚品33家（含3家快闪店）、法雅商贸300家（自营店铺108家、加盟店铺190家、卖场2家）。限制仅提及333家未并入78家，两条主线及其自营、加盟口径未形成已采用事实。建议按专业店自身口径补入，不要并入大型综合有税零售门店总数。"
+          }
+        ],
+        "reviewed_fact_ids": [
+          "ops-001",
+          "ops-002",
+          "ops-003",
+          "ops-004",
+          "ops-005",
+          "ops-006",
+          "ops-007",
+          "ops-010",
+          "ops-012",
+          "ops-013",
+          "ops-014"
+        ]
+      },
+      "usage": {
+        "input_tokens": 17668,
+        "output_tokens": 759,
+        "total_tokens": 43973
+      }
+    },
+    {
+      "request_id": "bp-work-5189881c12bb58c6aa019be1:workpaper:repair",
+      "purpose": "repair_profile_workpaper",
+      "request_hash": "8a96de4eb31674b29b949409f3a01ee400c25197725938523b0c1963280f9465",
+      "response_hash": "2f53a2e9c355e9d608da15fd1352d82e84af8d023a54b1d349d0b7be8decbd58",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:omit-ops-property-tenure\",\"text\":\"截至2025年末，按《报告期末已开业门店分布情况》合计行（经营业态：购物中心/百货/奥特莱斯/免税），自有物业门店25家、建筑面积207.7万平方米；租赁/托管物业门店53家、建筑面积359.5万平方米。该表将租赁与托管合并列示，原文不能拆分；该合计口径与业务概述的78家大型综合有税零售门店未说明为同一口径。\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"合计行（购物中心/百货/奥特莱斯/免税）自有物业门店数量\",\"raw_value\":\"25\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"25\",\"unit\":\"家\",\"source_unit\":\"家\"},{\"name\":\"合计行（购物中心/百货/奥特莱斯/免税）自有物业门店建筑面积\",\"raw_value\":\"207.7\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"207.7\",\"unit\":\"万平方米\",\"source_unit\":\"万平米\"},{\"name\":\"合计行（购物中心/百货/奥特莱斯/免税）租赁/托管物业门店数量\",\"raw_value\":\"53\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"53\",\"unit\":\"家\",\"source_unit\":\"家\"},{\"name\":\"合计行（购物中心/百货/奥特莱斯/免税）租赁/托管物业门店建筑面积\",\"raw_value\":\"359.5\",\"subject_scope\":\"business_segment\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"359.5\",\"unit\":\"万平方米\",\"source_unit\":\"万平米\"}],\"uncertainty_reason\":\"租赁/托管在表中合并列示，无法拆分；且该合计口径与业务概述的78家大型综合有税零售门店关系原文未说明。\"},{\"fact_id\":\"review-add:omit-ops-ending-area\",\"text\":\"截至2025年末，按《其他说明》期末合计：门店78家，建筑面积/租赁面积567.2万平方米；该表合计行经营业态栏写「购物中心/百货/奥特莱斯」，但分地区行含免税。门店清单（含免税门店）面积合计亦为567.2万平方米。原文注明因四舍五入，分项与合计可能不等。\",\"subject_scope\":\"unclear\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0007\",\"source-0006\"],\"metrics\":[{\"name\":\"《其他说明》期末合计（合计行业态：购物中心/百货/奥特莱斯；分地区含免税）门店数量\",\"raw_value\":\"78\",\"subject_scope\":\"unclear\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"78\",\"unit\":\"家\",\"source_unit\":\"家\",\"uncertainty_reason\":\"表内合计行业态标签与分地区行含免税的口径不完全一致。\"},{\"name\":\"《其他说明》期末合计（合计行业态：购物中心/百货/奥特莱斯；分地区含免税）建筑面积/租赁面积\",\"raw_value\":\"567.2\",\"subject_scope\":\"unclear\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"567.2\",\"unit\":\"万平方米\",\"source_unit\":\"万平方米\",\"uncertainty_reason\":\"面积栏为建筑面积/租赁面积混合口径；原文注明四舍五入可能使分项与合计不等。\"},{\"name\":\"门店清单（含免税门店）面积合计\",\"raw_value\":\"567.2\",\"subject_scope\":\"unclear\",\"period\":\"2025-12-31\",\"qualifier\":\"exact\",\"value\":\"567.2\",\"unit\":\"万平方米\",\"source_unit\":\"万平方米\",\"uncertainty_reason\":\"该清单包含免税门店，且与《其他说明》合计并非纯有税门店建筑面积口径。\"}],\"uncertainty_reason\":\"表内合计行业态栏为购物中心/百货/奥特莱斯，但分地区行含免税；面积栏为建筑面积/租赁面积混合口径，且原文注明四舍五入可能使分项与合计不等。\"}]}",
+      "response_payload": {
+        "repaired_facts": [
+          {
+            "fact_id": "review-add:omit-ops-property-tenure",
+            "text": "截至2025年末，按《报告期末已开业门店分布情况》合计行（经营业态：购物中心/百货/奥特莱斯/免税），自有物业门店25家、建筑面积207.7万平方米；租赁/托管物业门店53家、建筑面积359.5万平方米。该表将租赁与托管合并列示，原文不能拆分；该合计口径与业务概述的78家大型综合有税零售门店未说明为同一口径。",
+            "subject_scope": "business_segment",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "合计行（购物中心/百货/奥特莱斯/免税）自有物业门店数量",
+                "raw_value": "25",
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "qualifier": "exact",
+                "value": "25",
+                "unit": "家",
+                "source_unit": "家"
+              },
+              {
+                "name": "合计行（购物中心/百货/奥特莱斯/免税）自有物业门店建筑面积",
+                "raw_value": "207.7",
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "qualifier": "exact",
+                "value": "207.7",
+                "unit": "万平方米",
+                "source_unit": "万平米"
+              },
+              {
+                "name": "合计行（购物中心/百货/奥特莱斯/免税）租赁/托管物业门店数量",
+                "raw_value": "53",
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "qualifier": "exact",
+                "value": "53",
+                "unit": "家",
+                "source_unit": "家"
+              },
+              {
+                "name": "合计行（购物中心/百货/奥特莱斯/免税）租赁/托管物业门店建筑面积",
+                "raw_value": "359.5",
+                "subject_scope": "business_segment",
+                "period": "2025-12-31",
+                "qualifier": "exact",
+                "value": "359.5",
+                "unit": "万平方米",
+                "source_unit": "万平米"
+              }
+            ],
+            "uncertainty_reason": "租赁/托管在表中合并列示，无法拆分；且该合计口径与业务概述的78家大型综合有税零售门店关系原文未说明。"
+          },
+          {
+            "fact_id": "review-add:omit-ops-ending-area",
+            "text": "截至2025年末，按《其他说明》期末合计：门店78家，建筑面积/租赁面积567.2万平方米；该表合计行经营业态栏写「购物中心/百货/奥特莱斯」，但分地区行含免税。门店清单（含免税门店）面积合计亦为567.2万平方米。原文注明因四舍五入，分项与合计可能不等。",
+            "subject_scope": "unclear",
+            "period": "2025-12-31",
+            "evidence_ids": [
+              "source-0007",
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "《其他说明》期末合计（合计行业态：购物中心/百货/奥特莱斯；分地区含免税）门店数量",
+                "raw_value": "78",
+                "subject_scope": "unclear",
+                "period": "2025-12-31",
+                "qualifier": "exact",
+                "value": "78",
+                "unit": "家",
+                "source_unit": "家",
+                "uncertainty_reason": "表内合计行业态标签与分地区行含免税的口径不完全一致。"
+              },
+              {
+                "name": "《其他说明》期末合计（合计行业态：购物中心/百货/奥特莱斯；分地区含免税）建筑面积/租赁面积",
+                "raw_value": "567.2",
+                "subject_scope": "unclear",
+                "period": "2025-12-31",
+                "qualifier": "exact",
+                "value": "567.2",
+                "unit": "万平方米",
+                "source_unit": "万平方米",
+                "uncertainty_reason": "面积栏为建筑面积/租赁面积混合口径；原文注明四舍五入可能使分项与合计不等。"
+              },
+              {
+                "name": "门店清单（含免税门店）面积合计",
+                "raw_value": "567.2",
+                "subject_scope": "unclear",
+                "period": "2025-12-31",
+                "qualifier": "exact",
+                "value": "567.2",
+                "unit": "万平方米",
+                "source_unit": "万平方米",
+                "uncertainty_reason": "该清单包含免税门店，且与《其他说明》合计并非纯有税门店建筑面积口径。"
+              }
+            ],
+            "uncertainty_reason": "表内合计行业态栏为购物中心/百货/奥特莱斯，但分地区行含免税；面积栏为建筑面积/租赁面积混合口径，且原文注明四舍五入可能使分项与合计不等。"
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 9697,
+        "output_tokens": 9069,
+        "total_tokens": 18766
+      }
+    },
+    {
+      "request_id": "bp-work-5189881c12bb58c6aa019be1:workpaper:repair-verify",
+      "purpose": "verify_profile_workpaper_repair",
+      "request_hash": "7836261de08c377f006051f1c5d859b5873d59c11d515d4de8375cd4fbefc062",
+      "response_hash": "33e88bc5daad218a2427626aa6a1dcee56b89130d109f5ab2b88eed81d6d7f4f",
+      "finish_reason": "stop",
+      "source_label": "scorpio:grok-4.7",
+      "model": "grok-4.7",
+      "selected_profile": "semantic_extraction__scorpio_grok",
+      "logical_profile": "semantic_extraction__scorpio_grok",
+      "reasoning_effort": "high",
+      "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+      "contract_status": "accepted",
+      "raw_content": "{\"checked_fact_ids\":[\"review-add:omit-ops-ending-area\"],\"checks\":[{\"fact_id\":\"review-add:omit-ops-ending-area\",\"accepted\":true,\"evidence_ids\":[\"source-0007\",\"source-0006\"],\"explanation\":\"候选直接采用source-0007《其他说明》期末合计：门店78家、建筑面积/租赁面积567.2万平方米，并保留合计行「购物中心/百货/奥特莱斯」与华南等分地区行含免税的标签差异。source-0006门店清单合计同为567.2万平方米且清单含免税门店。时点为2025年末，单位与混合面积栏目正确；未把该数说成78家有税门店的纯建筑面积或完全权益面积，也未自行加总替换。四舍五入致分项与合计不等的限定已保留，主体标为unclear符合口径不能确认为合并集团或完全权益的原文情况。\"}]}",
+      "response_payload": {
+        "checked_fact_ids": [
+          "review-add:omit-ops-ending-area"
+        ],
+        "checks": [
+          {
+            "fact_id": "review-add:omit-ops-ending-area",
+            "accepted": true,
+            "evidence_ids": [
+              "source-0007",
+              "source-0006"
+            ],
+            "explanation": "候选直接采用source-0007《其他说明》期末合计：门店78家、建筑面积/租赁面积567.2万平方米，并保留合计行「购物中心/百货/奥特莱斯」与华南等分地区行含免税的标签差异。source-0006门店清单合计同为567.2万平方米且清单含免税门店。时点为2025年末，单位与混合面积栏目正确；未把该数说成78家有税门店的纯建筑面积或完全权益面积，也未自行加总替换。四舍五入致分项与合计不等的限定已保留，主体标为unclear符合口径不能确认为合并集团或完全权益的原文情况。"
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 12387,
+        "output_tokens": 221,
+        "total_tokens": 19919
+      }
+    }
+  ],
+  "workpaper_summary": {
+    "origin": "llm_generated",
+    "business_description": "",
+    "fact_count": 12,
+    "metric_count": 28,
+    "element_fact_counts": {
+      "business_structure": 0,
+      "products_services": 0,
+      "revenue_model": 0,
+      "scale_and_mix": 0,
+      "operations_and_inputs": 12,
+      "customers_channels_markets": 0,
+      "operating_drivers": 0,
+      "material_changes": 0
+    },
+    "review_status": "completed_with_open_findings",
+    "open_finding_count": 2,
+    "extraction_model": "deepseek-flash",
+    "review_model": "grok-4.7",
+    "delivery_counts": {
+      "reviewed": 5,
+      "pending": 0,
+      "limited": 3,
+      "source_only": 4,
+      "withheld": 0,
+      "duplicate": 0
+    },
+    "delivery_pending_review_count": 0,
+    "delivery_reviewed_count": 5,
+    "delivery_pending_count": 0,
+    "delivery_limited_count": 3,
+    "delivery_source_only_count": 4,
+    "delivery_withheld_count": 0,
+    "delivery_duplicate_count": 0
+  }
+}

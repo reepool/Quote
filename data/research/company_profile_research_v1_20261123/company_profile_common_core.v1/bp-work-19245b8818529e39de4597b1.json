@@ -1,0 +1,3478 @@
+{
+  "schema_version": "company_profile_common_core_runtime.v3",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "production_authorization": "not_authorized",
+  "work_id": "bp-work-19245b8818529e39de4597b1",
+  "report": {
+    "instrument_id": "300124.SZ",
+    "report_id": "asset_d0f371eb40bd22a8fabc83f1d1d78dea",
+    "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-27T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "assessment": {
+    "mapping_version": "company_profile_common_core_mapping.v1",
+    "production_authorization": "not_authorized",
+    "report": {
+      "instrument_id": "300124.SZ",
+      "report_id": "asset_d0f371eb40bd22a8fabc83f1d1d78dea",
+      "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-27T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "principal_business": {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "products_services": {
+      "dimension_id": "products_services",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "revenue_model": {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "core_complete": false
+  },
+  "activated_chapters": [],
+  "evidence_gap_codes": [],
+  "provider_calls": [
+    "select_profile_sections",
+    "extract_profile_workpaper"
+  ],
+  "provider_blocked": false,
+  "execution": {
+    "schema_version": "company_profile_execution_record.v1",
+    "production_authorization": "not_authorized",
+    "input_identity": {
+      "instrument_id": "300124.SZ",
+      "report_id": "asset_d0f371eb40bd22a8fabc83f1d1d78dea",
+      "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+      "report_period": "2025-12-31",
+      "policy_version": "company_profile_common_core_mapping.v2",
+      "processing_identity": {
+        "execution_mode": "provider",
+        "logical_request_timeout_seconds": 2450,
+        "max_layout_characters": 500000,
+        "max_section_characters": 160000,
+        "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+        "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "quality_review_profile": "semantic_extraction__scorpio_grok",
+        "reading_strategy": "chapter_workpaper_v1",
+        "repair_profile": "semantic_extraction__deepseek",
+        "review_max_output_tokens": 16384,
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "semantic_policy": "company_profile_llm_led.v2",
+        "semantic_reuse": false,
+        "source_binding_policy": "company_workpaper_source_literals.column-wrapped-amounts.v8",
+        "workpaper_format_recovery": "local_shape_before_retry.v3",
+        "workpaper_max_output_tokens": 12000,
+        "workpaper_metric_format_policy": "source_metric_unparsed_value_null.v1",
+        "workpaper_metric_limit_policy": "source_review_exact_metric_limits.v1",
+        "workpaper_review_execution": "deferred",
+        "workpaper_review_policy": "company_profile_workpaper_review.v13"
+      }
+    },
+    "scope_digests": {},
+    "model_attempts": [],
+    "token_budget": {
+      "total_token_budget": 1000000,
+      "extract_max_output_tokens": 4000,
+      "verify_max_output_tokens": 2000,
+      "tokens_used": 83095,
+      "tokens_remaining": 916905
+    },
+    "scope_token_allocations": {},
+    "transport_retries": 0,
+    "semantic_disputes": [],
+    "predecessor_lineage": []
+  },
+  "legacy_writers_invoked": [],
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "llm_generated",
+    "report": {
+      "instrument_id": "300124.SZ",
+      "report_id": "asset_d0f371eb40bd22a8fabc83f1d1d78dea",
+      "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-27T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0025",
+          "section_path": [
+            "第二节 公司简介和主要财务指标",
+            "五、主要会计数据和财务指标"
+          ],
+          "start_page": 9,
+          "end_page": 10,
+          "rationale": "选取公司主要会计数据和财务指标，用于掌握公司当期收入、利润与规模总貌；选取“报告期内公司从事的主要业务”，该节完整覆盖主要产品、用途、市场地位及经营模式，且不再下钻其子节以避免重叠；选取“主营业务分析”，获取经营情况概述、业绩影响因素和主要经营工作总结；选取“营业收入整体情况”，补充分行业/分产品收入口径、销量变化与业务权重，是收入构成和主要mix的核心来源；选取主要销售客户情况，补充客户集中度与市场侧信息；选取主要供应商情况所在完整子节，连同费用与研发投入，补充供应链、成本费用和研发资源投入等经营输入。上述章节均为公司层面实质经营讨论，能共同解释业务结构、产品用途、 monetization、收入权重、经营资源与客户/供应链。"
+        },
+        {
+          "section_id": "section-0033",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的主要业务"
+          ],
+          "start_page": 12,
+          "end_page": 18,
+          "rationale": "选取公司主要会计数据和财务指标，用于掌握公司当期收入、利润与规模总貌；选取“报告期内公司从事的主要业务”，该节完整覆盖主要产品、用途、市场地位及经营模式，且不再下钻其子节以避免重叠；选取“主营业务分析”，获取经营情况概述、业绩影响因素和主要经营工作总结；选取“营业收入整体情况”，补充分行业/分产品收入口径、销量变化与业务权重，是收入构成和主要mix的核心来源；选取主要销售客户情况，补充客户集中度与市场侧信息；选取主要供应商情况所在完整子节，连同费用与研发投入，补充供应链、成本费用和研发资源投入等经营输入。上述章节均为公司层面实质经营讨论，能共同解释业务结构、产品用途、 monetization、收入权重、经营资源与客户/供应链。"
+        },
+        {
+          "section_id": "section-0057",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "start_page": 23,
+          "end_page": 29,
+          "rationale": "选取公司主要会计数据和财务指标，用于掌握公司当期收入、利润与规模总貌；选取“报告期内公司从事的主要业务”，该节完整覆盖主要产品、用途、市场地位及经营模式，且不再下钻其子节以避免重叠；选取“主营业务分析”，获取经营情况概述、业绩影响因素和主要经营工作总结；选取“营业收入整体情况”，补充分行业/分产品收入口径、销量变化与业务权重，是收入构成和主要mix的核心来源；选取主要销售客户情况，补充客户集中度与市场侧信息；选取主要供应商情况所在完整子节，连同费用与研发投入，补充供应链、成本费用和研发资源投入等经营输入。上述章节均为公司层面实质经营讨论，能共同解释业务结构、产品用途、 monetization、收入权重、经营资源与客户/供应链。"
+        },
+        {
+          "section_id": "section-0065",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "营业收入整体情况"
+          ],
+          "start_page": 29,
+          "end_page": 31,
+          "rationale": "选取公司主要会计数据和财务指标，用于掌握公司当期收入、利润与规模总貌；选取“报告期内公司从事的主要业务”，该节完整覆盖主要产品、用途、市场地位及经营模式，且不再下钻其子节以避免重叠；选取“主营业务分析”，获取经营情况概述、业绩影响因素和主要经营工作总结；选取“营业收入整体情况”，补充分行业/分产品收入口径、销量变化与业务权重，是收入构成和主要mix的核心来源；选取主要销售客户情况，补充客户集中度与市场侧信息；选取主要供应商情况所在完整子节，连同费用与研发投入，补充供应链、成本费用和研发资源投入等经营输入。上述章节均为公司层面实质经营讨论，能共同解释业务结构、产品用途、 monetization、收入权重、经营资源与客户/供应链。"
+        },
+        {
+          "section_id": "section-0078",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "公司主要销售客户情况"
+          ],
+          "start_page": 31,
+          "end_page": 32,
+          "rationale": "选取公司主要会计数据和财务指标，用于掌握公司当期收入、利润与规模总貌；选取“报告期内公司从事的主要业务”，该节完整覆盖主要产品、用途、市场地位及经营模式，且不再下钻其子节以避免重叠；选取“主营业务分析”，获取经营情况概述、业绩影响因素和主要经营工作总结；选取“营业收入整体情况”，补充分行业/分产品收入口径、销量变化与业务权重，是收入构成和主要mix的核心来源；选取主要销售客户情况，补充客户集中度与市场侧信息；选取主要供应商情况所在完整子节，连同费用与研发投入，补充供应链、成本费用和研发资源投入等经营输入。上述章节均为公司层面实质经营讨论，能共同解释业务结构、产品用途、 monetization、收入权重、经营资源与客户/供应链。"
+        },
+        {
+          "section_id": "section-0079",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "公司主要供应商情况"
+          ],
+          "start_page": 32,
+          "end_page": 35,
+          "rationale": "选取公司主要会计数据和财务指标，用于掌握公司当期收入、利润与规模总貌；选取“报告期内公司从事的主要业务”，该节完整覆盖主要产品、用途、市场地位及经营模式，且不再下钻其子节以避免重叠；选取“主营业务分析”，获取经营情况概述、业绩影响因素和主要经营工作总结；选取“营业收入整体情况”，补充分行业/分产品收入口径、销量变化与业务权重，是收入构成和主要mix的核心来源；选取主要销售客户情况，补充客户集中度与市场侧信息；选取主要供应商情况所在完整子节，连同费用与研发投入，补充供应链、成本费用和研发资源投入等经营输入。上述章节均为公司层面实质经营讨论，能共同解释业务结构、产品用途、 monetization、收入权重、经营资源与客户/供应链。"
+        }
+      ],
+      "unread_or_deferred": [
+        "行业背景与行业趋势章节仅作外部环境参考，除非需要解释公司层面变化，否则不纳入。",
+        "核心竞争力分析偏泛化描述，且主要业务与经营分析已覆盖产品、模式和资源，暂不纳入。",
+        "未来发展规划、经营计划与风险展望具有前瞻性，非本期经营事实核心，暂不纳入。",
+        "公司治理、股权激励、员工与薪酬、股东与股份变动等章节与业务和收入解释关系较弱，暂不纳入。",
+        "完整财务报表、会计政策、资产明细、投资与募集资金、重大事项及承诺等，仅在出现明确收入或分部缺口时再定向补充，当前不扩读。",
+        "分部信息附注、收入确认会计政策等作为后续定向核对项，当前经营章节已能支撑主要判断。",
+        "物理页35布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+      ],
+      "selection_rationale": "选取公司主要会计数据和财务指标，用于掌握公司当期收入、利润与规模总貌；选取“报告期内公司从事的主要业务”，该节完整覆盖主要产品、用途、市场地位及经营模式，且不再下钻其子节以避免重叠；选取“主营业务分析”，获取经营情况概述、业绩影响因素和主要经营工作总结；选取“营业收入整体情况”，补充分行业/分产品收入口径、销量变化与业务权重，是收入构成和主要mix的核心来源；选取主要销售客户情况，补充客户集中度与市场侧信息；选取主要供应商情况所在完整子节，连同费用与研发投入，补充供应链、成本费用和研发资源投入等经营输入。上述章节均为公司层面实质经营讨论，能共同解释业务结构、产品用途、 monetization、收入权重、经营资源与客户/供应链。",
+      "stop_reason": "已选章节覆盖公司主要产品与用途、经营模式、收入总额及分行业/分产品构成、客户与供应链/研发投入等核心经营信息，足以回答业务结构、盈利来源、规模与主要mix及本期变化；继续扩展至行业背景、未来展望、治理或完整财务报表会超出当前经营解释所需范围，故在此停止。",
+      "transcription_version": "shared-pdf-layout-with-native-fallback.structured-notes.v3"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "BS-01",
+            "text": "公司业务生态横跨工业自动化与数字化、新能源汽车动力系统、智能机器人、数字能源，形成技术同源、协同发展的多个业务板块；其中工业自动化与数字化由通用自动化、智慧电梯、数字化等构成，智能机器人和数字能源作为新兴业务单独列示。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003",
+              "source-0012",
+              "source-0018"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未进一步展开各业务板块对应的法律主体和分板块利润。"
+        ]
+      },
+      "products_services": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "PS-01",
+            "text": "工业自动化与数字化业务包括通用自动化、智慧电梯和数字化：通用自动化提供变频器、伺服系统、PLC/HMI、CNC、高性能电机、精密机械、气动元件、传感器、工业视觉等产品及解决方案，用于工业自动化、数字化和智能化升级；智慧电梯提供电梯控制系统、人机界面、门系统、控制柜、线缆等电气大配套产品；数字化提供云边端一体化平台及InoCube EiOS、InoCube FOS等工业软件平台。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003",
+              "source-0004",
+              "source-0011",
+              "source-0012"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "PS-02",
+            "text": "新能源汽车动力系统业务提供电驱系统（电机、电机控制器、电驱总成）、电源系统（DC/DC、OBC、电源总成）和智能底盘系统（主动悬架液压泵、主动稳定杆等），主要服务新能源乘用车和新能源商用车。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005",
+              "source-0012"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "PS-03",
+            "text": "智能机器人业务提供工业机器人（SCARA、六关节、协作机器人等）、机器视觉（视觉控制器、工业相机等）以及人形机器人零部件（仿生臂、关节模组、无框电机、低压直流驱动器、行星滚柱丝杠、编码器等）及解决方案，面向制造环节的搬运、装配、码垛、焊接等作业和工业场景落地。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006",
+              "source-0014"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "PS-04",
+            "text": "数字能源业务提供储能变流器、升压一体机、储能系统及综合能源管理平台，覆盖户用到大型地面电站的储能功率场景，并服务工业级能源协同和零碳管理。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0015"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未逐一列示全部产品型号、细分规格和全部在研产品。"
+        ]
+      },
+      "revenue_model": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "RM-01",
+            "text": "公司通过销售标准化产品和定制化产品/解决方案取得收入，产品开发采用基于IPD的集成开发模式，研发涵盖技术研究、平台产品开发和定制化产品开发。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未披露分产品单价、销量和成本构成的完整收入模型。"
+        ]
+      },
+      "scale_and_mix": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "SM-01",
+            "text": "2025年公司营业收入合计451.05亿元，同比增长21.77%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0017"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入合计",
+                "raw_value": "45,104,844,200.13",
+                "value": "45104844200.13",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入同比增减",
+                "raw_value": "21.77%",
+                "value": "21.77",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "程序显示说明：SM-01正文451.05亿元为营业收入合计45,104,844,200.13元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "SM-02",
+            "text": "工业自动化与数字化产品2025年实现营业收入222.45亿元，占营业收入49.32%，同比增长18.79%，毛利率40.27%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0017",
+              "source-0018"
+            ],
+            "metrics": [
+              {
+                "name": "工业自动化与数字化营业收入",
+                "raw_value": "22,245,401,986.97",
+                "value": "22245401986.97",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "工业自动化与数字化占营业收入比重",
+                "raw_value": "49.32%",
+                "value": "49.32",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "占营业收入",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "工业自动化与数字化营业收入同比增减",
+                "raw_value": "18.79%",
+                "value": "18.79",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "工业自动化与数字化毛利率",
+                "raw_value": "40.27%",
+                "value": "40.27",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "程序显示说明：SM-02正文222.45亿元为工业自动化与数字化营业收入22,245,401,986.97元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "SM-03",
+            "text": "新能源汽车动力系统产品2025年实现营业收入203.23亿元，占营业收入45.06%，同比增长26.39%，毛利率16.10%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0017",
+              "source-0018"
+            ],
+            "metrics": [
+              {
+                "name": "新能源汽车动力系统营业收入",
+                "raw_value": "20,322,581,832.31",
+                "value": "20322581832.31",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "新能源汽车动力系统占营业收入比重",
+                "raw_value": "45.06%",
+                "value": "45.06",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "占营业收入",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "新能源汽车动力系统营业收入同比增减",
+                "raw_value": "26.39%",
+                "value": "26.39",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "新能源汽车动力系统毛利率",
+                "raw_value": "16.10%",
+                "value": "16.10",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "程序显示说明：SM-03正文203.23亿元为新能源汽车动力系统营业收入20,322,581,832.31元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "SM-04",
+            "text": "新兴产业产品2025年实现营业收入17.95亿元，占营业收入3.98%，同比增长15.80%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0017"
+            ],
+            "metrics": [
+              {
+                "name": "新兴产业营业收入",
+                "raw_value": "1,795,019,255.76",
+                "value": "1795019255.76",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "新兴产业占营业收入比重",
+                "raw_value": "3.98%",
+                "value": "3.98",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "占营业收入",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "新兴产业营业收入同比增减",
+                "raw_value": "15.80%",
+                "value": "15.80",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "程序显示说明：SM-04正文17.95亿元为新兴产业营业收入1,795,019,255.76元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "SM-05",
+            "text": "其他产品（报表分类中的残余类别）2025年实现营业收入7.42亿元，占营业收入1.64%，同比增长8.47%；该类别具体业务构成未在所选章节完整展开。",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0017"
+            ],
+            "metrics": [
+              {
+                "name": "其他产品营业收入",
+                "raw_value": "741,841,125.09",
+                "value": "741841125.09",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "其他为报表残余类别，具体业务范围未展开。"
+              },
+              {
+                "name": "其他产品占营业收入比重",
+                "raw_value": "1.64%",
+                "value": "1.64",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": "占营业收入",
+                "qualifier": "exact",
+                "uncertainty_reason": "其他为报表残余类别，具体业务范围未展开。"
+              },
+              {
+                "name": "其他产品营业收入同比增减",
+                "raw_value": "8.47%",
+                "value": "8.47",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": "其他为报表残余类别，具体业务范围未展开。"
+              }
+            ],
+            "uncertainty_reason": "其他为报表残余类别，具体业务范围未展开。；程序显示说明：SM-05正文7.42亿元为其他产品营业收入741,841,125.09元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "SM-06",
+            "text": "工业自动化与数字化业务内部，通用自动化业务2025年销售收入约169亿元，同比增长约23%；其中伺服系统约68.5亿元、变频器约57亿元、PLC&HMI约18亿元；智慧电梯相关产品销售收入约52亿元，同比增长约5%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0012"
+            ],
+            "metrics": [
+              {
+                "name": "通用自动化业务销售收入",
+                "raw_value": "约169",
+                "value": "169",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "通用自动化业务销售收入同比",
+                "raw_value": "约23%",
+                "value": "23",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "伺服系统销售收入",
+                "raw_value": "约68.5",
+                "value": "68.5",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "变频器销售收入",
+                "raw_value": "约57",
+                "value": "57",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "PLC&HMI销售收入",
+                "raw_value": "约18",
+                "value": "18",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "智慧电梯相关产品销售收入",
+                "raw_value": "约52",
+                "value": "52",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "智慧电梯相关产品销售收入同比",
+                "raw_value": "约5%",
+                "value": "5",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "其他为报表分类中的残余类别，具体业务构成未展开。",
+          "分行业与分产品口径存在差异，本稿主要按产品口径列示收入结构。"
+        ]
+      },
+      "operations_and_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "OI-01",
+            "text": "2025年研发费用42.56亿元，同比增长35.23%，主要由于研发投入增大、研发项目数量增加、研发人员增加叠加调薪，以及检测认证费、材料费、外协服务费、差旅费和办公费等增加。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0022"
+            ],
+            "metrics": [
+              {
+                "name": "研发费用",
+                "raw_value": "4,255,773,574.67",
+                "value": "4255773574.67",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "研发费用同比增减",
+                "raw_value": "35.23%",
+                "value": "35.23",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "程序显示说明：OI-01正文42.56亿元为研发费用4,255,773,574.67元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          },
+          {
+            "fact_id": "OI-02",
+            "text": "营业成本中材料成本占比较高：智能制造板块材料成本123.92亿元，占该板块营业成本85.09%；新能源汽车板块材料成本146.26亿元，占该板块营业成本85.78%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0019"
+            ],
+            "metrics": [
+              {
+                "name": "智能制造材料成本",
+                "raw_value": "12,391,635,374.62",
+                "value": "12391635374.62",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "智能制造材料成本占营业成本比重",
+                "raw_value": "85.09%",
+                "value": "85.09",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "占该板块营业成本",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "新能源汽车材料成本",
+                "raw_value": "14,625,528,764.58",
+                "value": "14625528764.58",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "新能源汽车材料成本占营业成本比重",
+                "raw_value": "85.78%",
+                "value": "85.78",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "占该板块营业成本",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "程序显示说明：OI-02正文123.92亿元为智能制造材料成本12,391,635,374.62元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。；程序显示说明：OI-02正文146.26亿元为新能源汽车材料成本14,625,528,764.58元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。"
+          }
+        ],
+        "limitations": [
+          "未获取完整产能、产能利用率、主要原材料具体品类及采购价格。"
+        ]
+      },
+      "customers_channels_markets": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "CC-01",
+            "text": "工业自动化与数字化及智能机器人业务采用“分销为主、直销为辅”的销售模式，通过分销商/系统集成商销售给客户，对少数采购量大、产品个性化要求高的战略客户采取直销；新能源汽车和数字能源领域主要为直销模式。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未披露具体客户名称，客户集中度仅按报告披露口径。",
+          "事实CC-02已隔离，未作为结论采用：narrative number is absent from cited source: 135.23亿元"
+        ]
+      },
+      "operating_drivers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "OD-01",
+            "text": "2025年业绩增长主要受下游客户定点车型放量带动新能源汽车业务收入增长，以及下游行业结构性增长、公司多产品解决方案和“上顶下沉”市场策略持续深化带动工业自动化与数字化业务（含电梯）收入增长；公司同时加强成本及费用管控。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "OD-02",
+            "text": "根据弗若斯特沙利文等数据，2025年按收入计，公司通用伺服系统、低压变频器、中高压变频器在中国市场份额分别约31%、20%、14%，均居第一，PLC产品（不含I/O系统）约5.7%居第四；工业机器人按出货量中国市场份额8.8%居第四，SCARA机器人约28%居第一；全球储能中大功率PCS按出货量份额6.7%居第五；新能源乘用车动力系统按收入为全球第三大、中国第一大第三方供应商，电机控制器按装机量为全球第二、中国第一大第三方供应商。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004",
+              "source-0006",
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "通用伺服系统中国市场份额",
+                "raw_value": "约31%",
+                "value": "31",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "按收入计",
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "低压变频器中国市场份额",
+                "raw_value": "约20%",
+                "value": "20",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "按收入计",
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "中高压变频器中国市场份额",
+                "raw_value": "约14%",
+                "value": "14",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "按收入计",
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "PLC产品中国市场份额",
+                "raw_value": "约5.7%",
+                "value": "5.7",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "按收入计",
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "工业机器人中国市场份额",
+                "raw_value": "8.8%",
+                "value": "8.8",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "按出货量计",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "SCARA机器人中国市场份额",
+                "raw_value": "约28%",
+                "value": "28",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "按出货量计",
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "全球储能中大功率PCS市场份额",
+                "raw_value": "6.7%",
+                "value": "6.7",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "按出货量计",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "市场份额为第三方数据口径，未获取完整行业规模、价格和竞争格局数据。"
+        ]
+      },
+      "material_changes": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "MC-01",
+            "text": "2025年公司对主营业务收入分类统计口径进行优化调整并追溯重述：分行业中“智能制造”名称简化，原部分OEM、生态战略、研发管理部、智能装备产品等调整至“其他”，轨道交通调整至“其他”；分产品中将储能、视觉、工业机器人、人形机器人调整至“新兴产业”，其余通用自动化与原智慧电梯电气类、数字化合并为“工业自动化与数字化”。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0018"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "MC-02",
+            "text": "公司报告期内业务、产品或服务未发生重大变化或调整。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0019"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未获取分类调整的完整量化重述明细；合并范围变化未展开。"
+        ]
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第二节 公司简介和主要财务指标",
+          "五、主要会计数据和财务指标"
+        ],
+        "physical_pages": [
+          9
+        ],
+        "source_spans": [
+          {
+            "page": 9,
+            "start": 817,
+            "end": 3204,
+            "quote": "五、主要会计数据和财务指标\n\n\n公司无需追溯调整或重述以前年度会计数据\n\n                                             2025  年                      2024  年                 本年比上年增减                           2023   年\n 营业收入（元）                                 45,104,844,200.13            37,040,952,138.72                         21.77%          30,419,925,397.64\n 归属于上市公司股东的净                               5,050,002,089.89             4,285,493,340.70                        17.84%            4,741,863,347.20\n 利润（元）\n 归属于上市公司股东的扣\n 除非经常性损益的净利润                               4,950,505,396.54             4,035,832,165.85                        22.66%            4,071,177,195.45\n （元）\n 经营活动产生的现金流量                               6,681,025,417.16             7,200,440,164.32                        -7.21%            3,369,915,897.12\n 净额（元）\n 基本每股收益（元/股）                                              1.87                         1.60                     16.88%                           1.78\n 稀释每股收益（元/股）                                              1.85                         1.60                     15.63%                           1.78\n 加权平均净资产收益率                                           16.34%                       16.52%        减少     0.18个百分点                             21.66%\n                                            2025  年末                     2024年末                本年末比上年末增减                           2023  年末\n 资产总额（元）                                 71,314,393,635.15            57,178,824,244.41                         24.72%          48,957,564,055.31\n 归属于上市公司股东的净                             35,352,991,488.32            27,994,377,858.21                         26.29%          24,481,893,916.24\n 资产（元）\n\n\n扣除股份支付影响后的净利润\n\n      主要会计数据                            2025   年                      2024  年              本期比上年同期增减(%)                             2023   年\n 扣除股份支付影响后                            5,475,844,343.83             4,586,324,766.33                             19.40%            5,099,550,809.23\n 的净利润（元）\n\n\n截至披露前一交易日的公司总股本：\n\n 截至披露前一交易日的公司总股本（股）                                                                                                                  2,707,445,479\n\n\n公司报告期末至年度报告披露日股本是否因发行新股、增发、配股、股权激励行权、回购等原因发生变化且影响所有者\n\n权益金额\n\n是  □否\n\n\n                                                                                                                                                      9"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第二节 公司简介和主要财务指标",
+          "五、主要会计数据和财务指标"
+        ],
+        "physical_pages": [
+          10
+        ],
+        "source_spans": [
+          {
+            "page": 10,
+            "start": 0,
+            "end": 547,
+            "quote": "                                                                                 深圳市汇川技术股份有限公司                     2025  年年度报告全文\n\n\n  支付的优先股股利                                                                                                                               -\n  支付的永续债利息（元）                                                                                                                            -\n  用最新股本计算的全面摊薄每股收益（元/股）                                                                                                           1.8652\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        "physical_pages": [
+          12
+        ],
+        "source_spans": [
+          {
+            "page": 12,
+            "start": 151,
+            "end": 1086,
+            "quote": "一、报告期内公司从事的主要业务\n\n     （一）公司从事的主要业务、主要产品及用途、所处市场地位\n\n     我们是一家全球领先、创新驱动的工业科技集团。顺应工业智能发展和能源变革的时代浪潮，依托在自动化、数字\n\n 化、智能化领域的深厚技术积淀和持续前沿创新，我们已构建起横跨工业自动化与数字化、新能源汽车动力系统、智能机\n 器人、数字能源等技术同源、协同发展的业务生态，致力于为全球客户提供智能、高效、绿色、安全的综合产品和解决方\n\n 案，以技术突破与应用推动工业文明演进。\n\n     1.工业自动化与数字化\n\n     ①通用自动化与数字化\n\n     公司聚焦工业领域的自动化、数字化、智能化，在“数字层、边缘层、控制层、驱动层、执行层与传感层”形成贯通\n 式布局，涵盖变频器、伺服系统、控制系统（PLC/HMI/CNC）、高性能电机、精密机械、气动元件、传感器、工业视\n\n 觉、电梯核心零部件等产品及解决方案，以及全场景智能化工业控制软件平台、云边端一体化的数字化平台。其中，变频\n 器是通过改变交流电机的工作电压和频率来控制电机转速及转矩，以满足设备节能、工艺调速等需要。伺服系统是自动化\n\n 运动控制环节的核心部件，可实现对速度、转矩与位置进行精确、快速、稳定的控制。                                              PLC（Programmable Logic\n Controller，可编程控制器）是设备自动化             /产线自动化及流程工业的           “大脑”，可通过数字或模拟输入/输出，控制各类机\n\n 械或生产过程。       公司依托数字化平台与工业自动化深度融合的技术优势，持续为工业客户提供“用得起、用得好，易部\n 署、易升级”的数自融合综合解决方案，助力客户实现智能化升级。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                          12"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        "physical_pages": [
+          13
+        ],
+        "source_spans": [
+          {
+            "page": 13,
+            "start": 0,
+            "end": 1744,
+            "quote": "                                                                        深圳市汇川技术股份有限公司                  2025  年年度报告全文\n\n\n\n    在工业自动化领域，公司的竞争对手主要是外资品牌公司，包括西门子、ABB、安川、三菱、松下、施耐德、发那科\n\n等。公司作为本土企业，与行业部分外资品牌相比，拥有行业定制化解决方案、性价比高、快速响应客户及交付等优势。\n公司在与外资品牌的竞争过程中，主要采用技术营销和行业营销策略，为行业客户提供“工控+工艺”的一体化解决方\n\n案，逐步提高市场占有率。根据弗若斯特沙利文数据，2025年按收入计，公司通用伺服系统在中国市场的份额约                                                                  31%，位\n居第一名；低压变频器产品（含电梯专用变频器）在中国市场的份额约                                           20%，位居第一名；中高压变频器产品在中国市场\n\n的份额约      14%，位居第一名；PLC产品（不含                    I/O 系统）在中国市场的份额约                 5.7%，位居第四名。\n\n\n\n\n\n\n\n\n\n\n                                                     汇川,                      汇川,              其\n                            汇川, 31%                   20%                     14.0%第二,         他,\n                     其他,                     其他,                                  10.4%       37.8      第一,\n                     56.2%      第二,           47%       第二,            其他,      第三,            %        42.0%\n                              第三, 7%                     18%          65.5%     10.1%           汇川,\n                              6.8%                  第三,                                         5.7%第三, 第二,\n                                                    15%                                            7.0% 7.5%\n\n\n\n\n\n\n\n\n\n\n                                          公司自动化核心产品（按收入）在中国市场的排名\n\n    ②智慧电梯\n\n    电梯核心零部件包括电梯控制系统（一体化控制器/变频器）、人机界面、电梯物联网等产品及电气大配套解决方案，\n\n其中电梯控制系统是指对电梯轿厢的运行、楼层指示、层站召唤、轿内指令、安全保护等进行管理和实施逻辑、速度控制\n的装置，人机界面是呼叫电梯和观察电梯状态的装置，包括电梯的外呼面板、轿内操纵箱和显示器等。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                                           13"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        "physical_pages": [
+          14
+        ],
+        "source_spans": [
+          {
+            "page": 14,
+            "start": 0,
+            "end": 1349,
+            "quote": "                                                              深圳市汇川技术股份有限公司               2025年年度报告全文\n\n\n\n    在电梯核心零部件领域，公司的竞争对手主要是内资品牌供应商。公司作为电梯部件供应商，通过持续的研发创新和\n\n市场拓展，在技术、品牌、规模、大配套解决方案等方面都具有明显优势。出于成本控制、质量管控等原因，电梯厂商将\n越来越趋向于采取大配套采购模式。这一采购模式的变化，将有利于公司市场占有率进一步提升。公司的电梯一体化控制\n\n器/变频器产品、人机界面产品的市场占有率均处于行业领先地位，公司已经成为行业领先的电梯电气大配套解决方案供应\n商。\n\n    长期来看，工业自动化与数字化行业将持续受益于制造业高质量升级的核心需求、数字经济与实体经济的深度融合，\n以及人工智能技术的全面加持，发展空间广阔且潜力深厚。随着“十五五”规划对智能制造的战略加码，在机器换人和工\n\n厂自动化/智能化的大背景下，公司变频器、伺服系统、PLC、精密机械、数字化等产品仍有较大成长空间。基于多产品平\n台及行业定制化解决方案的优势，公司市场份额有望继续提升。\n\n    2.新能源汽车动力系统\n\n    产品包括：电驱系统（电机、电机控制器、电驱总成）、电源系统（DC/DC、OBC、电源总成）、智能底盘系统（主\n动悬架液压泵、主动稳定杆等）等产品及解决方案，主要为新能源乘用车、新能源商用车提供高品质、低成本的综合产品\n\n解决方案与服务。电驱系统是新能源汽车行驶中的主要执行结构，其驱动特性决定了汽车行驶的主要性能指标，是新能源\n汽车的核心部件；DC/DC          变换器是将动力电池输出的高压直流电转化为                      12V、24V、48V     等低压直流电，为车灯、空调、\n\n音响等车载低压用电设备和各类控制器提供电能；OBC                         车载充电机是安装在新能源汽车上的充电机，将交流电转化为动力\n电池可以使用的直流电压，对新能源汽车的动力电池进行充电；主动悬架、线控转向与线控制动共同构成了新能源汽车线\n\n控智能底盘系统的三大核心执行模块，核心功能分别为调节车身垂向姿态、精准控制横向行驶轨迹，以及实现纵向制动与\n能量回收。相关业务详情可参见联合动力定期报告。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n    注：在智能底盘系统业务中，主动悬架液压泵、主动稳定杆均已获得主机厂定点。\n\n    在新能源乘用车领域，公司的主要竞争对手是国际汽车                          Tier 1及国内动力系统供应商。经过多年的战略投入，公司在\n\n新能源汽车领域已经搭建起完善的技术平台和产品平台，在汽车体系认证方面已经获得国内和国外一流整车厂的认可。公\n\n\n                                                                                                           14"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 0,
+            "end": 1473,
+            "quote": "                                                             深圳市汇川技术股份有限公司              2025 年年度报告全文\n\n\n司作为本土企业，与外资品牌相比，具有快速响应客户定制化需求、良好的交付能力等优势。与国内供应商相比，公司具\n有品牌、技术与解决方案、规模、精益经营等优势。得益于战略客户的定点和                                   SOP 放量，公司电机控制器、电驱总成、电\n\n机以及电源系统等产品均已形成大批量应用，具备较强的品牌影响力。在新能源商用车领域，公司继续深耕轻卡、微面、\n重卡、客车等市场，市场份额持续保持领先。\n\n    根据弗若斯特沙利文数据，2025             年按收入计，公司是全球第三大、中国第一大新能源乘用车动力系统（不含电池系\n\n统）第三方供应商；按装机量计，公司是全球第二大、中国第一大新能源乘用车电机控制器第三方供应商。同时也是中国\n第二大新能源乘用车电          驱系统第三方供应商以及中国第一大新能源乘用车定子第三方供应商。根据《电车资源》数据显\n\n示，2025年，公司的新能源物流车电机装机量                   138,043台，市场占比       22%，位居榜首。\n\n    伴随着全球新能源汽车渗透率的进一步提升，公司新能源汽车业务有望保持较快发展。\n\n    3.智能机器人\n\n    产品包括：工业机器人（SCARA            机器人、六关节机器人、协作机器人等）、机器视觉（视觉控制器、线阵相机、S2.0\n协议面阵相机、纳秒门控相机、智能相机等）、人形机器人零部件（七自由度仿生臂、行星旋转执行器、直线执行器、无\n\n框力矩电机、低压直流驱动器、行星滚柱丝杠和编码器等）等产品及解决方案，并推动泛人形机器人解决方案在工业场景\n落地。工业机器人是指应用于制造业生产环节，实现搬运、装配、码垛、焊接等作业的自动化设备；机器视觉是指通过相\n\n机、算法等实现图像采集、分析与处理，为机器人作业提供视觉引导和检测的装置；人形机器人是指模拟人体形态与动\n作，可适应多场景作业的智能装备，其零部件的精度、性能、可靠性与商业化成本，是人形机器人应用于工业场景的核心\n\n要素之一。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n    在工业机器人领域，公司的主要竞争对手是发那科、安川、                           ABB、库卡及埃斯顿等。在确保工业机器人稳定、可靠等\n\n特性的同时，公司将围绕综合解决方案能力、产品极致性价比等方面展开竞争。在机器视觉领域，公司的主要竞争对手以\n内资品牌为主。公司面对行业标杆品牌，通过持续打造“机器人+视觉”融合竞争力来拓展市场。在人形机器人领域，公\n\n司的主要竞争对手以国内品牌为主。随着人形机器人产业日新月异的高速发展，公司将紧跟行业技术发展趋势，在运动控\n制算法、零部件创新、批量制造等方面打造竞争力。根据弗若斯特沙利文数据，2025                                     年按出货量计，公司工业机器人产品\n\n\n                                                                                                         15"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        "physical_pages": [
+          16
+        ],
+        "source_spans": [
+          {
+            "page": 16,
+            "start": 0,
+            "end": 1250,
+            "quote": "                                                               深圳市汇川技术股份有限公司               2025年年度报告全文\n\n\n在中国市场的份额为          8.8%，排名第四，本土厂商中排名第二；公司                      SCARA 机器人产品在中国市场的份额约                28%，排名第\n一。\n\n    智能机器人是公司重点布局的战略新业务。未来，随着智能制造持续演进与人形机器人产业落地，公司智能机器人业\n\n务将为公司新的增长动能。\n\n    4.数字能源\n\n    产品包括：储能变流器、升压一体机、储能系统及综合能源管理平台。储能变流器（                                            12kW-3.5MW）与升压一体机\n\n（1MW-7MW）实现了从户用到大型地面电站的全场景功率覆盖；工商业储能系统是基于 “All-In-One”理念的一体化储能\n\n系统，将电芯、BMS、PCS         及安全热管理深度集成，实现即插即用；综合能源管理平台提供集一体化、智能化、专业化的智\n慧能源解决方案，高效实现 “源、网、荷、储、碳”协同管控与全场景能源的优化利用。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n    公司数字能源领域业务，坚持“研发创新”与“市场拓展”双轮驱动，持续夯实技术壁垒，加速全球化布局。在能源\n\n设备端，公司以电站全生命周期收益最大化为锚点，构筑系统级护城河，重点突破变流器构网、关键涉网技术及高效高安\n全储能解决方案；在能源管理端，聚焦工业级综合能源协同、公辅设备智能化节能，打造独特的差异化竞争力。依托在电\n\n力电子技术的深厚积累与工业自动化领域的客户基础，公司深耕工业企业能源设备管理与数字化降碳解决方案，通过差异\n化优势，推动行业发展。根据弗若斯特沙利文数据，2025                         年按出货量计，公司在全球储能中大功率                    PCS 市场中市场份额为\n\n6.7%。位列全球第五。\n\n    数字能源是公司重点布局的战略新业务。在人工智能加速应用与全球能源变革的背景下，数字能源业务将成为公司长\n\n期增长引擎。\n\n\n    （二）经营模式\n\n    公司聚焦工业领域的自动化、数字化、智能化，专注“数字层、边缘层、控制层、驱动层、执行层、传感层”核心技\n\n术，以   TOP  客户价值需求为导向，立足国内，拓展国际，为全球客户提供创新的解决方案与服务，追求规模和利润双增\n\n\n                                                                                                            16"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        "physical_pages": [
+          17
+        ],
+        "source_spans": [
+          {
+            "page": 17,
+            "start": 0,
+            "end": 1021,
+            "quote": "                                                               深圳市汇川技术股份有限公司               2025年年度报告全文\n\n\n长。\n\n    1.研发模式\n\n    公司产品分为标准化产品与定制化产品，产品开发采用基于                            IPD的集成开发模式。\n\n    IPD流程包括需求管理、市场管理（产品组合管理、路标规划和                             Charter管理）、技术管理、产品开发管理（概念阶\n\n段、计划阶段、开发阶段、验证阶段、产品发布以及产品生命周期管理），在产品开发流程中坚持                                               TOP 客户价值需求导\n向、产品平台化导向、基于平台产品的客户定制化导向。\n\n    公司研发涵盖“技术研究、平台产品开发、定制化产品开发”。通过技术研究和预研，跟进国际领先技术，补齐关键\n\n技术短板，并对关键器件进行前瞻性研究；通过平台产品开发，搭建高性能、高可靠性、低成本的标准化平台产品，为客\n户提供综合产品解决方案；通过定制化产品开发，为行业客户提供创新的定制化解决方案。\n\n    公司  IPD2.0版本如下图所示：\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n    2.供应链管理模式\n\n    公司基于质量管理、交付管理、成本管理的全流程运作体系建设高品质、低成本和快速交付的供应链管理模式。建立\n了以计划、采购、制造、物流、质量、过程设计为核心业务的扁平化生产组织，高效柔性地保障市场要货需求。结合产品\n\n特点、客户差异化的交付要求，设计了以计划驱动资源准备，订单拉动生产制造的多层次、多结构的推拉结合供应模式。\n\n    随着公司集团化业务快速提升，公司致力于整合、优化各分子公司的采购业务体系，建立高效、规范的采购业务平\n台，并与国内外优秀合作伙伴建立中长期战略合作伙伴关系。\n\n    公司集成供应链如下图所示：\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                                                            17"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        "physical_pages": [
+          18
+        ],
+        "source_spans": [
+          {
+            "page": 18,
+            "start": 0,
+            "end": 883,
+            "quote": "                                                              深圳市汇川技术股份有限公司              2025 年年度报告全文\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n     3.销售与服务模式\n\n     在工业自动化与数字化及智能机器人业务领域，公司在产品销售中采用业内通用的“分销为主，直销为辅”的销售模\n 式，即通过分销商/系统集成商将产品销售给客户，而对少数采购量大、产品个性化要求较高的战略客户则采取直销方式。\n\n 同时，公司坚持“分销但贴近客户”的原则，采用分销模式可以最大限度地利用市场资源，而贴近客户则可以快速响应市\n 场需求。在新能源汽车、数字能源领域，公司的销售方式主要为直销模式。\n\n     公司产品销售与服务模式如下图所示：\n\n\n                                                       公司\n\n                                              分\n                                              销\n\n                  直                                              直                       直\n                  销                   分销商                        销                       销\n\n\n\n\n\n\n                  设备制造商/系统集成商                    最终用户                汽车制造商、地铁公司、能源\n                                                                             行业客户等\n\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0010",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        "physical_pages": [
+          23
+        ],
+        "source_spans": [
+          {
+            "page": 23,
+            "start": 695,
+            "end": 1877,
+            "quote": "四、主营业务分析\n\n1、概述\n\n    （一）经营情况概述\n\n    报告期内，公司实现营业总收入                451.05亿元，较上年同期增长            21.77%；实现营业利润         54.36亿元，较上年同期增长\n17.50%；实现归属于上市公司股东的净利润                   50.5 亿元，较上年同期增长            17.84%；实现归属于上市公司股东的扣除非经\n\n常性损益的净利润         49.51亿元，较上年同期增长            22.66%；公司基本每股收益为            1.87元，较上年同期增长          16.88%。\n    （二）影响业绩因素\n\n    2025 年，中国工业自动化行业市场规模小幅下滑，但制造业转型升级、高质量发展以及中国制造出海带来了细分行\n业的结构性机遇；新能源汽车行业渗透率持续提升，产销量仍保持较好增长；人工智能快速发展加速智能机器人产业升\n\n级；“双碳”目标及         AI算力需求推动全球能源变革，上述因素，给公司发展带来新的产业机会。\n\n    业绩增长原因：①受下游客户定点车型放量等因素影响，新能源汽车业务收入同比增长约                                            26%；②受下游行业结构\n\n性增长、公司多产品解决方案与“上顶下沉”的市场策略持续深化等因素影响，工业自动化与数字化业务（含电梯）收\n入同比增长约       19%。③公司成本及费用管控得当。\n\n    （三）主要经营工作总结\n\n\n    （1）主要业务经营情况\n\n\n    1）工业自动化与数字化业务：包括通用自动化、智慧电梯、数字化等产品及解决方案\n\n\n    ①通用自动化：涵盖变频器、伺服系统、PLC&HMI、CNC（机床控制系统）、高性能电机、精密机械（丝杠、直\n\n线导轨）、气动等产品及解决方案\n\n\n    在市场拓展方面，行业深耕、多产品销售、出海及渠道规划等策略齐头并进，营销能力进一步提升，带动自动化业\n\n务销售实现较快增长。①重点把握了锂电池、风电、包装、物流装备、汽车装备等高景气度行业的市场机会，并在工程\n\n机械、暖通空调、注塑机、机床、精密金属加工等传统行业深耕结构性需求，公司在相关行业订单取得较好的增长。②\n\n深度洞察和挖掘客户多元化需求，积极推动多产品组合销售策略落地，实现伺服系统、低压变频器等核心产品的份额稳\n\n                                                                                                              23"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0011",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        "physical_pages": [
+          24
+        ],
+        "source_spans": [
+          {
+            "page": 24,
+            "start": 0,
+            "end": 2058,
+            "quote": "                                                                深圳市汇川技术股份有限公司              2025 年年度报告全文\n\n\n步提高，战略产品         PLC  主机产品在客户端的配套率显著提升，气动元件、CNC                          和高效电机等新产品订单快速增长。③\n\n持续推动“借船出海”和行业出海等策略落地，把握住了全球产能转移和海外客户供应链本土化带动的需求，在纺织、\n\n锂电、光伏、物流、轮胎、手机、空压机、暖通空调、注塑机等行业实现了海外需求的快速覆盖，“借船出海”订单同比\n\n实现快速增长。④持续优化战区资源配置和战区渠道体系规划，坚持战区行业化和渠道网格化运作模式，让渠道规划紧\n\n贴公司业务规划，有效盘活离散市场空间，推动公司在综合行业订单保持较快增长，战区有效支撑行业大客户战略落地。\n\n\n    在产品与技术方面，产品与行业解决方案竞争力持续领先。①深刻洞察各行业场景隐形痛点、需求趋势和新技术，\n\n以及数字化、AI、无线等新的技术趋势，公司依托根技术与跨界技术不断打造爆款产品，报告期内发布了                                                17 款新品，覆\n\n盖工业无线、控制、传动、视觉、机器人、气动、能源管理等各个产品领域。其中，INO                                         AIR 微型无线方案，引领工业\n\n无线新时代，具备         1ms 通信周期、1μs      端到端同步抖动和         99.9999%的可靠性，让高端设备实现“一次安装调试即终极交\n\n付”，在如锂电卷绕机这样的复杂装备上，线缆安装周期缩短                             50%，在手机组装的柔性产线上调试效率提升                     80%，同时\n\n依托于无线预测性维护，让设备的非计划停机率锐减                         50%以上。②坚持做强控制器战略，不断迭代中小型                        PLC 产品，开\n\n发并完善大型       PLC  及安全    PLC 产品，布局流程行业的整体解决方案，打造覆盖“小/中/大型+高安全+冗余”全场景的\n\n自主   PLC  平台。其中，推出的           EVO1000EF   系列安全控制系统，全系列达SIL3、PLe/CAT4                   级别，是国内唯一符合\n\nIEC61131-6 可编程控制器功能安全标准的控制类产品。③继续落地“做强解决方案”的策略，以“两提四节双安全”为目\n\n标，结合“工艺、软件、数据、AI”的积累，为工艺层/设备层/工序层/工厂层提供创新、差异化的产品与解决方案。如\n\n面向冶金行业的循环水系统，推出的多泵并联和远程集控方案，为客户实现                                   15%~35%的综合节电率，有效减少现场维护\n\n点检人员约     30%的工作量。\n\n\n    ②智慧电梯：涵盖电梯控制系统（一体化控制器/变频器）、人机界面、门系统、控制柜、线缆等产品及解决方案。\n\n\n    市场拓展方面：①紧抓国内客户转型期的对外合作机会，深化与国内市场大客户的合作粘性，实现销售规模稳步扩\n\n大与市场份额持续提升。②激活存量市场，加速开拓后市场节能改造与配件业务；跨国                                          MOD  业务及智能化技术平台取\n\n得突破，推动电梯后服务收入占比显著提升，成为新的增长引擎。③海外市场拓展持续发力，在巩固新兴市场竞争优势\n\n的基础上，成功切入多个高端市场，海外收入贡献度进一步提高，全球化布局成效显著。\n\n\n    在产品与技术方面：①依托公司在功能安全、PESSRAL、主动安全领域的深厚技术积累，深度参与全球主要市场标\n\n准的制定，以领先技术实力筑牢产品安全屏障，保障客户与终端用户的双重安全。②全面推进绿色低碳技术落地应用，\n\n通过节能算法优化、三电平技术及宽禁带器件规模化应用，持续提升产品能效水平并保持行业领先，助力行业实现节能\n\n降碳与可持续发展目标。③加速产品创新与解决方案迭代升级，“极光”系列家用梯智能化功能全面增强，市场认可度与\n\n竞争力持续提升。\n\n\n    ③数字化：涵盖云边端一体化数字化平台等产品及解决方案\n\n\n                                                                                                            24"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0012",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        "physical_pages": [
+          25
+        ],
+        "source_spans": [
+          {
+            "page": 25,
+            "start": 0,
+            "end": 2197,
+            "quote": "                                                                深圳市汇川技术股份有限公司              2025 年年度报告全文\n\n\n    市场拓展方面：①在数字装备领域：持续推进装备智能化，推出了电梯能碳管理方案、数字化                                            AI乘梯解决方案、数\n\n字化空压机测试机台系统、数字化实训解决方案，形成新的业务增长点。                                  ②在数字工厂领域：聚焦流程制造与离散制造\n\n的全流程深度管控，面向关键工艺环节推出了电解铝智慧用气、玻璃整线生产中控、涂装生产中控等解决方案                                                    ；发布了\n\n产线监控一体机、场桥/料流/岸桥远程控制解决方案，进一步强化公司“数自”融合的能力，并在冶金、光伏等行业头\n\n部客户实现标杆场景落地。面向纺织行业的印染车间集控解决方案已形成规模化复制与推广能力。\n\n\n    产品与技术方面：①持续推进              InoCube EiOS企业管理数字化平台能力迭代升级，全面支撑内部数字化项目落地实施，\n\n通过实战化场景持续打磨应用开发、数据开发及智能化开发能力。同时以资产中心建设为核心抓手，不断沉淀平台核心\n\n资产，持续提升用户体验与开发效率。②持续增强                        InoCube FOS 生产执行数字化平台在“数自”融合领域的核心竞争力，\n\n全场景解决方案能力得到有效验证并实现规模化落地；该平台统一了生产过程数据模型与业务能力模型，构建形成柔性\n\n编排与智能调度能力，并在此基础上开发出智能运维产品。\n\n\n    报告期内，工业自动化与数字化业务实现销售收入约                         222 亿元，同比增长约         19%。其中，通用自动化业务实现销售\n\n收入约   169 亿，同比增长约        23%（伺服系统实现销售收入约               68.5亿元，变频器实现销售收入约              57 亿元， PLC&HMI      实\n\n现销售收入约      18 亿元）；智慧电梯相关产品销售收入约                 52 亿元，同比增长约         5%。\n\n\n    2）新能源汽车动力系统业务：包括电驱系统（电控、电机、驱动总成）、电源系统（OBC、DC/DC、电源总成）\n\n和智能底盘系统（主动悬架液压泵、主动稳定杆）等产品、服务及解决方案。\n\n\n    2025 年，新能源汽车行业继续保持增长，行业整体渗透率持续提升。得益于客户定点车型快速放量及公司交付保障，\n\n各产品线年交付总量实现新突破、创新高，公司新能源汽车业务收入取得较快增长。\n\n\n    新能源乘用车：\n\n\n    在市场拓展方面，通过持续技术创新，公司以高集成、模块化、高可靠的产品与解决方案巩固与国内主机厂的合作，\n\n并拓展海外客户项目，支撑业绩增长。①                   前期定点的插电式/增程式混动车型及纯电车型实现                         SOP 放量，使得销售收入\n\n实现较快增长；②客户结构持续优化，规模化销售客户数量稳步增加，来自国内新势力、国内传统车企及海外车企的订\n\n单均实现快速增长；③销售产品多点开花，电机和电源产品加速放量，电驱总成产品继续保持快速增长，总成系统年交\n\n付量突破     100万台套，其中多合一总成产品表现尤为突出，超额完成全年订单目标；④在定点方面，海外客户定点                                                9 个\n\n项目，涉及电源、总成、电控三个产品类型；国内乘用车客户项目定点数量                                   70 余个，覆盖电源、总成、电控、电机、底\n\n盘等多个产品线。\n\n\n    在产品与技术方面，新平台产品与技术持续迭代。（1）公司总成、电机、电控与电源等产品均完成了新平台的迭代。\n\n①面向更契合增程四驱场景的全新增程动力总成平台，凭借极致体积、重量、成本等优势，实现多客户车型的搭载落地，\n\n且顺利完成冬季测试进入下一开发阶段；②新一代电机控制器平台，功率密度相比上一代产品实现显著提升，并在智能\n\n化、高效率方面进行了升级和突破；③新一代电源平台升级为采用                               GaN 功率器件的       OBC 和  DCDC  电源二合一产品。（3）\n\n预研技术方面，公司预研的部分核心技术包括：①嵌入式晶圆技术，相较于传统塑封功率半导体器件，具有低杂感、低\n\n                                                                                                            25"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0013",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        "physical_pages": [
+          26
+        ],
+        "source_spans": [
+          {
+            "page": 26,
+            "start": 0,
+            "end": 2144,
+            "quote": "                                                                深圳市汇川技术股份有限公司               2025年年度报告全文\n\n\n损耗、集成化等优势；②单级拓扑电源技术，相较于两级拓扑方案，具有器件数量少、功率密度高、占用空间小的优势；\n\n③定子槽内注塑技术，相比传统绝缘纸方案，具有端部高度低、热负荷高、功率密度高等技术优势；④高效智能电驱总\n\n成技术，采用创新系统架构、智能先进控制算法的电驱系统，打造面向未来                                    L3/L4 高阶智驾的高安全、高效率的智能电\n\n驱。\n\n\n    新能源商用车：\n\n\n    公司继续深耕轻卡、微面、重卡、客车等市场，坚定执行                           TOP  客户合作战略，销售收入取得较快增长。①在市场份\n\n额方面，公司持续保持市场份额领先，增速高于行业水平。2025                            年公司的商用车电控装机量达               29.3万台，总成装机量达\n\n16.6万台，电机装机量达          10.8万台，电源装机量达          2.35万台。②在产品方面，在             N1 行业，针对      VAN 类和卡类等不同细\n\n分场景提供前驱多合一、后驱智能桥、多合一电源等全新第四代产品；在国内轻卡行业，首发第五代油冷                                                  SiC 电驱总成，\n\n显著提高持续功率、系统效率、可靠性                  和使用寿命等核心产品竞争力；在国内新能源重卡行业，电机控制器份额持续领\n\n先，同步推出第四代大功率桥驱油冷电机产品，在行业                          TOP  客户完成定点和装车验证；在新能源客车行业，SiC                        七合一\n\n控制器扩大车型搭载比例，实现稳定交付。                    ③在海外市场拓展方面，伴随海外商用车电动化提速，公司积极布局海外商\n\n用车客户，收获了海外商用车项目定点。                   ④在技术平台方面，通过与客户联合开发，完成域控制器落地，在系统解决方\n\n案能力建设上持续进步。⑤在产品竞争力方面，重点提升高可靠性、高效率、长寿命设计和智能化，助力运营成本持续\n\n优化，保障整车在全场景下运行无忧。\n\n\n    内部运营：\n\n\n    ①制造运营：常州工厂实现年产                100 万台电驱总成，完成从单一部件到系统集成的百万级量产跨越，支撑规模化交\n\n付。推进全流程数字化，部署 MES、QMS、LES 等 15 个管理系统，叠加 6 大 AI 防错 / 监测技术，实现原材料到成品\n\n100%可追溯。产线实现柔性化生产，平均 15 分钟快速换型，大大提升生产与交付效率。②质量管控：启动零缺陷管理\n\n变革，覆盖研发、生产、供应链全环节，依托                      PONC  方法排查浪费、降本提效，推动全员品质意识升级，转变质量管控\n\n理念。③研发迭代：继续加大研发投入，推动在研产品开发，实现高压                                  800V、SiC   电控和扁线、油冷电机量产，同时推\n\n进新一代产品预研，聚焦高速化、轻量化、集成化、智能化，适配多场景需求。④全球化布局：推进匈牙利、泰国工厂\n\n建设，海外研发中心投入运营，完善“研发+制造+销售”全球网络，推动产品属地化交付，拓展与国际主流车企合作。\n\n⑤经营保障：供应链推行“质量数字化、生产自动化、人员专业化、可信赖标签”策略，保障规模化交付与品质。\n\n\n    报告期内，公司新能源汽车动力系统业务实现销售收入约                           203亿元，同比增长约          26%。\n\n\n    3）新兴业务：包括智能机器人和数字能源业务。\n\n\n    ①智能机器人业务：包括工业机器人、机器视觉、人形机器人零部件等产品及解决方案，并推动泛人形机器人解决\n\n方案在工业场景落地。\n\n\n    2025 年，中国市场工业机器人销量首次突破                   30 万台，重回两位数增长，但同时内外资厂商的竞争也愈加白热化。\n\n人形机器人步入“量产元年”，全球出货量快速增长，产业从技术验证转向规模化商用初期。面对行业机遇与竞争压力，\n\n公司聚焦高景气下游行业、深化头部客户合作、强化技术创新与全球化拓展，收入实现较快增长。\n\n\n\n                                                                                                             26"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0014",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        "physical_pages": [
+          27
+        ],
+        "source_spans": [
+          {
+            "page": 27,
+            "start": 0,
+            "end": 1949,
+            "quote": "                                                               深圳市汇川技术股份有限公司               2025年年度报告全文\n\n\n    工业机器人及机器视觉：涵盖工业机器人（SCARA                       机器人、六关节机器人、协作机器人等）、机器视觉（视觉控制\n\n器、线阵相机、S2.0协议面阵相机、纳秒门控相机、智能相机等）等产品及解决方案\n\n\n    市场拓展方面：①公司重点覆盖手机、显示、锂电、硅晶、汽车及一般工业，坚持 TOP 客户策略，深度服务行业龙\n\n头，持续深挖客户价值。②SCARA 机器人在 3C、锂电、汽车电子等领域持续放量，不断巩固行业领先地位；六关节机\n\n器人在锂电、一般工业、汽车零部件领域实现大批量应用，同时在汽车整车领域建立样板点，成为新的增长支柱。③依\n\n托公司在消费电子等领域的解决方案优势，突破了越南、韩国等市场                                TOP 客户，海外市场实现高速增长；同时，积极挖\n\n掘海外食品饮料、金属加工等行业市场机会。\n\n\n    产品与技术方面：①推出            S35、S60、GS60    等系列大负载        SCARA  机器人，负载能力大幅提升，减速机寿命显著改\n\n善，适配锂电大负载需求。②推出首款协作机器人                        U8 系列，具备超低碰撞偏移量及超高轨迹精度，满足精密涂胶、激\n\n光切割等高端场景需求。③推出               R220 大六关节压铸专机，具备耐粉尘、耐腐蚀的                     IP67 防护等级和高灵敏的软浮动功能，\n\n适配汽车零部件压铸取件与喷雾工况场景。④发布 S2.0 协议小面阵相机，将车规级协议引入工业场景，具备小体积、低\n\n功耗、高稳定、高带宽等特点，适用于锂电、3C                     等行业。\n\n\n    人形机器人：涵盖人形机器人零部件（仿生臂、关节模组、无框电机、低压直流伺服驱动器、传感器等）产品及解\n\n决方案，并推动泛人形机器人解决方案在工业场景落地\n\n\n    公司完成从产品预研到商业化的突破，构建核心部件全栈能力，完成无框力矩电机、低压高功率伺服驱动器、关节\n\n模组、行星滚柱丝杠、编码器等第一代零部件产品开发和交付，积极推进与人形机器人主机厂、科研机构等各类客户的\n\n送样与合作。①旋转关节模组通过优化温升控制、散热结构与可靠性设计，实现长时间稳定出力，持续工作能力处于行\n\n业领先水平。②优化电机电磁方案与绕组工艺，显著提升扭矩密度至                                38Nm/kg 以上，力矩与电流响应线性优良，控制精\n\n度更高。③直线模组实现核心零部件全栈自研，可为客户提供一体化设计与一站式交付服务。④行星滚柱丝杠通过装备\n\n定制、制造工艺提升和生产技术升级，显著提高加工效率与过载能力，产品轻量化与集成水平进一步提升。⑤完成上肢\n\n七轴仿生臂开发，产品具备高负载自重比、柔顺精确力控及人机安全协同的能力，同时公司联合生态伙伴进行工业场景\n\n的探索与应用。\n\n\n    内部运营：\n\n\n    强化产能建设，推进组织整合。①大负载                    SCARA  机器人、小六关节机器人、协作机器人等自动化产线落地，产能\n\n大幅提升，支撑规模化交付。②整合工业机器人、工业视觉、人形机器人业务，组建智能机器人事业部，强化技术协同\n\n与资源集中投入，构建“机器人+视觉+AI”的一体化竞争力。\n\n\n    ②数字能源业务：包括储能及能源管理等产品及解决方案\n\n\n    在人工智能加速应用与全球能源转型的背景下，数字能源市场保持高速增长。公司依托在电力电子领域深厚的技术\n\n积累及丰富的工业客户资源，深耕能源“源、网、荷、储、碳”全场景，为客户提供数字化智慧能源解决方案。\n\n\n    储能：涵盖储能变流器、升压一体机、储能系统等产品及解决方案。\n\n\n    在市场拓展方面，2025         年公司在海外及国内储能电站市场取得突破性进展。①PCS                           储能逆变器及升压一体机出货量\n\n\n\n                                                                                                           27"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0015",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        "physical_pages": [
+          28
+        ],
+        "source_spans": [
+          {
+            "page": 28,
+            "start": 0,
+            "end": 2149,
+            "quote": "                                                                 深圳市汇川技术股份有限公司              2025 年年度报告全文\n\n\n突破   10GW，其中构网项目累计出货超过                1GW，单体最大项目构网规模超过                 500MW，并成功实现某电网首个构网型项\n\n目落地。②储能系统累计出货量超                 1GWh，标志着公司已完成从交流侧设备供应商向储能系统解决方案提供商的转变。\n\n③成功构建多个“行业+储能”融合解决方案，在矿山离网备电、石油钻井、移动储能等场景打造样板点。④海外布局扎\n\n实推进，在      20 余个国家完成样板点建设，最大单体项目中标规模达                          2.6GW，成功实现了从单一国内市场到国内国际双\n\n轮驱动的战略转型。\n\n\n    在产品与技术方面，公司紧密跟踪电芯技术前沿趋势，持续推出多项创新成果。①重磅推出新一代                                                3.15MW/3.5MW\n\n大功率集中式       PCS 及  7MW   升压一体机交流侧解决方案，占地面积减少                     20%以上，降低场站热岛效应超               4℃。②发布新\n\n一代   430KW  组串式储能变流器，采用全液冷设计以优化噪声表现，能量密度提升                                  27%，同时满足构网过载要求，并兼\n\n容  4h/6h/8h等多时长储能系统。③公司储能构网控制技术已获得中国电科院（标准起草单位）权威认证，并取得终端用\n\n户及海外能源市场运营机构的双重认可。④通过重构储能系统架构，推行平台化与子系统模块化设计，有效提升了产品\n\n迭代与开发效率。\n\n\n    能源管理及零碳：涵盖综合能源管理平台等产品及解决方案\n\n\n    在市场拓展方面，公司深度挖掘工业领域能源需求，积极构建零碳合作生态。①聚焦能源管理、能源优化、能源运\n\n营市场，重点攻坚新能源汽车制造、数据中心等高能耗领域，全力拓展集团型大终端用户，以优质服务驱动业绩稳步增\n\n长；②与项目开发商、资金方深化合作，依托行业领先的并网效率与高温稳定性，推动零碳微网解决方案及双循环液冷\n\n工商储系统在削峰填谷、光伏配储、台区治理等场景规模化落地；③积极探索业务新模式，把握电力现货市场机遇，构\n\n建贴合行业需求的商业模式，为业务持续拓展奠定坚实基础。\n\n\n    在产品与技术方面，持续推动新平台产品与解决方案的创新突破。①全面升级                                      EMS平台并实现核心技术突破，打通\n\n能源资产从管理、优化到运营的全链路闭环；②推进节能解决方案标准化建设，通过平台内置算法与产品标准化设计，\n\n实现软硬件协同，灵活适配多元应用场景，提升规模化交付能力与市场竞争力；③发布能源聚合交易系统（AEMS），依\n\n托先进的负荷侧资源聚合技术与               AI 智能调度算法，实现用户侧资源的高效运营，丰富数字能源产品矩阵。\n\n\n    内部运营：\n\n\n    继续推进精细化运营体系建设，优化组织架构。①成立数字能源事业部，以经营目标为导向，旨在提升人效与组织\n\n运营效率，加速推动业务全球化布局，实现业务持续增长；②西安能源工厂                                    2025年全面投产运营，采用国内首创的自动\n\n化对接测试工艺，年产能达             50GW，建立了涵盖         PCS  组装、测试及包装的全自动化产线，显著提升产品一致性与交付效\n\n率。\n\n\n    报告期内，新兴业务实现销售收入约                  18亿元，同比增长约          16%。\n\n\n    4）AI\n\n    2025年，公司在工业         AI技术平台与产品融合方面取得较好进展。①AI                      平台建设：完成了集数据、模型、智能体的\n\niFG（Inovance Factory Genius，汇川工业智脑）一体化            AI平台架构的开发，并已面向公司内部全域开放；iFG                        平台实现\n\n了数科中心、智能体中心、知识库中心三大核心模块的全面打通，为                                 AI规模化应用奠定坚实底座。②产品                 AI 建设：\n\n\n\n                                                                                                              28"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0016",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        "physical_pages": [
+          29
+        ],
+        "source_spans": [
+          {
+            "page": 29,
+            "start": 0,
+            "end": 1260,
+            "quote": "                                                                                   深圳市汇川技术股份有限公司                       2025  年年度报告全文\n\n\niFG平台为公司多款核心工业软件平台注入智能化能力，落地智能问答、代码生成、智能交互三大核心功能，并面向公\n\n网客户开放         AI 能力，为用户提供更高效、更智能的工业自动化整体解决方案。③研发                                                     AI 建设：iFG       平台面向内部研发\n\n部门全面推进          AI  赋能工作，累计落地                20 余项 AI    智能体应用，覆盖代码编程、自动化测试、领域知识问答、产品资料开\n\n发等关键场景，显著提升研发业务效率，并成功培育一批                                          AI  金种子人才。\n\n\n     5）可持续发展\n\n     2025  年度，公司可持续发展相关工作取得了显著成果。\n\n     报告期间，公司持续完善可持续发展管理体系：①积极与多元利益相关方建立沟通渠道，了解相关方期望并积极推动\n改善。②针对新建运营点和高风险运营点开展了可持续发展内审，重点覆盖劳工权益、职业健康与安全、环境保护与能源\n\n使用等，切实推进公司可持续发展水平提升。\n\n     报告期内，公司不断推进绿色低碳运营水平提升：①2025                                         年，公司成立数字能源事业部，以体系化、专业化布局能源\n业务，以抓住清洁技术发展机遇，同时加大力度推进自身绿色低碳运营水平。②继续推进清洁能源替代工作，报告期内公\n\n司清洁能源用量占比提升至                    10.20%；公司通过提升能源清洁化水平和节能减排方式，减少了                                              18,167  吨二氧化碳当量的温室\n气体排放。③继续加强对上游供应商在温室气体减排方面的工作力度，通过绩效考核和现场赋能的方式，推动核心上游供\n\n应商温室气体排放强度同比下降                        3.9%。\n\n     公司在可持续发展方面的工作得到了社会各界的广泛认可。报告期内，公司入选中国上市公司协会“2025                                                                             年上市公司\n\n可持续发展最佳案例”，同时荣获了《时代》《财富》《福布斯》等知名媒体的可持续发展相关奖项。\n\n\n2、收入与成本\n\n（1） 营业收入构成\n\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0017",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "营业收入整体情况"
+        ],
+        "physical_pages": [
+          29
+        ],
+        "source_spans": [
+          {
+            "page": 29,
+            "start": 1260,
+            "end": 3399,
+            "quote": "营业收入整体情况\n\n                                                                                                                                  单位：元\n                                                2025年                                               2024  年                          同比增\n                                      金额                 占营业收入比重                         金额                  占营业收入比重                    减\n\n 营业收入合计                          45,104,844,200.13                    100%          37,040,952,138.72                      100%       21.77%\n 分行业\n 智能制造                            24,040,421,242.73                  53.30%          20,277,313,397.49                    54.74%       18.56%\n 新能源汽车                           20,322,581,832.31                  45.06%          16,079,755,617.10                    43.41%       26.39%\n 其他                                 741,841,125.09                   1.64%             683,883,124.13                     1.85%        8.47%\n 分产品\n 工业自动化与数字化                       22,245,401,986.97                  49.32%          18,727,220,981.79                    50.56%       18.79%\n 新能源汽车动力系统                       20,322,581,832.31                  45.06%          16,079,755,617.10                    43.41%       26.39%\n 新兴产业                             1,795,019,255.76                   3.98%           1,550,092,415.70                     4.18%       15.80%\n 其他                                 741,841,125.09                   1.64%             683,883,124.13                     1.85%        8.47%\n 分地区\n 中国内地                            42,455,952,295.10                  94.13%          35,001,617,797.90                    94.49%       21.30%\n 境外                               2,648,891,905.03                   5.87%           2,039,334,340.82                     5.51%       29.89%\n 分销售模式\n 直销/分销                           45,104,844,200.13                 100.00%          37,040,952,138.72                   100.00%       21.77%\n\n\n                                                                                                                                             29"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0018",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "营业收入整体情况"
+        ],
+        "physical_pages": [
+          30
+        ],
+        "source_spans": [
+          {
+            "page": 30,
+            "start": 0,
+            "end": 4596,
+            "quote": "                                                                                                深圳市汇川技术股份有限公司                           2025  年年度报告全文\n\n\n          注：为更精准反映公司业务结构与经营实质，公司报告期对主营业务收入分类统计口径进行优化调整，相关数据已\n    同步追溯重述。\n          1、分行业口径调整情况具体如下：\n          ①原“智能制造（通用自动化、智慧电梯等）”名称调整为“智能制造”，原“智能制造（通用自动化、智慧电梯等）”\n    中的    OEM、生态战略、研发管理部、智能装备产品及其它调整至“其他”；\n          ②原“新能源&轨道交通”中的轨道交通调整至“其他”，“新能源汽车”仅包含新能源汽车电驱系统、电源系统等；\n          2、分产品口径调整情况具体如下：\n          ①原“通用自动化类”中储能、视觉、工业机器人、人形机器人调整至“新兴产业”，原“通用自动化类”中剩余部\n    分与原“智慧电梯电气类”、原“其他”中的数字化合并为“工业自动化与数字化”；\n          ②原“新能源汽车＆轨道交通类”中轨道交通调整至“其他”，“新能源汽车动力系统”仅包含新能源汽车电驱系统、\n    电源系统等。\n\n\n    （2） 占公司营业收入或营业利润                             10%以上的行业、产品、地区、销售模式的情况\n\n\n                                                                                                                                                    单位：元\n                                      营业收入                          营业成本                    毛利率           营业收入比上                  营业成本比上                毛利率比上\n                                                                                                            年同期增减                  年同期增减                年同期增减\n分行业\n智能制造                               24,040,421,242.73             14,562,505,544.70          39.42%                  18.56%                 16.06%              1.30%\n新能源汽车                              20,322,581,832.31             17,050,417,804.94          16.10%                  26.39%                 26.80%             -0.28%\n分产品\n工业自动化与数字化                          22,245,401,986.97             13,286,504,359.12          40.27%                  18.79%                 15.59%              1.65%\n新能源汽车动力系统                          20,322,581,832.31             17,050,417,804.94          16.10%                  26.39%                 26.80%             -0.28%\n分地区\n中国内地                               42,455,952,295.10             30,336,147,240.30          28.55%                  21.30%                 21.29%              0.01%\n境外                                  2,648,891,905.03               1,708,791,606.94         35.49%                  29.89%                 22.24%              4.03%\n分销售模式\n直销/分销                              45,104,844,200.13             32,044,938,847.24          28.95%                  21.77%                 21.34%              0.25%\n\n\n    公司主营业务数据统计口径在报告期发生调整的情况下，公司                                                      2024  年按报告期末口径调整后的主营业务数据\n\n                                                                                                                                                    单位：元\n                                      营业收入                          营业成本                    毛利率           营业收入比上                  营业成本比上                毛利率比上\n                                                                                                            年同期增减                  年同期增减                年同期增减\n分行业\n智能制造                               20,277,313,397.49             12,547,719,368.81          38.12%                  -0.52%                   2.68%            -1.93%\n新能源汽车                              16,079,755,617.10             13,446,514,292.41          16.38%                  71.67%                 69.70%              0.97%\n分产品\n工业自动化与数字化                          18,727,220,981.79             11,494,783,499.74          38.62%                  -3.30%                  -0.98%            -1.44%\n新能源汽车动力系统                          16,079,755,617.10             13,446,514,292.41          16.38%                  71.67%                 69.70%              0.97%\n分地区\n中国内地                               35,001,617,797.90             25,011,553,314.49          28.54%                  22.04%                 28.00%             -3.33%\n境外                                  2,039,334,340.82               1,397,850,367.14         31.46%                  17.22%                 33.93%             -8.55%\n分销售模式\n直销/分销                              37,040,952,138.72             26,409,403,681.63          28.70%                  21.77%                 28.30%             -3.64%\n\n\n    （3） 公司实物销售收入情况\n\n\n           行业分类                          项目                        单位                       2025  年                    2024  年                  同比增减\n     智能制造                       销售量                        PCS                             25,971,863.00              19,785,481.00                     31.27%\n\n\n                                                                                                                                                                30"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0019",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "营业收入整体情况"
+        ],
+        "physical_pages": [
+          31
+        ],
+        "source_spans": [
+          {
+            "page": 31,
+            "start": 0,
+            "end": 4285,
+            "quote": "                                                                                                 深圳市汇川技术股份有限公司                           2025   年年度报告全文\n\n\n                                生产量                        PCS                              25,499,533.00              20,084,736.00                      26.96%\n                                库存量                        PCS                                1,361,822.00               1,834,152.00                    -25.75%\n                                销售量                        PCS                                5,933,895.00               4,619,378.00                     28.46%\n      新能源汽车                     生产量                        PCS                                6,108,223.00               4,845,348.00                     26.06%\n                                库存量                        PCS                                  724,156.00                 549,828.00                     31.71%\n                                销售量                        PCS                                     4,490.00                   3,361.00                    33.59%\n      其他                        生产量                        PCS                                     4,333.00                   3,868.00                    12.02%\n                                库存量                        PCS                                     1,303.00                   1,460.00                   -10.75%\n          相关数据同比发生变动                     30%以上的原因说明\n          1、智能制造板块               2025   年销售量同比增加                 31.27%，主要系            2025   年工业自动化受下游行业结构性需求增加及公司多\n    产品销售策略影响；\n          2、新能源汽车板块                 2025   年库存量同比增加                 31.71%，系电驱系统备货策略，使得库存量同比增长；\n          3、其他板块           2025   年销售量同比增加                 33.59%，主要系            2025  年轨道交通维保项目增多。\n\n\n    （4） 公司已签订的重大销售合同、重大采购合同截至本报告期的履行情况\n\n\n          不适用。\n\n\n    （5） 营业成本构成\n\n\n                                                                                                                                                      单位：元\n\n  行业分类                      项目                                     2025   年                                                 2024  年                             比重同\n                                                        金额                  占营业成本比重                              金额                   占营业成本比重                   比增减\n                     材料成本                        12,391,635,374.62                       85.09%           10,568,059,279.57                       84.22%          0.87%\n智能制造                 人工成本                            561,492,423.14                       3.86%               474,994,240.42                        3.79%         0.07%\n                     制造费用及其他                       1,609,377,746.94                      11.05%             1,504,665,848.82                      11.99%         -0.94%\n                     材料成本                        14,625,528,764.58                       85.78%            11,569,280,667.73                      86.04%         -0.26%\n新能源汽车                人工成本                            477,906,569.25                       2.80%               359,767,736.02                        2.68%         0.12%\n                     制造费用及其他                       1,946,982,471.11                      11.42%             1,517,465,888.66                      11.28%          0.14%\n                     材料成本                            363,164,680.88                      84.06%               329,000,520.68                      79.24%          4.82%\n其他                   人工成本                              19,368,653.06                      4.48%                  7,537,251.86                       1.82%         2.66%\n                     制造费用及其他                           49,482,163.66                     11.46%                 78,632,247.87                     18.94%         -7.48%\n\n\n    （6） 报告期内合并范围是否发生变动\n\n\n          报告期内，新纳入合并范围的公司共                                 10  家，其中，新设立子公司                       9 家，不构成业务的收购子公司                           1 家；不再纳入合\n    并范围的公司             6 家，均为清算注销子公司。\n\n          本期合并财务报表范围及其变化详见“第八节 财务报告”中“九、合并范围的变更”和“十、在其他主体中的权\n    益”。\n\n\n    （7） 公司报告期内业务、产品或服务发生重大变化或调整有关情况\n\n\n          公司报告期内业务、产品或服务未发生重大变化或调整。\n\n\n    （8） 主要销售客户和主要供应商情况\n\n\n    "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0020",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "公司主要销售客户情况"
+        ],
+        "physical_pages": [
+          31
+        ],
+        "source_spans": [
+          {
+            "page": 31,
+            "start": 4285,
+            "end": 4461,
+            "quote": "公司主要销售客户情况\n\n                                                                                                                                                                  31"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0021",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "公司主要销售客户情况"
+        ],
+        "physical_pages": [
+          32
+        ],
+        "source_spans": [
+          {
+            "page": 32,
+            "start": 0,
+            "end": 1771,
+            "quote": "                                                                                        深圳市汇川技术股份有限公司                        2025   年年度报告全文\n\n\n 前五名客户合计销售金额（元）                                                                                                                  13,522,711,968.69\n 前五名客户合计销售金额占年度销售总额比例                                                                                                                        29.98%\n 前五名客户销售额中关联方销售额占年度销售总额比例                                                                                                                            -\n公司前      5 大客户资料\n\n                序号                                 客户名称                               销售额（元）                            占年度销售总额比例\n                  1                    第一名                                                  3,676,752,400.35                                   8.15%\n                  2                    第二名                                                  3,660,630,900.85                                   8.12%\n                  3                    第三名                                                  3,358,960,649.09                                   7.45%\n                  4                    第四名                                                  1,688,913,959.53                                   3.74%\n                  5                    第五名                                                  1,137,454,058.87                                   2.52%\n                合计                                      --                                 13,522,711,968.69                                 29.98%\n     主要客户其他情况说明\n     前五名客户与公司不存在关联关系。与上年同期相比，本期公司前                                                       5  大客户名单及排名变化系新能源汽车动力系统\n业务客户的排名变动所致。\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0022",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "公司主要供应商情况"
+        ],
+        "physical_pages": [
+          32
+        ],
+        "source_spans": [
+          {
+            "page": 32,
+            "start": 1771,
+            "end": 4643,
+            "quote": "公司主要供应商情况\n\n 前五名供应商合计采购金额（元）                                                                                                                  3,991,796,126.82\n 前五名供应商合计采购金额占年度采购总额比例                                                                                                                       13.04%\n 前五名供应商采购额中关联方采购额占年度采购总额比例                                                                                                                           -\n公司前      5 名供应商资料\n\n                序号                               供应商名称                                采购额（元）                            占年度采购总额比例\n                  1                    第一名                                                  1,541,263,141.38                                   5.04%\n                  2                    第二名                                                    703,480,836.99                                   2.30%\n                  3                    第三名                                                    646,183,712.53                                   2.11%\n                  4                    第四名                                                    556,914,713.68                                   1.82%\n                  5                    第五名                                                    543,953,722.24                                   1.78%\n                合计                                      --                                  3,991,796,126.82                                 13.04%\n     注：合计比例以四舍五入后，取百分比后两位小数列示。\n     主要供应商其他情况说明\n     前五名供应商与公司不存在关联关系。与上年同期相比，本期公司前                                                        5 大供应商名单及排名变化系公司生产经营及\n采购策略变化所致。\n\n     报告期内公司贸易业务收入占营业收入比例超过                                        10%\n     不适用。\n\n3、费用\n\n\n                                                                                                                                         单位：元\n                        2025年                      2024年                同比增减                                   重大变动说明\n 销售费用               1,535,569,362.25           1,480,877,527.16               3.69%\n 管理费用               1,825,083,023.76           1,541,353,074.89             18.41%\n 财务费用                  -65,718,516.78              -3,193,949.05        -1,957.59%       主要是汇率波动导致汇兑收益增加\n                                                                                         研发投入增大、研发项目数量增加，导致人力资\n 研发费用               4,255,773,574.67           3,147,080,701.82             35.23%       源费增加（研发人员数量增加叠加调薪），检测认\n                                                                                         证费、材料费和外协服务费、差旅费和办公费等\n                                                                                         同比增加\n\n\n                                                                                                                                                     32"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0023",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "公司主要供应商情况"
+        ],
+        "physical_pages": [
+          33
+        ],
+        "source_spans": [
+          {
+            "page": 33,
+            "start": 0,
+            "end": 6100,
+            "quote": "                                                                      深圳市汇川技术股份有限公司                 2025 年年度报告全文\n\n\n 4、研发投入\n\n\n 截至报告期末，仍在研发进展中的项目：\n序号        主要研发项目名称                      项目目的                 项目进展              拟达到的目标                预计对公司未来发展的\n                                                                                                              影响\n 1       MD630  系列变频器           开发新一代变频器产品                验证阶段            开发一款经济型变频器                 提升变频器产品市场占\n                                平台                                        产品                         有率\n 2       中压   IGCT变频器           优化大功率       IGCT  变频      开发阶段            完善公司三电平产品系                 提高中高压产品市场占\n                                器设计                                       列                          有率\n 3       高防护变频器                 完善变频器产品系列                 开发阶段            满足高防护应用场景需                 提升变频器产品的市场\n                                                                          求                          竞争力\n                                开发高速、高自动化、                                定位高端，通过解决方                 引领电子化开发，建立\n 4       剑杆织机控制柜                高效能的剑杆织机控制                开发阶段            案竞争力打造行业高端                 行业影响力\n                                柜                                         品牌\n 5       四象限一体机                 补全低谐波产品                   验证阶段            推出高效率产品，进入                 提升空调驱动器产品竞\n                                                                          全球供应体系                     争力，增加市场占有率\n                                新一代    PC-based 通用数                       布局中高端数字化、智                 为传统制造业数字化转\n 6       PAC800                 字智能控制器                    开发阶段            能化通用控制器                    型提供显/视/控一体化解\n                                                                                                     决方案\n         AC800中型     PLC系       丰富产品系列，提升产                                满足不同场景需求，提                 提升产品解决方案竞争\n 7       列                      品功能、应用性及可拓                开发阶段            升产品综合解决方案的                 力，提高中型       PLC  市场\n                                展性                                        竞争力                        占有率\n 8       安全   IO                打造安全可靠，性能高                验证阶段            安全、可靠、性能、高                 拓宽安全可靠专业场景\n                                速的   IO产品                                 速的高端      IO产品             业务\n 9       过程   IO                推出过程控制领域           IO解    验证阶段            开发高性能       IO产品           过程工业领域重要产品\n                                决方案                                                                  支撑\n         激光平面切割解决方              补齐关键功能，完善激                                提升解决方案稳定性，                 提高激光切割方案竞争\n 10      案                      光切割解决方案                   开发阶段            打造部分差异化竞争力                 力，完善     CNC  整体解决\n                                                                                                     方案，提升市场竞争力\n                                积累铣削与激光领域加                                提升铣削方案的工艺竞                 提升   CNC  解决方案的市\n 11      数控铣床     CNC           工工艺                       开发阶段            争力，助力客户的设备                 场地位，实现部分细分\n                                                                          升级迭代                       设备领域内领先\n 12      风电主控解决方案               补充风电行业控制器解                验证阶段            提升风电行业整体解决                 扩大市场容量，提升风\n                                决方案                                       方案能力                       电市场份额\n 13      全新一代注塑机控制              开发新一代高端注塑机                验证阶段            完善注塑机控制器产品                 为注塑机客户提供更优\n         器                      控制器                                       系列                         质的全电解决方案\n 14      经济型    HMI             开发低成本、易用的                 验证阶段            降低产品成本，提升产                 提升公司     HMI  产品在客\n                                HMI  系列产品                                 品易用性                       户端市场竞争力\n 15      高端   HMI               布局高端      HMI产品           验证阶段            搭建高端      HMI软硬件平          提高   HMI 核心竞争力，\n                                                                          台                          提升公司品牌影响力\n 16      小尺寸    HMI             研发小尺寸、易用的                 开发阶段            打造新一代高性价           HMI     提升公司在空压机行业\n                                HMI  系列产品                                 产品平台                       产品竞争力\n 17      新一代控制电机平台              补充大功率伺服电机系                开发阶段            完善公司大功率电机产                 提升公司在大功率电机\n                                列                                         品族谱                        领域的市场份额\n 18      磁悬浮制冷电机                开发满足客户需求的系                开发阶段            为制冷整机客户提供高                 拓展高速流体业务，提\n                                列化制冷电机                                    速磁浮电机核心部件                  高市场份额\n 19      MVSE   系列   EC风机       开发用于畜牧业通风风                开发阶段            打造高防护、高能效的                 开拓产品新行业应用，\n         一体机                    机的一体化永磁电机                                 一体化    EC电机                提高市场销售额\n 20      总线阀岛                   开发总线控制的集成阀                验证阶段            打造一款具有竞争力的                 提升公司气动品牌影响\n                                岛产品                                       总线阀岛产品                     力\n                                开发高响应、高精度比                                打造一款竞争力对标国                 拓展气动业务，打开高\n 21      电气比例阀                  例阀                        验证阶段            际品牌的比例阀产品，                 端应用市场，提升气动\n                                                                          补齐产品系列                     品牌影响力\n                                开发高响应、高真空度                                打造一款竞争力对标国                 拓展气动业务，打开高\n 22      真空组件                   真空组件                      验证阶段            际品牌的比例阀产品，                 端应用市场，提升气动\n                                                                          补齐产品系列                     品牌影响力\n\n                                                                                                                      33"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0024",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "公司主要供应商情况"
+        ],
+        "physical_pages": [
+          34
+        ],
+        "source_spans": [
+          {
+            "page": 34,
+            "start": 0,
+            "end": 5766,
+            "quote": "                                                                       深圳市汇川技术股份有限公司                 2025 年年度报告全文\n\n\n                                  开发可编程工业软件平                                打造易用性高、竞争力                提升产品竞争力，提高\n   23      HMI组态系统                台产品                       开发阶段            强的   HMI组态产品              市场占有率、客户满意\n                                                                                                      度\n\n           适用于    PLC  编程的        完善软件平台功能，提                                                          提升产品解决方案竞争\n   24      Inoproshop平台           升软件易用性                    开发阶段            优化平台设计                    力，提高中型       PLC  市场\n                                                                                                      占有率\n\n           适用于小型       PLC 编      完善软件平台功能，升                                优化平台设计，补全平                提升产品整体解决方案\n   25      程的   AutoShop 平台       级、优化混合编译功能                开发阶段            台短板功能                     竞争力，提高小型          PLC\n                                                                                                      市场占有率\n                                                                            支持自动化装备从设                 集成公司积累的工业机\n   26      FA软件平台                 开发全集成的        IDE 组态      开发阶段            计、集成到监控、维保                理模型，提升整体解决\n                                  产品及可视化平台                                  全流程的工业软件集合                方案竞争力\n                                                                            平台\n   27      IEC平台                  打造完全自主可控的一                开发阶段            支持客户个性化需求，                打造控制软件平台，提\n                                  站式编程平台                                    降低开发成本                    升产品解决方案竞争力\n                                  补全无电池多圈编码器                                实现无电池多圈计数功\n   28      编码器                    平台，深入探索”电感型               开发阶段            能                         提升伺服产品竞争力\n                                  技术方向\n   29      光学传感器                  实现自动化过程的检测                开发阶段            打造近距离检测产品                 丰富过程自动化检测方\n                                                                                                      案\n\n   30      家用梯智能电驱系统              研发一款电驱一体化产                验证阶段            提升智能电驱系统竞争                提升家用梯产品市场份\n           解决方案                   品                                         力                         额\n\n                                  推出高端家用梯兼具智                                实现兼具智能交互、主\n                                  能交互与多重安全的智                                动安全与成本优势的智\n   31      高端家用梯智慧屏               慧生活伙伴，持续引领                开发阶段            慧生活终端，以用户为                布局高端家用梯市场，\n           10.1吋                  行业从“功能硬件”向“有                              中心的产品战略驱动业                提升市场占有率\n                                  温度的服务终端”转型                                绩持续增长，引领行业\n                                                                            价值升级\n                                                                            实现   AI数据、AI     模        工业  AI 智能体会成为公\n   32      IFG-工业   AI 平台         面向工业制造的         AI全集      开发阶段            型、AI   智能体的一揽子            司第二增长曲线的重要\n（新增）                              成平台                                       开发，提升工业         AI应用      组成之一\n                                                                            交付效率\n   33      微型自主无线解决方              开发无线网关模块，适                                打造业界首个无线运控                拓展工业无线应用新场\n（新增）       案                      配  PLC、伺服等产品，             开发阶段            解决方案，兼容标准工                景，提升整体解决方案\n                                  形成工业无线解决方案                                控设备                       竞争力\n   34      实时工业有线通信技              验证自主工业网络协议                                持续优化改进，保证自                自主研发的工业网络协\n（新增）       术的开发                   的核心规格、兼容性                 开发阶段            主工业网络协议指标行                议成为国际标准，引领\n                                                                            业领先                       工业智造新生态\n                                  开发交换机、网关、网                                在原有工业应用的基础\n   35      产线级网络解决方案              管软件，适配        PLC 等产      开发阶段            上补齐整场解决方案短                提升整体解决方案竞争\n（新增）                              品，形成完善的整体解                                板                         力\n                                  决方案\n   36      中央空调冷媒变频器              开发冷媒散热的小体                 开发阶段            持续优化改进，小体                 进行产品的迭代优化，\n（新增）                              积、高集成变频器                                  积、高集成变频器                  进一步扩大市场份额\n                                                                                                      通过驱动器软件优化迭\n                                  开发高性价比、高易用                                通过三线合一，一插即                代，拓展简易编程功\n   37      四轴步进伺服                 性、高可靠性的四轴薄                开发阶段            调等功能更新，提高易                能，搭配预测性维护功\n（新增）                              型步进驱动器                                    用性，结合优质售后服                能，逐步推广控制产\n                                                                            务，提升客户满意度                 品，打造全链路汇川生\n                                                                                                      态\n   38                             开发新一代高性能伺服                                拓展国内高端制造行业                拓展海外市场，提升市\n（新增）       多传伺服                   系统，满足国内外高端                开发阶段            应用，推动符合国际标                场占有率\n                                  市场的需求                                     准的产品进入欧美市场\n\n\n\n\n\n                                                                                                                       34"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0025",
+        "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "公司主要供应商情况"
+        ],
+        "physical_pages": [
+          35
+        ],
+        "source_spans": [
+          {
+            "page": 35,
+            "start": 0,
+            "end": 1761,
+            "quote": "深圳市汇川技术股份有限公司 2025 年年度报告全文\r\n35\r\n39\r\n（新增） 欧系 MSK 系列-57\r\n开发欧系接口伺服电\r\n机，满足国内以及海外\r\n市场需求\r\n开发阶段\r\n完善欧系伺服产品系\r\n列，覆盖国内外客户场\r\n景\r\n提升伺服海外竞争力，\r\n扩大高端市场份额\r\n40\r\n（新增）\r\nEVO760C&EVO780C\r\n系列产品 V1R1\r\n开发满足客户需求的高\r\n性能、小体积的 PLC 验证阶段 推出紧凑型高性能控制\r\n器\r\n完善智能控制器产品系\r\n列，提升综合产品解决\r\n方案竞争力，扩大市场\r\n份额\r\n41\r\n（新增） 功能安全 PLC 开发满足客户需求的国\r\n产功能安全控制器 验证阶段\r\n满足不同场景需求，提\r\n升功能安全解决方案的\r\n竞争力\r\n提升产品解决方案竞争\r\n力，提高功能安全 PLC\r\n市场占有率\r\n42\r\n（新增） 大型 PLC 开发满足客户需求的国\r\n产大型控制器 验证阶段\r\n满足不同场景需求，提\r\n升大型解决方案的竞争\r\n力\r\n提升产品解决方案竞争\r\n力，提高大型 PLC 市场\r\n占有率\r\n43\r\n（新增） 先进工艺控制器\r\n开发满足客户需求的高\r\n性能、极易用的智能温\r\n控器\r\n验证阶段\r\n推出先进控制解决方\r\n案，实现比 PID 更好的\r\n控制效果和经济效益\r\n提升产品解决方案竞争\r\n力，解决客户的温控痛\r\n点\r\n44\r\n（新增） 高防护 HMI 可靠的高防护 HMI 开发阶段\r\n研发全新高防护 HMI 产\r\n品，补齐 HMI 产品矩阵\r\n短板，完善产品生态，\r\n最终实现工业场景全覆\r\n盖\r\n构建全品类工业控制设\r\n备矩阵，提供贯穿各种\r\n生产场景、覆盖自动化\r\n全流程的一站式解决方\r\n案\r\n45\r\n（新增） 无电池电机\r\n推出不需要电池的绝对\r\n值编码器电机，解决易\r\n用性问题\r\n验证阶段 免维护，高可靠性 扩大市场份额，提高解\r\n决方案竞争力\r\n46 第五代乘用车电源转\r\n换器\r\n开发一款具有国际竞争\r\n力的电源产品 开发阶段 满足国际一流乘用车整\r\n车厂需求\r\n提升乘用车电源产品市\r\n场覆盖率和国际竞争力\r\n47\r\n（新增）\r\n第六代乘用车集成式\r\n动力总成\r\n开发新一代集成式乘用\r\n车动力总成 开发阶段 满足国际一流整车厂的\r\n未来车型需求\r\n提升乘用车动力总成产\r\n品的市场覆盖率和国际\r\n竞争力\r\n48\r\n（新增）\r\n第六代乘用车混动汽\r\n车电机控制器\r\n开发一款具有国际竞争\r\n力的适用于混动车型的\r\n电控产品\r\n开发阶段 满足国际一流整车厂的\r\n未来混动车型需求\r\n提升乘用车电控产品在\r\n未来混动车型的市场覆\r\n盖率和国际竞争力\r\n49\r\n（新增）\r\n第六代乘用车纯电动\r\n汽车电机控制器\r\n开发一款具有国际竞争\r\n力的适用于纯电动车型\r\n的电控产品\r\n开发阶段 满足国际一流整车厂的\r\n未来纯电动车型需求\r\n提升乘用车电控产品在\r\n未来纯电动车型的市场\r\n覆盖率和国际竞争力\r\n50 视觉控制器产品平台 推出易用、稳定的解决\r\n方案开发平台 开发阶段 提升工业视觉应用开发\r\n效率\r\n大幅提升工业视觉解决\r\n方案开发效率\r\n51 视觉 AI 产品平台\r\n推出面向工业视觉的 AI\r\n开发平台，支撑 AI 解决\r\n方案开发\r\n开发阶段 打造高效、易用的视觉\r\nAI 开发平台\r\n丰富工业视觉 AI 应用场\r\n景，提升工业视觉 AI 部\r\n署效率\r\n52 工业相机产品平台\r\n推出全新通信协议下极\r\n致性价比的工业系列化\r\n相机\r\n开发阶段\r\n通过架构设计变化，推\r\n出一系列高性能、低成\r\n本的工业相机\r\n通过全新技术架构与通\r\n信协议，构建差异化竞\r\n争优势，建设新品类工\r\n业相机生态\r\n53 大负载工业机器人 搭建大负载机器人平台 验证阶段 完善机器人产品系列 扩宽市场空间，提升市\r\n场覆盖率\r\n54 小负载六关节机器人 小负载六关节机器人 验证阶段 提升产品紧凑性，降低\r\n产品重量\r\n提升工业机器人整体竞\r\n争力\r\n55 协作机器人 搭建协作机器人产品平\r\n台\r\n验证阶段 补充机器人产品新系列 提升机器人产品市场覆\r\n盖率，扩宽市场空间\r\n56 力学传感器 构建应变力学传感器产\r\n品平台 验证阶段 开发高精度工业力学传\r\n"
+          }
+        ],
+        "table_context": "物理页35布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。"
+      }
+    ],
+    "limitations": [
+      "仅基于选定年度报告章节，未覆盖行业展望、治理、完整财务报表和分部附注。",
+      "物理页35布局未恢复，相关研发项目表列关系未核定，未用于推断金额或表头。",
+      "未将计划、行业统计或目标表述为公司当期已实现结果。"
+    ],
+    "supply_chain": {
+      "position": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "SC-01",
+            "text": "公司处于工业自动化与数字化、新能源汽车动力系统、智能机器人、数字能源等产品的研发、制造与销售环节，通过自有工厂和供应链体系向客户交付产品和解决方案。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008",
+              "source-0013"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未披露完整生产基地和产能利用率。"
+        ]
+      },
+      "upstream_inputs": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "未披露具体原材料供应商名称及采购品类结构。",
+          "可选事实SC-02未纳入：narrative number is absent from cited source: 39.92亿元"
+        ]
+      },
+      "downstream_customers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "SC-03",
+            "text": "公司产品下游覆盖工业制造（锂电、风电、包装、物流、汽车装备、工程机械、暖通空调、注塑机、机床等）、电梯、新能源汽车乘用车/商用车、3C/锂电/汽车电子等机器人应用行业，以及储能电站和工业能源管理场景；这些为产品用途和客户类型，不构成本报告披露的具体购买方名单。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0010",
+              "source-0014",
+              "source-0015"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未披露具体客户名单，仅保留产品用途、行业和客户类型。"
+        ]
+      }
+    },
+    "generation": {
+      "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+      "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+      "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+      "selection": {
+        "purpose": "select_profile_sections",
+        "request_id": "bp-work-19245b8818529e39de4597b1:workpaper:sections",
+        "request_hash": "6dc109154d28ba83a25b593ce61431d800277ec1333d06f0db09cb4497983b88",
+        "response_hash": "165653deac5c06d5c5a893a5020b3f845e1eb2ca85af832e5494840c6cef93ac",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 27819,
+          "output_tokens": 4123,
+          "total_tokens": 31942
+        },
+        "scope_kind": "report_heading_index",
+        "heading_count": 949,
+        "section_ids": [
+          "section-0001",
+          "section-0002",
+          "section-0003",
+          "section-0004",
+          "section-0005",
+          "section-0006",
+          "section-0007",
+          "section-0008",
+          "section-0009",
+          "section-0010",
+          "section-0011",
+          "section-0012",
+          "section-0013",
+          "section-0014",
+          "section-0015",
+          "section-0016",
+          "section-0017",
+          "section-0018",
+          "section-0019",
+          "section-0020",
+          "section-0021",
+          "section-0022",
+          "section-0023",
+          "section-0024",
+          "section-0025",
+          "section-0026",
+          "section-0027",
+          "section-0028",
+          "section-0029",
+          "section-0030",
+          "section-0031",
+          "section-0032",
+          "section-0033",
+          "section-0034",
+          "section-0035",
+          "section-0036",
+          "section-0037",
+          "section-0038",
+          "section-0039",
+          "section-0040",
+          "section-0041",
+          "section-0042",
+          "section-0043",
+          "section-0044",
+          "section-0045",
+          "section-0046",
+          "section-0047",
+          "section-0048",
+          "section-0049",
+          "section-0050",
+          "section-0051",
+          "section-0052",
+          "section-0053",
+          "section-0054",
+          "section-0055",
+          "section-0056",
+          "section-0057",
+          "section-0058",
+          "section-0059",
+          "section-0060",
+          "section-0061",
+          "section-0063",
+          "section-0065",
+          "section-0066",
+          "section-0067",
+          "section-0070",
+          "section-0071",
+          "section-0072",
+          "section-0078",
+          "section-0079",
+          "section-0080",
+          "section-0081",
+          "section-0082",
+          "section-0083",
+          "section-0084",
+          "section-0087",
+          "section-0088",
+          "section-0089",
+          "section-0090",
+          "section-0091",
+          "section-0092",
+          "section-0093",
+          "section-0094",
+          "section-0095",
+          "section-0096",
+          "section-0099",
+          "section-0100",
+          "section-0101",
+          "section-0102",
+          "section-0103",
+          "section-0106",
+          "section-0107",
+          "section-0113",
+          "section-0119",
+          "section-0120",
+          "section-0121",
+          "section-0122",
+          "section-0123",
+          "section-0124",
+          "section-0125",
+          "section-0126",
+          "section-0127",
+          "section-0128",
+          "section-0129",
+          "section-0130",
+          "section-0131",
+          "section-0132",
+          "section-0133",
+          "section-0134",
+          "section-0135",
+          "section-0136",
+          "section-0137",
+          "section-0138",
+          "section-0139",
+          "section-0140",
+          "section-0141",
+          "section-0142",
+          "section-0143",
+          "section-0148",
+          "section-0149",
+          "section-0150",
+          "section-0151",
+          "section-0152",
+          "section-0153",
+          "section-0154",
+          "section-0155",
+          "section-0156",
+          "section-0157",
+          "section-0158",
+          "section-0159",
+          "section-0160",
+          "section-0161",
+          "section-0162",
+          "section-0163",
+          "section-0164",
+          "section-0165",
+          "section-0166",
+          "section-0167",
+          "section-0168",
+          "section-0169",
+          "section-0170",
+          "section-0171",
+          "section-0172",
+          "section-0173",
+          "section-0174",
+          "section-0175",
+          "section-0176",
+          "section-0177",
+          "section-0178",
+          "section-0179",
+          "section-0180",
+          "section-0181",
+          "section-0182",
+          "section-0183",
+          "section-0184",
+          "section-0185",
+          "section-0186",
+          "section-0187",
+          "section-0188",
+          "section-0189",
+          "section-0190",
+          "section-0191",
+          "section-0192",
+          "section-0193",
+          "section-0194",
+          "section-0195",
+          "section-0196",
+          "section-0197",
+          "section-0198",
+          "section-0199",
+          "section-0200",
+          "section-0201",
+          "section-0202",
+          "section-0203",
+          "section-0204",
+          "section-0205",
+          "section-0206",
+          "section-0207",
+          "section-0208",
+          "section-0209",
+          "section-0210",
+          "section-0211",
+          "section-0212",
+          "section-0213",
+          "section-0214",
+          "section-0215",
+          "section-0216",
+          "section-0217",
+          "section-0218",
+          "section-0219",
+          "section-0220",
+          "section-0221",
+          "section-0222",
+          "section-0223",
+          "section-0224",
+          "section-0225",
+          "section-0226",
+          "section-0227",
+          "section-0228",
+          "section-0229",
+          "section-0230",
+          "section-0231",
+          "section-0232",
+          "section-0233",
+          "section-0234",
+          "section-0235",
+          "section-0236",
+          "section-0239",
+          "section-0241",
+          "section-0243",
+          "section-0246",
+          "section-0247",
+          "section-0248",
+          "section-0249",
+          "section-0250",
+          "section-0251",
+          "section-0252",
+          "section-0253",
+          "section-0254",
+          "section-0255",
+          "section-0256",
+          "section-0257",
+          "section-0258",
+          "section-0259",
+          "section-0260",
+          "section-0261",
+          "section-0262",
+          "section-0263",
+          "section-0264",
+          "section-0269",
+          "section-0270",
+          "section-0271",
+          "section-0272",
+          "section-0273",
+          "section-0274",
+          "section-0275",
+          "section-0277",
+          "section-0278",
+          "section-0279",
+          "section-0280",
+          "section-0281",
+          "section-0282",
+          "section-0283",
+          "section-0284",
+          "section-0285",
+          "section-0286",
+          "section-0287",
+          "section-0288",
+          "section-0289",
+          "section-0290",
+          "section-0291",
+          "section-0292",
+          "section-0293",
+          "section-0294",
+          "section-0295",
+          "section-0296",
+          "section-0297",
+          "section-0298",
+          "section-0299",
+          "section-0300",
+          "section-0301",
+          "section-0302",
+          "section-0303",
+          "section-0304",
+          "section-0305",
+          "section-0306",
+          "section-0307",
+          "section-0308",
+          "section-0309",
+          "section-0310",
+          "section-0311",
+          "section-0312",
+          "section-0313",
+          "section-0314",
+          "section-0315",
+          "section-0316",
+          "section-0317",
+          "section-0318",
+          "section-0319",
+          "section-0320",
+          "section-0321",
+          "section-0322",
+          "section-0323",
+          "section-0324",
+          "section-0325",
+          "section-0326",
+          "section-0327",
+          "section-0328",
+          "section-0329",
+          "section-0330",
+          "section-0331",
+          "section-0332",
+          "section-0338",
+          "section-0345",
+          "section-0346",
+          "section-0347",
+          "section-0348",
+          "section-0349",
+          "section-0350",
+          "section-0351",
+          "section-0352",
+          "section-0353",
+          "section-0354",
+          "section-0355",
+          "section-0356",
+          "section-0357",
+          "section-0358",
+          "section-0359",
+          "section-0360",
+          "section-0361",
+          "section-0362",
+          "section-0363",
+          "section-0364",
+          "section-0365",
+          "section-0366",
+          "section-0367",
+          "section-0368",
+          "section-0369",
+          "section-0370",
+          "section-0371",
+          "section-0372",
+          "section-0373",
+          "section-0374",
+          "section-0375",
+          "section-0376",
+          "section-0377",
+          "section-0378",
+          "section-0379",
+          "section-0380",
+          "section-0381",
+          "section-0382",
+          "section-0383",
+          "section-0384",
+          "section-0385",
+          "section-0386",
+          "section-0387",
+          "section-0388",
+          "section-0389",
+          "section-0390",
+          "section-0391",
+          "section-0392",
+          "section-0393",
+          "section-0394",
+          "section-0395",
+          "section-0396",
+          "section-0397",
+          "section-0398",
+          "section-0399",
+          "section-0400",
+          "section-0401",
+          "section-0402",
+          "section-0403",
+          "section-0404",
+          "section-0405",
+          "section-0406",
+          "section-0407",
+          "section-0408",
+          "section-0409",
+          "section-0410",
+          "section-0411",
+          "section-0412",
+          "section-0413",
+          "section-0417",
+          "section-0418",
+          "section-0419",
+          "section-0420",
+          "section-0421",
+          "section-0422",
+          "section-0423",
+          "section-0424",
+          "section-0425",
+          "section-0426",
+          "section-0427",
+          "section-0428",
+          "section-0429",
+          "section-0430",
+          "section-0431",
+          "section-0432",
+          "section-0433",
+          "section-0434",
+          "section-0435",
+          "section-0436",
+          "section-0437",
+          "section-0438",
+          "section-0439",
+          "section-0440",
+          "section-0441",
+          "section-0442",
+          "section-0443",
+          "section-0444",
+          "section-0445",
+          "section-0446",
+          "section-0447",
+          "section-0448",
+          "section-0449",
+          "section-0450",
+          "section-0451",
+          "section-0452",
+          "section-0453",
+          "section-0454",
+          "section-0455",
+          "section-0456",
+          "section-0457",
+          "section-0458",
+          "section-0459",
+          "section-0460",
+          "section-0461",
+          "section-0462",
+          "section-0463",
+          "section-0464",
+          "section-0465",
+          "section-0466",
+          "section-0467",
+          "section-0468",
+          "section-0469",
+          "section-0470",
+          "section-0471",
+          "section-0472",
+          "section-0473",
+          "section-0474",
+          "section-0482",
+          "section-0483",
+          "section-0484",
+          "section-0485",
+          "section-0486",
+          "section-0487",
+          "section-0488",
+          "section-0491",
+          "section-0492",
+          "section-0493",
+          "section-0496",
+          "section-0497",
+          "section-0498",
+          "section-0499",
+          "section-0500",
+          "section-0501",
+          "section-0502",
+          "section-0503",
+          "section-0504",
+          "section-0505",
+          "section-0506",
+          "section-0507",
+          "section-0508",
+          "section-0509",
+          "section-0510",
+          "section-0511",
+          "section-0521",
+          "section-0522",
+          "section-0523",
+          "section-0524",
+          "section-0525",
+          "section-0529",
+          "section-0538",
+          "section-0539",
+          "section-0540",
+          "section-0541",
+          "section-0542",
+          "section-0543",
+          "section-0544",
+          "section-0545",
+          "section-0546",
+          "section-0547",
+          "section-0548",
+          "section-0549",
+          "section-0550",
+          "section-0551",
+          "section-0552",
+          "section-0553",
+          "section-0554",
+          "section-0555",
+          "section-0556",
+          "section-0557",
+          "section-0558",
+          "section-0559",
+          "section-0560",
+          "section-0566",
+          "section-0573",
+          "section-0574",
+          "section-0575",
+          "section-0582",
+          "section-0583",
+          "section-0584",
+          "section-0585",
+          "section-0586",
+          "section-0587",
+          "section-0588",
+          "section-0589",
+          "section-0590",
+          "section-0591",
+          "section-0592",
+          "section-0593",
+          "section-0594",
+          "section-0595",
+          "section-0596",
+          "section-0597",
+          "section-0598",
+          "section-0599",
+          "section-0600",
+          "section-0601",
+          "section-0602",
+          "section-0603",
+          "section-0604",
+          "section-0605",
+          "section-0606",
+          "section-0607",
+          "section-0608",
+          "section-0609",
+          "section-0610",
+          "section-0611",
+          "section-0612",
+          "section-0613",
+          "section-0614",
+          "section-0615",
+          "section-0616",
+          "section-0617",
+          "section-0618",
+          "section-0619",
+          "section-0620",
+          "section-0621",
+          "section-0622",
+          "section-0623",
+          "section-0624",
+          "section-0625",
+          "section-0626",
+          "section-0627",
+          "section-0628",
+          "section-0629",
+          "section-0630",
+          "section-0631",
+          "section-0632",
+          "section-0633",
+          "section-0634",
+          "section-0635",
+          "section-0636",
+          "section-0637",
+          "section-0638",
+          "section-0639",
+          "section-0640",
+          "section-0641",
+          "section-0642",
+          "section-0643",
+          "section-0644",
+          "section-0645",
+          "section-0646",
+          "section-0647",
+          "section-0648",
+          "section-0649",
+          "section-0650",
+          "section-0651",
+          "section-0652",
+          "section-0653",
+          "section-0654",
+          "section-0655",
+          "section-0656",
+          "section-0657",
+          "section-0658",
+          "section-0659",
+          "section-0660",
+          "section-0661",
+          "section-0662",
+          "section-0663",
+          "section-0664",
+          "section-0665",
+          "section-0666",
+          "section-0667",
+          "section-0668",
+          "section-0669",
+          "section-0670",
+          "section-0671",
+          "section-0672",
+          "section-0673",
+          "section-0674",
+          "section-0675",
+          "section-0676",
+          "section-0677",
+          "section-0678",
+          "section-0679",
+          "section-0680",
+          "section-0681",
+          "section-0682",
+          "section-0683",
+          "section-0684",
+          "section-0685",
+          "section-0686",
+          "section-0687",
+          "section-0688",
+          "section-0689",
+          "section-0690",
+          "section-0691",
+          "section-0692",
+          "section-0693",
+          "section-0694",
+          "section-0695",
+          "section-0696",
+          "section-0697",
+          "section-0698",
+          "section-0699",
+          "section-0700",
+          "section-0701",
+          "section-0702",
+          "section-0703",
+          "section-0704",
+          "section-0705",
+          "section-0706",
+          "section-0707",
+          "section-0708",
+          "section-0709",
+          "section-0710",
+          "section-0711",
+          "section-0712",
+          "section-0713",
+          "section-0714",
+          "section-0715",
+          "section-0716",
+          "section-0717",
+          "section-0718",
+          "section-0719",
+          "section-0720",
+          "section-0721",
+          "section-0722",
+          "section-0723",
+          "section-0724",
+          "section-0725",
+          "section-0726",
+          "section-0727",
+          "section-0728",
+          "section-0729",
+          "section-0730",
+          "section-0731",
+          "section-0732",
+          "section-0733",
+          "section-0734",
+          "section-0735",
+          "section-0736",
+          "section-0737",
+          "section-0738",
+          "section-0739",
+          "section-0740",
+          "section-0741",
+          "section-0742",
+          "section-0743",
+          "section-0744",
+          "section-0745",
+          "section-0746",
+          "section-0747",
+          "section-0748",
+          "section-0749",
+          "section-0750",
+          "section-0751",
+          "section-0752",
+          "section-0753",
+          "section-0754",
+          "section-0755",
+          "section-0756",
+          "section-0757",
+          "section-0758",
+          "section-0759",
+          "section-0760",
+          "section-0761",
+          "section-0762",
+          "section-0763",
+          "section-0764",
+          "section-0765",
+          "section-0766",
+          "section-0767",
+          "section-0770",
+          "section-0776",
+          "section-0777",
+          "section-0780",
+          "section-0787",
+          "section-0788",
+          "section-0789",
+          "section-0792",
+          "section-0793",
+          "section-0796",
+          "section-0802",
+          "section-0806",
+          "section-0807",
+          "section-0812",
+          "section-0813",
+          "section-0818",
+          "section-0821",
+          "section-0822",
+          "section-0823",
+          "section-0824",
+          "section-0829",
+          "section-0832",
+          "section-0833",
+          "section-0834",
+          "section-0835",
+          "section-0836",
+          "section-0840",
+          "section-0841",
+          "section-0844",
+          "section-0845",
+          "section-0849",
+          "section-0850",
+          "section-0851",
+          "section-0852",
+          "section-0853",
+          "section-0854",
+          "section-0855",
+          "section-0862",
+          "section-0868",
+          "section-0873",
+          "section-0878",
+          "section-0880",
+          "section-0881",
+          "section-0884",
+          "section-0890",
+          "section-0891",
+          "section-0892",
+          "section-0893",
+          "section-0894",
+          "section-0895",
+          "section-0896",
+          "section-0898",
+          "section-0899",
+          "section-0900",
+          "section-0904",
+          "section-0908",
+          "section-0909",
+          "section-0910",
+          "section-0911",
+          "section-0914",
+          "section-0918",
+          "section-0919",
+          "section-0920",
+          "section-0921",
+          "section-0923",
+          "section-0926",
+          "section-0927",
+          "section-0928",
+          "section-0929",
+          "section-0933",
+          "section-0935",
+          "section-0936",
+          "section-0937",
+          "section-0942",
+          "section-0946",
+          "section-0947",
+          "section-0948",
+          "section-0949",
+          "section-0953",
+          "section-0957",
+          "section-0958",
+          "section-0959",
+          "section-0960",
+          "section-0962",
+          "section-0964",
+          "section-0965",
+          "section-0966",
+          "section-0967",
+          "section-0972",
+          "section-0978",
+          "section-0980",
+          "section-0981",
+          "section-0982",
+          "section-0986",
+          "section-0988",
+          "section-0989",
+          "section-0990",
+          "section-0991",
+          "section-0994",
+          "section-0996",
+          "section-0997",
+          "section-0998",
+          "section-0999",
+          "section-1001",
+          "section-1003",
+          "section-1004",
+          "section-1005",
+          "section-1006",
+          "section-1008",
+          "section-1010",
+          "section-1011",
+          "section-1012",
+          "section-1018",
+          "section-1021",
+          "section-1022",
+          "section-1023",
+          "section-1024",
+          "section-1028",
+          "section-1031",
+          "section-1032",
+          "section-1033",
+          "section-1034",
+          "section-1036",
+          "section-1038",
+          "section-1039",
+          "section-1040",
+          "section-1041",
+          "section-1045",
+          "section-1051",
+          "section-1052",
+          "section-1058",
+          "section-1059",
+          "section-1060",
+          "section-1061",
+          "section-1064",
+          "section-1065",
+          "section-1066",
+          "section-1069",
+          "section-1072",
+          "section-1075",
+          "section-1076",
+          "section-1078",
+          "section-1079",
+          "section-1080",
+          "section-1082",
+          "section-1083",
+          "section-1084",
+          "section-1085",
+          "section-1086",
+          "section-1088",
+          "section-1089",
+          "section-1090",
+          "section-1091",
+          "section-1092",
+          "section-1093",
+          "section-1095",
+          "section-1096",
+          "section-1097",
+          "section-1098",
+          "section-1099",
+          "section-1100",
+          "section-1101",
+          "section-1102",
+          "section-1103",
+          "section-1104",
+          "section-1105",
+          "section-1106",
+          "section-1107",
+          "section-1108",
+          "section-1109",
+          "section-1110",
+          "section-1111",
+          "section-1112",
+          "section-1113",
+          "section-1114",
+          "section-1115",
+          "section-1116",
+          "section-1117",
+          "section-1118",
+          "section-1119",
+          "section-1120",
+          "section-1121",
+          "section-1122",
+          "section-1123",
+          "section-1124",
+          "section-1125",
+          "section-1126",
+          "section-1127",
+          "section-1128",
+          "section-1129",
+          "section-1130",
+          "section-1131",
+          "section-1132",
+          "section-1135",
+          "section-1136",
+          "section-1140",
+          "section-1141",
+          "section-1143",
+          "section-1144",
+          "section-1145",
+          "section-1148",
+          "section-1149",
+          "section-1150",
+          "section-1152",
+          "section-1155",
+          "section-1159",
+          "section-1160",
+          "section-1161",
+          "section-1162",
+          "section-1163",
+          "section-1164",
+          "section-1166",
+          "section-1169",
+          "section-1172",
+          "section-1176",
+          "section-1177",
+          "section-1178",
+          "section-1179",
+          "section-1180",
+          "section-1181",
+          "section-1182",
+          "section-1183",
+          "section-1184",
+          "section-1185",
+          "section-1186",
+          "section-1187",
+          "section-1189",
+          "section-1190",
+          "section-1191",
+          "section-1193",
+          "section-1197",
+          "section-1198",
+          "section-1199",
+          "section-1200",
+          "section-1201",
+          "section-1204",
+          "section-1205",
+          "section-1206",
+          "section-1209",
+          "section-1210",
+          "section-1211",
+          "section-1212",
+          "section-1216",
+          "section-1219",
+          "section-1220",
+          "section-1221",
+          "section-1222",
+          "section-1223",
+          "section-1224",
+          "section-1225",
+          "section-1230",
+          "section-1233",
+          "section-1234",
+          "section-1235",
+          "section-1236",
+          "section-1237",
+          "section-1238",
+          "section-1239",
+          "section-1240",
+          "section-1241",
+          "section-1242",
+          "section-1243",
+          "section-1244",
+          "section-1245",
+          "section-1248",
+          "section-1249",
+          "section-1250",
+          "section-1251",
+          "section-1252",
+          "section-1255",
+          "section-1256",
+          "section-1262",
+          "section-1265",
+          "section-1266",
+          "section-1269",
+          "section-1270",
+          "section-1271",
+          "section-1272",
+          "section-1273",
+          "section-1274",
+          "section-1275",
+          "section-1276",
+          "section-1277",
+          "section-1278"
+        ],
+        "physical_pages": []
+      },
+      "extraction": {
+        "purpose": "extract_profile_workpaper",
+        "request_id": "bp-work-19245b8818529e39de4597b1:workpaper:extract",
+        "request_hash": "54802d67946f04363f21098ad899f7a8f163f5f45c225bcb3c73b485ddcbbe7a",
+        "response_hash": "0fcb8fd5aab80d7b7e1c436c442f0003fd4e529506de49c8346fe4b5f25c8cf9",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 23683,
+          "output_tokens": 27470,
+          "total_tokens": 51153
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0025",
+          "section-0033",
+          "section-0057",
+          "section-0065",
+          "section-0078",
+          "section-0079"
+        ],
+        "physical_pages": [
+          9,
+          10,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ]
+      }
+    },
+    "quality_review": null,
+    "standardization_notes": [
+      "程序显示说明：SM-01正文451.05亿元为营业收入合计45,104,844,200.13元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+      "程序显示说明：SM-02正文222.45亿元为工业自动化与数字化营业收入22,245,401,986.97元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+      "程序显示说明：SM-03正文203.23亿元为新能源汽车动力系统营业收入20,322,581,832.31元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+      "程序显示说明：SM-04正文17.95亿元为新兴产业营业收入1,795,019,255.76元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+      "程序显示说明：SM-05正文7.42亿元为其他产品营业收入741,841,125.09元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+      "程序显示说明：OI-01正文42.56亿元为研发费用4,255,773,574.67元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+      "程序显示说明：OI-02正文123.92亿元为智能制造材料成本12,391,635,374.62元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+      "程序显示说明：OI-02正文146.26亿元为新能源汽车材料成本14,625,528,764.58元的舍入展示，非精确值；结构化原值及来源未改，不据展示值精确加总。",
+      "事实CC-02已隔离，未作为结论采用：narrative number is absent from cited source: 135.23亿元",
+      "可选事实SC-02未纳入：narrative number is absent from cited source: 39.92亿元"
+    ],
+    "company_features": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "CF-01",
+          "text": "公司完成iFG（汇川工业智脑）一体化AI平台架构开发并面向内部全域开放，平台打通数科中心、智能体中心、知识库中心，并为多款工业软件注入智能问答、代码生成、智能交互能力。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0015",
+            "source-0016"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ],
+      "limitations": [
+        "AI平台落地效果及对应收入未单独披露。"
+      ]
+    }
+  },
+  "workpaper_receipts": [
+    {
+      "request_id": "bp-work-19245b8818529e39de4597b1:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "6dc109154d28ba83a25b593ce61431d800277ec1333d06f0db09cb4497983b88",
+      "response_hash": "165653deac5c06d5c5a893a5020b3f845e1eb2ca85af832e5494840c6cef93ac",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0025\",\"section-0033\",\"section-0057\",\"section-0065\",\"section-0078\",\"section-0079\"],\"rationale\":\"选取公司主要会计数据和财务指标，用于掌握公司当期收入、利润与规模总貌；选取“报告期内公司从事的主要业务”，该节完整覆盖主要产品、用途、市场地位及经营模式，且不再下钻其子节以避免重叠；选取“主营业务分析”，获取经营情况概述、业绩影响因素和主要经营工作总结；选取“营业收入整体情况”，补充分行业/分产品收入口径、销量变化与业务权重，是收入构成和主要mix的核心来源；选取主要销售客户情况，补充客户集中度与市场侧信息；选取主要供应商情况所在完整子节，连同费用与研发投入，补充供应链、成本费用和研发资源投入等经营输入。上述章节均为公司层面实质经营讨论，能共同解释业务结构、产品用途、 monetization、收入权重、经营资源与客户/供应链。\",\"deferred\":[\"行业背景与行业趋势章节仅作外部环境参考，除非需要解释公司层面变化，否则不纳入。\",\"核心竞争力分析偏泛化描述，且主要业务与经营分析已覆盖产品、模式和资源，暂不纳入。\",\"未来发展规划、经营计划与风险展望具有前瞻性，非本期经营事实核心，暂不纳入。\",\"公司治理、股权激励、员工与薪酬、股东与股份变动等章节与业务和收入解释关系较弱，暂不纳入。\",\"完整财务报表、会计政策、资产明细、投资与募集资金、重大事项及承诺等，仅在出现明确收入或分部缺口时再定向补充，当前不扩读。\",\"分部信息附注、收入确认会计政策等作为后续定向核对项，当前经营章节已能支撑主要判断。\"],\"stop_reason\":\"已选章节覆盖公司主要产品与用途、经营模式、收入总额及分行业/分产品构成、客户与供应链/研发投入等核心经营信息，足以回答业务结构、盈利来源、规模与主要mix及本期变化；继续扩展至行业背景、未来展望、治理或完整财务报表会超出当前经营解释所需范围，故在此停止。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0025",
+          "section-0033",
+          "section-0057",
+          "section-0065",
+          "section-0078",
+          "section-0079"
+        ],
+        "rationale": "选取公司主要会计数据和财务指标，用于掌握公司当期收入、利润与规模总貌；选取“报告期内公司从事的主要业务”，该节完整覆盖主要产品、用途、市场地位及经营模式，且不再下钻其子节以避免重叠；选取“主营业务分析”，获取经营情况概述、业绩影响因素和主要经营工作总结；选取“营业收入整体情况”，补充分行业/分产品收入口径、销量变化与业务权重，是收入构成和主要mix的核心来源；选取主要销售客户情况，补充客户集中度与市场侧信息；选取主要供应商情况所在完整子节，连同费用与研发投入，补充供应链、成本费用和研发资源投入等经营输入。上述章节均为公司层面实质经营讨论，能共同解释业务结构、产品用途、 monetization、收入权重、经营资源与客户/供应链。",
+        "deferred": [
+          "行业背景与行业趋势章节仅作外部环境参考，除非需要解释公司层面变化，否则不纳入。",
+          "核心竞争力分析偏泛化描述，且主要业务与经营分析已覆盖产品、模式和资源，暂不纳入。",
+          "未来发展规划、经营计划与风险展望具有前瞻性，非本期经营事实核心，暂不纳入。",
+          "公司治理、股权激励、员工与薪酬、股东与股份变动等章节与业务和收入解释关系较弱，暂不纳入。",
+          "完整财务报表、会计政策、资产明细、投资与募集资金、重大事项及承诺等，仅在出现明确收入或分部缺口时再定向补充，当前不扩读。",
+          "分部信息附注、收入确认会计政策等作为后续定向核对项，当前经营章节已能支撑主要判断。"
+        ],
+        "stop_reason": "已选章节覆盖公司主要产品与用途、经营模式、收入总额及分行业/分产品构成、客户与供应链/研发投入等核心经营信息，足以回答业务结构、盈利来源、规模与主要mix及本期变化；继续扩展至行业背景、未来展望、治理或完整财务报表会超出当前经营解释所需范围，故在此停止。"
+      },
+      "usage": {
+        "input_tokens": 27819,
+        "output_tokens": 4123,
+        "total_tokens": 31942
+      }
+    },
+    {
+      "request_id": "bp-work-19245b8818529e39de4597b1:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "54802d67946f04363f21098ad899f7a8f163f5f45c225bcb3c73b485ddcbbe7a",
+      "response_hash": "0fcb8fd5aab80d7b7e1c436c442f0003fd4e529506de49c8346fe4b5f25c8cf9",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"BS-01\",\"text\":\"公司业务生态横跨工业自动化与数字化、新能源汽车动力系统、智能机器人、数字能源，形成技术同源、协同发展的多个业务板块；其中工业自动化与数字化由通用自动化、智慧电梯、数字化等构成，智能机器人和数字能源作为新兴业务单独列示。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0012\",\"source-0018\"]}],\"limitations\":[\"未进一步展开各业务板块对应的法律主体和分板块利润。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"PS-01\",\"text\":\"工业自动化与数字化业务包括通用自动化、智慧电梯和数字化：通用自动化提供变频器、伺服系统、PLC/HMI、CNC、高性能电机、精密机械、气动元件、传感器、工业视觉等产品及解决方案，用于工业自动化、数字化和智能化升级；智慧电梯提供电梯控制系统、人机界面、门系统、控制柜、线缆等电气大配套产品；数字化提供云边端一体化平台及InoCube EiOS、InoCube FOS等工业软件平台。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\",\"source-0011\",\"source-0012\"]},{\"fact_id\":\"PS-02\",\"text\":\"新能源汽车动力系统业务提供电驱系统（电机、电机控制器、电驱总成）、电源系统（DC/DC、OBC、电源总成）和智能底盘系统（主动悬架液压泵、主动稳定杆等），主要服务新能源乘用车和新能源商用车。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0012\"]},{\"fact_id\":\"PS-03\",\"text\":\"智能机器人业务提供工业机器人（SCARA、六关节、协作机器人等）、机器视觉（视觉控制器、工业相机等）以及人形机器人零部件（仿生臂、关节模组、无框电机、低压直流驱动器、行星滚柱丝杠、编码器等）及解决方案，面向制造环节的搬运、装配、码垛、焊接等作业和工业场景落地。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0014\"]},{\"fact_id\":\"PS-04\",\"text\":\"数字能源业务提供储能变流器、升压一体机、储能系统及综合能源管理平台，覆盖户用到大型地面电站的储能功率场景，并服务工业级能源协同和零碳管理。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0015\"]}],\"limitations\":[\"未逐一列示全部产品型号、细分规格和全部在研产品。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"RM-01\",\"text\":\"公司通过销售标准化产品和定制化产品/解决方案取得收入，产品开发采用基于IPD的集成开发模式，研发涵盖技术研究、平台产品开发和定制化产品开发。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]}],\"limitations\":[\"未披露分产品单价、销量和成本构成的完整收入模型。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SM-01\",\"text\":\"2025年公司营业收入合计451.05亿元，同比增长21.77%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"营业收入合计\",\"raw_value\":\"45,104,844,200.13\",\"value\":\"45104844200.13\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"营业收入同比增减\",\"raw_value\":\"21.77%\",\"value\":\"21.77\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"同比\"}]},{\"fact_id\":\"SM-02\",\"text\":\"工业自动化与数字化产品2025年实现营业收入222.45亿元，占营业收入49.32%，同比增长18.79%，毛利率40.27%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\",\"source-0018\"],\"metrics\":[{\"name\":\"工业自动化与数字化营业收入\",\"raw_value\":\"22,245,401,986.97\",\"value\":\"22245401986.97\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"工业自动化与数字化占营业收入比重\",\"raw_value\":\"49.32%\",\"value\":\"49.32\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"占营业收入\"},{\"name\":\"工业自动化与数字化营业收入同比增减\",\"raw_value\":\"18.79%\",\"value\":\"18.79\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"同比\"},{\"name\":\"工业自动化与数字化毛利率\",\"raw_value\":\"40.27%\",\"value\":\"40.27\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"SM-03\",\"text\":\"新能源汽车动力系统产品2025年实现营业收入203.23亿元，占营业收入45.06%，同比增长26.39%，毛利率16.10%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\",\"source-0018\"],\"metrics\":[{\"name\":\"新能源汽车动力系统营业收入\",\"raw_value\":\"20,322,581,832.31\",\"value\":\"20322581832.31\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"新能源汽车动力系统占营业收入比重\",\"raw_value\":\"45.06%\",\"value\":\"45.06\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"占营业收入\"},{\"name\":\"新能源汽车动力系统营业收入同比增减\",\"raw_value\":\"26.39%\",\"value\":\"26.39\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"同比\"},{\"name\":\"新能源汽车动力系统毛利率\",\"raw_value\":\"16.10%\",\"value\":\"16.10\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"SM-04\",\"text\":\"新兴产业产品2025年实现营业收入17.95亿元，占营业收入3.98%，同比增长15.80%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"新兴产业营业收入\",\"raw_value\":\"1,795,019,255.76\",\"value\":\"1795019255.76\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"新兴产业占营业收入比重\",\"raw_value\":\"3.98%\",\"value\":\"3.98\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"占营业收入\"},{\"name\":\"新兴产业营业收入同比增减\",\"raw_value\":\"15.80%\",\"value\":\"15.80\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"同比\"}]},{\"fact_id\":\"SM-05\",\"text\":\"其他产品（报表分类中的残余类别）2025年实现营业收入7.42亿元，占营业收入1.64%，同比增长8.47%；该类别具体业务构成未在所选章节完整展开。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"uncertainty_reason\":\"其他为报表残余类别，具体业务范围未展开。\",\"metrics\":[{\"name\":\"其他产品营业收入\",\"raw_value\":\"741,841,125.09\",\"value\":\"741841125.09\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"元\",\"uncertainty_reason\":\"其他为报表残余类别，具体业务范围未展开。\"},{\"name\":\"其他产品占营业收入比重\",\"raw_value\":\"1.64%\",\"value\":\"1.64\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"占营业收入\",\"uncertainty_reason\":\"其他为报表残余类别，具体业务范围未展开。\"},{\"name\":\"其他产品营业收入同比增减\",\"raw_value\":\"8.47%\",\"value\":\"8.47\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"同比\",\"uncertainty_reason\":\"其他为报表残余类别，具体业务范围未展开。\"}]},{\"fact_id\":\"SM-06\",\"text\":\"工业自动化与数字化业务内部，通用自动化业务2025年销售收入约169亿元，同比增长约23%；其中伺服系统约68.5亿元、变频器约57亿元、PLC&HMI约18亿元；智慧电梯相关产品销售收入约52亿元，同比增长约5%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"通用自动化业务销售收入\",\"raw_value\":\"约169\",\"value\":\"169\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"approximate\",\"source_unit\":\"亿元\"},{\"name\":\"通用自动化业务销售收入同比\",\"raw_value\":\"约23%\",\"value\":\"23\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"approximate\",\"source_unit\":\"%\",\"comparison_basis\":\"同比\"},{\"name\":\"伺服系统销售收入\",\"raw_value\":\"约68.5\",\"value\":\"68.5\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"approximate\",\"source_unit\":\"亿元\"},{\"name\":\"变频器销售收入\",\"raw_value\":\"约57\",\"value\":\"57\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"approximate\",\"source_unit\":\"亿元\"},{\"name\":\"PLC&HMI销售收入\",\"raw_value\":\"约18\",\"value\":\"18\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"approximate\",\"source_unit\":\"亿元\"},{\"name\":\"智慧电梯相关产品销售收入\",\"raw_value\":\"约52\",\"value\":\"52\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"approximate\",\"source_unit\":\"亿元\"},{\"name\":\"智慧电梯相关产品销售收入同比\",\"raw_value\":\"约5%\",\"value\":\"5\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"approximate\",\"source_unit\":\"%\",\"comparison_basis\":\"同比\"}]}],\"limitations\":[\"其他为报表分类中的残余类别，具体业务构成未展开。\",\"分行业与分产品口径存在差异，本稿主要按产品口径列示收入结构。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"OI-01\",\"text\":\"2025年研发费用42.56亿元，同比增长35.23%，主要由于研发投入增大、研发项目数量增加、研发人员增加叠加调薪，以及检测认证费、材料费、外协服务费、差旅费和办公费等增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0022\"],\"metrics\":[{\"name\":\"研发费用\",\"raw_value\":\"4,255,773,574.67\",\"value\":\"4255773574.67\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"研发费用同比增减\",\"raw_value\":\"35.23%\",\"value\":\"35.23\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"同比\"}]},{\"fact_id\":\"OI-02\",\"text\":\"营业成本中材料成本占比较高：智能制造板块材料成本123.92亿元，占该板块营业成本85.09%；新能源汽车板块材料成本146.26亿元，占该板块营业成本85.78%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"智能制造材料成本\",\"raw_value\":\"12,391,635,374.62\",\"value\":\"12391635374.62\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"智能制造材料成本占营业成本比重\",\"raw_value\":\"85.09%\",\"value\":\"85.09\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"占该板块营业成本\"},{\"name\":\"新能源汽车材料成本\",\"raw_value\":\"14,625,528,764.58\",\"value\":\"14625528764.58\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"新能源汽车材料成本占营业成本比重\",\"raw_value\":\"85.78%\",\"value\":\"85.78\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"占该板块营业成本\"}]}],\"limitations\":[\"未获取完整产能、产能利用率、主要原材料具体品类及采购价格。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"CC-01\",\"text\":\"工业自动化与数字化及智能机器人业务采用“分销为主、直销为辅”的销售模式，通过分销商/系统集成商销售给客户，对少数采购量大、产品个性化要求高的战略客户采取直销；新能源汽车和数字能源领域主要为直销模式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"CC-02\",\"text\":\"2025年前五名客户合计销售金额135.23亿元，占年度销售总额29.98%；前五名客户与公司不存在关联关系，客户名单及排名变化主要系新能源汽车动力系统业务客户排名变动所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0021\"],\"metrics\":[{\"name\":\"前五名客户合计销售金额\",\"raw_value\":\"13,522,711,968.69\",\"value\":\"13522711968.69\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"前五名客户合计销售金额占年度销售总额比例\",\"raw_value\":\"29.98%\",\"value\":\"29.98\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"占年度销售总额\"}]}],\"limitations\":[\"未披露具体客户名称，客户集中度仅按报告披露口径。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"OD-01\",\"text\":\"2025年业绩增长主要受下游客户定点车型放量带动新能源汽车业务收入增长，以及下游行业结构性增长、公司多产品解决方案和“上顶下沉”市场策略持续深化带动工业自动化与数字化业务（含电梯）收入增长；公司同时加强成本及费用管控。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]},{\"fact_id\":\"OD-02\",\"text\":\"根据弗若斯特沙利文等数据，2025年按收入计，公司通用伺服系统、低压变频器、中高压变频器在中国市场份额分别约31%、20%、14%，均居第一，PLC产品（不含I/O系统）约5.7%居第四；工业机器人按出货量中国市场份额8.8%居第四，SCARA机器人约28%居第一；全球储能中大功率PCS按出货量份额6.7%居第五；新能源乘用车动力系统按收入为全球第三大、中国第一大第三方供应商，电机控制器按装机量为全球第二、中国第一大第三方供应商。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0006\",\"source-0007\"],\"metrics\":[{\"name\":\"通用伺服系统中国市场份额\",\"raw_value\":\"约31%\",\"value\":\"31\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"approximate\",\"source_unit\":\"%\",\"comparison_basis\":\"按收入计\"},{\"name\":\"低压变频器中国市场份额\",\"raw_value\":\"约20%\",\"value\":\"20\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"approximate\",\"source_unit\":\"%\",\"comparison_basis\":\"按收入计\"},{\"name\":\"中高压变频器中国市场份额\",\"raw_value\":\"约14%\",\"value\":\"14\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"approximate\",\"source_unit\":\"%\",\"comparison_basis\":\"按收入计\"},{\"name\":\"PLC产品中国市场份额\",\"raw_value\":\"约5.7%\",\"value\":\"5.7\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"approximate\",\"source_unit\":\"%\",\"comparison_basis\":\"按收入计\"},{\"name\":\"工业机器人中国市场份额\",\"raw_value\":\"8.8%\",\"value\":\"8.8\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"按出货量计\"},{\"name\":\"SCARA机器人中国市场份额\",\"raw_value\":\"约28%\",\"value\":\"28\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"approximate\",\"source_unit\":\"%\",\"comparison_basis\":\"按出货量计\"},{\"name\":\"全球储能中大功率PCS市场份额\",\"raw_value\":\"6.7%\",\"value\":\"6.7\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"按出货量计\"}]}],\"limitations\":[\"市场份额为第三方数据口径，未获取完整行业规模、价格和竞争格局数据。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"MC-01\",\"text\":\"2025年公司对主营业务收入分类统计口径进行优化调整并追溯重述：分行业中“智能制造”名称简化，原部分OEM、生态战略、研发管理部、智能装备产品等调整至“其他”，轨道交通调整至“其他”；分产品中将储能、视觉、工业机器人、人形机器人调整至“新兴产业”，其余通用自动化与原智慧电梯电气类、数字化合并为“工业自动化与数字化”。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"]},{\"fact_id\":\"MC-02\",\"text\":\"公司报告期内业务、产品或服务未发生重大变化或调整。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"]}],\"limitations\":[\"未获取分类调整的完整量化重述明细；合并范围变化未展开。\"]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"CF-01\",\"text\":\"公司完成iFG（汇川工业智脑）一体化AI平台架构开发并面向内部全域开放，平台打通数科中心、智能体中心、知识库中心，并为多款工业软件注入智能问答、代码生成、智能交互能力。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\",\"source-0016\"]}],\"limitations\":[\"AI平台落地效果及对应收入未单独披露。\"]},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SC-01\",\"text\":\"公司处于工业自动化与数字化、新能源汽车动力系统、智能机器人、数字能源等产品的研发、制造与销售环节，通过自有工厂和供应链体系向客户交付产品和解决方案。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0013\"]}],\"limitations\":[\"未披露完整生产基地和产能利用率。\"]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SC-02\",\"text\":\"2025年前五名供应商合计采购金额39.92亿元，占年度采购总额13.04%；前五名供应商与公司不存在关联关系，供应商名单及排名变化主要系公司生产经营及采购策略变化所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0022\"],\"metrics\":[{\"name\":\"前五名供应商合计采购金额\",\"raw_value\":\"3,991,796,126.82\",\"value\":\"3991796126.82\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"前五名供应商合计采购金额占年度采购总额比例\",\"raw_value\":\"13.04%\",\"value\":\"13.04\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"占年度采购总额\"}]}],\"limitations\":[\"未披露具体原材料供应商名称及采购品类结构。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SC-03\",\"text\":\"公司产品下游覆盖工业制造（锂电、风电、包装、物流、汽车装备、工程机械、暖通空调、注塑机、机床等）、电梯、新能源汽车乘用车/商用车、3C/锂电/汽车电子等机器人应用行业，以及储能电站和工业能源管理场景；这些为产品用途和客户类型，不构成本报告披露的具体购买方名单。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0014\",\"source-0015\"]}],\"limitations\":[\"未披露具体客户名单，仅保留产品用途、行业和客户类型。\"]}},\"limitations\":[\"仅基于选定年度报告章节，未覆盖行业展望、治理、完整财务报表和分部附注。\",\"物理页35布局未恢复，相关研发项目表列关系未核定，未用于推断金额或表头。\",\"未将计划、行业统计或目标表述为公司当期已实现结果。\"]}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "BS-01",
+                "text": "公司业务生态横跨工业自动化与数字化、新能源汽车动力系统、智能机器人、数字能源，形成技术同源、协同发展的多个业务板块；其中工业自动化与数字化由通用自动化、智慧电梯、数字化等构成，智能机器人和数字能源作为新兴业务单独列示。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003",
+                  "source-0012",
+                  "source-0018"
+                ]
+              }
+            ],
+            "limitations": [
+              "未进一步展开各业务板块对应的法律主体和分板块利润。"
+            ]
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "PS-01",
+                "text": "工业自动化与数字化业务包括通用自动化、智慧电梯和数字化：通用自动化提供变频器、伺服系统、PLC/HMI、CNC、高性能电机、精密机械、气动元件、传感器、工业视觉等产品及解决方案，用于工业自动化、数字化和智能化升级；智慧电梯提供电梯控制系统、人机界面、门系统、控制柜、线缆等电气大配套产品；数字化提供云边端一体化平台及InoCube EiOS、InoCube FOS等工业软件平台。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003",
+                  "source-0004",
+                  "source-0011",
+                  "source-0012"
+                ]
+              },
+              {
+                "fact_id": "PS-02",
+                "text": "新能源汽车动力系统业务提供电驱系统（电机、电机控制器、电驱总成）、电源系统（DC/DC、OBC、电源总成）和智能底盘系统（主动悬架液压泵、主动稳定杆等），主要服务新能源乘用车和新能源商用车。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005",
+                  "source-0012"
+                ]
+              },
+              {
+                "fact_id": "PS-03",
+                "text": "智能机器人业务提供工业机器人（SCARA、六关节、协作机器人等）、机器视觉（视觉控制器、工业相机等）以及人形机器人零部件（仿生臂、关节模组、无框电机、低压直流驱动器、行星滚柱丝杠、编码器等）及解决方案，面向制造环节的搬运、装配、码垛、焊接等作业和工业场景落地。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006",
+                  "source-0014"
+                ]
+              },
+              {
+                "fact_id": "PS-04",
+                "text": "数字能源业务提供储能变流器、升压一体机、储能系统及综合能源管理平台，覆盖户用到大型地面电站的储能功率场景，并服务工业级能源协同和零碳管理。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007",
+                  "source-0015"
+                ]
+              }
+            ],
+            "limitations": [
+              "未逐一列示全部产品型号、细分规格和全部在研产品。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "RM-01",
+                "text": "公司通过销售标准化产品和定制化产品/解决方案取得收入，产品开发采用基于IPD的集成开发模式，研发涵盖技术研究、平台产品开发和定制化产品开发。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露分产品单价、销量和成本构成的完整收入模型。"
+            ]
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "SM-01",
+                "text": "2025年公司营业收入合计451.05亿元，同比增长21.77%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入合计",
+                    "raw_value": "45,104,844,200.13",
+                    "value": "45104844200.13",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "营业收入同比增减",
+                    "raw_value": "21.77%",
+                    "value": "21.77",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              },
+              {
+                "fact_id": "SM-02",
+                "text": "工业自动化与数字化产品2025年实现营业收入222.45亿元，占营业收入49.32%，同比增长18.79%，毛利率40.27%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017",
+                  "source-0018"
+                ],
+                "metrics": [
+                  {
+                    "name": "工业自动化与数字化营业收入",
+                    "raw_value": "22,245,401,986.97",
+                    "value": "22245401986.97",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "工业自动化与数字化占营业收入比重",
+                    "raw_value": "49.32%",
+                    "value": "49.32",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "占营业收入"
+                  },
+                  {
+                    "name": "工业自动化与数字化营业收入同比增减",
+                    "raw_value": "18.79%",
+                    "value": "18.79",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "同比"
+                  },
+                  {
+                    "name": "工业自动化与数字化毛利率",
+                    "raw_value": "40.27%",
+                    "value": "40.27",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "SM-03",
+                "text": "新能源汽车动力系统产品2025年实现营业收入203.23亿元，占营业收入45.06%，同比增长26.39%，毛利率16.10%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017",
+                  "source-0018"
+                ],
+                "metrics": [
+                  {
+                    "name": "新能源汽车动力系统营业收入",
+                    "raw_value": "20,322,581,832.31",
+                    "value": "20322581832.31",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "新能源汽车动力系统占营业收入比重",
+                    "raw_value": "45.06%",
+                    "value": "45.06",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "占营业收入"
+                  },
+                  {
+                    "name": "新能源汽车动力系统营业收入同比增减",
+                    "raw_value": "26.39%",
+                    "value": "26.39",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "同比"
+                  },
+                  {
+                    "name": "新能源汽车动力系统毛利率",
+                    "raw_value": "16.10%",
+                    "value": "16.10",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "SM-04",
+                "text": "新兴产业产品2025年实现营业收入17.95亿元，占营业收入3.98%，同比增长15.80%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017"
+                ],
+                "metrics": [
+                  {
+                    "name": "新兴产业营业收入",
+                    "raw_value": "1,795,019,255.76",
+                    "value": "1795019255.76",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "新兴产业占营业收入比重",
+                    "raw_value": "3.98%",
+                    "value": "3.98",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "占营业收入"
+                  },
+                  {
+                    "name": "新兴产业营业收入同比增减",
+                    "raw_value": "15.80%",
+                    "value": "15.80",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              },
+              {
+                "fact_id": "SM-05",
+                "text": "其他产品（报表分类中的残余类别）2025年实现营业收入7.42亿元，占营业收入1.64%，同比增长8.47%；该类别具体业务构成未在所选章节完整展开。",
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017"
+                ],
+                "uncertainty_reason": "其他为报表残余类别，具体业务范围未展开。",
+                "metrics": [
+                  {
+                    "name": "其他产品营业收入",
+                    "raw_value": "741,841,125.09",
+                    "value": "741841125.09",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "unclear",
+                    "qualifier": "exact",
+                    "source_unit": "元",
+                    "uncertainty_reason": "其他为报表残余类别，具体业务范围未展开。"
+                  },
+                  {
+                    "name": "其他产品占营业收入比重",
+                    "raw_value": "1.64%",
+                    "value": "1.64",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "unclear",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "占营业收入",
+                    "uncertainty_reason": "其他为报表残余类别，具体业务范围未展开。"
+                  },
+                  {
+                    "name": "其他产品营业收入同比增减",
+                    "raw_value": "8.47%",
+                    "value": "8.47",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "unclear",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "同比",
+                    "uncertainty_reason": "其他为报表残余类别，具体业务范围未展开。"
+                  }
+                ]
+              },
+              {
+                "fact_id": "SM-06",
+                "text": "工业自动化与数字化业务内部，通用自动化业务2025年销售收入约169亿元，同比增长约23%；其中伺服系统约68.5亿元、变频器约57亿元、PLC&HMI约18亿元；智慧电梯相关产品销售收入约52亿元，同比增长约5%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0012"
+                ],
+                "metrics": [
+                  {
+                    "name": "通用自动化业务销售收入",
+                    "raw_value": "约169",
+                    "value": "169",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "approximate",
+                    "source_unit": "亿元"
+                  },
+                  {
+                    "name": "通用自动化业务销售收入同比",
+                    "raw_value": "约23%",
+                    "value": "23",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "approximate",
+                    "source_unit": "%",
+                    "comparison_basis": "同比"
+                  },
+                  {
+                    "name": "伺服系统销售收入",
+                    "raw_value": "约68.5",
+                    "value": "68.5",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "approximate",
+                    "source_unit": "亿元"
+                  },
+                  {
+                    "name": "变频器销售收入",
+                    "raw_value": "约57",
+                    "value": "57",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "approximate",
+                    "source_unit": "亿元"
+                  },
+                  {
+                    "name": "PLC&HMI销售收入",
+                    "raw_value": "约18",
+                    "value": "18",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "approximate",
+                    "source_unit": "亿元"
+                  },
+                  {
+                    "name": "智慧电梯相关产品销售收入",
+                    "raw_value": "约52",
+                    "value": "52",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "approximate",
+                    "source_unit": "亿元"
+                  },
+                  {
+                    "name": "智慧电梯相关产品销售收入同比",
+                    "raw_value": "约5%",
+                    "value": "5",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "approximate",
+                    "source_unit": "%",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "其他为报表分类中的残余类别，具体业务构成未展开。",
+              "分行业与分产品口径存在差异，本稿主要按产品口径列示收入结构。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "OI-01",
+                "text": "2025年研发费用42.56亿元，同比增长35.23%，主要由于研发投入增大、研发项目数量增加、研发人员增加叠加调薪，以及检测认证费、材料费、外协服务费、差旅费和办公费等增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0022"
+                ],
+                "metrics": [
+                  {
+                    "name": "研发费用",
+                    "raw_value": "4,255,773,574.67",
+                    "value": "4255773574.67",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "研发费用同比增减",
+                    "raw_value": "35.23%",
+                    "value": "35.23",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              },
+              {
+                "fact_id": "OI-02",
+                "text": "营业成本中材料成本占比较高：智能制造板块材料成本123.92亿元，占该板块营业成本85.09%；新能源汽车板块材料成本146.26亿元，占该板块营业成本85.78%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0019"
+                ],
+                "metrics": [
+                  {
+                    "name": "智能制造材料成本",
+                    "raw_value": "12,391,635,374.62",
+                    "value": "12391635374.62",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "智能制造材料成本占营业成本比重",
+                    "raw_value": "85.09%",
+                    "value": "85.09",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "占该板块营业成本"
+                  },
+                  {
+                    "name": "新能源汽车材料成本",
+                    "raw_value": "14,625,528,764.58",
+                    "value": "14625528764.58",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "新能源汽车材料成本占营业成本比重",
+                    "raw_value": "85.78%",
+                    "value": "85.78",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "占该板块营业成本"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取完整产能、产能利用率、主要原材料具体品类及采购价格。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "CC-01",
+                "text": "工业自动化与数字化及智能机器人业务采用“分销为主、直销为辅”的销售模式，通过分销商/系统集成商销售给客户，对少数采购量大、产品个性化要求高的战略客户采取直销；新能源汽车和数字能源领域主要为直销模式。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ]
+              },
+              {
+                "fact_id": "CC-02",
+                "text": "2025年前五名客户合计销售金额135.23亿元，占年度销售总额29.98%；前五名客户与公司不存在关联关系，客户名单及排名变化主要系新能源汽车动力系统业务客户排名变动所致。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0021"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名客户合计销售金额",
+                    "raw_value": "13,522,711,968.69",
+                    "value": "13522711968.69",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "前五名客户合计销售金额占年度销售总额比例",
+                    "raw_value": "29.98%",
+                    "value": "29.98",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "占年度销售总额"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露具体客户名称，客户集中度仅按报告披露口径。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "OD-01",
+                "text": "2025年业绩增长主要受下游客户定点车型放量带动新能源汽车业务收入增长，以及下游行业结构性增长、公司多产品解决方案和“上顶下沉”市场策略持续深化带动工业自动化与数字化业务（含电梯）收入增长；公司同时加强成本及费用管控。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ]
+              },
+              {
+                "fact_id": "OD-02",
+                "text": "根据弗若斯特沙利文等数据，2025年按收入计，公司通用伺服系统、低压变频器、中高压变频器在中国市场份额分别约31%、20%、14%，均居第一，PLC产品（不含I/O系统）约5.7%居第四；工业机器人按出货量中国市场份额8.8%居第四，SCARA机器人约28%居第一；全球储能中大功率PCS按出货量份额6.7%居第五；新能源乘用车动力系统按收入为全球第三大、中国第一大第三方供应商，电机控制器按装机量为全球第二、中国第一大第三方供应商。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004",
+                  "source-0006",
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "通用伺服系统中国市场份额",
+                    "raw_value": "约31%",
+                    "value": "31",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "approximate",
+                    "source_unit": "%",
+                    "comparison_basis": "按收入计"
+                  },
+                  {
+                    "name": "低压变频器中国市场份额",
+                    "raw_value": "约20%",
+                    "value": "20",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "approximate",
+                    "source_unit": "%",
+                    "comparison_basis": "按收入计"
+                  },
+                  {
+                    "name": "中高压变频器中国市场份额",
+                    "raw_value": "约14%",
+                    "value": "14",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "approximate",
+                    "source_unit": "%",
+                    "comparison_basis": "按收入计"
+                  },
+                  {
+                    "name": "PLC产品中国市场份额",
+                    "raw_value": "约5.7%",
+                    "value": "5.7",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "approximate",
+                    "source_unit": "%",
+                    "comparison_basis": "按收入计"
+                  },
+                  {
+                    "name": "工业机器人中国市场份额",
+                    "raw_value": "8.8%",
+                    "value": "8.8",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "按出货量计"
+                  },
+                  {
+                    "name": "SCARA机器人中国市场份额",
+                    "raw_value": "约28%",
+                    "value": "28",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "approximate",
+                    "source_unit": "%",
+                    "comparison_basis": "按出货量计"
+                  },
+                  {
+                    "name": "全球储能中大功率PCS市场份额",
+                    "raw_value": "6.7%",
+                    "value": "6.7",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "按出货量计"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "市场份额为第三方数据口径，未获取完整行业规模、价格和竞争格局数据。"
+            ]
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "MC-01",
+                "text": "2025年公司对主营业务收入分类统计口径进行优化调整并追溯重述：分行业中“智能制造”名称简化，原部分OEM、生态战略、研发管理部、智能装备产品等调整至“其他”，轨道交通调整至“其他”；分产品中将储能、视觉、工业机器人、人形机器人调整至“新兴产业”，其余通用自动化与原智慧电梯电气类、数字化合并为“工业自动化与数字化”。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0018"
+                ]
+              },
+              {
+                "fact_id": "MC-02",
+                "text": "公司报告期内业务、产品或服务未发生重大变化或调整。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0019"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取分类调整的完整量化重述明细；合并范围变化未展开。"
+            ]
+          }
+        },
+        "company_features": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "CF-01",
+              "text": "公司完成iFG（汇川工业智脑）一体化AI平台架构开发并面向内部全域开放，平台打通数科中心、智能体中心、知识库中心，并为多款工业软件注入智能问答、代码生成、智能交互能力。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015",
+                "source-0016"
+              ]
+            }
+          ],
+          "limitations": [
+            "AI平台落地效果及对应收入未单独披露。"
+          ]
+        },
+        "supply_chain": {
+          "position": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "SC-01",
+                "text": "公司处于工业自动化与数字化、新能源汽车动力系统、智能机器人、数字能源等产品的研发、制造与销售环节，通过自有工厂和供应链体系向客户交付产品和解决方案。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008",
+                  "source-0013"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露完整生产基地和产能利用率。"
+            ]
+          },
+          "upstream_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "SC-02",
+                "text": "2025年前五名供应商合计采购金额39.92亿元，占年度采购总额13.04%；前五名供应商与公司不存在关联关系，供应商名单及排名变化主要系公司生产经营及采购策略变化所致。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0022"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名供应商合计采购金额",
+                    "raw_value": "3,991,796,126.82",
+                    "value": "3991796126.82",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "前五名供应商合计采购金额占年度采购总额比例",
+                    "raw_value": "13.04%",
+                    "value": "13.04",
+                    "unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "占年度采购总额"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露具体原材料供应商名称及采购品类结构。"
+            ]
+          },
+          "downstream_customers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "SC-03",
+                "text": "公司产品下游覆盖工业制造（锂电、风电、包装、物流、汽车装备、工程机械、暖通空调、注塑机、机床等）、电梯、新能源汽车乘用车/商用车、3C/锂电/汽车电子等机器人应用行业，以及储能电站和工业能源管理场景；这些为产品用途和客户类型，不构成本报告披露的具体购买方名单。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0014",
+                  "source-0015"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露具体客户名单，仅保留产品用途、行业和客户类型。"
+            ]
+          }
+        },
+        "limitations": [
+          "仅基于选定年度报告章节，未覆盖行业展望、治理、完整财务报表和分部附注。",
+          "物理页35布局未恢复，相关研发项目表列关系未核定，未用于推断金额或表头。",
+          "未将计划、行业统计或目标表述为公司当期已实现结果。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 23683,
+        "output_tokens": 27470,
+        "total_tokens": 51153
+      }
+    }
+  ]
+}

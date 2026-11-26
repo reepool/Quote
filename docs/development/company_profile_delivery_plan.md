@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-26[6.FO统一研究使用已完成](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-unified-39-research-20261126/result.md)：B原writer追加36安全记录，原唯一研究root现39股1082条/1648指标；A实际HTTP依赖8次200及完整39预期/API/export/fresh相等，原21/新18全部内容和限制保持，297旧文件不变、1导航获准更新。光大/国信无稿仍missing，两股具体缺项计划仅planned；0新模型/共享配置/生产，无新质量分或重开6.FN。当前以统一研究数据实际消费和按问题有界补读为主，先清后做/必要一套后清及隔离正常Git收口，具体边界见[原卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-unified-39-research-card.md)。
+
 2026-11-26当前[6.FN整体验收结果](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/result.md)已交，正式V1不通过、不进S3：首17/20、终18/20、核心90%，自动已明确判定383/391=97.954%另7未评、实际补充331不足400。18股研究稿400条/533指标可读，8对象A局部保护不改自动成绩；原21股继续保护。两模型前同文档别名误拒和raw/null格式连带丢失按同卡合并零调用修复，已保存响应只作源绑定候选，不冒领终核或重算首发。后续以这批真实画像/API研究消费和用户具体问题补读为主，不再派逐公司凑100%卡或滚动付费确认组，不自动扩100家/全市场/生产。本人临时库、重复导出和脚本核必要证据后清，首次失败/源/wire/原件和49既有脏改保护。
 
 2026-11-25 [6.FM真实研究与准确率审计完成](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-http-research-use-20261125/result.md)：海尔原HTTP首读/源核、王府井enrich均正常，10物理/321442供应商total与账本/0恢复/1141.497业务秒/unknown。A原文独核后统一21股682/1115，19其余完整profile保持，王府井净增8/17且新4尾项仅源参考。512/523原v12分数无跨轮累计，不能当当前准确率；当前整体未充分评估，原已知错指标15位置不外放。A/B同窗交原owner实物、完整21匹配/只读HTTP、Review/strict及49既有隔离；必要证据归一并清本人垃圾，不再重跑20或补齐尾项，不自动扩量/生产。

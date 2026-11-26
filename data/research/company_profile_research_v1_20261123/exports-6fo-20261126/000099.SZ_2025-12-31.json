@@ -1,0 +1,3617 @@
+{
+  "schema_version": "company_profile_common_core_profile.v3",
+  "production_authorization": "not_authorized",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "work_id": "bp-work-5470620ee9834702d5a05c32",
+  "instrument_id": "000099.SZ",
+  "report": {
+    "instrument_id": "000099.SZ",
+    "report_id": "asset_13cf072b922d15bcd81c755ac7b69d44",
+    "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-16T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "freshness": {
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-16T16:00:00+00:00",
+    "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+    "knowledge_time": "2026-03-16T16:00:00+00:00"
+  },
+  "core_complete": false,
+  "dimensions": [
+    {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    {
+      "dimension_id": "products_services",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    }
+  ],
+  "accepted_facts": [],
+  "gaps": [],
+  "evidence_gap_codes": [],
+  "commodity_exposure": {
+    "assessment": {
+      "schema_version": "company_profile_commodity_exposure.v1",
+      "production_authorization": "not_authorized",
+      "report": {
+        "instrument_id": "000099.SZ",
+        "report_id": "asset_13cf072b922d15bcd81c755ac7b69d44",
+        "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-16T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "assessment_status": "not_assessed",
+      "checked_evidence_ids": [],
+      "exposures": []
+    },
+    "reported_period": "2025-12-31",
+    "knowledge_time": "2026-03-16T16:00:00+00:00",
+    "consumer_authorization": {
+      "dcf": false,
+      "trading": false,
+      "price_sensitivity": false
+    }
+  },
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "llm_generated",
+    "report": {
+      "instrument_id": "000099.SZ",
+      "report_id": "asset_13cf072b922d15bcd81c755ac7b69d44",
+      "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-16T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0020",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的主要业务"
+          ],
+          "start_page": 14,
+          "end_page": 14,
+          "rationale": "本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。"
+        },
+        {
+          "section_id": "section-0023",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、核心竞争力分析",
+            "（一）全面的品牌影响力"
+          ],
+          "start_page": 15,
+          "end_page": 15,
+          "rationale": "本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。"
+        },
+        {
+          "section_id": "section-0024",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、核心竞争力分析",
+            "（二）多元的运营服务体系"
+          ],
+          "start_page": 15,
+          "end_page": 15,
+          "rationale": "本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。"
+        },
+        {
+          "section_id": "section-0026",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、核心竞争力分析",
+            "（四）领先的机队和基地规模"
+          ],
+          "start_page": 15,
+          "end_page": 15,
+          "rationale": "本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。"
+        },
+        {
+          "section_id": "section-0028",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "start_page": 15,
+          "end_page": 17,
+          "rationale": "本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。"
+        },
+        {
+          "section_id": "section-0623",
+          "section_path": [
+            "第八节 财务报告",
+            "一、不能",
+            "35、营业收入和营业成本"
+          ],
+          "start_page": 135,
+          "end_page": 135,
+          "rationale": "本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。"
+        }
+      ],
+      "unread_or_deferred": [
+        "section-0021 行业情况：属行业背景，非公司收入构成直接来源，暂不读",
+        "section-0022 核心竞争力其余子节及section-0025、section-0027：技术/人才细节对收入构成解释力有限",
+        "section-0041、section-0042 客户与供应商：供应链非本次定向目标，暂不读",
+        "section-0716 分部信息：若section-0030已披露分行业/分产品收入则无需扩读；仅在收入细分仍缺失时再定向补充",
+        "section-0270 财务报告其余附注：不扩读整个财务报告"
+      ],
+      "selection_rationale": "本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。",
+      "stop_reason": "已覆盖主要业务、经营模式、收入与成本分行业/分产品表及收入附注，可回答通航运输收入构成与收费模式；行业背景、供应链与其余附注对本次定向问题边际贡献低，故在此停止。",
+      "transcription_version": "shared-pdf-pypdf-layout.structured-notes.v1"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "not_disclosed",
+        "facts": [],
+        "limitations": [
+          "本次为定向补充阅读，未针对业务结构进行系统提取；仅依据所选章节原文回答通航运输收入构成与收费模式。"
+        ]
+      },
+      "products_services": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-PS-01",
+            "text": "公司主要业务包括海上油气直升机飞行服务、应急救援、陆上通航、通航维修和港口引航，并探索低空经济业务新场景；其中海上油气直升机飞行服务为主要收入来源和核心业务。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-PS-02",
+            "text": "公司业务覆盖机场运营、直升机运营、通航维修等核心领域，形成上下游协同的一体化运营格局，并在海上油气、应急救援、陆上通航、港口引航及通航维修五大业务板块持续发力。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入金额或占比。"
+        ]
+      },
+      "revenue_model": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-RM-01",
+            "text": "公司营业收入合计2,235,378,155.32元，占营业收入比重100%，同比增减3.33%；增长原因为报告期合同机数量及飞行作业量增加，海油业务收入增加。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入合计",
+                "raw_value": "2,235,378,155.32",
+                "value": "2235378155.32",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入合计占营业收入比重",
+                "raw_value": "100%",
+                "value": "100",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入合计同比增减",
+                "raw_value": "3.33%",
+                "value": "3.33",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "2024年度",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-RM-03",
+            "text": "分行业看，通航维修收入8,835,401.52元，占营业收入比重0.40%，同比增减-48.09%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "通航维修收入",
+                "raw_value": "8,835,401.52",
+                "value": "8835401.52",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "通航维修收入占营业收入比重",
+                "raw_value": "0.40%",
+                "value": "0.40",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "通航维修收入同比增减",
+                "raw_value": "-48.09%",
+                "value": "-48.09",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "2024年度",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-RM-04",
+            "text": "分行业看，其他业务收入10,557,775.95元，占营业收入比重0.47%，同比增减-39.07%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "其他业务收入",
+                "raw_value": "10,557,775.95",
+                "value": "10557775.95",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他业务收入占营业收入比重",
+                "raw_value": "0.47%",
+                "value": "0.47",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他业务收入同比增减",
+                "raw_value": "-39.07%",
+                "value": "-39.07",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "2024年度",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-RM-05",
+            "text": "财务报告附注显示，主营业务收入2,224,820,379.37元、成本1,700,253,570.91元；其他业务收入10,557,775.95元、成本3,604,291.85元；合计收入2,235,378,155.32元、成本1,703,857,862.76元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "主营业务收入",
+                "raw_value": "2,224,820,379.37",
+                "value": "2224820379.37",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "主营业务成本",
+                "raw_value": "1,700,253,570.91",
+                "value": "1700253570.91",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他业务收入",
+                "raw_value": "10,557,775.95",
+                "value": "10557775.95",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他业务成本",
+                "raw_value": "3,604,291.85",
+                "value": "3604291.85",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入合计",
+                "raw_value": "2,235,378,155.32",
+                "value": "2235378155.32",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业成本合计",
+                "raw_value": "1,703,857,862.76",
+                "value": "1703857862.76",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-RM-06",
+            "text": "通航运输服务在服务提供时按服务进度结算收款，公司为主要责任人，主要提供通航运输服务；通航维修服务在服务完成时以预付款、交付验收款结算，主要对直升机及部件提供修理服务，公司为主要责任人，并提供服务类质保。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-RM-07",
+            "text": "本报告期末已签订合同但尚未履行或尚未履行完毕的履约义务对应收入金额为419,133,003.25元，其中206,841,119.73元预计于2026年度确认收入，132,933,802.73元预计于2027年度确认收入，79,358,080.79元预计于2028年度确认收入。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年末",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "尚未履行或尚未履行完毕的履约义务对应收入金额",
+                "raw_value": "419,133,003.25",
+                "value": "419133003.25",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "预计2026年度确认收入",
+                "raw_value": "206,841,119.73",
+                "value": "206841119.73",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2026年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "预计2027年度确认收入",
+                "raw_value": "132,933,802.73",
+                "value": "132933802.73",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2027年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "预计2028年度确认收入",
+                "raw_value": "79,358,080.79",
+                "value": "79358080.79",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2028年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入金额或占比，无法恢复通航运输收入内部细分。",
+          "分产品收入表在原文中为空，未披露分产品收入。",
+          "分地区收入为地区口径，不能替代通航运输业务收入构成。",
+          "事实F-RM-02已隔离，未作为结论采用：metric number is absent from cited source: 通航运输收入"
+        ]
+      },
+      "scale_and_mix": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-SM-01",
+            "text": "分行业收入构成中，通航运输占营业收入99.13%，通航维修占0.40%，其他业务占0.47%，通航运输为绝对主体。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006",
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "通航运输收入占营业收入比重",
+                "raw_value": "99.13%",
+                "value": "99.13",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "通航维修收入占营业收入比重",
+                "raw_value": "0.40%",
+                "value": "0.40",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他业务收入占营业收入比重",
+                "raw_value": "0.47%",
+                "value": "0.47",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "分地区收入为地区口径，不能替代通航运输业务内部收入构成。",
+          "所选章节未披露海上油气、应急救援、陆上通航、港口引航等业务板块的收入占比。",
+          "事实F-SM-02已隔离，未作为结论采用：metric number is absent from cited source: 深圳地区收入"
+        ]
+      },
+      "operations_and_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-OI-01",
+            "text": "报告期内公司共运营87架直升机，机型来自莱奥纳多公司、空客直升机公司、西科斯基公司、俄罗斯直升机公司等；在湖北、江西、新疆、广东、海南等地部署无人机共9架；运营深圳南头、天津塘沽、湛江坡头、海南东方4个直升机场，并在全国多地设有基地、起降点。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "运营直升机数量",
+                "raw_value": "87",
+                "value": "87",
+                "unit": "架",
+                "source_unit": "架",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "部署无人机数量",
+                "raw_value": "9",
+                "value": "9",
+                "unit": "架",
+                "source_unit": "架",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "运营直升机场数量",
+                "raw_value": "4",
+                "value": "4",
+                "unit": "个",
+                "source_unit": "个",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-OI-02",
+            "text": "公司依托成熟稳定的安全飞行专业能力，打造完整的通用航空产业链，业务覆盖机场运营、直升机运营、通航维修等核心领域，形成上下游协同发展的一体化运营格局。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "所选章节未披露航材航油等具体采购来源或供应商信息。"
+        ]
+      },
+      "customers_channels_markets": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-CC-01",
+            "text": "公司海上油气业务与中海油合作完成2吨级eVTOL海上平台货运试飞；应急救援业务全年服务于内蒙古、湖南、湖北、四川、浙江、江西等地；港口引航业务在天津港、黄骅港、青岛港、湛江港持续开展引航作业。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-CC-02",
+            "text": "公司分地区收入覆盖深圳、湛江、武汉/北京、天津、浙江、海南、江西、安徽等地区，其中深圳地区收入占比47.83%为最大区域。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "深圳地区收入占营业收入比重",
+                "raw_value": "47.83%",
+                "value": "47.83",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "所选章节未披露客户集中度或具体客户名单。"
+        ]
+      },
+      "operating_drivers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "F-OD-01",
+            "text": "报告期营业收入同比增长3.33%，原因为合同机数量及飞行作业量增加，海油业务收入增加；营业成本同比增长2.34%，原因为作业量增加，航材航油、飞机折旧费、保障费等成本均增加。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入同比增减",
+                "raw_value": "3.33%",
+                "value": "3.33",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "2024年度",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业成本同比增减",
+                "raw_value": "2.34%",
+                "value": "2.34",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "2024年度",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "F-OD-02",
+            "text": "通航运输业务毛利率23.78%，营业收入比上年同期增减4.09%，营业成本比上年同期增减2.84%，毛利率比上年同期增减0.93%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "通航运输毛利率",
+                "raw_value": "23.78%",
+                "value": "23.78",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "通航运输营业收入同比增减",
+                "raw_value": "4.09%",
+                "value": "4.09",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "2024年度",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "通航运输营业成本同比增减",
+                "raw_value": "2.84%",
+                "value": "2.84",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "2024年度",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "通航运输毛利率比上年同期增减",
+                "raw_value": "0.93%",
+                "value": "0.93",
+                "unit": "百分点",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "2024年度",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入驱动因素。"
+        ]
+      },
+      "material_changes": {
+        "status": "not_disclosed",
+        "facts": [],
+        "limitations": [
+          "本次为定向补充阅读，未针对报告期重大变化进行系统提取；所选章节未明确披露通航运输业务收入构成的重大变化。"
+        ]
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        "physical_pages": [
+          14
+        ],
+        "source_spans": [
+          {
+            "page": 14,
+            "start": 122,
+            "end": 1453,
+            "quote": "一、报告期内公司从事的主要业务\n\n\n    公司作为国内通用航空行业的标杆企业，一直保持和扩大直升机海上油气服务的发展优势，积极拓展应急救援、陆上通\n航、港口引航和通航维修业务，探索低空经济业务新场景，推进通用航空新业务新模式形成，依托科学系统的安全管理能力\n和丰富扎实的飞行作业经验深入构建企业高质量发展格局，打造国内领先的通航和低空综合运营商。\n    海上油气：海上油气直升机飞行服务为公司主要收入来源和核心业务。报告期公司坚持提供优质的海上油气飞行服务，\n推进五年期协议签署，助力国家海上油气能源增储上产。坚守市场占有率，协调优质机源完成各项飞行任务。与中海油合作\n完成  2 吨级  eVTOL 海上平台货运的试飞。\n    应急救援：坚持融入国家航空应急救援体系建设，建立有人机与无人机协同的航空应急救援体系，全年服务于内蒙古、\n湖南、湖北、四川、浙江、江西等地，持续保持国内应急救援市场的领先地位。深耕“海岛快巴”业务，开通紧急医疗转运\n航线。编制发布《直升机海上应急救援运行要求》团体标准，提升标准化运作水平。\n    陆上通航：发挥综合运营优势，打造特色                   C端消费品牌，实现深圳—珠海短途运输航线常态化运行，在深圳新增多条空\n中游览航线，在浙江运营普陀山机场至舟山群岛航线。开展多项陆上通航业务，在大田机场保障                                           11 家驻场单位开展低空作\n业活动。完成保障第         41 次南极科考、第       15 次北极科考任务，开启第            42次南极科考保障任务。保障中央广播电视总台哈尔\n滨亚冬会、纪念中国人民抗日战争暨世界反法西斯战争胜利                           80周年活动专项任务、天津马拉松赛事空中拍照飞行任务。执\n飞第十五届全国运动会深圳赛区火炬空中传递路线，实现全运会历史上首次空陆传递。\n    通航维修：公司积极践行国家战略，持续开拓国产直升机市场。进一步拓展机型承修范围，提升深度维修能力和质量体\n系管理能力。\n    港口引航：公司在天津港、黄骅港、青岛港、湛江港持续开展引航作业，作业量创历史新高。编制发布《直升机引航作\n业安全运行要求》团体标准，提升标准化运作水平。启用日照岚山直升机基地，提升日照港引航的服务保障能力和创新水\n平。\n    低空经济：融入地方低空经济发展，探索多样化的低空经济应用场景。推动央地合作，谋划区域布局，在珠三角、长三\n角、新疆、四川、湖北等多个地区打造包含运营服务、空域管理、维修保障、机场运营等业务在内的区域综合性运营服务平\n台。拓展多元化低空应用场景，圆满完成吨级                     eVTOL海油平台试飞、合肥—怀宁跨城货运测试航线首飞，初步建立                            eVTOL 低\n空货运试验飞行能力及数字化塔台运营能力。启动大型无人机人工影响天气业务，与江西省气象局签署全面合作框架协议，\n与新疆、云南等省区气象局人影中心建立长期战略合作伙伴关系。\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、核心竞争力分析",
+          "（一）全面的品牌影响力"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 501,
+            "end": 787,
+            "quote": "（一）全面的品牌影响力\n    公司长期深耕通用航空核心领域，在海上油气、应急救援、通航维修等业务板块积累了深厚的运营经验。通过持续刷新\n安全飞行纪录、提升综合服务保障能力，公司以稳定可靠的专业服务赢得客户的长期信赖，在业内树立起技术领先、安全可\n靠的专业品牌形象。公司积极融入国家深海战略和大应急救援体系建设，在极地科考、海上搜救、重大活动保障等任务中发\n挥重要作用。通过践行社会责任、服务国家战略，公司品牌公信力与社会影响力持续提升，成为通航领域具有高度社会责任\n感的企业代表。伴随海外业务稳步拓展，公司服务能力与国际标准接轨，品牌影响力逐步延伸至海外市场。\n    "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、核心竞争力分析",
+          "（二）多元的运营服务体系"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 787,
+            "end": 1167,
+            "quote": "（二）多元的运营服务体系\n    公司依托成熟稳定的安全飞行专业能力，打造完整的通用航空产业链，业务覆盖机场运营、直升机运营、通航维修等核\n心领域，形成上下游协同发展的一体化运营格局。公司在海上油气、应急救援、陆上通航、港口引航及通航维修五大业务板\n块持续发力，稳固市场份额。在此基础上，公司积极拓展业务边界，依托无人机应用能力向智慧城市管理领域延伸，通过参\n与城市巡检、交通巡查、环境监测等综合服务，探索构建空地协同的城市立体管理体系。同时，公司充分发挥在                                                    600米以下\n空域长期积累的有人机—无人机协调管制能力，推动自身业务从单一的飞行作业向空管运营服务延伸，为多机型协同运营提\n供坚实保障，致力于成为国内领先、国际知名的通航和低空综合运营商。\n    "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、核心竞争力分析",
+          "（四）领先的机队和基地规模"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 1467,
+            "end": 1687,
+            "quote": "（四）领先的机队和基地规模\n    报告期内公司共运营          87架直升机，机型种类丰富。目前机队运营的主要机型来自莱奥纳多公司、空客直升机公司、西\n科斯基公司、俄罗斯直升机公司等生产的多种型号直升机。中信海直还在湖北、江西、新疆、广东、海南等地部署无人机共\n9架。运营     4个直升机场：深圳南头、天津塘沽、湛江坡头、海南东方；在全国多地设有基地、起降点。领先的机队规模和\n综合保障能力得到国内外客户的广泛认可。\n    "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 1821,
+            "end": 2020,
+            "quote": "四、主营业务分析\n\n1、概述\n\n\n参见“第三节 管理层讨论与分析”中的“一、报告期内公司从事的主要业务”、“二、报告期内公司所处行业情况”及\n“三、核心竞争力分析”相关内容。\n                                                                                                             15"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        "physical_pages": [
+          16
+        ],
+        "source_spans": [
+          {
+            "page": 16,
+            "start": 0,
+            "end": 5043,
+            "quote": "                                           中信海洋直升机股份有限公司                        2025  年年度报告全文\n\n\n主要财务数据同比变动情况：\n            项目                          2025  年                      2024   年              同比增减                          变动原因\n\n营业收入                                 2,235,378,155.32            2,163,321,977.59                  3.33% 报告期合同机数量及飞行作业量\n                                                                                                          增加，海油业务收入增加。\n                                                                                                          报告期作业量增加，航材航油、\n营业成本                                 1,703,857,862.76            1,664,849,766.84                  2.34% 飞机折旧费、保障费等成本均增\n                                                                                                          加。\n销售费用                                       7,348,428.36                9,247,014.11             -20.53% 报告期职工薪酬、差旅办公费、\n                                                                                                          交际应酬费同比减少。\n                                                                                                          报告期公司调整退休人员医疗保\n                                                                                                          险福利政策，根据《企业会计准\n                                                                                                          则第     9 号——职工薪酬》相关规\n管理费用                                      99,934,154.84             120,822,824.30              -17.29% 定，以        2025   年  12  月  31 日时点\n                                                                                                          的离职后福利精算结果，对设定\n                                                                                                          受益计划变更产生的过去服务成\n                                                                                                          本予以冲减，致设定受益计划成\n                                                                                                          本同比减少。\n财务费用                                      31,612,480.54               12,400,312.81             154.93% 报告期确认的租赁负债融资费\n                                                                                                          用、汇兑损失同比增加。\n研发投入                                       4,349,217.61                3,384,158.95               28.52% 报告期研发投入增加。\n\n经营活动产生的现金流                              988,071,142.74              612,962,070.26                61.20% 报告期销售商品、提供劳务收到\n量净额                                                                                                       的现金同比增加。\n\n\n投资活动产生的现金流                                                                                                报告期公司定期存款到期收回、\n量净额                                    -347,151,125.14          -1,011,568,334.73                 65.68% 收到南头直升机搬迁项目补偿\n                                                                                                          款，投资活动现金流入增加。\n\n筹资活动产生的现金流                                                                                                报告期分配          2024  年度股利及\n量净额                                    -352,631,455.98             -318,167,240.37              -10.83% 2025     年中期股利支付的现金同比\n                                                                                                          增加。\n\n                                                                                                          报告期经营活动现金流入增长、\n现金及现金等价物净增                              288,066,897.27             -714,445,897.09              140.32% 投资活动现金流出减少，共同推\n加额                                                                                                        动现金及现金等价物净增加额实\n                                                                                                          现增长。\n\n\n2、收入与成本\n\n（1） 营业收入构成\n\n\n                                                                                                                                          单位：元\n                                              2025  年                                          2024  年                             同比增减\n                                   金额                占营业收入比重                         金额               占营业收入比重\n   营业收入合计                   2,235,378,155.3                         100%     2,163,321,977.5                         100%                   3.33%\n                                               2                                                 9\n   分行业\n   通航运输                     2,215,984,977.8                      99.13%      2,128,972,380.6                      98.41%                    4.09%\n                                               5                                                 8\n   通航维修                         8,835,401.52                      0.40%         17,021,487.16                       0.79%                -48.09%\n\n                                                                                                                                                  16"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        "physical_pages": [
+          17
+        ],
+        "source_spans": [
+          {
+            "page": 17,
+            "start": 0,
+            "end": 3454,
+            "quote": "                                               中信海洋直升机股份有限公司                          2025   年年度报告全文\n\n\n   其他业务                          10,557,775.95                          0.47%          17,328,109.75                         0.80%                   -39.07%\n   分产品\n   分地区\n   深圳                         1,069,108,931.9                         47.83%        1,081,151,684.6                         49.98%                    -1.11%\n                                                   1                                                    4\n   湛江                           283,763,821.24                        12.69%         221,059,450.79                         10.22%                    28.37%\n   武汉/北京                        268,028,647.02                        11.99%         305,661,441.06                         14.13%                   -12.31%\n   天津                           222,028,912.87                          9.93%        175,330,767.01                          8.10%                    26.63%\n   浙江                           298,738,462.10                        13.36%         283,034,482.17                         13.08%                      5.55%\n   海南                            89,703,450.89                          4.01%          91,848,633.68                         4.25%                    -2.34%\n   江西                              4,005,929.27                         0.18%           5,235,518.24                         0.24%                   -23.49%\n   安徽                                          0.02                     0.00%\n   分销售模式\n\n\n（2） 占公司营业收入或营业利润                             10%以上的行业、产品、地区、销售模式的情况\n\n\n适用 □不适用\n                                                                                                                                                      单位：元\n                              营业收入                  营业成本                     毛利率               营业收入比上                 营业成本比上                 毛利率比上年\n                                                                                                 年同期增减                 年同期增减                    同期增减\n   分行业\n   通航运输                    2,215,984,97           1,689,013,34                    23.78%                  4.09%                  2.84%                  0.93%\n                                       7.85                   6.63\n   分产品\n   分地区\n   深圳                      1,069,108,93           834,567,947.                    21.94%                 -1.11%                -2.63%                   1.21%\n                                       1.91                      10\n   武汉/北京                   268,028,647.           285,495,154.                    -6.52%               -12.31%                   1.88%               -14.83%\n                                          02                     54\n   浙江                      298,738,462.           186,392,487.                    37.61%                  5.55%                -4.38%                   6.48%\n                                          10                     91\n   湛江                      283,763,821.           181,319,873.                    36.10%                 28.37%                36.91%                 -3.99%\n                                          24                     51\n   分销售模式\n\n公司主营业务数据统计口径在报告期发生调整的情况下，公司最近                                                          1 年按报告期末口径调整后的主营业务数据\n□适用 不适用\n\n\n（3） 公司实物销售收入是否大于劳务收入\n\n\n□是 否\n\n\n（4） 公司已签订的重大销售合同、重大采购合同截至本报告期的履行情况\n\n\n适用 □不适用\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+        "section_path": [
+          "第八节 财务报告",
+          "一、不能",
+          "35、营业收入和营业成本"
+        ],
+        "physical_pages": [
+          135
+        ],
+        "source_spans": [
+          {
+            "page": 135,
+            "start": 1536,
+            "end": 3512,
+            "quote": "35、营业收入和营业成本\n\n\n                                                                                                                                 单位：元\n            项目                                    本期发生额                                                  上期发生额\n                                        收入                          成本                         收入                          成本\n   主营业务                           2,224,820,379.37            1,700,253,570.91           2,145,993,867.84            1,657,518,920.64\n   其他业务                               10,557,775.95                3,604,291.85              17,328,109.75                7,330,846.20\n   合计                             2,235,378,155.32            1,703,857,862.76           2,163,321,977.59            1,664,849,766.84\n\n公司报告期内经审计利润总额、净利润、扣除非经常性损益后的净利润三者孰低为负值\n□是 否\n与履约义务相关的信息：\n\n                       履行履约义务              重要的支付条             公司承诺转让              是否为主要责              公司承担的预              公司提供的质\n        项目                 的时间                   款              商品的性质                  任人             期将退还给客              量保证类型及\n                                                                                                         户的款项               相关义务\n   通航运输服务             服务提供时               服务进度结算              主要提供通航              是                  无                   无\n                                          收款                  运输服务\n                                          预付款、交付              主要对直升机\n   通航维修服务             服务完成时               验收款                 及部件的修理              是                  无                   服务类质保\n                                                              服务\n与分摊至剩余履约义务的交易价格相关的信息：\n本报告期末已签订合同、但尚未履行或尚未履行完毕的履约义务所对应的收入金额为                                                           419,133,003.25元，其中，\n206,841,119.73    元预计将于         2026  年度确认收入，132,933,802.73               元预计将于         2027  年度确认收入，79,358,080.79               元预计将\n于  2028  年度确认收入。\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "limitations": [
+      "本次为定向补充阅读，仅回答通航运输业务收入构成与收费模式相关问题，未覆盖公司整体画像。",
+      "所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入金额或占比，通航运输收入内部细分未获取成功。",
+      "分产品收入表在原文中为空，未披露分产品收入。",
+      "分地区收入为地区口径，不能替代通航运输业务收入构成。"
+    ],
+    "supply_chain": null,
+    "generation": {
+      "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+      "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+      "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+      "selection": {
+        "purpose": "select_profile_sections",
+        "request_id": "bp-work-5470620ee9834702d5a05c32:workpaper:sections",
+        "request_hash": "bb1cd81a2df094251f2f83337b95aa2e647ffda06085712ba8d30addfcbe3bc3",
+        "response_hash": "e99862dd8dd2ad2da42a933080578df73716ac0c6e3ec0cc7dcea66fc269cce0",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 14135,
+          "output_tokens": 415,
+          "total_tokens": 14550
+        },
+        "scope_kind": "report_heading_index",
+        "heading_count": 542,
+        "section_ids": [
+          "section-0001",
+          "section-0002",
+          "section-0003",
+          "section-0004",
+          "section-0005",
+          "section-0006",
+          "section-0007",
+          "section-0008",
+          "section-0009",
+          "section-0010",
+          "section-0011",
+          "section-0012",
+          "section-0013",
+          "section-0014",
+          "section-0015",
+          "section-0016",
+          "section-0017",
+          "section-0018",
+          "section-0019",
+          "section-0020",
+          "section-0021",
+          "section-0022",
+          "section-0023",
+          "section-0024",
+          "section-0025",
+          "section-0026",
+          "section-0027",
+          "section-0028",
+          "section-0029",
+          "section-0030",
+          "section-0035",
+          "section-0036",
+          "section-0041",
+          "section-0042",
+          "section-0043",
+          "section-0044",
+          "section-0045",
+          "section-0046",
+          "section-0047",
+          "section-0048",
+          "section-0049",
+          "section-0050",
+          "section-0051",
+          "section-0052",
+          "section-0053",
+          "section-0054",
+          "section-0055",
+          "section-0056",
+          "section-0057",
+          "section-0058",
+          "section-0059",
+          "section-0060",
+          "section-0061",
+          "section-0062",
+          "section-0063",
+          "section-0064",
+          "section-0065",
+          "section-0066",
+          "section-0067",
+          "section-0068",
+          "section-0069",
+          "section-0072",
+          "section-0073",
+          "section-0074",
+          "section-0075",
+          "section-0076",
+          "section-0083",
+          "section-0084",
+          "section-0085",
+          "section-0086",
+          "section-0087",
+          "section-0088",
+          "section-0089",
+          "section-0093",
+          "section-0096",
+          "section-0099",
+          "section-0100",
+          "section-0101",
+          "section-0102",
+          "section-0103",
+          "section-0104",
+          "section-0105",
+          "section-0106",
+          "section-0107",
+          "section-0108",
+          "section-0109",
+          "section-0110",
+          "section-0111",
+          "section-0112",
+          "section-0113",
+          "section-0114",
+          "section-0115",
+          "section-0116",
+          "section-0117",
+          "section-0118",
+          "section-0119",
+          "section-0120",
+          "section-0121",
+          "section-0122",
+          "section-0123",
+          "section-0124",
+          "section-0125",
+          "section-0126",
+          "section-0127",
+          "section-0128",
+          "section-0129",
+          "section-0130",
+          "section-0131",
+          "section-0132",
+          "section-0133",
+          "section-0134",
+          "section-0135",
+          "section-0136",
+          "section-0137",
+          "section-0138",
+          "section-0139",
+          "section-0140",
+          "section-0141",
+          "section-0142",
+          "section-0143",
+          "section-0144",
+          "section-0145",
+          "section-0146",
+          "section-0147",
+          "section-0148",
+          "section-0149",
+          "section-0150",
+          "section-0151",
+          "section-0152",
+          "section-0153",
+          "section-0154",
+          "section-0155",
+          "section-0156",
+          "section-0157",
+          "section-0158",
+          "section-0159",
+          "section-0160",
+          "section-0161",
+          "section-0162",
+          "section-0179",
+          "section-0180",
+          "section-0181",
+          "section-0182",
+          "section-0183",
+          "section-0184",
+          "section-0185",
+          "section-0186",
+          "section-0187",
+          "section-0189",
+          "section-0190",
+          "section-0191",
+          "section-0192",
+          "section-0193",
+          "section-0194",
+          "section-0195",
+          "section-0196",
+          "section-0197",
+          "section-0198",
+          "section-0199",
+          "section-0200",
+          "section-0201",
+          "section-0202",
+          "section-0203",
+          "section-0204",
+          "section-0205",
+          "section-0206",
+          "section-0207",
+          "section-0208",
+          "section-0209",
+          "section-0210",
+          "section-0211",
+          "section-0212",
+          "section-0217",
+          "section-0218",
+          "section-0222",
+          "section-0223",
+          "section-0226",
+          "section-0227",
+          "section-0228",
+          "section-0229",
+          "section-0230",
+          "section-0231",
+          "section-0232",
+          "section-0234",
+          "section-0235",
+          "section-0236",
+          "section-0237",
+          "section-0238",
+          "section-0239",
+          "section-0240",
+          "section-0241",
+          "section-0242",
+          "section-0243",
+          "section-0244",
+          "section-0245",
+          "section-0246",
+          "section-0247",
+          "section-0248",
+          "section-0249",
+          "section-0250",
+          "section-0251",
+          "section-0252",
+          "section-0253",
+          "section-0254",
+          "section-0255",
+          "section-0256",
+          "section-0257",
+          "section-0258",
+          "section-0259",
+          "section-0260",
+          "section-0261",
+          "section-0262",
+          "section-0263",
+          "section-0264",
+          "section-0265",
+          "section-0266",
+          "section-0267",
+          "section-0268",
+          "section-0269",
+          "section-0270",
+          "section-0271",
+          "section-0272",
+          "section-0285",
+          "section-0286",
+          "section-0287",
+          "section-0288",
+          "section-0289",
+          "section-0290",
+          "section-0291",
+          "section-0292",
+          "section-0293",
+          "section-0294",
+          "section-0295",
+          "section-0296",
+          "section-0297",
+          "section-0298",
+          "section-0299",
+          "section-0300",
+          "section-0301",
+          "section-0302",
+          "section-0303",
+          "section-0304",
+          "section-0305",
+          "section-0306",
+          "section-0307",
+          "section-0308",
+          "section-0309",
+          "section-0310",
+          "section-0311",
+          "section-0312",
+          "section-0313",
+          "section-0314",
+          "section-0315",
+          "section-0316",
+          "section-0317",
+          "section-0318",
+          "section-0319",
+          "section-0320",
+          "section-0321",
+          "section-0322",
+          "section-0323",
+          "section-0324",
+          "section-0325",
+          "section-0326",
+          "section-0327",
+          "section-0328",
+          "section-0329",
+          "section-0330",
+          "section-0331",
+          "section-0332",
+          "section-0333",
+          "section-0334",
+          "section-0335",
+          "section-0336",
+          "section-0337",
+          "section-0338",
+          "section-0339",
+          "section-0340",
+          "section-0341",
+          "section-0342",
+          "section-0343",
+          "section-0344",
+          "section-0345",
+          "section-0346",
+          "section-0347",
+          "section-0348",
+          "section-0349",
+          "section-0350",
+          "section-0351",
+          "section-0352",
+          "section-0353",
+          "section-0354",
+          "section-0355",
+          "section-0356",
+          "section-0357",
+          "section-0358",
+          "section-0359",
+          "section-0360",
+          "section-0361",
+          "section-0362",
+          "section-0363",
+          "section-0364",
+          "section-0365",
+          "section-0366",
+          "section-0367",
+          "section-0368",
+          "section-0369",
+          "section-0370",
+          "section-0371",
+          "section-0372",
+          "section-0373",
+          "section-0376",
+          "section-0377",
+          "section-0378",
+          "section-0379",
+          "section-0381",
+          "section-0389",
+          "section-0390",
+          "section-0393",
+          "section-0397",
+          "section-0398",
+          "section-0402",
+          "section-0405",
+          "section-0406",
+          "section-0407",
+          "section-0409",
+          "section-0410",
+          "section-0411",
+          "section-0415",
+          "section-0416",
+          "section-0417",
+          "section-0418",
+          "section-0419",
+          "section-0422",
+          "section-0423",
+          "section-0424",
+          "section-0425",
+          "section-0429",
+          "section-0433",
+          "section-0434",
+          "section-0435",
+          "section-0436",
+          "section-0437",
+          "section-0438",
+          "section-0443",
+          "section-0447",
+          "section-0449",
+          "section-0450",
+          "section-0453",
+          "section-0456",
+          "section-0457",
+          "section-0462",
+          "section-0463",
+          "section-0464",
+          "section-0465",
+          "section-0467",
+          "section-0468",
+          "section-0469",
+          "section-0475",
+          "section-0478",
+          "section-0479",
+          "section-0480",
+          "section-0481",
+          "section-0484",
+          "section-0487",
+          "section-0488",
+          "section-0489",
+          "section-0490",
+          "section-0492",
+          "section-0494",
+          "section-0495",
+          "section-0496",
+          "section-0497",
+          "section-0500",
+          "section-0504",
+          "section-0506",
+          "section-0507",
+          "section-0508",
+          "section-0509",
+          "section-0510",
+          "section-0511",
+          "section-0512",
+          "section-0513",
+          "section-0515",
+          "section-0517",
+          "section-0518",
+          "section-0519",
+          "section-0520",
+          "section-0522",
+          "section-0524",
+          "section-0525",
+          "section-0526",
+          "section-0527",
+          "section-0529",
+          "section-0531",
+          "section-0532",
+          "section-0533",
+          "section-0538",
+          "section-0540",
+          "section-0541",
+          "section-0542",
+          "section-0543",
+          "section-0545",
+          "section-0547",
+          "section-0548",
+          "section-0549",
+          "section-0550",
+          "section-0552",
+          "section-0554",
+          "section-0555",
+          "section-0556",
+          "section-0557",
+          "section-0559",
+          "section-0560",
+          "section-0564",
+          "section-0565",
+          "section-0566",
+          "section-0567",
+          "section-0568",
+          "section-0569",
+          "section-0570",
+          "section-0573",
+          "section-0576",
+          "section-0577",
+          "section-0579",
+          "section-0580",
+          "section-0581",
+          "section-0583",
+          "section-0584",
+          "section-0585",
+          "section-0586",
+          "section-0587",
+          "section-0588",
+          "section-0590",
+          "section-0591",
+          "section-0592",
+          "section-0593",
+          "section-0594",
+          "section-0595",
+          "section-0596",
+          "section-0598",
+          "section-0599",
+          "section-0602",
+          "section-0603",
+          "section-0604",
+          "section-0605",
+          "section-0606",
+          "section-0607",
+          "section-0608",
+          "section-0609",
+          "section-0610",
+          "section-0611",
+          "section-0612",
+          "section-0613",
+          "section-0614",
+          "section-0615",
+          "section-0616",
+          "section-0617",
+          "section-0618",
+          "section-0619",
+          "section-0620",
+          "section-0621",
+          "section-0622",
+          "section-0623",
+          "section-0624",
+          "section-0625",
+          "section-0626",
+          "section-0627",
+          "section-0628",
+          "section-0629",
+          "section-0630",
+          "section-0631",
+          "section-0632",
+          "section-0633",
+          "section-0634",
+          "section-0635",
+          "section-0636",
+          "section-0637",
+          "section-0638",
+          "section-0641",
+          "section-0642",
+          "section-0646",
+          "section-0647",
+          "section-0649",
+          "section-0650",
+          "section-0651",
+          "section-0653",
+          "section-0654",
+          "section-0655",
+          "section-0657",
+          "section-0660",
+          "section-0663",
+          "section-0664",
+          "section-0665",
+          "section-0666",
+          "section-0670",
+          "section-0674",
+          "section-0675",
+          "section-0676",
+          "section-0677",
+          "section-0678",
+          "section-0679",
+          "section-0680",
+          "section-0684",
+          "section-0686",
+          "section-0687",
+          "section-0688",
+          "section-0689",
+          "section-0690",
+          "section-0691",
+          "section-0692",
+          "section-0693",
+          "section-0694",
+          "section-0695",
+          "section-0696",
+          "section-0697",
+          "section-0698",
+          "section-0699",
+          "section-0704",
+          "section-0707",
+          "section-0708",
+          "section-0709",
+          "section-0711",
+          "section-0712",
+          "section-0713",
+          "section-0714",
+          "section-0715",
+          "section-0716",
+          "section-0719",
+          "section-0720",
+          "section-0725",
+          "section-0727",
+          "section-0729",
+          "section-0730",
+          "section-0733",
+          "section-0734",
+          "section-0735",
+          "section-0736",
+          "section-0737",
+          "section-0738",
+          "section-0739",
+          "section-0740"
+        ],
+        "physical_pages": []
+      },
+      "extraction": {
+        "purpose": "extract_profile_workpaper",
+        "request_id": "bp-work-5470620ee9834702d5a05c32:workpaper:extract",
+        "request_hash": "ceb7fbe64045c2abc9552c99bf7183e214102014e9a6996c850c10416e9f06d9",
+        "response_hash": "7f56029f7ace4457a6335690cf160735e0375341f4ade9dfa6c05f6278eea708",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 9393,
+          "output_tokens": 4749,
+          "total_tokens": 14142
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0020",
+          "section-0023",
+          "section-0024",
+          "section-0026",
+          "section-0028",
+          "section-0623"
+        ],
+        "physical_pages": [
+          14,
+          15,
+          16,
+          17,
+          135
+        ]
+      }
+    },
+    "quality_review": {
+      "status": "completed_with_open_findings",
+      "policy_version": "company_profile_workpaper_review.v12",
+      "original_draft_hash": "beebeb91ddad5bbb6142c6ef3ec32948ac50b28307b56e60522bcfca460b70fd",
+      "findings": [
+        {
+          "finding_id": "REV-001",
+          "element": "revenue_model",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0006",
+            "source-0007"
+          ],
+          "explanation": "定向问题要求恢复可安全归属的通航运输收入。source-0006分行业表2025年金额列将通航运输收入换行显示为“2,215,984,977.8”与下行“5”，与表头、单位合读为2,215,984,977.85元，占营业收入比重99.13%；同页未换行的营业收入合计2,235,378,155.32元可核对换行位置。source-0007“占公司营业收入10%以上”表再次列示该行营业收入，换行合读同为2,215,984,977.85元。该类别约占公司收入99%，且不能由占比乘公司总额精确回推。草稿已收录公司总额、主营业务总额以及金额较小的通航维修、其他业务，仅在F-SM-01保留通航运输占比，并误将通航运输收入金额视为引文缺失而隔离。此为收入构成的重要遗漏。所选章节确未按海上油气、应急救援、陆上通航等板块披露收入，该未披露事项已说明，不并入本项。",
+          "resolution": "repair_rejected",
+          "original_fact": null,
+          "revised_fact": {
+            "fact_id": "review-add:REV-001",
+            "text": "2025年通航运输业务收入为2,215,984,977.85元，占营业收入比重99.13%；报告期公司未按海上油气、应急救援、陆上通航等业务板块披露收入细分。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006",
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "通航运输营业收入",
+                "raw_value": "2,215,984,977.85",
+                "value": "2215984977.85",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "通航运输营业收入占营业收入比重",
+                "raw_value": "99.13%",
+                "value": "99.13",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        }
+      ],
+      "checked_fact_ids": [
+        "F-PS-01",
+        "F-PS-02",
+        "F-RM-01",
+        "F-RM-03",
+        "F-RM-04",
+        "F-RM-05",
+        "F-RM-06",
+        "F-RM-07",
+        "F-SM-01",
+        "F-OI-01",
+        "F-OI-02",
+        "F-CC-01",
+        "F-CC-02",
+        "F-OD-01",
+        "F-OD-02"
+      ],
+      "calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-5470620ee9834702d5a05c32:workpaper:review",
+          "request_hash": "969567548c99f2aae37c93d87e2ccef5b52e8eca7fc178c184d2ba8beedcd8a2",
+          "response_hash": "69544190caccaad48f808c4eef6c095c86afb79e4b874d7dae25ac177769787b",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 13529,
+            "output_tokens": 415,
+            "total_tokens": 35263
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0020",
+            "section-0023",
+            "section-0024",
+            "section-0026",
+            "section-0028",
+            "section-0623"
+          ],
+          "physical_pages": [
+            14,
+            15,
+            16,
+            17,
+            135
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-5470620ee9834702d5a05c32:workpaper:repair",
+          "request_hash": "97ebbfbf3a3027fbbd211f974f2a5a1523cfbec35cb519ace2dd1b40c7181851",
+          "response_hash": "40a85902e62e9e3ecdf0cfcc8b48a898d0d00557f69081ab08284ba5e857a96a",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 5981,
+            "output_tokens": 261,
+            "total_tokens": 6242
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0020",
+            "section-0023",
+            "section-0024",
+            "section-0026",
+            "section-0028",
+            "section-0623"
+          ],
+          "physical_pages": [
+            14,
+            15,
+            16,
+            17,
+            135
+          ]
+        }
+      ],
+      "retained_request_ids": [],
+      "locally_revalidated_request_ids": [],
+      "error": null,
+      "checked_fact_hashes": {
+        "F-PS-01": "8ab4b22fe853f049bbf9d4c2afd017ec3b0b24309c74191151a704e11012435f",
+        "F-PS-02": "c93d6798a7f85cda5a28e33423d45ec2a01d75857c8059735a29a790f9f86c9b",
+        "F-RM-01": "d0a9d4d72c5b76362783897607f08f42ea3f63bf1cc69c57d50e9968297174d9",
+        "F-RM-03": "f9d722462d30a37a264b2736e9b2b484f65538e16caa3e0a8d6922dc287458d3",
+        "F-RM-04": "a474d9032da7bc2658f399d76497410fd9471c28b068b6aa8fe578c3282d49f4",
+        "F-RM-05": "deb5080dc2cf2260acbf8d62276c7bdc709d0a9b47141a48ed6591a9f6a6beb5",
+        "F-RM-06": "ef1bf51a5d19b6acb6cd5ef5336a11c562ae9f13b88a42b4e091c6d41815c0c1",
+        "F-RM-07": "3083945cf78f26866897b9d4d0966fa75c87f60cc172e93a7bfa84ee1309c46a",
+        "F-SM-01": "759a4340438a136331a17998a89c70f1c91c53e684ac7800ba1ef873106f2036",
+        "F-OI-01": "038f3a4460681214048dc062791b09389fd94aa1fcfa013453f115139e37faa2",
+        "F-OI-02": "ca588721c5558ef7d90ecfca58014f709d1e0eb91c75fea210d1f3200ccfd086",
+        "F-CC-01": "2739816037765967c53ad854aaf1aa1ea5963a8d8c7e2de46351cc1f630294fb",
+        "F-CC-02": "ef70c9bf0aaa655a42b59c2851bafe1c532d155123c4add103da1791a77bdd77",
+        "F-OD-01": "772097ffb52a68cb908c833b4dc7220600264b4cf25aac9560e6028892a5dfed",
+        "F-OD-02": "0fce11d5af187e4bcb8d5171c020e30a143a77a5412ba68f9ee5c4e004fa59e4"
+      },
+      "metric_limit_policy": "source_review_exact_metric_limits.v1"
+    },
+    "standardization_notes": [
+      "事实F-RM-02已隔离，未作为结论采用：metric number is absent from cited source: 通航运输收入",
+      "事实F-SM-02已隔离，未作为结论采用：metric number is absent from cited source: 深圳地区收入",
+      "修订源检查隔离：review-add:REV-001未进入最终再核或正文；ValueError: metric number is absent from cited source: 通航运输营业收入"
+    ]
+  },
+  "workpaper_raw_for_audit": true,
+  "workpaper_delivery": {
+    "policy_version": "company_profile_research_delivery.v1",
+    "research_only": true,
+    "formal_acceptance": "not_assessed",
+    "production_authorization": "not_authorized",
+    "information_gaps": [
+      {
+        "element": "business_structure",
+        "status": "not_disclosed",
+        "reasons": [
+          "本次为定向补充阅读，未针对业务结构进行系统提取；仅依据所选章节原文回答通航运输收入构成与收费模式。"
+        ]
+      },
+      {
+        "element": "products_services",
+        "status": "observed",
+        "reasons": [
+          "所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入金额或占比。"
+        ]
+      },
+      {
+        "element": "revenue_model",
+        "status": "observed",
+        "reasons": [
+          "所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入金额或占比，无法恢复通航运输收入内部细分。",
+          "分产品收入表在原文中为空，未披露分产品收入。",
+          "分地区收入为地区口径，不能替代通航运输业务收入构成。",
+          "事实F-RM-02已隔离，未作为结论采用：metric number is absent from cited source: 通航运输收入"
+        ]
+      },
+      {
+        "element": "scale_and_mix",
+        "status": "observed",
+        "reasons": [
+          "分地区收入为地区口径，不能替代通航运输业务内部收入构成。",
+          "所选章节未披露海上油气、应急救援、陆上通航、港口引航等业务板块的收入占比。",
+          "事实F-SM-02已隔离，未作为结论采用：metric number is absent from cited source: 深圳地区收入"
+        ]
+      },
+      {
+        "element": "operations_and_inputs",
+        "status": "observed",
+        "reasons": [
+          "所选章节未披露航材航油等具体采购来源或供应商信息。"
+        ]
+      },
+      {
+        "element": "customers_channels_markets",
+        "status": "observed",
+        "reasons": [
+          "所选章节未披露客户集中度或具体客户名单。"
+        ]
+      },
+      {
+        "element": "operating_drivers",
+        "status": "observed",
+        "reasons": [
+          "所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入驱动因素。"
+        ]
+      },
+      {
+        "element": "material_changes",
+        "status": "not_disclosed",
+        "reasons": [
+          "本次为定向补充阅读，未针对报告期重大变化进行系统提取；所选章节未明确披露通航运输业务收入构成的重大变化。"
+        ]
+      }
+    ],
+    "suggested_acquisitions": [
+      {
+        "finding_id": "REV-001",
+        "element": "revenue_model",
+        "severity": "material",
+        "reason": "定向问题要求恢复可安全归属的通航运输收入。source-0006分行业表2025年金额列将通航运输收入换行显示为“2,215,984,977.8”与下行“5”，与表头、单位合读为2,215,984,977.85元，占营业收入比重99.13%；同页未换行的营业收入合计2,235,378,155.32元可核对换行位置。source-0007“占公司营业收入10%以上”表再次列示该行营业收入，换行合读同为2,215,984,977.85元。该类别约占公司收入99%，且不能由占比乘公司总额精确回推。草稿已收录公司总额、主营业务总额以及金额较小的通航维修、其他业务，仅在F-SM-01保留通航运输占比，并误将通航运输收入金额视为引文缺失而隔离。此为收入构成的重要遗漏。所选章节确未按海上油气、应急救援、陆上通航等板块披露收入，该未披露事项已说明，不并入本项。",
+        "evidence_ids": [
+          "source-0006",
+          "source-0007"
+        ]
+      }
+    ],
+    "counts": {
+      "reviewed": 15,
+      "pending": 0,
+      "limited": 0,
+      "source_only": 0,
+      "withheld": 0,
+      "duplicate": 0
+    },
+    "labels": {
+      "reviewed": "已核（研究用途，非正式接受）",
+      "pending": "待核（无其他限用）",
+      "limited": "保真限用",
+      "source_only": "仅源参考／解释",
+      "withheld": "已隔离",
+      "duplicate": "重复未再展示"
+    },
+    "pending_review_count": 0,
+    "facts": [
+      {
+        "fact_id": "F-PS-01",
+        "element": "products_services",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F-PS-01",
+          "text": "公司主要业务包括海上油气直升机飞行服务、应急救援、陆上通航、通航维修和港口引航，并探索低空经济业务新场景；其中海上油气直升机飞行服务为主要收入来源和核心业务。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-PS-02",
+        "element": "products_services",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "fact": {
+          "fact_id": "F-PS-02",
+          "text": "公司业务覆盖机场运营、直升机运营、通航维修等核心领域，形成上下游协同的一体化运营格局，并在海上油气、应急救援、陆上通航、港口引航及通航维修五大业务板块持续发力。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-RM-01",
+        "element": "revenue_model",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "fact": {
+          "fact_id": "F-RM-01",
+          "text": "公司营业收入合计2,235,378,155.32元，占营业收入比重100%，同比增减3.33%；增长原因为报告期合同机数量及飞行作业量增加，海油业务收入增加。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "营业收入合计",
+              "raw_value": "2,235,378,155.32",
+              "value": "2235378155.32",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业收入合计占营业收入比重",
+              "raw_value": "100%",
+              "value": "100",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业收入合计同比增减",
+              "raw_value": "3.33%",
+              "value": "3.33",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "2024年度",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-RM-03",
+        "element": "revenue_model",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "fact": {
+          "fact_id": "F-RM-03",
+          "text": "分行业看，通航维修收入8,835,401.52元，占营业收入比重0.40%，同比增减-48.09%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "通航维修收入",
+              "raw_value": "8,835,401.52",
+              "value": "8835401.52",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "通航维修收入占营业收入比重",
+              "raw_value": "0.40%",
+              "value": "0.40",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "通航维修收入同比增减",
+              "raw_value": "-48.09%",
+              "value": "-48.09",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "2024年度",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-RM-04",
+        "element": "revenue_model",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "fact": {
+          "fact_id": "F-RM-04",
+          "text": "分行业看，其他业务收入10,557,775.95元，占营业收入比重0.47%，同比增减-39.07%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "其他业务收入",
+              "raw_value": "10,557,775.95",
+              "value": "10557775.95",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他业务收入占营业收入比重",
+              "raw_value": "0.47%",
+              "value": "0.47",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他业务收入同比增减",
+              "raw_value": "-39.07%",
+              "value": "-39.07",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "2024年度",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-RM-05",
+        "element": "revenue_model",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "fact": {
+          "fact_id": "F-RM-05",
+          "text": "财务报告附注显示，主营业务收入2,224,820,379.37元、成本1,700,253,570.91元；其他业务收入10,557,775.95元、成本3,604,291.85元；合计收入2,235,378,155.32元、成本1,703,857,862.76元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "主营业务收入",
+              "raw_value": "2,224,820,379.37",
+              "value": "2224820379.37",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务成本",
+              "raw_value": "1,700,253,570.91",
+              "value": "1700253570.91",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他业务收入",
+              "raw_value": "10,557,775.95",
+              "value": "10557775.95",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他业务成本",
+              "raw_value": "3,604,291.85",
+              "value": "3604291.85",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业收入合计",
+              "raw_value": "2,235,378,155.32",
+              "value": "2235378155.32",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业成本合计",
+              "raw_value": "1,703,857,862.76",
+              "value": "1703857862.76",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-RM-06",
+        "element": "revenue_model",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "fact": {
+          "fact_id": "F-RM-06",
+          "text": "通航运输服务在服务提供时按服务进度结算收款，公司为主要责任人，主要提供通航运输服务；通航维修服务在服务完成时以预付款、交付验收款结算，主要对直升机及部件提供修理服务，公司为主要责任人，并提供服务类质保。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-RM-07",
+        "element": "revenue_model",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "fact": {
+          "fact_id": "F-RM-07",
+          "text": "本报告期末已签订合同但尚未履行或尚未履行完毕的履约义务对应收入金额为419,133,003.25元，其中206,841,119.73元预计于2026年度确认收入，132,933,802.73元预计于2027年度确认收入，79,358,080.79元预计于2028年度确认收入。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年末",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "尚未履行或尚未履行完毕的履约义务对应收入金额",
+              "raw_value": "419,133,003.25",
+              "value": "419133003.25",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "预计2026年度确认收入",
+              "raw_value": "206,841,119.73",
+              "value": "206841119.73",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2026年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "预计2027年度确认收入",
+              "raw_value": "132,933,802.73",
+              "value": "132933802.73",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2027年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "预计2028年度确认收入",
+              "raw_value": "79,358,080.79",
+              "value": "79358080.79",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2028年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-SM-01",
+        "element": "scale_and_mix",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0006",
+          "source-0007"
+        ],
+        "fact": {
+          "fact_id": "F-SM-01",
+          "text": "分行业收入构成中，通航运输占营业收入99.13%，通航维修占0.40%，其他业务占0.47%，通航运输为绝对主体。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006",
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "通航运输收入占营业收入比重",
+              "raw_value": "99.13%",
+              "value": "99.13",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "通航维修收入占营业收入比重",
+              "raw_value": "0.40%",
+              "value": "0.40",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他业务收入占营业收入比重",
+              "raw_value": "0.47%",
+              "value": "0.47",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-OI-01",
+        "element": "operations_and_inputs",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "fact": {
+          "fact_id": "F-OI-01",
+          "text": "报告期内公司共运营87架直升机，机型来自莱奥纳多公司、空客直升机公司、西科斯基公司、俄罗斯直升机公司等；在湖北、江西、新疆、广东、海南等地部署无人机共9架；运营深圳南头、天津塘沽、湛江坡头、海南东方4个直升机场，并在全国多地设有基地、起降点。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "运营直升机数量",
+              "raw_value": "87",
+              "value": "87",
+              "unit": "架",
+              "source_unit": "架",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "部署无人机数量",
+              "raw_value": "9",
+              "value": "9",
+              "unit": "架",
+              "source_unit": "架",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "运营直升机场数量",
+              "raw_value": "4",
+              "value": "4",
+              "unit": "个",
+              "source_unit": "个",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-OI-02",
+        "element": "operations_and_inputs",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "fact": {
+          "fact_id": "F-OI-02",
+          "text": "公司依托成熟稳定的安全飞行专业能力，打造完整的通用航空产业链，业务覆盖机场运营、直升机运营、通航维修等核心领域，形成上下游协同发展的一体化运营格局。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-CC-01",
+        "element": "customers_channels_markets",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "fact": {
+          "fact_id": "F-CC-01",
+          "text": "公司海上油气业务与中海油合作完成2吨级eVTOL海上平台货运试飞；应急救援业务全年服务于内蒙古、湖南、湖北、四川、浙江、江西等地；港口引航业务在天津港、黄骅港、青岛港、湛江港持续开展引航作业。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-CC-02",
+        "element": "customers_channels_markets",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "fact": {
+          "fact_id": "F-CC-02",
+          "text": "公司分地区收入覆盖深圳、湛江、武汉/北京、天津、浙江、海南、江西、安徽等地区，其中深圳地区收入占比47.83%为最大区域。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "深圳地区收入占营业收入比重",
+              "raw_value": "47.83%",
+              "value": "47.83",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-OD-01",
+        "element": "operating_drivers",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "fact": {
+          "fact_id": "F-OD-01",
+          "text": "报告期营业收入同比增长3.33%，原因为合同机数量及飞行作业量增加，海油业务收入增加；营业成本同比增长2.34%，原因为作业量增加，航材航油、飞机折旧费、保障费等成本均增加。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "营业收入同比增减",
+              "raw_value": "3.33%",
+              "value": "3.33",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "2024年度",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业成本同比增减",
+              "raw_value": "2.34%",
+              "value": "2.34",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "2024年度",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      },
+      {
+        "fact_id": "F-OD-02",
+        "element": "operating_drivers",
+        "state": "reviewed",
+        "label": "已核（研究用途，非正式接受）／模型源核",
+        "review_basis": "model_source_check",
+        "model_review_stage": "initial",
+        "reasons": [],
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "fact": {
+          "fact_id": "F-OD-02",
+          "text": "通航运输业务毛利率23.78%，营业收入比上年同期增减4.09%，营业成本比上年同期增减2.84%，毛利率比上年同期增减0.93%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "metrics": [
+            {
+              "name": "通航运输毛利率",
+              "raw_value": "23.78%",
+              "value": "23.78",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "通航运输营业收入同比增减",
+              "raw_value": "4.09%",
+              "value": "4.09",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "2024年度",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "通航运输营业成本同比增减",
+              "raw_value": "2.84%",
+              "value": "2.84",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "2024年度",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "通航运输毛利率比上年同期增减",
+              "raw_value": "0.93%",
+              "value": "0.93",
+              "unit": "百分点",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "2024年度",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      }
+    ]
+  },
+  "workpaper_markdown": "# 000099.SZ｜2025-12-31 公司画像底稿\n\n真实模型底稿（待核，不代表正式公司可用）\n\n来源版本：`6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb`。发布时点：2026-03-16T16:00:00+00:00。\n\n研究分级不等于正式可信发布；以下普通正文不含隔离、仅源参考或重复对象。原底稿及后文复核记录保留审计。\n\n已核（研究用途，非正式接受） 15；待核（无其他限用） 0；保真限用 0；仅源参考／解释 0；已隔离 0；重复未再展示 0\n待核合计（含限用中的待核）：0。\n\n## 业务结构\n\n- 限制：本次为定向补充阅读，未针对业务结构进行系统提取；仅依据所选章节原文回答通航运输收入构成与收费模式。\n\n## 产品、服务及用途\n\n- 【已核（研究用途，非正式接受）／模型源核】公司主要业务包括海上油气直升机飞行服务、应急救援、陆上通航、通航维修和港口引航，并探索低空经济业务新场景；其中海上油气直升机飞行服务为主要收入来源和核心业务。（[source-0001](#source-0001)）\n- 【已核（研究用途，非正式接受）／模型源核】公司业务覆盖机场运营、直升机运营、通航维修等核心领域，形成上下游协同的一体化运营格局，并在海上油气、应急救援、陆上通航、港口引航及通航维修五大业务板块持续发力。（[source-0003](#source-0003)）\n- 限制：所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入金额或占比。\n\n## 怎么赚钱\n\n- 【已核（研究用途，非正式接受）／模型源核】公司营业收入合计2,235,378,155.32元，占营业收入比重100%，同比增减3.33%；增长原因为报告期合同机数量及飞行作业量增加，海油业务收入增加。（[source-0006](#source-0006)）\n  - 营业收入合计：2,235,378,155.32 元；2025年度，consolidated_group。\n  - 营业收入合计占营业收入比重：100%；2025年度，consolidated_group。\n  - 营业收入合计同比增减：3.33%；2025年度，consolidated_group。\n- 【已核（研究用途，非正式接受）／模型源核】分行业看，通航维修收入8,835,401.52元，占营业收入比重0.40%，同比增减-48.09%。（[source-0006](#source-0006)）\n  - 通航维修收入：8,835,401.52 元；2025年度，business_segment。\n  - 通航维修收入占营业收入比重：0.40%；2025年度，business_segment。\n  - 通航维修收入同比增减：-48.09%；2025年度，business_segment。\n- 【已核（研究用途，非正式接受）／模型源核】分行业看，其他业务收入10,557,775.95元，占营业收入比重0.47%，同比增减-39.07%。（[source-0007](#source-0007)）\n  - 其他业务收入：10,557,775.95 元；2025年度，business_segment。\n  - 其他业务收入占营业收入比重：0.47%；2025年度，business_segment。\n  - 其他业务收入同比增减：-39.07%；2025年度，business_segment。\n- 【已核（研究用途，非正式接受）／模型源核】财务报告附注显示，主营业务收入2,224,820,379.37元、成本1,700,253,570.91元；其他业务收入10,557,775.95元、成本3,604,291.85元；合计收入2,235,378,155.32元、成本1,703,857,862.76元。（[source-0008](#source-0008)）\n  - 主营业务收入：2,224,820,379.37 元；2025年度，consolidated_group。\n  - 主营业务成本：1,700,253,570.91 元；2025年度，consolidated_group。\n  - 其他业务收入：10,557,775.95 元；2025年度，consolidated_group。\n  - 其他业务成本：3,604,291.85 元；2025年度，consolidated_group。\n  - 营业收入合计：2,235,378,155.32 元；2025年度，consolidated_group。\n  - 营业成本合计：1,703,857,862.76 元；2025年度，consolidated_group。\n- 【已核（研究用途，非正式接受）／模型源核】通航运输服务在服务提供时按服务进度结算收款，公司为主要责任人，主要提供通航运输服务；通航维修服务在服务完成时以预付款、交付验收款结算，主要对直升机及部件提供修理服务，公司为主要责任人，并提供服务类质保。（[source-0008](#source-0008)）\n- 【已核（研究用途，非正式接受）／模型源核】本报告期末已签订合同但尚未履行或尚未履行完毕的履约义务对应收入金额为419,133,003.25元，其中206,841,119.73元预计于2026年度确认收入，132,933,802.73元预计于2027年度确认收入，79,358,080.79元预计于2028年度确认收入。（[source-0008](#source-0008)）\n  - 尚未履行或尚未履行完毕的履约义务对应收入金额：419,133,003.25 元；2025年末，consolidated_group。\n  - 预计2026年度确认收入：206,841,119.73 元；2026年度，consolidated_group。\n  - 预计2027年度确认收入：132,933,802.73 元；2027年度，consolidated_group。\n  - 预计2028年度确认收入：79,358,080.79 元；2028年度，consolidated_group。\n- 限制：所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入金额或占比，无法恢复通航运输收入内部细分。\n- 限制：分产品收入表在原文中为空，未披露分产品收入。\n- 限制：分地区收入为地区口径，不能替代通航运输业务收入构成。\n- 限制：事实F-RM-02已隔离，未作为结论采用：metric number is absent from cited source: 通航运输收入\n\n## 规模与业务权重\n\n- 【已核（研究用途，非正式接受）／模型源核】分行业收入构成中，通航运输占营业收入99.13%，通航维修占0.40%，其他业务占0.47%，通航运输为绝对主体。（[source-0006](#source-0006)、[source-0007](#source-0007)）\n  - 通航运输收入占营业收入比重：99.13%；2025年度，business_segment。\n  - 通航维修收入占营业收入比重：0.40%；2025年度，business_segment。\n  - 其他业务收入占营业收入比重：0.47%；2025年度，business_segment。\n- 限制：分地区收入为地区口径，不能替代通航运输业务内部收入构成。\n- 限制：所选章节未披露海上油气、应急救援、陆上通航、港口引航等业务板块的收入占比。\n- 限制：事实F-SM-02已隔离，未作为结论采用：metric number is absent from cited source: 深圳地区收入\n\n## 经营方式与关键投入\n\n- 【已核（研究用途，非正式接受）／模型源核】报告期内公司共运营87架直升机，机型来自莱奥纳多公司、空客直升机公司、西科斯基公司、俄罗斯直升机公司等；在湖北、江西、新疆、广东、海南等地部署无人机共9架；运营深圳南头、天津塘沽、湛江坡头、海南东方4个直升机场，并在全国多地设有基地、起降点。（[source-0004](#source-0004)）\n  - 运营直升机数量：87 架；2025年度，consolidated_group。\n  - 部署无人机数量：9 架；2025年度，consolidated_group。\n  - 运营直升机场数量：4 个；2025年度，consolidated_group。\n- 【已核（研究用途，非正式接受）／模型源核】公司依托成熟稳定的安全飞行专业能力，打造完整的通用航空产业链，业务覆盖机场运营、直升机运营、通航维修等核心领域，形成上下游协同发展的一体化运营格局。（[source-0003](#source-0003)）\n- 限制：所选章节未披露航材航油等具体采购来源或供应商信息。\n\n## 客户、渠道与市场\n\n- 【已核（研究用途，非正式接受）／模型源核】公司海上油气业务与中海油合作完成2吨级eVTOL海上平台货运试飞；应急救援业务全年服务于内蒙古、湖南、湖北、四川、浙江、江西等地；港口引航业务在天津港、黄骅港、青岛港、湛江港持续开展引航作业。（[source-0001](#source-0001)）\n- 【已核（研究用途，非正式接受）／模型源核】公司分地区收入覆盖深圳、湛江、武汉/北京、天津、浙江、海南、江西、安徽等地区，其中深圳地区收入占比47.83%为最大区域。（[source-0007](#source-0007)）\n  - 深圳地区收入占营业收入比重：47.83%；2025年度，business_segment。\n- 限制：所选章节未披露客户集中度或具体客户名单。\n\n## 关键经营影响因素\n\n- 【已核（研究用途，非正式接受）／模型源核】报告期营业收入同比增长3.33%，原因为合同机数量及飞行作业量增加，海油业务收入增加；营业成本同比增长2.34%，原因为作业量增加，航材航油、飞机折旧费、保障费等成本均增加。（[source-0006](#source-0006)）\n  - 营业收入同比增减：3.33%；2025年度，consolidated_group。\n  - 营业成本同比增减：2.34%；2025年度，consolidated_group。\n- 【已核（研究用途，非正式接受）／模型源核】通航运输业务毛利率23.78%，营业收入比上年同期增减4.09%，营业成本比上年同期增减2.84%，毛利率比上年同期增减0.93%。（[source-0007](#source-0007)）\n  - 通航运输毛利率：23.78%；2025年度，business_segment。\n  - 通航运输营业收入同比增减：4.09%；2025年度，business_segment。\n  - 通航运输营业成本同比增减：2.84%；2025年度，business_segment。\n  - 通航运输毛利率比上年同期增减：0.93 百分点（原文0.93%）；2025年度，business_segment。\n- 限制：所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入驱动因素。\n\n## 近期重要变化\n\n- 限制：本次为定向补充阅读，未针对报告期重大变化进行系统提取；所选章节未明确披露通航运输业务收入构成的重大变化。\n\n## 建议获取（不阻塞画像交付）\n\n- 怎么赚钱：定向问题要求恢复可安全归属的通航运输收入。source-0006分行业表2025年金额列将通航运输收入换行显示为“2,215,984,977.8”与下行“5”，与表头、单位合读为2,215,984,977.85元，占营业收入比重99.13%；同页未换行的营业收入合计2,235,378,155.32元可核对换行位置。source-0007“占公司营业收入10%以上”表再次列示该行营业收入，换行合读同为2,215,984,977.85元。该类别约占公司收入99%，且不能由占比乘公司总额精确回推。草稿已收录公司总额、主营业务总额以及金额较小的通航维修、其他业务，仅在F-SM-01保留通航运输占比，并误将通航运输收入金额视为引文缺失而隔离。此为收入构成的重要遗漏。所选章节确未按海上油气、应急救援、陆上通航等板块披露收入，该未披露事项已说明，不并入本项。\n\n## 阅读范围与取舍\n\n本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。\n\n- 第三节 管理层讨论与分析 / 一、报告期内公司从事的主要业务，物理页14—14：本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。\n- 第三节 管理层讨论与分析 / 三、核心竞争力分析 / （一）全面的品牌影响力，物理页15—15：本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。\n- 第三节 管理层讨论与分析 / 三、核心竞争力分析 / （二）多元的运营服务体系，物理页15—15：本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。\n- 第三节 管理层讨论与分析 / 三、核心竞争力分析 / （四）领先的机队和基地规模，物理页15—15：本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。\n- 第三节 管理层讨论与分析 / 四、主营业务分析，物理页15—17：本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。\n- 第八节 财务报告 / 一、不能 / 35、营业收入和营业成本，物理页135—135：本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。\n\n停止理由：已覆盖主要业务、经营模式、收入与成本分行业/分产品表及收入附注，可回答通航运输收入构成与收费模式；行业背景、供应链与其余附注对本次定向问题边际贡献低，故在此停止。\n\n- 未读/后置：section-0021 行业情况：属行业背景，非公司收入构成直接来源，暂不读\n- 未读/后置：section-0022 核心竞争力其余子节及section-0025、section-0027：技术/人才细节对收入构成解释力有限\n- 未读/后置：section-0041、section-0042 客户与供应商：供应链非本次定向目标，暂不读\n- 未读/后置：section-0716 分部信息：若section-0030已披露分行业/分产品收入则无需扩读；仅在收入细分仍缺失时再定向补充\n- 未读/后置：section-0270 财务报告其余附注：不扩读整个财务报告\n- 限制：本次为定向补充阅读，仅回答通航运输业务收入构成与收费模式相关问题，未覆盖公司整体画像。\n- 限制：所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入金额或占比，通航运输收入内部细分未获取成功。\n- 限制：分产品收入表在原文中为空，未披露分产品收入。\n- 限制：分地区收入为地区口径，不能替代通航运输业务收入构成。\n\n## 模型处理记录\n\n- 选章：deepseek-flash（deepseek:deepseek-flash，semantic_extraction__deepseek），报告标题索引（542个候选章节）；输入/输出/合计 14135/415/14550；finish=stop；requested_reasoning=high。\n- 正文抽取：deepseek-flash（deepseek:deepseek-flash，semantic_extraction__deepseek），章节 section-0020, section-0023, section-0024, section-0026, section-0028, section-0623；物理页 14,15,16,17,135；输入/输出/合计 9393/4749/14142；finish=stop；requested_reasoning=high。\n- 提示版本：`company_profile_workpaper.2026-11-19.independent-assertions.v21`；预处理：`toc_sections_native_layout.v8.structured-note-markers`。\n\n## 原文复核（开发结果仍待正式核验）\n\n复核状态：`completed_with_open_findings`。\n- 已检查原事实：15条；范围限于本次所选原文，不是全报告完整性保证。\n- 原始底稿哈希：`beebeb91ddad5bbb6142c6ef3ec32948ac50b28307b56e60522bcfca460b70fd`。\n- review_profile_workpaper：grok-4.7（scorpio:grok-4.7）；requested_reasoning=high；usage=35263；本次调用。\n- repair_profile_workpaper：deepseek-flash（deepseek:deepseek-flash）；requested_reasoning=high；usage=6242；本次调用。\n- material / material_omission / repair_rejected：定向问题要求恢复可安全归属的通航运输收入。source-0006分行业表2025年金额列将通航运输收入换行显示为“2,215,984,977.8”与下行“5”，与表头、单位合读为2,215,984,977.85元，占营业收入比重99.13%；同页未换行的营业收入合计2,235,378,155.32元可核对换行位置。source-0007“占公司营业收入10%以上”表再次列示该行营业收入，换行合读同为2,215,984,977.85元。该类别约占公司收入99%，且不能由占比乘公司总额精确回推。草稿已收录公司总额、主营业务总额以及金额较小的通航维修、其他业务，仅在F-SM-01保留通航运输占比，并误将通航运输收入金额视为引文缺失而隔离。此为收入构成的重要遗漏。所选章节确未按海上油气、应急救援、陆上通航等板块披露收入，该未披露事项已说明，不并入本项。（[source-0006](#source-0006)、[source-0007](#source-0007)）\n  - 修订候选（尚非可信发布）：2025年通航运输业务收入为2,215,984,977.85元，占营业收入比重99.13%；报告期公司未按海上油气、应急救援、陆上通航等业务板块披露收入细分。\n\n## 程序处理说明\n\n- 事实F-RM-02已隔离，未作为结论采用：metric number is absent from cited source: 通航运输收入\n- 事实F-SM-02已隔离，未作为结论采用：metric number is absent from cited source: 深圳地区收入\n- 修订源检查隔离：review-add:REV-001未进入最终再核或正文；ValueError: metric number is absent from cited source: 通航运输营业收入\n\n## 来源\n\n### source-0001\n\n第三节 管理层讨论与分析 / 一、报告期内公司从事的主要业务\n\n物理页14，字符122—1453：\n\n> 一、报告期内公司从事的主要业务 公司作为国内通用航空行业的标杆企业，一直保持和扩大直升机海上油气服务的发展优势，积极拓展应急救援、陆上通 航、港口引航和通航维修业务，探索低空经济业务新场景，推进通用航空新业务新模式形成，依托科学系统的安全管理能力 和丰富扎实的飞行作业经验深入构建企业高质量发展格局，打造国内领先的通航和低空综合运营商。 海上油气：海上油气直升机飞行服务为公司主要收入来源和核心业务。报告期公司坚持提供优质的海上油气飞行服务， 推进五年期协议签署，助力国家海上油气能源增储上产。坚守市场占有率，协调优质机源完成各项飞行任务。与中海油合作 完成 2 吨级 eVTOL 海上平台货运的试飞。 应急救援：坚持融入国家航空应急救援体系建设，建立有人机与无人机协同的航空应急救援体系，全年服务于内蒙古、 湖南、湖北、四川、浙江、江西等地，持续保持国内应急救援市场的领先地位。深耕“海岛快巴”业务，开通紧急医疗转运 航线。编制发布《直升机海上应急救援运行要求》团体标准，提升标准化运作水平。 陆上通航：发挥综合运营优势，打造特色 C端消费品牌，实现深圳—珠海短途运输航线常态化运行，在深圳新增多条空 中游览航线，在浙江运营普陀山机场至舟山群岛航线。开展多项陆上通航业务，在大田机场保障 11 家驻场单位开展低空作 业活动。完成保障第 41 次南极科考、第 15 次北极科考任务，开启第 42次南极科考保障任务。保障中央广播电视总台哈尔 滨亚冬会、纪念中国人民抗日战争暨世界反法西斯战争胜利 80周年活动专项任务、天津马拉松赛事空中拍照飞行任务。执 飞第十五届全国运动会深圳赛区火炬空中传递路线，实现全运会历史上首次空陆传递。 通航维修：公司积极践行国家战略，持续开拓国产直升机市场。进一步拓展机型承修范围，提升深度维修能力和质量体 系管理能力。 港口引航：公司在天津港、黄骅港、青岛港、湛江港持续开展引航作业，作业量创历史新高。编制发布《直升机引航作 业安全运行要求》团体标准，提升标准化运作水平。启用日照岚山直升机基地，提升日照港引航的服务保障能力和创新水 平。 低空经济：融入地方低空经济发展，探索多样化的低空经济应用场景。推动央地合作，谋划区域布局，在珠三角、长三 角、新疆、四川、湖北等多个地区打造包含运营服务、空域管理、维修保障、机场运营等业务在内的区域综合性运营服务平 台。拓展多元化低空应用场景，圆满完成吨级 eVTOL海油平台试飞、合肥—怀宁跨城货运测试航线首飞，初步建立 eVTOL 低 空货运试验飞行能力及数字化塔台运营能力。启动大型无人机人工影响天气业务，与江西省气象局签署全面合作框架协议， 与新疆、云南等省区气象局人影中心建立长期战略合作伙伴关系。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0002\n\n第三节 管理层讨论与分析 / 三、核心竞争力分析 / （一）全面的品牌影响力\n\n物理页15，字符501—787：\n\n> （一）全面的品牌影响力 公司长期深耕通用航空核心领域，在海上油气、应急救援、通航维修等业务板块积累了深厚的运营经验。通过持续刷新 安全飞行纪录、提升综合服务保障能力，公司以稳定可靠的专业服务赢得客户的长期信赖，在业内树立起技术领先、安全可 靠的专业品牌形象。公司积极融入国家深海战略和大应急救援体系建设，在极地科考、海上搜救、重大活动保障等任务中发 挥重要作用。通过践行社会责任、服务国家战略，公司品牌公信力与社会影响力持续提升，成为通航领域具有高度社会责任 感的企业代表。伴随海外业务稳步拓展，公司服务能力与国际标准接轨，品牌影响力逐步延伸至海外市场。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0003\n\n第三节 管理层讨论与分析 / 三、核心竞争力分析 / （二）多元的运营服务体系\n\n物理页15，字符787—1167：\n\n> （二）多元的运营服务体系 公司依托成熟稳定的安全飞行专业能力，打造完整的通用航空产业链，业务覆盖机场运营、直升机运营、通航维修等核 心领域，形成上下游协同发展的一体化运营格局。公司在海上油气、应急救援、陆上通航、港口引航及通航维修五大业务板 块持续发力，稳固市场份额。在此基础上，公司积极拓展业务边界，依托无人机应用能力向智慧城市管理领域延伸，通过参 与城市巡检、交通巡查、环境监测等综合服务，探索构建空地协同的城市立体管理体系。同时，公司充分发挥在 600米以下 空域长期积累的有人机—无人机协调管制能力，推动自身业务从单一的飞行作业向空管运营服务延伸，为多机型协同运营提 供坚实保障，致力于成为国内领先、国际知名的通航和低空综合运营商。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0004\n\n第三节 管理层讨论与分析 / 三、核心竞争力分析 / （四）领先的机队和基地规模\n\n物理页15，字符1467—1687：\n\n> （四）领先的机队和基地规模 报告期内公司共运营 87架直升机，机型种类丰富。目前机队运营的主要机型来自莱奥纳多公司、空客直升机公司、西 科斯基公司、俄罗斯直升机公司等生产的多种型号直升机。中信海直还在湖北、江西、新疆、广东、海南等地部署无人机共 9架。运营 4个直升机场：深圳南头、天津塘沽、湛江坡头、海南东方；在全国多地设有基地、起降点。领先的机队规模和 综合保障能力得到国内外客户的广泛认可。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0005\n\n第三节 管理层讨论与分析 / 四、主营业务分析\n\n物理页15，字符1821—2020：\n\n> 四、主营业务分析 1、概述 参见“第三节 管理层讨论与分析”中的“一、报告期内公司从事的主要业务”、“二、报告期内公司所处行业情况”及 “三、核心竞争力分析”相关内容。 15\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0006\n\n第三节 管理层讨论与分析 / 四、主营业务分析\n\n物理页16，字符0—5043：\n\n> 中信海洋直升机股份有限公司 2025 年年度报告全文 主要财务数据同比变动情况： 项目 2025 年 2024 年 同比增减 变动原因 营业收入 2,235,378,155.32 2,163,321,977.59 3.33% 报告期合同机数量及飞行作业量 增加，海油业务收入增加。 报告期作业量增加，航材航油、 营业成本 1,703,857,862.76 1,664,849,766.84 2.34% 飞机折旧费、保障费等成本均增 加。 销售费用 7,348,428.36 9,247,014.11 -20.53% 报告期职工薪酬、差旅办公费、 交际应酬费同比减少。 报告期公司调整退休人员医疗保 险福利政策，根据《企业会计准 则第 9 号——职工薪酬》相关规 管理费用 99,934,154.84 120,822,824.30 -17.29% 定，以 2025 年 12 月 31 日时点 的离职后福利精算结果，对设定 受益计划变更产生的过去服务成 本予以冲减，致设定受益计划成 本同比减少。 财务费用 31,612,480.54 12,400,312.81 154.93% 报告期确认的租赁负债融资费 用、汇兑损失同比增加。 研发投入 4,349,217.61 3,384,158.95 28.52% 报告期研发投入增加。 经营活动产生的现金流 988,071,142.74 612,962,070.26 61.20% 报告期销售商品、提供劳务收到 量净额 的现金同比增加。 投资活动产生的现金流 报告期公司定期存款到期收回、 量净额 -347,151,125.14 -1,011,568,334.73 65.68% 收到南头直升机搬迁项目补偿 款，投资活动现金流入增加。 筹资活动产生的现金流 报告期分配 2024 年度股利及 量净额 -352,631,455.98 -318,167,240.37 -10.83% 2025 年中期股利支付的现金同比 增加。 报告期经营活动现金流入增长、 现金及现金等价物净增 288,066,897.27 -714,445,897.09 140.32% 投资活动现金流出减少，共同推 加额 动现金及现金等价物净增加额实 现增长。 2、收入与成本 （1） 营业收入构成 单位：元 2025 年 2024 年 同比增减 金额 占营业收入比重 金额 占营业收入比重 营业收入合计 2,235,378,155.3 100% 2,163,321,977.5 100% 3.33% 2 9 分行业 通航运输 2,215,984,977.8 99.13% 2,128,972,380.6 98.41% 4.09% 5 8 通航维修 8,835,401.52 0.40% 17,021,487.16 0.79% -48.09% 16\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0007\n\n第三节 管理层讨论与分析 / 四、主营业务分析\n\n物理页17，字符0—3454：\n\n> 中信海洋直升机股份有限公司 2025 年年度报告全文 其他业务 10,557,775.95 0.47% 17,328,109.75 0.80% -39.07% 分产品 分地区 深圳 1,069,108,931.9 47.83% 1,081,151,684.6 49.98% -1.11% 1 4 湛江 283,763,821.24 12.69% 221,059,450.79 10.22% 28.37% 武汉/北京 268,028,647.02 11.99% 305,661,441.06 14.13% -12.31% 天津 222,028,912.87 9.93% 175,330,767.01 8.10% 26.63% 浙江 298,738,462.10 13.36% 283,034,482.17 13.08% 5.55% 海南 89,703,450.89 4.01% 91,848,633.68 4.25% -2.34% 江西 4,005,929.27 0.18% 5,235,518.24 0.24% -23.49% 安徽 0.02 0.00% 分销售模式 （2） 占公司营业收入或营业利润 10%以上的行业、产品、地区、销售模式的情况 适用 □不适用 单位：元 营业收入 营业成本 毛利率 营业收入比上 营业成本比上 毛利率比上年 年同期增减 年同期增减 同期增减 分行业 通航运输 2,215,984,97 1,689,013,34 23.78% 4.09% 2.84% 0.93% 7.85 6.63 分产品 分地区 深圳 1,069,108,93 834,567,947. 21.94% -1.11% -2.63% 1.21% 1.91 10 武汉/北京 268,028,647. 285,495,154. -6.52% -12.31% 1.88% -14.83% 02 54 浙江 298,738,462. 186,392,487. 37.61% 5.55% -4.38% 6.48% 10 91 湛江 283,763,821. 181,319,873. 36.10% 28.37% 36.91% -3.99% 24 51 分销售模式 公司主营业务数据统计口径在报告期发生调整的情况下，公司最近 1 年按报告期末口径调整后的主营业务数据 □适用 不适用 （3） 公司实物销售收入是否大于劳务收入 □是 否 （4） 公司已签订的重大销售合同、重大采购合同截至本报告期的履行情况 适用 □不适用\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0008\n\n第八节 财务报告 / 一、不能 / 35、营业收入和营业成本\n\n物理页135，字符1536—3512：\n\n> 35、营业收入和营业成本 单位：元 项目 本期发生额 上期发生额 收入 成本 收入 成本 主营业务 2,224,820,379.37 1,700,253,570.91 2,145,993,867.84 1,657,518,920.64 其他业务 10,557,775.95 3,604,291.85 17,328,109.75 7,330,846.20 合计 2,235,378,155.32 1,703,857,862.76 2,163,321,977.59 1,664,849,766.84 公司报告期内经审计利润总额、净利润、扣除非经常性损益后的净利润三者孰低为负值 □是 否 与履约义务相关的信息： 履行履约义务 重要的支付条 公司承诺转让 是否为主要责 公司承担的预 公司提供的质 项目 的时间 款 商品的性质 任人 期将退还给客 量保证类型及 户的款项 相关义务 通航运输服务 服务提供时 服务进度结算 主要提供通航 是 无 无 收款 运输服务 预付款、交付 主要对直升机 通航维修服务 服务完成时 验收款 及部件的修理 是 无 服务类质保 服务 与分摊至剩余履约义务的交易价格相关的信息： 本报告期末已签订合同、但尚未履行或尚未履行完毕的履约义务所对应的收入金额为 419,133,003.25元，其中， 206,841,119.73 元预计将于 2026 年度确认收入，132,933,802.73 元预计将于 2027 年度确认收入，79,358,080.79 元预计将 于 2028 年度确认收入。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n",
+  "workpaper_status": "review_limited_pending_verification",
+  "workpaper_receipts": [
+    {
+      "request_id": "bp-work-5470620ee9834702d5a05c32:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "bb1cd81a2df094251f2f83337b95aa2e647ffda06085712ba8d30addfcbe3bc3",
+      "response_hash": "e99862dd8dd2ad2da42a933080578df73716ac0c6e3ec0cc7dcea66fc269cce0",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0020\",\"section-0028\",\"section-0029\",\"section-0030\",\"section-0023\",\"section-0024\",\"section-0026\",\"section-0623\"],\"rationale\":\"本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。\",\"deferred\":[\"section-0021 行业情况：属行业背景，非公司收入构成直接来源，暂不读\",\"section-0022 核心竞争力其余子节及section-0025、section-0027：技术/人才细节对收入构成解释力有限\",\"section-0041、section-0042 客户与供应商：供应链非本次定向目标，暂不读\",\"section-0716 分部信息：若section-0030已披露分行业/分产品收入则无需扩读；仅在收入细分仍缺失时再定向补充\",\"section-0270 财务报告其余附注：不扩读整个财务报告\"],\"stop_reason\":\"已覆盖主要业务、经营模式、收入与成本分行业/分产品表及收入附注，可回答通航运输收入构成与收费模式；行业背景、供应链与其余附注对本次定向问题边际贡献低，故在此停止。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0020",
+          "section-0028",
+          "section-0029",
+          "section-0030",
+          "section-0023",
+          "section-0024",
+          "section-0026",
+          "section-0623"
+        ],
+        "rationale": "本次为定向补充阅读，核心是回答通航运输业务的收入构成与收费模式。section-0020（主要业务）说明公司从事的通航运输服务及经营模式；section-0028（主营业务分析）及其子节section-0029（概述）与section-0030（收入与成本）提供分行业/分产品收入表，是恢复通航运输收入及主营/公司总额口径的关键原文；section-0623（营业收入和营业成本附注）补充收入确认与构成口径。另选section-0023、section-0024、section-0026以说明品牌、运营服务体系与机队基地规模等经营资源，帮助解释收入来源与业务结构。未选纯行业背景、核心竞争力其余细项及大量财务附注，避免扩读。",
+        "deferred": [
+          "section-0021 行业情况：属行业背景，非公司收入构成直接来源，暂不读",
+          "section-0022 核心竞争力其余子节及section-0025、section-0027：技术/人才细节对收入构成解释力有限",
+          "section-0041、section-0042 客户与供应商：供应链非本次定向目标，暂不读",
+          "section-0716 分部信息：若section-0030已披露分行业/分产品收入则无需扩读；仅在收入细分仍缺失时再定向补充",
+          "section-0270 财务报告其余附注：不扩读整个财务报告"
+        ],
+        "stop_reason": "已覆盖主要业务、经营模式、收入与成本分行业/分产品表及收入附注，可回答通航运输收入构成与收费模式；行业背景、供应链与其余附注对本次定向问题边际贡献低，故在此停止。"
+      },
+      "usage": {
+        "input_tokens": 14135,
+        "output_tokens": 415,
+        "total_tokens": 14550
+      }
+    },
+    {
+      "request_id": "bp-work-5470620ee9834702d5a05c32:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "ceb7fbe64045c2abc9552c99bf7183e214102014e9a6996c850c10416e9f06d9",
+      "response_hash": "7f56029f7ace4457a6335690cf160735e0375341f4ade9dfa6c05f6278eea708",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+      "contract_status": "accepted",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，未针对业务结构进行系统提取；仅依据所选章节原文回答通航运输收入构成与收费模式。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"公司主要业务包括海上油气直升机飞行服务、应急救援、陆上通航、通航维修和港口引航，并探索低空经济业务新场景；其中海上油气直升机飞行服务为主要收入来源和核心业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-02\",\"text\":\"公司业务覆盖机场运营、直升机运营、通航维修等核心领域，形成上下游协同的一体化运营格局，并在海上油气、应急救援、陆上通航、港口引航及通航维修五大业务板块持续发力。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}],\"limitations\":[\"所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入金额或占比。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"公司营业收入合计2,235,378,155.32元，占营业收入比重100%，同比增减3.33%；增长原因为报告期合同机数量及飞行作业量增加，海油业务收入增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"营业收入合计\",\"raw_value\":\"2,235,378,155.32\",\"value\":\"2235378155.32\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"营业收入合计占营业收入比重\",\"raw_value\":\"100%\",\"value\":\"100\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"营业收入合计同比增减\",\"raw_value\":\"3.33%\",\"value\":\"3.33\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"2024年度\"}]},{\"fact_id\":\"F-RM-02\",\"text\":\"分行业看，通航运输收入2,215,984,977.85元，占营业收入比重99.13%，同比增减4.09%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"通航运输收入\",\"raw_value\":\"2,215,984,977.85\",\"value\":\"2215984977.85\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"通航运输收入占营业收入比重\",\"raw_value\":\"99.13%\",\"value\":\"99.13\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"通航运输收入同比增减\",\"raw_value\":\"4.09%\",\"value\":\"4.09\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"2024年度\"}]},{\"fact_id\":\"F-RM-03\",\"text\":\"分行业看，通航维修收入8,835,401.52元，占营业收入比重0.40%，同比增减-48.09%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"通航维修收入\",\"raw_value\":\"8,835,401.52\",\"value\":\"8835401.52\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"通航维修收入占营业收入比重\",\"raw_value\":\"0.40%\",\"value\":\"0.40\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"通航维修收入同比增减\",\"raw_value\":\"-48.09%\",\"value\":\"-48.09\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"2024年度\"}]},{\"fact_id\":\"F-RM-04\",\"text\":\"分行业看，其他业务收入10,557,775.95元，占营业收入比重0.47%，同比增减-39.07%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"其他业务收入\",\"raw_value\":\"10,557,775.95\",\"value\":\"10557775.95\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"其他业务收入占营业收入比重\",\"raw_value\":\"0.47%\",\"value\":\"0.47\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"其他业务收入同比增减\",\"raw_value\":\"-39.07%\",\"value\":\"-39.07\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"2024年度\"}]},{\"fact_id\":\"F-RM-05\",\"text\":\"财务报告附注显示，主营业务收入2,224,820,379.37元、成本1,700,253,570.91元；其他业务收入10,557,775.95元、成本3,604,291.85元；合计收入2,235,378,155.32元、成本1,703,857,862.76元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"主营业务收入\",\"raw_value\":\"2,224,820,379.37\",\"value\":\"2224820379.37\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"主营业务成本\",\"raw_value\":\"1,700,253,570.91\",\"value\":\"1700253570.91\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"其他业务收入\",\"raw_value\":\"10,557,775.95\",\"value\":\"10557775.95\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"其他业务成本\",\"raw_value\":\"3,604,291.85\",\"value\":\"3604291.85\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"营业收入合计\",\"raw_value\":\"2,235,378,155.32\",\"value\":\"2235378155.32\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"营业成本合计\",\"raw_value\":\"1,703,857,862.76\",\"value\":\"1703857862.76\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F-RM-06\",\"text\":\"通航运输服务在服务提供时按服务进度结算收款，公司为主要责任人，主要提供通航运输服务；通航维修服务在服务完成时以预付款、交付验收款结算，主要对直升机及部件提供修理服务，公司为主要责任人，并提供服务类质保。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"F-RM-07\",\"text\":\"本报告期末已签订合同但尚未履行或尚未履行完毕的履约义务对应收入金额为419,133,003.25元，其中206,841,119.73元预计于2026年度确认收入，132,933,802.73元预计于2027年度确认收入，79,358,080.79元预计于2028年度确认收入。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"尚未履行或尚未履行完毕的履约义务对应收入金额\",\"raw_value\":\"419,133,003.25\",\"value\":\"419133003.25\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"预计2026年度确认收入\",\"raw_value\":\"206,841,119.73\",\"value\":\"206841119.73\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2026年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"预计2027年度确认收入\",\"raw_value\":\"132,933,802.73\",\"value\":\"132933802.73\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2027年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"预计2028年度确认收入\",\"raw_value\":\"79,358,080.79\",\"value\":\"79358080.79\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2028年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]}],\"limitations\":[\"所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入金额或占比，无法恢复通航运输收入内部细分。\",\"分产品收入表在原文中为空，未披露分产品收入。\",\"分地区收入为地区口径，不能替代通航运输业务收入构成。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"分行业收入构成中，通航运输占营业收入99.13%，通航维修占0.40%，其他业务占0.47%，通航运输为绝对主体。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"metrics\":[{\"name\":\"通航运输收入占营业收入比重\",\"raw_value\":\"99.13%\",\"value\":\"99.13\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"通航维修收入占营业收入比重\",\"raw_value\":\"0.40%\",\"value\":\"0.40\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"其他业务收入占营业收入比重\",\"raw_value\":\"0.47%\",\"value\":\"0.47\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"分地区收入中，深圳1,069,108,931.91元占47.83%，湛江283,763,821.24元占12.69%，武汉/北京268,028,647.02元占11.99%，天津222,028,912.87元占9.93%，浙江298,738,462.10元占13.36%，海南89,703,450.89元占4.01%，江西4,005,929.27元占0.18%，安徽0.02元占0.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"深圳地区收入\",\"raw_value\":\"1,069,108,931.91\",\"value\":\"1069108931.91\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"湛江地区收入\",\"raw_value\":\"283,763,821.24\",\"value\":\"283763821.24\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"武汉/北京地区收入\",\"raw_value\":\"268,028,647.02\",\"value\":\"268028647.02\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"天津地区收入\",\"raw_value\":\"222,028,912.87\",\"value\":\"222028912.87\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"浙江地区收入\",\"raw_value\":\"298,738,462.10\",\"value\":\"298738462.10\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"海南地区收入\",\"raw_value\":\"89,703,450.89\",\"value\":\"89703450.89\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"江西地区收入\",\"raw_value\":\"4,005,929.27\",\"value\":\"4005929.27\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"安徽地区收入\",\"raw_value\":\"0.02\",\"value\":\"0.02\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]}],\"limitations\":[\"分地区收入为地区口径，不能替代通航运输业务内部收入构成。\",\"所选章节未披露海上油气、应急救援、陆上通航、港口引航等业务板块的收入占比。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"报告期内公司共运营87架直升机，机型来自莱奥纳多公司、空客直升机公司、西科斯基公司、俄罗斯直升机公司等；在湖北、江西、新疆、广东、海南等地部署无人机共9架；运营深圳南头、天津塘沽、湛江坡头、海南东方4个直升机场，并在全国多地设有基地、起降点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"运营直升机数量\",\"raw_value\":\"87\",\"value\":\"87\",\"unit\":\"架\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"架\"},{\"name\":\"部署无人机数量\",\"raw_value\":\"9\",\"value\":\"9\",\"unit\":\"架\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"架\"},{\"name\":\"运营直升机场数量\",\"raw_value\":\"4\",\"value\":\"4\",\"unit\":\"个\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"个\"}]},{\"fact_id\":\"F-OI-02\",\"text\":\"公司依托成熟稳定的安全飞行专业能力，打造完整的通用航空产业链，业务覆盖机场运营、直升机运营、通航维修等核心领域，形成上下游协同发展的一体化运营格局。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}],\"limitations\":[\"所选章节未披露航材航油等具体采购来源或供应商信息。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"公司海上油气业务与中海油合作完成2吨级eVTOL海上平台货运试飞；应急救援业务全年服务于内蒙古、湖南、湖北、四川、浙江、江西等地；港口引航业务在天津港、黄骅港、青岛港、湛江港持续开展引航作业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-CC-02\",\"text\":\"公司分地区收入覆盖深圳、湛江、武汉/北京、天津、浙江、海南、江西、安徽等地区，其中深圳地区收入占比47.83%为最大区域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"深圳地区收入占营业收入比重\",\"raw_value\":\"47.83%\",\"value\":\"47.83\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]}],\"limitations\":[\"所选章节未披露客户集中度或具体客户名单。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"报告期营业收入同比增长3.33%，原因为合同机数量及飞行作业量增加，海油业务收入增加；营业成本同比增长2.34%，原因为作业量增加，航材航油、飞机折旧费、保障费等成本均增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"营业收入同比增减\",\"raw_value\":\"3.33%\",\"value\":\"3.33\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"2024年度\"},{\"name\":\"营业成本同比增减\",\"raw_value\":\"2.34%\",\"value\":\"2.34\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"2024年度\"}]},{\"fact_id\":\"F-OD-02\",\"text\":\"通航运输业务毛利率23.78%，营业收入比上年同期增减4.09%，营业成本比上年同期增减2.84%，毛利率比上年同期增减0.93%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"通航运输毛利率\",\"raw_value\":\"23.78%\",\"value\":\"23.78\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"通航运输营业收入同比增减\",\"raw_value\":\"4.09%\",\"value\":\"4.09\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"2024年度\"},{\"name\":\"通航运输营业成本同比增减\",\"raw_value\":\"2.84%\",\"value\":\"2.84\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"2024年度\"},{\"name\":\"通航运输毛利率比上年同期增减\",\"raw_value\":\"0.93%\",\"value\":\"0.93\",\"unit\":\"百分点\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"2024年度\"}]}],\"limitations\":[\"所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入驱动因素。\"]},\"material_changes\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"本次为定向补充阅读，未针对报告期重大变化进行系统提取；所选章节未明确披露通航运输业务收入构成的重大变化。\"]}},\"supply_chain\":null,\"company_features\":null,\"limitations\":[\"本次为定向补充阅读，仅回答通航运输业务收入构成与收费模式相关问题，未覆盖公司整体画像。\",\"所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入金额或占比，通航运输收入内部细分未获取成功。\",\"分产品收入表在原文中为空，未披露分产品收入。\",\"分地区收入为地区口径，不能替代通航运输业务收入构成。\"]}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "not_disclosed",
+            "facts": [],
+            "limitations": [
+              "本次为定向补充阅读，未针对业务结构进行系统提取；仅依据所选章节原文回答通航运输收入构成与收费模式。"
+            ]
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-PS-01",
+                "text": "公司主要业务包括海上油气直升机飞行服务、应急救援、陆上通航、通航维修和港口引航，并探索低空经济业务新场景；其中海上油气直升机飞行服务为主要收入来源和核心业务。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-PS-02",
+                "text": "公司业务覆盖机场运营、直升机运营、通航维修等核心领域，形成上下游协同的一体化运营格局，并在海上油气、应急救援、陆上通航、港口引航及通航维修五大业务板块持续发力。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              }
+            ],
+            "limitations": [
+              "所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入金额或占比。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-RM-01",
+                "text": "公司营业收入合计2,235,378,155.32元，占营业收入比重100%，同比增减3.33%；增长原因为报告期合同机数量及飞行作业量增加，海油业务收入增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入合计",
+                    "raw_value": "2,235,378,155.32",
+                    "value": "2235378155.32",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "营业收入合计占营业收入比重",
+                    "raw_value": "100%",
+                    "value": "100",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  },
+                  {
+                    "name": "营业收入合计同比增减",
+                    "raw_value": "3.33%",
+                    "value": "3.33",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "2024年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-RM-02",
+                "text": "分行业看，通航运输收入2,215,984,977.85元，占营业收入比重99.13%，同比增减4.09%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "通航运输收入",
+                    "raw_value": "2,215,984,977.85",
+                    "value": "2215984977.85",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "通航运输收入占营业收入比重",
+                    "raw_value": "99.13%",
+                    "value": "99.13",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  },
+                  {
+                    "name": "通航运输收入同比增减",
+                    "raw_value": "4.09%",
+                    "value": "4.09",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "2024年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-RM-03",
+                "text": "分行业看，通航维修收入8,835,401.52元，占营业收入比重0.40%，同比增减-48.09%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "通航维修收入",
+                    "raw_value": "8,835,401.52",
+                    "value": "8835401.52",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "通航维修收入占营业收入比重",
+                    "raw_value": "0.40%",
+                    "value": "0.40",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  },
+                  {
+                    "name": "通航维修收入同比增减",
+                    "raw_value": "-48.09%",
+                    "value": "-48.09",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "2024年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-RM-04",
+                "text": "分行业看，其他业务收入10,557,775.95元，占营业收入比重0.47%，同比增减-39.07%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "其他业务收入",
+                    "raw_value": "10,557,775.95",
+                    "value": "10557775.95",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "其他业务收入占营业收入比重",
+                    "raw_value": "0.47%",
+                    "value": "0.47",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  },
+                  {
+                    "name": "其他业务收入同比增减",
+                    "raw_value": "-39.07%",
+                    "value": "-39.07",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "2024年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-RM-05",
+                "text": "财务报告附注显示，主营业务收入2,224,820,379.37元、成本1,700,253,570.91元；其他业务收入10,557,775.95元、成本3,604,291.85元；合计收入2,235,378,155.32元、成本1,703,857,862.76元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "主营业务收入",
+                    "raw_value": "2,224,820,379.37",
+                    "value": "2224820379.37",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "主营业务成本",
+                    "raw_value": "1,700,253,570.91",
+                    "value": "1700253570.91",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "其他业务收入",
+                    "raw_value": "10,557,775.95",
+                    "value": "10557775.95",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "其他业务成本",
+                    "raw_value": "3,604,291.85",
+                    "value": "3604291.85",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "营业收入合计",
+                    "raw_value": "2,235,378,155.32",
+                    "value": "2235378155.32",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "营业成本合计",
+                    "raw_value": "1,703,857,862.76",
+                    "value": "1703857862.76",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-RM-06",
+                "text": "通航运输服务在服务提供时按服务进度结算收款，公司为主要责任人，主要提供通航运输服务；通航维修服务在服务完成时以预付款、交付验收款结算，主要对直升机及部件提供修理服务，公司为主要责任人，并提供服务类质保。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ]
+              },
+              {
+                "fact_id": "F-RM-07",
+                "text": "本报告期末已签订合同但尚未履行或尚未履行完毕的履约义务对应收入金额为419,133,003.25元，其中206,841,119.73元预计于2026年度确认收入，132,933,802.73元预计于2027年度确认收入，79,358,080.79元预计于2028年度确认收入。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "尚未履行或尚未履行完毕的履约义务对应收入金额",
+                    "raw_value": "419,133,003.25",
+                    "value": "419133003.25",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "预计2026年度确认收入",
+                    "raw_value": "206,841,119.73",
+                    "value": "206841119.73",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2026年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "预计2027年度确认收入",
+                    "raw_value": "132,933,802.73",
+                    "value": "132933802.73",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2027年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "预计2028年度确认收入",
+                    "raw_value": "79,358,080.79",
+                    "value": "79358080.79",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2028年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入金额或占比，无法恢复通航运输收入内部细分。",
+              "分产品收入表在原文中为空，未披露分产品收入。",
+              "分地区收入为地区口径，不能替代通航运输业务收入构成。"
+            ]
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-SM-01",
+                "text": "分行业收入构成中，通航运输占营业收入99.13%，通航维修占0.40%，其他业务占0.47%，通航运输为绝对主体。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006",
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "通航运输收入占营业收入比重",
+                    "raw_value": "99.13%",
+                    "value": "99.13",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  },
+                  {
+                    "name": "通航维修收入占营业收入比重",
+                    "raw_value": "0.40%",
+                    "value": "0.40",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  },
+                  {
+                    "name": "其他业务收入占营业收入比重",
+                    "raw_value": "0.47%",
+                    "value": "0.47",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-02",
+                "text": "分地区收入中，深圳1,069,108,931.91元占47.83%，湛江283,763,821.24元占12.69%，武汉/北京268,028,647.02元占11.99%，天津222,028,912.87元占9.93%，浙江298,738,462.10元占13.36%，海南89,703,450.89元占4.01%，江西4,005,929.27元占0.18%，安徽0.02元占0.00%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "深圳地区收入",
+                    "raw_value": "1,069,108,931.91",
+                    "value": "1069108931.91",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "湛江地区收入",
+                    "raw_value": "283,763,821.24",
+                    "value": "283763821.24",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "武汉/北京地区收入",
+                    "raw_value": "268,028,647.02",
+                    "value": "268028647.02",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "天津地区收入",
+                    "raw_value": "222,028,912.87",
+                    "value": "222028912.87",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "浙江地区收入",
+                    "raw_value": "298,738,462.10",
+                    "value": "298738462.10",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "海南地区收入",
+                    "raw_value": "89,703,450.89",
+                    "value": "89703450.89",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "江西地区收入",
+                    "raw_value": "4,005,929.27",
+                    "value": "4005929.27",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "安徽地区收入",
+                    "raw_value": "0.02",
+                    "value": "0.02",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "元"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "分地区收入为地区口径，不能替代通航运输业务内部收入构成。",
+              "所选章节未披露海上油气、应急救援、陆上通航、港口引航等业务板块的收入占比。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-OI-01",
+                "text": "报告期内公司共运营87架直升机，机型来自莱奥纳多公司、空客直升机公司、西科斯基公司、俄罗斯直升机公司等；在湖北、江西、新疆、广东、海南等地部署无人机共9架；运营深圳南头、天津塘沽、湛江坡头、海南东方4个直升机场，并在全国多地设有基地、起降点。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "运营直升机数量",
+                    "raw_value": "87",
+                    "value": "87",
+                    "unit": "架",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "架"
+                  },
+                  {
+                    "name": "部署无人机数量",
+                    "raw_value": "9",
+                    "value": "9",
+                    "unit": "架",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "架"
+                  },
+                  {
+                    "name": "运营直升机场数量",
+                    "raw_value": "4",
+                    "value": "4",
+                    "unit": "个",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "个"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-OI-02",
+                "text": "公司依托成熟稳定的安全飞行专业能力，打造完整的通用航空产业链，业务覆盖机场运营、直升机运营、通航维修等核心领域，形成上下游协同发展的一体化运营格局。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              }
+            ],
+            "limitations": [
+              "所选章节未披露航材航油等具体采购来源或供应商信息。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-CC-01",
+                "text": "公司海上油气业务与中海油合作完成2吨级eVTOL海上平台货运试飞；应急救援业务全年服务于内蒙古、湖南、湖北、四川、浙江、江西等地；港口引航业务在天津港、黄骅港、青岛港、湛江港持续开展引航作业。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-CC-02",
+                "text": "公司分地区收入覆盖深圳、湛江、武汉/北京、天津、浙江、海南、江西、安徽等地区，其中深圳地区收入占比47.83%为最大区域。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "深圳地区收入占营业收入比重",
+                    "raw_value": "47.83%",
+                    "value": "47.83",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "所选章节未披露客户集中度或具体客户名单。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-OD-01",
+                "text": "报告期营业收入同比增长3.33%，原因为合同机数量及飞行作业量增加，海油业务收入增加；营业成本同比增长2.34%，原因为作业量增加，航材航油、飞机折旧费、保障费等成本均增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入同比增减",
+                    "raw_value": "3.33%",
+                    "value": "3.33",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "2024年度"
+                  },
+                  {
+                    "name": "营业成本同比增减",
+                    "raw_value": "2.34%",
+                    "value": "2.34",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "2024年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-OD-02",
+                "text": "通航运输业务毛利率23.78%，营业收入比上年同期增减4.09%，营业成本比上年同期增减2.84%，毛利率比上年同期增减0.93%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "通航运输毛利率",
+                    "raw_value": "23.78%",
+                    "value": "23.78",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%"
+                  },
+                  {
+                    "name": "通航运输营业收入同比增减",
+                    "raw_value": "4.09%",
+                    "value": "4.09",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "2024年度"
+                  },
+                  {
+                    "name": "通航运输营业成本同比增减",
+                    "raw_value": "2.84%",
+                    "value": "2.84",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "2024年度"
+                  },
+                  {
+                    "name": "通航运输毛利率比上年同期增减",
+                    "raw_value": "0.93%",
+                    "value": "0.93",
+                    "unit": "百分点",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "source_unit": "%",
+                    "comparison_basis": "2024年度"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入驱动因素。"
+            ]
+          },
+          "material_changes": {
+            "status": "not_disclosed",
+            "facts": [],
+            "limitations": [
+              "本次为定向补充阅读，未针对报告期重大变化进行系统提取；所选章节未明确披露通航运输业务收入构成的重大变化。"
+            ]
+          }
+        },
+        "supply_chain": null,
+        "company_features": null,
+        "limitations": [
+          "本次为定向补充阅读，仅回答通航运输业务收入构成与收费模式相关问题，未覆盖公司整体画像。",
+          "所选章节未按海上油气、应急救援、陆上通航、港口引航等业务板块分别披露收入金额或占比，通航运输收入内部细分未获取成功。",
+          "分产品收入表在原文中为空，未披露分产品收入。",
+          "分地区收入为地区口径，不能替代通航运输业务收入构成。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 9393,
+        "output_tokens": 4749,
+        "total_tokens": 14142
+      }
+    },
+    {
+      "request_id": "bp-work-5470620ee9834702d5a05c32:workpaper:review",
+      "purpose": "review_profile_workpaper",
+      "request_hash": "969567548c99f2aae37c93d87e2ccef5b52e8eca7fc178c184d2ba8beedcd8a2",
+      "response_hash": "69544190caccaad48f808c4eef6c095c86afb79e4b874d7dae25ac177769787b",
+      "finish_reason": "stop",
+      "source_label": "scorpio:grok-4.7",
+      "model": "grok-4.7",
+      "selected_profile": "semantic_extraction__scorpio_grok",
+      "logical_profile": "semantic_extraction__scorpio_grok",
+      "reasoning_effort": "high",
+      "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+      "contract_status": "accepted",
+      "raw_content": "{\"findings\":[{\"finding_id\":\"REV-001\",\"element\":\"revenue_model\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"explanation\":\"定向问题要求恢复可安全归属的通航运输收入。source-0006分行业表2025年金额列将通航运输收入换行显示为“2,215,984,977.8”与下行“5”，与表头、单位合读为2,215,984,977.85元，占营业收入比重99.13%；同页未换行的营业收入合计2,235,378,155.32元可核对换行位置。source-0007“占公司营业收入10%以上”表再次列示该行营业收入，换行合读同为2,215,984,977.85元。该类别约占公司收入99%，且不能由占比乘公司总额精确回推。草稿已收录公司总额、主营业务总额以及金额较小的通航维修、其他业务，仅在F-SM-01保留通航运输占比，并误将通航运输收入金额视为引文缺失而隔离。此为收入构成的重要遗漏。所选章节确未按海上油气、应急救援、陆上通航等板块披露收入，该未披露事项已说明，不并入本项。\"}],\"reviewed_fact_ids\":[\"F-PS-01\",\"F-PS-02\",\"F-RM-01\",\"F-RM-03\",\"F-RM-04\",\"F-RM-05\",\"F-RM-06\",\"F-RM-07\",\"F-SM-01\",\"F-OI-01\",\"F-OI-02\",\"F-CC-01\",\"F-CC-02\",\"F-OD-01\",\"F-OD-02\"]}",
+      "response_payload": {
+        "findings": [
+          {
+            "finding_id": "REV-001",
+            "element": "revenue_model",
+            "severity": "material",
+            "issue_type": "material_omission",
+            "action": "possible_omission",
+            "affected_fact_id": null,
+            "evidence_ids": [
+              "source-0006",
+              "source-0007"
+            ],
+            "explanation": "定向问题要求恢复可安全归属的通航运输收入。source-0006分行业表2025年金额列将通航运输收入换行显示为“2,215,984,977.8”与下行“5”，与表头、单位合读为2,215,984,977.85元，占营业收入比重99.13%；同页未换行的营业收入合计2,235,378,155.32元可核对换行位置。source-0007“占公司营业收入10%以上”表再次列示该行营业收入，换行合读同为2,215,984,977.85元。该类别约占公司收入99%，且不能由占比乘公司总额精确回推。草稿已收录公司总额、主营业务总额以及金额较小的通航维修、其他业务，仅在F-SM-01保留通航运输占比，并误将通航运输收入金额视为引文缺失而隔离。此为收入构成的重要遗漏。所选章节确未按海上油气、应急救援、陆上通航等板块披露收入，该未披露事项已说明，不并入本项。"
+          }
+        ],
+        "reviewed_fact_ids": [
+          "F-PS-01",
+          "F-PS-02",
+          "F-RM-01",
+          "F-RM-03",
+          "F-RM-04",
+          "F-RM-05",
+          "F-RM-06",
+          "F-RM-07",
+          "F-SM-01",
+          "F-OI-01",
+          "F-OI-02",
+          "F-CC-01",
+          "F-CC-02",
+          "F-OD-01",
+          "F-OD-02"
+        ]
+      },
+      "usage": {
+        "input_tokens": 13529,
+        "output_tokens": 415,
+        "total_tokens": 35263
+      }
+    },
+    {
+      "request_id": "bp-work-5470620ee9834702d5a05c32:workpaper:repair",
+      "purpose": "repair_profile_workpaper",
+      "request_hash": "97ebbfbf3a3027fbbd211f974f2a5a1523cfbec35cb519ace2dd1b40c7181851",
+      "response_hash": "40a85902e62e9e3ecdf0cfcc8b48a898d0d00557f69081ab08284ba5e857a96a",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+      "contract_status": "accepted",
+      "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:REV-001\",\"text\":\"2025年通航运输业务收入为2,215,984,977.85元，占营业收入比重99.13%；报告期公司未按海上油气、应急救援、陆上通航等业务板块披露收入细分。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"metrics\":[{\"name\":\"通航运输营业收入\",\"raw_value\":\"2,215,984,977.85\",\"value\":\"2215984977.85\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"comparison_basis\":null,\"uncertainty_reason\":null},{\"name\":\"通航运输营业收入占营业收入比重\",\"raw_value\":\"99.13%\",\"value\":\"99.13\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"comparison_basis\":null,\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+      "response_payload": {
+        "repaired_facts": [
+          {
+            "fact_id": "review-add:REV-001",
+            "text": "2025年通航运输业务收入为2,215,984,977.85元，占营业收入比重99.13%；报告期公司未按海上油气、应急救援、陆上通航等业务板块披露收入细分。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006",
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "通航运输营业收入",
+                "raw_value": "2,215,984,977.85",
+                "value": "2215984977.85",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "period": "2025年度",
+                "subject_scope": "business_segment",
+                "qualifier": "exact",
+                "comparison_basis": null,
+                "uncertainty_reason": null
+              },
+              {
+                "name": "通航运输营业收入占营业收入比重",
+                "raw_value": "99.13%",
+                "value": "99.13",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "period": "2025年度",
+                "subject_scope": "business_segment",
+                "qualifier": "exact",
+                "comparison_basis": null,
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 5981,
+        "output_tokens": 261,
+        "total_tokens": 6242
+      }
+    }
+  ],
+  "workpaper_summary": {
+    "origin": "llm_generated",
+    "business_description": "",
+    "fact_count": 15,
+    "metric_count": 32,
+    "element_fact_counts": {
+      "business_structure": 0,
+      "products_services": 2,
+      "revenue_model": 6,
+      "scale_and_mix": 1,
+      "operations_and_inputs": 2,
+      "customers_channels_markets": 2,
+      "operating_drivers": 2,
+      "material_changes": 0
+    },
+    "review_status": "completed_with_open_findings",
+    "open_finding_count": 1,
+    "extraction_model": "deepseek-flash",
+    "review_model": "grok-4.7",
+    "delivery_counts": {
+      "reviewed": 15,
+      "pending": 0,
+      "limited": 0,
+      "source_only": 0,
+      "withheld": 0,
+      "duplicate": 0
+    },
+    "delivery_pending_review_count": 0,
+    "delivery_reviewed_count": 15,
+    "delivery_pending_count": 0,
+    "delivery_limited_count": 0,
+    "delivery_source_only_count": 0,
+    "delivery_withheld_count": 0,
+    "delivery_duplicate_count": 0
+  }
+}
