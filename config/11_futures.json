@@ -829,7 +829,7 @@
           "api_key_env": "EIA_API_KEY",
           "quality_flag": "official_public_api",
           "parser_version": "eia_commodity_provider.v2",
-          "timeout_seconds": 30,
+          "timeout_seconds": 60,
           "request_retry": {
             "max_attempts": 3,
             "backoff_seconds": 0.5

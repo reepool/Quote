@@ -181,7 +181,7 @@ def _request_with_retry(
                 attempt,
                 attempt + 1,
                 sleep_seconds,
-                exc,
+                _redact_exception_text(str(exc)),
             )
             if sleep_seconds:
                 time.sleep(sleep_seconds)
@@ -227,7 +227,7 @@ def _request_post_with_retry(
                 attempt,
                 attempt + 1,
                 sleep_seconds,
-                exc,
+                _redact_exception_text(str(exc)),
             )
             if sleep_seconds:
                 time.sleep(sleep_seconds)
@@ -381,19 +381,38 @@ def _parse_date(value: Optional[str]) -> Optional[date]:
         return None
 
 
+_SECRET_QUERY_KEYS = {"api_key", "apikey", "key", "token", "access_token", "appkey", "secret"}
+_URL_IN_TEXT = re.compile(r"https?://[^\s<>\"']+")
+_SECRET_QUERY_IN_TEXT = re.compile(
+    r"(?i)\b(api_key|apikey|access_token|appkey|token|secret|key)=([^&\s]+)"
+)
+
+
 def _redact_url(url: str) -> str:
     """Remove secret-bearing query values before storing lineage URLs."""
     if not url:
         return ""
     try:
         parts = urlsplit(url)
-        secret_keys = {"api_key", "apikey", "key", "token", "access_token", "appkey", "secret"}
         query = []
         for key, value in parse_qsl(parts.query, keep_blank_values=True):
-            query.append((key, "***" if key.lower() in secret_keys else value))
+            query.append((key, "***" if key.lower() in _SECRET_QUERY_KEYS else value))
         return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
     except Exception:
         return url
+
+
+def _redact_exception_text(text: str) -> str:
+    """Remove secret query values from exception text before it is logged or stored."""
+    raw = str(text or "")
+
+    def _replace_url(match: re.Match[str]) -> str:
+        url = match.group(0)
+        trimmed = url.rstrip(").,;")
+        return _redact_url(trimmed) + url[len(trimmed):]
+
+    redacted = _URL_IN_TEXT.sub(_replace_url, raw)
+    return _SECRET_QUERY_IN_TEXT.sub(r"\1=***", redacted)
 
 
 def _build_observation(
@@ -577,6 +596,7 @@ class CommodityMasterGovernanceResult:
     records: List[Dict[str, Any]] = field(default_factory=list)
     warnings: List[Dict[str, Any]] = field(default_factory=list)
     blockers: List[Dict[str, Any]] = field(default_factory=list)
+    notes: List[Dict[str, Any]] = field(default_factory=list)
     prefetched_result: Optional[CommodityProviderResult] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
 
@@ -2469,7 +2489,7 @@ class FredCommodityProvider:
                         "reason": "provider_request_failed",
                         "series_id": item.series_id,
                         "source_symbol": item.source_symbol,
-                        "error": str(exc),
+                        "error": _redact_exception_text(str(exc)),
                     }
                 )
                 continue
@@ -2593,7 +2613,7 @@ class EiaCommodityProvider:
                             "reason": "provider_request_failed",
                             "series_id": item.series_id,
                             "offset": offset,
-                            "error": str(exc),
+                            "error": _redact_exception_text(str(exc)),
                         }
                     )
                     break
@@ -2873,6 +2893,44 @@ class ConfiguredSourceChainProvider:
             else:
                 unresolved_warnings.append(item)
         warnings = unresolved_warnings
+        covered_series = {
+            series_id
+            for series_id, filled in fallback_dates_by_series.items()
+            if filled > 0 and series_id in selected_series_ids and series_id not in conflict_series
+        }
+        classified_blockers: List[Dict[str, Any]] = []
+        for blocker in blockers:
+            if (
+                str(blocker.get("reason") or "") != "missing_api_key"
+                or str(blocker.get("chain_source_profile") or "") != primary_profile
+            ):
+                classified_blockers.append(blocker)
+                continue
+            target_ids = (
+                [str(blocker.get("series_id"))]
+                if blocker.get("series_id")
+                else [item.series_id for item in series]
+            )
+            for series_id in target_ids:
+                if series_id in covered_series:
+                    notes.append(
+                        {
+                            "reason": "missing_api_key_fallback_covered",
+                            "series_id": series_id,
+                            "chain_source_profile": primary_profile,
+                            "api_key_env": blocker.get("api_key_env"),
+                            "fallback_filled_dates": fallback_dates_by_series.get(series_id, 0),
+                        }
+                    )
+                    continue
+                classified_blockers.append(
+                    {
+                        **blocker,
+                        "series_id": series_id,
+                        "chain_source_profile": primary_profile,
+                    }
+                )
+        blockers = classified_blockers
         return CommodityProviderResult(
             observations=selected,
             warnings=warnings,
@@ -7688,15 +7746,16 @@ class FredCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
                 )
                 source_row = (payload.get("seriess") or [])[0]
             except Exception as exc:
+                redacted_error = _redact_exception_text(str(exc))
                 blockers.append(
-                    {"reason": "master_metadata_request_failed", "series_id": item.series_id, "error": str(exc)}
+                    {"reason": "master_metadata_request_failed", "series_id": item.series_id, "error": redacted_error}
                 )
                 records.append(
                     _blocked_master_governance_record(
                         item,
                         reason="master_metadata_request_failed",
                         evidence_url=endpoint,
-                        metadata={"error": str(exc)},
+                        metadata={"error": redacted_error},
                     )
                 )
                 continue
@@ -7807,15 +7866,16 @@ class EiaCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
                 response_payload = payload.get("response") or {}
                 source_row = (response_payload.get("data") or [])[0]
             except Exception as exc:
+                redacted_error = _redact_exception_text(str(exc))
                 blockers.append(
-                    {"reason": "master_metadata_request_failed", "series_id": item.series_id, "error": str(exc)}
+                    {"reason": "master_metadata_request_failed", "series_id": item.series_id, "error": redacted_error}
                 )
                 records.append(
                     _blocked_master_governance_record(
                         item,
                         reason="master_metadata_request_failed",
                         evidence_url=endpoint,
-                        metadata={"error": str(exc)},
+                        metadata={"error": redacted_error},
                     )
                 )
                 continue
@@ -7869,6 +7929,278 @@ class EiaCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
         return CommodityMasterGovernanceResult(records=records, blockers=blockers)
 
 
+_REQUEST_CLASS_MASTER_REASONS = {"missing_api_key", "master_metadata_request_failed"}
+_PRIMARY_MASTER_QUALITY_FLAG = "official_primary_with_governed_fallback"
+_FALLBACK_MASTER_QUALITY_FLAG = "fallback_master_verified"
+
+
+@dataclass
+class SourceChainMasterState:
+    """Running master-governance outcome for one configured source chain."""
+
+    records: List[Dict[str, Any]] = field(default_factory=list)
+    blockers: List[Dict[str, Any]] = field(default_factory=list)
+    notes: List[Dict[str, Any]] = field(default_factory=list)
+    warnings: List[Dict[str, Any]] = field(default_factory=list)
+    pending_errors: Dict[str, List[Dict[str, Any]]] = field(default_factory=dict)
+
+
+def _is_request_class_master_blocker(blocker: Mapping[str, Any]) -> bool:
+    return str(blocker.get("reason") or "") in _REQUEST_CLASS_MASTER_REASONS
+
+
+def _master_request_error_summary(blocker: Mapping[str, Any]) -> str:
+    """Return a non-empty redacted summary for a request-class master blocker."""
+    error = _redact_exception_text(str(blocker.get("error") or "")).strip()
+    if error:
+        return error
+    reason = str(blocker.get("reason") or "request_failed")
+    api_key_env = str(blocker.get("api_key_env") or "").strip()
+    if api_key_env:
+        return f"{reason}:{api_key_env}"
+    return reason
+
+
+def _stamp_master_blocker(
+    blocker: Mapping[str, Any],
+    *,
+    profile: str,
+    series_id: str,
+) -> Dict[str, Any]:
+    stamped = dict(blocker)
+    stamped["series_id"] = series_id
+    stamped.setdefault("source_profile", profile)
+    if stamped.get("error"):
+        stamped["error"] = _redact_exception_text(str(stamped["error"]))
+    return stamped
+
+
+def _blockers_affecting_series(
+    blockers: Sequence[Mapping[str, Any]],
+    series_id: str,
+) -> List[Mapping[str, Any]]:
+    return [
+        item
+        for item in blockers
+        if not str(item.get("series_id") or "") or str(item.get("series_id")) == series_id
+    ]
+
+
+def _success_master_record(
+    records: Sequence[Mapping[str, Any]],
+    series_id: str,
+) -> Optional[Mapping[str, Any]]:
+    for record in records:
+        if (
+            str(record.get("series_id") or "") == series_id
+            and str(record.get("governance_status") or "") == "success"
+        ):
+            return record
+    return None
+
+
+def _copy_source_chain_master_state(state: SourceChainMasterState) -> SourceChainMasterState:
+    return SourceChainMasterState(
+        records=list(state.records),
+        blockers=list(state.blockers),
+        notes=list(state.notes),
+        warnings=list(state.warnings),
+        pending_errors={key: list(value) for key, value in state.pending_errors.items()},
+    )
+
+
+def apply_source_chain_master_profile(
+    state: SourceChainMasterState,
+    *,
+    series: Sequence[CommoditySeries],
+    profile: str,
+    is_primary: bool,
+    has_later_profile: bool,
+    chain_source_profile: str,
+    primary_profile: str,
+    chain_profiles: Sequence[str],
+    result: CommodityMasterGovernanceResult,
+) -> tuple[SourceChainMasterState, List[CommoditySeries]]:
+    """Fold one called profile and return the canonical series that still need a later profile."""
+    folded = _copy_source_chain_master_state(state)
+    for warning in result.warnings:
+        stamped = dict(warning)
+        stamped.setdefault("source_profile", profile)
+        folded.warnings.append(stamped)
+    pending: List[CommoditySeries] = []
+    for item in series:
+        applicable = _blockers_affecting_series(result.blockers, item.series_id)
+        semantic = [blocker for blocker in applicable if not _is_request_class_master_blocker(blocker)]
+        request_failures = [blocker for blocker in applicable if _is_request_class_master_blocker(blocker)]
+        success = _success_master_record(result.records, item.series_id)
+        if semantic or (success is None and not request_failures):
+            if not semantic and success is None and not request_failures:
+                request_failures = [
+                    {
+                        "reason": "master_metadata_request_failed",
+                        "series_id": item.series_id,
+                        "source_profile": profile,
+                        "error": "master metadata record missing",
+                    }
+                ]
+        if semantic:
+            stamped = [
+                _stamp_master_blocker(blocker, profile=profile, series_id=item.series_id)
+                for blocker in [*semantic, *request_failures]
+            ]
+            folded.pending_errors.pop(item.series_id, None)
+            folded.blockers.extend(stamped)
+            folded.records.append(
+                _chain_blocked_master_record(
+                    item,
+                    chain_source_profile=chain_source_profile,
+                    reason=str(stamped[0].get("reason") or "master_metadata_request_failed"),
+                    metadata={
+                        "errors": [_master_request_error_summary(blocker) for blocker in stamped],
+                        **(
+                            {"api_key_env": stamped[0]["api_key_env"]}
+                            if stamped[0].get("api_key_env")
+                            else {}
+                        ),
+                    },
+                )
+            )
+            continue
+        if success is None or request_failures:
+            accumulated = [
+                _stamp_master_blocker(blocker, profile=profile, series_id=item.series_id)
+                for blocker in [*folded.pending_errors.get(item.series_id, []), *request_failures]
+            ]
+            folded.pending_errors[item.series_id] = accumulated
+            if has_later_profile:
+                pending.append(item)
+                continue
+            folded.pending_errors.pop(item.series_id, None)
+            folded.blockers.extend(accumulated)
+            api_key_env = next(
+                (blocker.get("api_key_env") for blocker in accumulated if blocker.get("api_key_env")),
+                None,
+            )
+            folded.records.append(
+                _chain_blocked_master_record(
+                    item,
+                    chain_source_profile=chain_source_profile,
+                    reason=str(accumulated[0].get("reason") or "master_metadata_request_failed"),
+                    metadata={
+                        "errors": [_master_request_error_summary(blocker) for blocker in accumulated],
+                        **({"api_key_env": api_key_env} if api_key_env else {}),
+                    },
+                )
+            )
+            continue
+        accumulated = folded.pending_errors.pop(item.series_id, [])
+        primary_error = ""
+        for blocker in accumulated:
+            if str(blocker.get("source_profile") or "") == primary_profile:
+                primary_error = _master_request_error_summary(blocker)
+                break
+        if not primary_error and accumulated:
+            primary_error = _master_request_error_summary(accumulated[0])
+        if not is_primary and not primary_error:
+            primary_error = "master_metadata_request_failed"
+        metadata = dict(success.get("metadata") or {})
+        metadata.update(
+            {
+                "canonical_source_chain": list(chain_profiles),
+                "primary_source_profile": primary_profile,
+                "fallback_source_profiles": list(chain_profiles[1:]),
+                "master_verified_by": profile,
+            }
+        )
+        if not is_primary:
+            metadata["primary_error"] = primary_error
+            folded.notes.append(
+                {
+                    "reason": "primary_master_request_failed_fallback_verified",
+                    "series_id": item.series_id,
+                    "primary_source_profile": primary_profile,
+                    "fallback_source_profile": profile,
+                    "primary_error": primary_error,
+                }
+            )
+        folded.records.append(
+            {
+                **dict(success),
+                "series_id": item.series_id,
+                "commodity_id": item.commodity_id,
+                "venue": item.venue,
+                "source_profile": chain_source_profile,
+                "governance_status": "success",
+                "quality_flag": (
+                    _PRIMARY_MASTER_QUALITY_FLAG if is_primary else _FALLBACK_MASTER_QUALITY_FLAG
+                ),
+                "metadata": metadata,
+            }
+        )
+    return folded, pending
+
+
+def _provider_blocked_series_ids(
+    blockers: Sequence[Mapping[str, Any]],
+    series_ids: Sequence[str],
+) -> set[str]:
+    """Series excluded from persistence by provider blockers.
+
+    A blocker without ``series_id`` applies to every series in the provider call.
+    """
+    blocked = {str(item.get("series_id")) for item in blockers if item.get("series_id")}
+    if any(not item.get("series_id") for item in blockers):
+        blocked.update(str(series_id) for series_id in series_ids)
+    return blocked
+
+
+def _chain_blocked_master_record(
+    item: CommoditySeries,
+    *,
+    chain_source_profile: str,
+    reason: str,
+    metadata: Optional[Dict[str, Any]] = None,
+    evidence_url: str = "",
+) -> Dict[str, Any]:
+    record = _blocked_master_governance_record(
+        item,
+        reason=reason,
+        evidence_url=evidence_url,
+        metadata=metadata,
+    )
+    record["source_profile"] = chain_source_profile
+    return record
+
+
+def _finalize_unresolved_chain_series(
+    state: SourceChainMasterState,
+    series: Sequence[CommoditySeries],
+    *,
+    profile: str,
+    chain_source_profile: str,
+    reason: str,
+) -> SourceChainMasterState:
+    """Block series that no remaining configured profile can govern."""
+    folded = _copy_source_chain_master_state(state)
+    for item in series:
+        accumulated = folded.pending_errors.pop(item.series_id, [])
+        blocker = {
+            "reason": reason,
+            "series_id": item.series_id,
+            "source_profile": profile,
+        }
+        folded.blockers.extend([*accumulated, blocker])
+        folded.records.append(
+            _chain_blocked_master_record(
+                item,
+                chain_source_profile=chain_source_profile,
+                reason=reason,
+                metadata={"source_profile": profile},
+            )
+        )
+    return folded
+
+
 class ConfiguredSourceChainGovernanceAdapter(SourceObservedDateGovernanceAdapter):
     """Govern canonical series from primary-source evidence and row-level lineage."""
 
@@ -7899,54 +8231,68 @@ class ConfiguredSourceChainGovernanceAdapter(SourceObservedDateGovernanceAdapter
             return CommodityMasterGovernanceResult(
                 blockers=[{"reason": "empty_source_chain"}]
             )
+        state = SourceChainMasterState()
+        pending = list(series)
         primary_profile = profiles[0]
-        primary_cfg = dict(
-            (self.module_cfg.get("source_profiles") or {}).get(primary_profile) or {}
-        )
-        provider_factory = ConfiguredSourceChainProvider.PROVIDERS.get(
-            str(primary_cfg.get("provider_adapter") or "")
-        )
-        governance_factory = self.GOVERNANCE.get(
-            str(primary_cfg.get("governance_adapter") or "")
-        )
-        primary_series = provider.mapped_series(primary_profile, series)
-        if provider_factory is None or governance_factory is None or len(primary_series) != len(series):
-            return CommodityMasterGovernanceResult(
-                blockers=[
-                    {
-                        "reason": "primary_source_chain_governance_unavailable",
-                        "source_profile": primary_profile,
-                    }
-                ]
+        for index, profile in enumerate(profiles):
+            if not pending:
+                break
+            has_later_profile = index < len(profiles) - 1
+            profile_cfg = dict((self.module_cfg.get("source_profiles") or {}).get(profile) or {})
+            governance_factory = self.GOVERNANCE.get(str(profile_cfg.get("governance_adapter") or ""))
+            provider_factory = ConfiguredSourceChainProvider.PROVIDERS.get(
+                str(profile_cfg.get("provider_adapter") or "")
             )
-        primary_result = governance_factory(primary_cfg).govern_master(
-            primary_series,
-            provider_factory(primary_profile, primary_cfg),
-            start_date=start_date,
-            end_date=end_date,
-        )
-        records: List[Dict[str, Any]] = []
-        for record in primary_result.records:
-            metadata = dict(record.get("metadata") or {})
-            metadata.update(
-                {
-                    "canonical_source_chain": profiles,
-                    "primary_source_profile": primary_profile,
-                    "fallback_source_profiles": profiles[1:],
-                }
-            )
-            records.append(
-                {
-                    **record,
-                    "source_profile": provider.source_profile,
-                    "quality_flag": "official_primary_with_governed_fallback",
-                    "metadata": metadata,
-                }
-            )
+            mapped = provider.mapped_series(profile, pending) if governance_factory and provider_factory else []
+            mapped_ids = {item.series_id for item in mapped}
+            callable_series = [item for item in pending if item.series_id in mapped_ids]
+            skipped = [item for item in pending if item.series_id not in mapped_ids]
+            still_pending: List[CommoditySeries] = []
+            if callable_series:
+                profile_result = governance_factory(profile_cfg).govern_master(
+                    provider.mapped_series(profile, callable_series),
+                    provider_factory(profile, profile_cfg),
+                    start_date=start_date,
+                    end_date=end_date,
+                    prior_master_records=prior_master_records,
+                )
+                state, deferred = apply_source_chain_master_profile(
+                    state,
+                    series=callable_series,
+                    profile=profile,
+                    is_primary=index == 0,
+                    has_later_profile=has_later_profile,
+                    chain_source_profile=provider.source_profile,
+                    primary_profile=primary_profile,
+                    chain_profiles=profiles,
+                    result=profile_result,
+                )
+                still_pending.extend(deferred)
+            if skipped:
+                if index == 0:
+                    state = _finalize_unresolved_chain_series(
+                        state,
+                        skipped,
+                        profile=profile,
+                        chain_source_profile=provider.source_profile,
+                        reason="primary_source_chain_governance_unavailable",
+                    )
+                elif has_later_profile:
+                    still_pending.extend(skipped)
+                else:
+                    state = _finalize_unresolved_chain_series(
+                        state,
+                        skipped,
+                        profile=profile,
+                        chain_source_profile=provider.source_profile,
+                        reason="source_chain_adapter_or_mapping_missing",
+                    )
+            pending = still_pending
         return CommodityMasterGovernanceResult(
-            records=records,
-            warnings=primary_result.warnings,
-            blockers=primary_result.blockers,
+            records=state.records,
+            warnings=state.warnings,
+            blockers=state.blockers,
+            notes=state.notes,
         )
 
 
@@ -9237,6 +9583,13 @@ class SpecialCommodityGovernancePipeline:
                     research_role=research_role,
                 )
             )
+            notes.extend(
+                _annotate_source_diagnostics(
+                    [{**item, "governance_stage": "master_data"} for item in master_result.notes],
+                    source_profile=source_profile,
+                    research_role=research_role,
+                )
+            )
             blocked_series = {
                 str(item.get("series_id"))
                 for item in master_result.blockers
@@ -9279,11 +9632,10 @@ class SpecialCommodityGovernancePipeline:
                     research_role=research_role,
                 )
             )
-            provider_blocked_series = {
-                str(item.get("series_id"))
-                for item in provider_result.blockers
-                if item.get("series_id")
-            }
+            provider_blocked_series = _provider_blocked_series_ids(
+                provider_result.blockers,
+                [item.series_id for item in eligible_series],
+            )
             date_series = [
                 item for item in eligible_series if item.series_id not in provider_blocked_series
             ]
@@ -9447,7 +9799,7 @@ class SpecialCommodityGovernancePipeline:
                 "calendar_rows": len(date_result.calendar_rows),
                 "fetched": len(governed_observations),
                 "warnings": source_warnings,
-                "notes": len(provider_result.notes),
+                "notes": len(provider_result.notes) + len(master_result.notes),
                 "blockers": source_blockers,
                 "calendar_type": date_result.metadata.get("calendar_type"),
                 "weekday_inference_used": False,

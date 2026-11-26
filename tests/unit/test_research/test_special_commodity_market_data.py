@@ -23,12 +23,14 @@ from research.special_commodity_market_data import (
     CommodityProviderResult,
     CommoditySeries,
     CommodityUniverseSelector,
+    ConfiguredSourceChainGovernanceAdapter,
     ConfiguredSourceChainProvider,
     CctdaBspiPortPriceProvider,
     CctdaTtciPortInventoryProvider,
     CqcoalBspiPortPriceProvider,
     CompilerPublicPriceGovernanceAdapter,
     parse_bspi_period_and_value,
+    EiaCommodityGovernanceAdapter,
     EiaCommodityProvider,
     FredCommodityProvider,
     NbsMonthlyIndustrialOutputProvider,
@@ -47,6 +49,7 @@ from research.special_commodity_market_data import (
     SpecialCommoditySeriesCatalogService,
     SpecialCommodityPriceSyncService,
     SpecialCommodityGovernancePipeline,
+    SourceChainMasterState,
     SpecialCommodityStorageManager,
     ShanghaiShippingExchangeCbcfiProvider,
     WorldBankCommodityProvider,
@@ -54,8 +57,12 @@ from research.special_commodity_market_data import (
     _observation_quality_diagnostics,
     _query_nbs_official_search,
     _actual_contract_series_blockers,
+    _provider_blocked_series_ids,
+    _redact_exception_text,
     _request_json_with_retry,
+    _request_with_retry,
     _source_unit_matches,
+    apply_source_chain_master_profile,
 )
 
 
@@ -859,6 +866,844 @@ def test_configured_source_chain_keeps_warning_when_only_fallback_failed(monkeyp
     assert [
         entry for entry in result.warnings if entry["reason"] == "provider_request_failed"
     ]
+
+
+def _oil_chain_series(*series_ids: str):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    return cfg, CommodityUniverseSelector(cfg).resolve(series_ids=list(series_ids))
+
+
+def _chain_success_record(series: CommoditySeries, *, venue: str = "FRED") -> dict:
+    return {
+        "series_id": series.series_id,
+        "commodity_id": series.commodity_id,
+        "venue": venue,
+        "source_profile": "mapped-profile",
+        "governance_status": "success",
+        "quality_flag": "official_master_verified",
+        "source_name": series.source_symbol,
+        "source_frequency": "daily",
+        "source_currency": "USD",
+        "source_unit": "USD/barrel",
+        "metadata": {},
+    }
+
+
+def test_eia_profile_timeout_is_configured_and_used(monkeypatch):
+    cfg, series = _oil_chain_series("CMD.OIL.WTI.SPOT.EIA.DAILY")
+    source_cfg = cfg["source_profiles"]["eia_official_api"]
+    assert source_cfg["timeout_seconds"] == 60
+    custom_cfg = dict(source_cfg)
+    custom_cfg["timeout_seconds"] = 45
+    seen = []
+
+    def capture(url, *, params, headers, timeout, tls_config, retry_cfg, log_context):
+        seen.append(timeout)
+        raise RuntimeError("stop before network")
+
+    monkeypatch.setenv("EIA_API_KEY", "unit-test-key")
+    monkeypatch.setattr(
+        "research.special_commodity_market_data._request_json_with_retry",
+        capture,
+    )
+    EiaCommodityProvider("eia_official_api", custom_cfg).fetch(
+        series,
+        start_date="2026-11-17",
+        end_date="2026-11-26",
+    )
+    EiaCommodityGovernanceAdapter(custom_cfg).govern_master(
+        series,
+        provider=None,
+        start_date="2026-11-17",
+        end_date="2026-11-26",
+    )
+
+    assert seen == [45, 45]
+    assert source_cfg["timeout_seconds"] == 60
+
+
+def test_source_chain_master_fallback_outcomes(monkeypatch):
+    cfg, series = _oil_chain_series(
+        "CMD.OIL.WTI.SPOT.EIA.DAILY",
+        "CMD.OIL.BRENT.SPOT.EIA.DAILY",
+    )
+    wti, brent = series[0], series[1]
+    if wti.series_id != "CMD.OIL.WTI.SPOT.EIA.DAILY":
+        wti, brent = brent, wti
+    calls = []
+
+    class PrimaryGovernance:
+        def __init__(self, source_cfg):
+            self.mode = source_cfg.get("mode")
+
+        def govern_master(self, called, provider, **kwargs):
+            calls.append(("primary", [item.series_id for item in called]))
+            mode = self.mode
+            if mode == "both_success":
+                return CommodityMasterGovernanceResult(
+                    records=[_chain_success_record(item, venue="EIA") for item in called],
+                    warnings=[{"reason": "primary_warning", "series_id": called[0].series_id}],
+                )
+            if mode == "wti_success_brent_timeout":
+                return CommodityMasterGovernanceResult(
+                    records=[_chain_success_record(wti, venue="EIA")],
+                    blockers=[
+                        {
+                            "reason": "master_metadata_request_failed",
+                            "series_id": brent.series_id,
+                            "error": "Read timed out",
+                        }
+                    ],
+                )
+            if mode == "wti_unit_brent_timeout":
+                return CommodityMasterGovernanceResult(
+                    blockers=[
+                        {
+                            "reason": "master_unit_mismatch",
+                            "series_id": wti.series_id,
+                            "configured": "USD/barrel",
+                            "source": "index",
+                        },
+                        {
+                            "reason": "master_metadata_request_failed",
+                            "series_id": brent.series_id,
+                            "error": "Read timed out",
+                        },
+                    ]
+                )
+            if mode == "missing_key":
+                return CommodityMasterGovernanceResult(
+                    blockers=[{"reason": "missing_api_key", "api_key_env": "EIA_API_KEY"}]
+                )
+            if mode == "both_timeout":
+                return CommodityMasterGovernanceResult(
+                    blockers=[
+                        {
+                            "reason": "master_metadata_request_failed",
+                            "series_id": item.series_id,
+                            "error": "Read timed out",
+                        }
+                        for item in called
+                    ]
+                )
+            raise AssertionError(mode)
+
+    class FallbackGovernance:
+        def __init__(self, source_cfg):
+            self.mode = source_cfg.get("mode")
+
+        def govern_master(self, called, provider, **kwargs):
+            calls.append(("fallback", [item.series_id for item in called]))
+            mode = self.mode
+            if mode == "unit_mismatch":
+                return CommodityMasterGovernanceResult(
+                    blockers=[
+                        {
+                            "reason": "master_unit_mismatch",
+                            "series_id": called[0].series_id,
+                            "configured": "USD/barrel",
+                            "source": "index",
+                        }
+                    ]
+                )
+            if mode == "missing_key":
+                return CommodityMasterGovernanceResult(
+                    blockers=[{"reason": "missing_api_key", "api_key_env": "FRED_API_KEY"}]
+                )
+            return CommodityMasterGovernanceResult(
+                records=[_chain_success_record(item, venue="FRED") for item in called],
+                warnings=[{"reason": "fallback_warning", "series_id": called[0].series_id}]
+                if mode == "keep_warning"
+                else [],
+            )
+
+    def run(primary_mode, fallback_mode="success"):
+        calls.clear()
+        module_cfg = deepcopy(cfg)
+        module_cfg["source_profiles"]["eia_official_api"] = {
+            **module_cfg["source_profiles"]["eia_official_api"],
+            "mode": primary_mode,
+        }
+        module_cfg["source_profiles"]["fred_official_api"] = {
+            **module_cfg["source_profiles"]["fred_official_api"],
+            "mode": fallback_mode,
+        }
+        monkeypatch.setattr(
+            ConfiguredSourceChainGovernanceAdapter,
+            "GOVERNANCE",
+            {"eia": PrimaryGovernance, "fred": FallbackGovernance},
+        )
+        adapter = ConfiguredSourceChainGovernanceAdapter(
+            module_cfg["source_profiles"]["eia_fred_oil_chain"],
+            module_cfg,
+        )
+        provider = ConfiguredSourceChainProvider(
+            "eia_fred_oil_chain",
+            module_cfg["source_profiles"]["eia_fred_oil_chain"],
+            module_cfg,
+        )
+        return adapter.govern_master(
+            [wti, brent],
+            provider,
+            start_date="2026-11-17",
+            end_date="2026-11-26",
+        )
+
+    primary_success = run("both_success")
+    assert calls == [("primary", [wti.series_id, brent.series_id])]
+    assert primary_success.blockers == []
+    assert primary_success.notes == []
+    assert {record["quality_flag"] for record in primary_success.records} == {
+        "official_primary_with_governed_fallback"
+    }
+    assert {record["venue"] for record in primary_success.records} == {"EIA"}
+    assert {record["metadata"]["master_verified_by"] for record in primary_success.records} == {
+        "eia_official_api"
+    }
+    assert primary_success.warnings[0]["reason"] == "primary_warning"
+
+    mixed = run("wti_success_brent_timeout")
+    assert calls[0] == ("primary", [wti.series_id, brent.series_id])
+    assert calls[1] == ("fallback", [brent.series_id])
+    brent_record = next(record for record in mixed.records if record["series_id"] == brent.series_id)
+    assert brent_record["venue"] == "EIA"
+    assert brent_record["source_profile"] == "eia_fred_oil_chain"
+    assert brent_record["quality_flag"] == "fallback_master_verified"
+    assert brent_record["metadata"]["master_verified_by"] == "fred_official_api"
+    assert brent_record["metadata"]["primary_error"] == "Read timed out"
+    assert mixed.notes[0]["reason"] == "primary_master_request_failed_fallback_verified"
+    assert mixed.notes[0]["primary_error"] == "Read timed out"
+    assert mixed.blockers == []
+
+    semantic = run("wti_unit_brent_timeout")
+    assert calls[1] == ("fallback", [brent.series_id])
+    assert any(
+        blocker["reason"] == "master_unit_mismatch" and blocker["series_id"] == wti.series_id
+        for blocker in semantic.blockers
+    )
+    wti_record = next(record for record in semantic.records if record["series_id"] == wti.series_id)
+    assert wti_record["governance_status"] == "blocked"
+    assert wti_record["quality_flag"] == "unverified"
+
+    fallback_semantic = run("both_timeout", "unit_mismatch")
+    assert calls[1][0] == "fallback"
+    assert fallback_semantic.notes == []
+    assert any(blocker["reason"] == "master_unit_mismatch" for blocker in fallback_semantic.blockers)
+    assert all(record["quality_flag"] == "unverified" for record in fallback_semantic.records)
+
+    covered = run("missing_key")
+    assert calls[1][1] == [wti.series_id, brent.series_id]
+    assert covered.blockers == []
+    assert {note["primary_error"] for note in covered.notes} == {"missing_api_key:EIA_API_KEY"}
+    assert {record["metadata"]["primary_error"] for record in covered.records} == {
+        "missing_api_key:EIA_API_KEY"
+    }
+
+    failed = run("both_timeout", "missing_key")
+    assert failed.notes == []
+    assert any(
+        blocker["reason"] == "missing_api_key" and blocker["api_key_env"] == "FRED_API_KEY"
+        for blocker in failed.blockers
+    )
+    assert all(record["governance_status"] == "blocked" for record in failed.records)
+    assert all(record["quality_flag"] == "unverified" for record in failed.records)
+    assert all(record["source_profile"] == "eia_fred_oil_chain" for record in failed.records)
+
+    warned = run("both_timeout", "keep_warning")
+    assert any(item["reason"] == "fallback_warning" for item in warned.warnings)
+    assert any(
+        item["reason"] == "primary_master_request_failed_fallback_verified" for item in warned.notes
+    )
+    assert all(item["reason"] != "fallback_warning" for item in warned.notes)
+
+
+def test_primary_profile_gap_blocks_without_fallback(monkeypatch):
+    from dataclasses import replace
+
+    cfg, series = _oil_chain_series(
+        "CMD.OIL.WTI.SPOT.EIA.DAILY",
+        "CMD.OIL.BRENT.SPOT.EIA.DAILY",
+    )
+    calls = []
+
+    class PrimaryGovernance:
+        def __init__(self, source_cfg):
+            pass
+
+        def govern_master(self, called, provider, **kwargs):
+            calls.append(("primary", [item.series_id for item in called]))
+            return CommodityMasterGovernanceResult(
+                records=[_chain_success_record(item, venue="EIA") for item in called]
+            )
+
+    class FallbackGovernance:
+        def __init__(self, source_cfg):
+            pass
+
+        def govern_master(self, called, provider, **kwargs):
+            calls.append(("fallback", [item.series_id for item in called]))
+            return CommodityMasterGovernanceResult(
+                records=[_chain_success_record(item) for item in called]
+            )
+
+    monkeypatch.setattr(
+        ConfiguredSourceChainGovernanceAdapter,
+        "GOVERNANCE",
+        {"eia": PrimaryGovernance, "fred": FallbackGovernance},
+    )
+
+    def run(module_cfg, selected):
+        calls.clear()
+        adapter = ConfiguredSourceChainGovernanceAdapter(
+            module_cfg["source_profiles"]["eia_fred_oil_chain"],
+            module_cfg,
+        )
+        provider = ConfiguredSourceChainProvider(
+            "eia_fred_oil_chain",
+            module_cfg["source_profiles"]["eia_fred_oil_chain"],
+            module_cfg,
+        )
+        return adapter.govern_master(
+            selected,
+            provider,
+            start_date="2026-11-17",
+            end_date="2026-11-26",
+        )
+
+    missing_adapter = deepcopy(cfg)
+    missing_adapter["source_profiles"]["eia_official_api"] = {
+        **missing_adapter["source_profiles"]["eia_official_api"],
+        "governance_adapter": "not_registered",
+    }
+    blocked = run(missing_adapter, series)
+    assert calls == []
+    assert blocked.notes == []
+    assert {item["reason"] for item in blocked.blockers} == {
+        "primary_source_chain_governance_unavailable"
+    }
+    assert all(record["source_profile"] == "eia_fred_oil_chain" for record in blocked.records)
+    assert all(record["quality_flag"] == "unverified" for record in blocked.records)
+
+    wti = next(item for item in series if item.series_id == "CMD.OIL.WTI.SPOT.EIA.DAILY")
+    brent = next(item for item in series if item.series_id == "CMD.OIL.BRENT.SPOT.EIA.DAILY")
+    metadata = dict(wti.metadata)
+    chain_sources = dict(metadata.get("source_chain_sources") or {})
+    chain_sources.pop("eia_official_api", None)
+    metadata["source_chain_sources"] = chain_sources
+    unmapped_wti = replace(wti, metadata=metadata)
+    partial = run(cfg, [unmapped_wti, brent])
+    assert calls == [("primary", [brent.series_id])]
+    wti_record = next(record for record in partial.records if record["series_id"] == wti.series_id)
+    assert wti_record["governance_status"] == "blocked"
+    assert wti_record["source_profile"] == "eia_fred_oil_chain"
+    assert any(
+        item["reason"] == "primary_source_chain_governance_unavailable"
+        and item["series_id"] == wti.series_id
+        for item in partial.blockers
+    )
+
+    skipped_middle = deepcopy(cfg)
+    skipped_middle["source_profiles"]["missing_fallback"] = {
+        "provider_adapter": "not_a_provider",
+        "governance_adapter": "not_registered",
+    }
+    skipped_middle["source_profiles"]["eia_fred_oil_chain"] = {
+        **skipped_middle["source_profiles"]["eia_fred_oil_chain"],
+        "source_chain": [
+            {"source_profile": "eia_official_api", "role": "primary"},
+            {"source_profile": "missing_fallback", "role": "fallback"},
+            {"source_profile": "fred_official_api", "role": "fallback"},
+        ],
+    }
+
+    class TimeoutPrimary(PrimaryGovernance):
+        def govern_master(self, called, provider, **kwargs):
+            calls.append(("primary", [item.series_id for item in called]))
+            return CommodityMasterGovernanceResult(
+                blockers=[
+                    {
+                        "reason": "master_metadata_request_failed",
+                        "series_id": item.series_id,
+                        "error": "Read timed out",
+                    }
+                    for item in called
+                ]
+            )
+
+    monkeypatch.setattr(
+        ConfiguredSourceChainGovernanceAdapter,
+        "GOVERNANCE",
+        {"eia": TimeoutPrimary, "fred": FallbackGovernance},
+    )
+    recovered = run(skipped_middle, [wti])
+    assert [name for name, _ids in calls] == ["primary", "fallback"]
+    assert recovered.blockers == []
+    assert recovered.notes[0]["primary_error"] == "Read timed out"
+    assert recovered.records[0]["quality_flag"] == "fallback_master_verified"
+
+    terminal = deepcopy(cfg)
+    terminal["source_profiles"]["missing_fallback"] = {
+        "provider_adapter": "not_a_provider",
+        "governance_adapter": "not_registered",
+    }
+    terminal["source_profiles"]["eia_fred_oil_chain"] = {
+        **terminal["source_profiles"]["eia_fred_oil_chain"],
+        "source_chain": [
+            {"source_profile": "eia_official_api", "role": "primary"},
+            {"source_profile": "missing_fallback", "role": "fallback"},
+        ],
+    }
+    exhausted = run(terminal, [wti])
+    assert [name for name, _ids in calls] == ["primary"]
+    assert any(
+        item["reason"] == "source_chain_adapter_or_mapping_missing" for item in exhausted.blockers
+    )
+    assert any(item["reason"] == "master_metadata_request_failed" for item in exhausted.blockers)
+    assert exhausted.records[0]["source_profile"] == "eia_fred_oil_chain"
+    assert exhausted.records[0]["quality_flag"] == "unverified"
+
+
+def test_real_chain_pipeline_uses_fallback_and_preserves_prior_success(monkeypatch, tmp_path):
+    cfg = _research_config(tmp_path)
+    special_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    series = CommodityUniverseSelector(special_cfg).resolve(
+        series_ids=["CMD.OIL.WTI.SPOT.EIA.DAILY"]
+    )
+    item = series[0]
+
+    class EiaGovernance:
+        def __init__(self, source_cfg):
+            pass
+
+        def govern_master(self, called, provider, **kwargs):
+            return CommodityMasterGovernanceResult(
+                blockers=[{"reason": "missing_api_key", "api_key_env": "EIA_API_KEY"}]
+            )
+
+    class FredGovernance:
+        def __init__(self, source_cfg):
+            pass
+
+        def govern_master(self, called, provider, **kwargs):
+            return CommodityMasterGovernanceResult(
+                records=[_chain_success_record(value, venue="FRED") for value in called]
+            )
+
+    class EiaFetcher:
+        def __init__(self, profile, source_cfg):
+            pass
+
+        def fetch(self, called, *, start_date, end_date):
+            return CommodityProviderResult(
+                blockers=[{"reason": "missing_api_key", "api_key_env": "EIA_API_KEY"}]
+            )
+
+    class FredFetcher:
+        def __init__(self, profile, source_cfg):
+            self.profile = profile
+
+        def fetch(self, called, *, start_date, end_date):
+            return CommodityProviderResult(
+                observations=[
+                    CommodityObservation(
+                        series_id=value.series_id,
+                        observation_date="2026-11-17",
+                        value=89.53,
+                        currency="USD",
+                        unit="USD/barrel",
+                        raw_value=89.53,
+                        raw_currency="USD",
+                        raw_unit="USD/barrel",
+                        source_profile=self.profile,
+                        source_url="https://example.test/fred",
+                        quality_flag="official_public_api",
+                        source_symbol=value.source_symbol,
+                        parser_version="unit-test",
+                        raw_payload_hash=value.series_id,
+                    )
+                    for value in called
+                ]
+            )
+
+    monkeypatch.setattr(
+        ConfiguredSourceChainGovernanceAdapter,
+        "GOVERNANCE",
+        {"eia": EiaGovernance, "fred": FredGovernance},
+    )
+    monkeypatch.setattr(
+        ConfiguredSourceChainProvider,
+        "PROVIDERS",
+        {"eia": EiaFetcher, "fred": FredFetcher},
+    )
+    success = SpecialCommodityPriceSyncService(storage, cfg).sync(
+        series_ids=[item.series_id],
+        start_date="2026-11-17",
+        end_date="2026-11-26",
+        dry_run=False,
+    )
+    assert success["status"] == "success"
+    assert success["fetched_rows"] == 1
+    assert {note["reason"] for note in success["notes"]} == {
+        "primary_master_request_failed_fallback_verified",
+        "missing_api_key_fallback_covered",
+    }
+    stored_rows = storage.read_observations(series_id=item.series_id)
+    assert [row["observation_date"] for row in stored_rows] == ["2026-11-17"]
+    verified = storage.read_master_governance([item.series_id])[item.series_id]
+    assert verified["governance_status"] == "success"
+    assert verified["quality_flag"] == "fallback_master_verified"
+    assert verified["venue"] == "EIA"
+
+    class FailingGovernance:
+        def __init__(self, source_cfg):
+            pass
+
+        def govern_master(self, called, provider, **kwargs):
+            return CommodityMasterGovernanceResult(
+                blockers=[
+                    {
+                        "reason": "master_metadata_request_failed",
+                        "series_id": value.series_id,
+                        "error": "Read timed out",
+                    }
+                    for value in called
+                ]
+            )
+
+    prior_hash = verified["evidence_hash"]
+    monkeypatch.setattr(
+        ConfiguredSourceChainGovernanceAdapter,
+        "GOVERNANCE",
+        {"eia": FailingGovernance, "fred": FailingGovernance},
+    )
+    blocked = SpecialCommodityPriceSyncService(storage, cfg).sync(
+        series_ids=[item.series_id],
+        start_date="2026-11-17",
+        end_date="2026-11-26",
+        dry_run=False,
+    )
+    assert blocked["status"] == "blocked"
+    assert blocked["master_governance_write"]["preserved_verified"] == 1
+    preserved = storage.read_master_governance([item.series_id])[item.series_id]
+    assert preserved["governance_status"] == "success"
+    assert preserved["evidence_hash"] == prior_hash
+    assert preserved["quality_flag"] == "fallback_master_verified"
+
+
+def test_primary_price_missing_key_follows_fallback_coverage(monkeypatch):
+    cfg, series = _oil_chain_series("CMD.OIL.WTI.SPOT.EIA.DAILY", "CMD.OIL.BRENT.SPOT.EIA.DAILY")
+    provider = ConfiguredSourceChainProvider(
+        "eia_fred_oil_chain",
+        cfg["source_profiles"]["eia_fred_oil_chain"],
+        cfg,
+    )
+
+    def observation(item, observed_date="2026-11-17"):
+        return CommodityObservation(
+            series_id=item.series_id,
+            observation_date=observed_date,
+            value=70.0,
+            currency="USD",
+            unit="USD/barrel",
+            raw_value=70.0,
+            raw_currency="USD",
+            raw_unit="USD/barrel",
+            source_profile="fred_official_api",
+            source_url="https://example.test/fred",
+            quality_flag="official_public_api",
+            source_symbol=item.source_symbol,
+            parser_version="unit-test",
+            raw_payload_hash=item.series_id,
+        )
+
+    class MissingPrimary:
+        def fetch(self, called, *, start_date, end_date):
+            return CommodityProviderResult(
+                blockers=[{"reason": "missing_api_key", "api_key_env": "EIA_API_KEY"}]
+            )
+
+    class CoveringFallback:
+        def fetch(self, called, *, start_date, end_date):
+            return CommodityProviderResult(observations=[observation(item) for item in called])
+
+    class PartialFallback:
+        def fetch(self, called, *, start_date, end_date):
+            covered = [item for item in called if item.series_id == "CMD.OIL.WTI.SPOT.EIA.DAILY"]
+            return CommodityProviderResult(observations=[observation(item) for item in covered])
+
+    monkeypatch.setattr(
+        provider,
+        "_resolve_provider",
+        lambda profile: MissingPrimary() if profile == "eia_official_api" else CoveringFallback(),
+    )
+    covered = provider.fetch(series, start_date="2026-11-17", end_date="2026-11-26")
+    assert covered.blockers == []
+    assert {note["reason"] for note in covered.notes} == {"missing_api_key_fallback_covered"}
+    assert {note["api_key_env"] for note in covered.notes} == {"EIA_API_KEY"}
+    assert all(note["fallback_filled_dates"] == 1 for note in covered.notes)
+
+    monkeypatch.setattr(
+        provider,
+        "_resolve_provider",
+        lambda profile: MissingPrimary() if profile == "eia_official_api" else PartialFallback(),
+    )
+    partial = provider.fetch(series, start_date="2026-11-17", end_date="2026-11-26")
+    assert {row.series_id for row in partial.observations} == {"CMD.OIL.WTI.SPOT.EIA.DAILY"}
+    assert [note["series_id"] for note in partial.notes] == ["CMD.OIL.WTI.SPOT.EIA.DAILY"]
+    assert partial.blockers[0]["series_id"] == "CMD.OIL.BRENT.SPOT.EIA.DAILY"
+    assert partial.blockers[0]["api_key_env"] == "EIA_API_KEY"
+
+
+def test_seriesless_provider_blocker_excludes_the_whole_call(monkeypatch, tmp_path):
+    blocked = _provider_blocked_series_ids(
+        [{"reason": "missing_api_key", "api_key_env": "FRED_API_KEY"}],
+        ["CMD.OIL.WTI.SPOT.EIA.DAILY", "CMD.OIL.BRENT.SPOT.EIA.DAILY"],
+    )
+    assert blocked == {"CMD.OIL.WTI.SPOT.EIA.DAILY", "CMD.OIL.BRENT.SPOT.EIA.DAILY"}
+
+    cfg = _research_config(tmp_path)
+    special_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    series = CommodityUniverseSelector(special_cfg).resolve(
+        series_ids=["CMD.OIL.WTI.SPOT.EIA.DAILY"]
+    )
+
+    def govern_master(self, called, provider, **kwargs):
+        item = called[0]
+        return CommodityMasterGovernanceResult(records=[_chain_success_record(item, venue="EIA")])
+
+    def fetch(self, called, *, start_date, end_date):
+        item = called[0]
+        return CommodityProviderResult(
+            observations=[
+                CommodityObservation(
+                    series_id=item.series_id,
+                    observation_date="2026-11-17",
+                    value=70.0,
+                    currency="USD",
+                    unit="USD/barrel",
+                    raw_value=70.0,
+                    raw_currency="USD",
+                    raw_unit="USD/barrel",
+                    source_profile=item.source_profile,
+                    source_url="https://example.test",
+                    quality_flag="official_public_api",
+                    source_symbol=item.source_symbol,
+                    parser_version="unit-test",
+                    raw_payload_hash="secret-blocker",
+                )
+            ],
+            blockers=[{"reason": "missing_api_key", "api_key_env": "FRED_API_KEY"}],
+        )
+
+    monkeypatch.setattr(ConfiguredSourceChainGovernanceAdapter, "govern_master", govern_master)
+    monkeypatch.setattr(ConfiguredSourceChainProvider, "fetch", fetch)
+    result = SpecialCommodityGovernancePipeline(storage, special_cfg).run(
+        target_series=series,
+        start_date="2026-11-17",
+        end_date="2026-11-26",
+        dry_run=False,
+    )
+
+    assert result["status"] == "blocked"
+    assert result["fetched_rows"] == 0
+    assert storage.read_observations(series_id=series[0].series_id) == []
+
+
+def test_metadata_fallback_note_redacts_secret_and_reports_success():
+    from requests import HTTPError
+    from scheduler.tasks import _format_special_commodity_scheduler_report
+
+    secret_error = (
+        "504 Server Error: Gateway Timeout for url: "
+        "https://api.eia.gov/v2/petroleum/pri/spt/data/?api_key=SECRET_VALUE&frequency=daily"
+    )
+    series = CommoditySeries(
+        series_id="CMD.OIL.WTI.SPOT.EIA.DAILY",
+        commodity_id="OIL.WTI.SPOT",
+        venue="EIA",
+        source_profile="eia_fred_oil_chain",
+        source_symbol="PET.RWTC.D",
+        frequency="daily",
+        quote_type="spot_canonical",
+        currency="USD",
+        unit="USD/barrel",
+    )
+    state, pending = apply_source_chain_master_profile(
+        SourceChainMasterState(),
+        series=[series],
+        profile="eia_official_api",
+        is_primary=True,
+        has_later_profile=True,
+        chain_source_profile="eia_fred_oil_chain",
+        primary_profile="eia_official_api",
+        chain_profiles=["eia_official_api", "fred_official_api"],
+        result=CommodityMasterGovernanceResult(
+            blockers=[
+                {
+                    "reason": "master_metadata_request_failed",
+                    "series_id": series.series_id,
+                    "error": str(HTTPError(secret_error)),
+                }
+            ]
+        ),
+    )
+    assert pending == [series]
+    state, pending = apply_source_chain_master_profile(
+        state,
+        series=[series],
+        profile="fred_official_api",
+        is_primary=False,
+        has_later_profile=False,
+        chain_source_profile="eia_fred_oil_chain",
+        primary_profile="eia_official_api",
+        chain_profiles=["eia_official_api", "fred_official_api"],
+        result=CommodityMasterGovernanceResult(records=[_chain_success_record(series)]),
+    )
+    assert pending == []
+    rendered = json.dumps({"records": state.records, "notes": state.notes}, ensure_ascii=False)
+    assert "SECRET_VALUE" not in rendered
+    assert "api_key=***" in rendered or "api_key=%2A%2A%2A" in rendered
+    report = _format_special_commodity_scheduler_report(
+        {
+            "status": "success",
+            "run_id": 1,
+            "dry_run": False,
+            "target_series": 1,
+            "venues": ["EIA"],
+            "master_data_governance": "success",
+            "date_governance": "success",
+            "fetched_rows": 1,
+            "inserted": 1,
+            "changed": 0,
+            "unchanged": 0,
+            "would_write": 0,
+            "notes": state.notes,
+            "warnings": [],
+            "blockers": [],
+        }
+    )
+    assert "成功" in report
+    assert "说明" in report
+    assert "primary_master_request_failed_fallback_verified" in report
+    assert "阻断:" not in report
+    assert "告警:" not in report
+    assert "SECRET_VALUE" not in report
+
+
+def test_retry_log_and_eia_master_error_redact_api_key(monkeypatch, caplog):
+    from requests import HTTPError
+
+    secret_error = HTTPError(
+        "504 Server Error for url: https://api.eia.gov/v2/data/?api_key=SECRET_VALUE&frequency=daily"
+    )
+
+    def boom(*args, **kwargs):
+        raise secret_error
+
+    from utils.logging_manager import ds_logger
+
+    monkeypatch.setattr("research.special_commodity_market_data.request_get", boom)
+    ds_logger.addHandler(caplog.handler)
+    try:
+        with pytest.raises(HTTPError):
+            _request_with_retry(
+                "https://api.eia.gov/v2/data/",
+                params={"api_key": "SECRET_VALUE"},
+                headers={},
+                timeout=1,
+                tls_config=None,
+                retry_cfg={"max_attempts": 2, "backoff_seconds": 0},
+                log_context="unit",
+            )
+    finally:
+        ds_logger.removeHandler(caplog.handler)
+    assert "SECRET_VALUE" not in caplog.text
+    assert "api_key=***" in caplog.text
+
+    cfg, series = _oil_chain_series("CMD.OIL.WTI.SPOT.EIA.DAILY")
+    monkeypatch.setenv("EIA_API_KEY", "SECRET_VALUE")
+
+    def fail_request(*args, **kwargs):
+        raise secret_error
+
+    monkeypatch.setattr(
+        "research.special_commodity_market_data._request_json_with_retry",
+        fail_request,
+    )
+    result = EiaCommodityGovernanceAdapter(cfg["source_profiles"]["eia_official_api"]).govern_master(
+        series,
+        provider=None,
+        start_date="2026-11-17",
+        end_date="2026-11-26",
+    )
+    rendered = json.dumps({"blockers": result.blockers, "records": result.records}, ensure_ascii=False)
+    assert "SECRET_VALUE" not in rendered
+
+
+def test_price_warning_remains_after_metadata_fallback(monkeypatch, tmp_path):
+    cfg = _research_config(tmp_path)
+    special_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    series = CommodityUniverseSelector(special_cfg).resolve(
+        series_ids=["CMD.OIL.WTI.SPOT.EIA.DAILY"]
+    )
+
+    def govern_master(self, called, provider, **kwargs):
+        item = called[0]
+        return CommodityMasterGovernanceResult(
+            records=[
+                {
+                    **_chain_success_record(item, venue="EIA"),
+                    "source_profile": item.source_profile,
+                    "quality_flag": "fallback_master_verified",
+                }
+            ],
+            notes=[
+                {
+                    "reason": "primary_master_request_failed_fallback_verified",
+                    "series_id": item.series_id,
+                    "primary_source_profile": "eia_official_api",
+                    "fallback_source_profile": "fred_official_api",
+                    "primary_error": "Read timed out",
+                }
+            ],
+        )
+
+    def fetch(self, called, *, start_date, end_date):
+        return CommodityProviderResult(
+            warnings=[
+                {
+                    "reason": "provider_request_failed",
+                    "series_id": called[0].series_id,
+                    "error": "still unavailable",
+                }
+            ]
+        )
+
+    monkeypatch.setattr(ConfiguredSourceChainGovernanceAdapter, "govern_master", govern_master)
+    monkeypatch.setattr(ConfiguredSourceChainProvider, "fetch", fetch)
+    result = SpecialCommodityGovernancePipeline(storage, special_cfg).run(
+        target_series=series,
+        start_date="2026-11-17",
+        end_date="2026-11-26",
+        dry_run=True,
+    )
+
+    assert result["status"] == "warning"
+    assert any(item["reason"] == "provider_request_failed" for item in result["warnings"])
+    assert any(
+        item["reason"] == "primary_master_request_failed_fallback_verified"
+        for item in result["notes"]
+    )
+    assert result["per_source"]["eia_fred_oil_chain"]["notes"] == 1
+    assert result["blockers"] == []
 
 
 def test_source_unit_governance_normalizes_equivalent_official_labels():
