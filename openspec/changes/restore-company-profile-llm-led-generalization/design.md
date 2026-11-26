@@ -1,5 +1,9 @@
 ## Context
 
+### 6.FR one real known-case source-review observation
+
+Freeze the current authored drafts and original source packets for Shengnan, Youngor andCIMC, plus independent source-first risk/positive references excluded from model input. Three individually bounded current-draft review plans reuse the existing task entry/TaskService at concurrency at most3. Raw successors remain isolated until A checks actual detection, repair/limitation, false positives and inherited-versus-new manual intervention. Only approved useful research successors join the original writer/API; no old result is rewritten or used as a new generalization score. No application feature or live HTTP-policy activation is needed. The one group ends with an explicit effectiveness/limits decision, not another per-field repair series. Exact source identity, total resources and cleanup are in the6.FR card.
+
 ### 6.FQ explicit successors preserve closed-window history
 
 The existing finite HTTP task owner gains one operator-only activation for a separately authorized successor after the predecessor is exhausted and terminal. Existing root locks, exact predecessor hash and a fresh checkpoint protect the transition; historical policies/ledgers/wires stay immutable. New services resolve historical tasks and request identities through the explicit predecessor references, report the owning policy allowance and never dispatch historical work. Activation alone sends no models and does not edit the caller's environment. The current live6.FP window remains exhausted and unchanged in this zero-supplier-call card; controlled two-window original-owner validation does not establish semantic quality. See the6.FQ card for the narrow write set and cleanup.

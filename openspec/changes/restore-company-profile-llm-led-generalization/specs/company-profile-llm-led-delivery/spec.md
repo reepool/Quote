@@ -200,6 +200,12 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 - **AND** supported ambiguous wording MAY retain unclear scope and a specific reason, while unsupported definite scope, false prose or a future conditional result presented as already realized MUST NOT be rescued by removing metrics or adding an uncertainty label
 - **AND** metric-only limitation requires support for the fact's own scope, period, qualifications, prose and evidence; program code MUST NOT infer that semantic support from reason-text patterns or matching field names, and frozen historical identities/results remain unchanged
 
+#### Scenario: A changed fact has its own final after an older model metric limit
+- **WHEN** a current-draft recheck has its own accepted complete initial, repair and final source calls for the same report/sections/pages, and a non-inherited accepted revision binds the exact original and current fact-content hashes
+- **THEN** a prior model metric-only limitation bound to that exact old original hash MUST NOT be retargeted as a whole-fact defect on the newly source-verified changed content
+- **AND** independent use decisions, unrelated prior defects/omissions and any limitation without that exact successful binding remain conservative; missing/retained/failed or mismatched final calls do not release the old guard
+- **AND** offline consumption of sealed original replies may derive a separately identified local successor with original model attribution and zero new usage, without rewriting the original wire/checkpoint/result, manufacturing a new final review or rescoring the original run
+
 #### Scenario: A local numeric representation cannot be normalized without guessing
 - **WHEN** a new processing identity encounters the observed narrow metric-format incompatibility while preparing an otherwise source-bound fact or repair candidate
 - **THEN** the existing owner MAY retain its original narrative and raw metric spelling with a null normalized value and explicit local-format limitation after applicable typed/source checks, without guessing sign, amount, unit or subject or converting unknown to zero

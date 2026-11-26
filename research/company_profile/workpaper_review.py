@@ -666,12 +666,40 @@ def _inherit_current_review_guards(paper, link):
 
     These findings are explicitly labelled inherited; the old opinion was not
     supplied to the new model. Changed component positions fail closed instead
-    of guessing a mapping. Old source rechecks keep their previous behavior.
+    of guessing a mapping, unless the changed whole fact has its own matching
+    source-checked repair/final. Independent restrictions remain separate.
+    Old source rechecks keep their previous behavior.
     """
     previous, review = link.prior_quality_review, paper.quality_review
     if link.current_draft_policy not in {CURRENT_DRAFT_REVIEW_POLICY, RECOVERED_REPAIR_POLICY} or previous is None or review is None:
         return paper
     facts = _fact_map(paper)
+    sections = {s.section_id for s in paper.reading_scope.sections}
+    pages = {span.page for evidence in paper.evidence for span in evidence.source_spans}
+
+    def own_source_call(purpose):
+        calls = [call for call in review.calls if call.purpose == purpose]
+        return bool(len(calls) == 1 and sections and pages
+            and calls[0].contract_status == "accepted" and calls[0].finish_reason == "stop"
+            and calls[0].request_hash and calls[0].response_hash and calls[0].model and calls[0].source_label
+            and calls[0].request_id not in review.retained_request_ids
+            and calls[0].scope_kind == "selected_source_sections"
+            and set(calls[0].section_ids) == sections and set(calls[0].physical_pages) == pages)
+
+    verified_changes = {}
+    if (paper.report == link.report and review.status in {"completed", "completed_with_open_findings"}
+        and review.error is None and review.execution_failure is None
+        and all(own_source_call(purpose) for purpose in (
+            "review_profile_workpaper", "repair_profile_workpaper", "verify_profile_workpaper_repair"))):
+        for finding in review.findings:
+            current = facts.get(finding.affected_fact_id)
+            if (not finding.finding_id.startswith("inherited:") and finding.resolution == "corrected_pending_trust"
+                and finding.original_fact is not None and finding.revised_fact is not None and current is not None
+                and finding.revised_fact.fact_id == finding.affected_fact_id
+                and workpaper_fact_hash(finding.revised_fact) == workpaper_fact_hash(current[1])
+                and (review.checked_fact_hashes or {}).get(finding.affected_fact_id)
+                    == workpaper_fact_hash(finding.original_fact)):
+                verified_changes[finding.affected_fact_id] = workpaper_fact_hash(finding.original_fact)
     inherited = []
     existing_ids = {f.finding_id for f in review.findings}
     for finding in previous.findings:
@@ -687,6 +715,12 @@ def _inherit_current_review_guards(paper, link):
         elif finding.original_fact is not None:
             item = finding
             if workpaper_fact_hash(current[1]) != workpaper_fact_hash(finding.original_fact):
+                if (finding.resolution == "metrics_limited"
+                    and verified_changes.get(finding.affected_fact_id) == workpaper_fact_hash(finding.original_fact)):
+                    # The complete changed fact has its own source-checked final.
+                    # Do not retarget an old metric limit onto that new content.
+                    # Independent decisions below and other old defects remain.
+                    continue
                 item = finding.model_copy(update={"original_fact": current[1], "revised_fact": None,
                     "metric_limit": None, "resolution": "quarantined"})
         else:

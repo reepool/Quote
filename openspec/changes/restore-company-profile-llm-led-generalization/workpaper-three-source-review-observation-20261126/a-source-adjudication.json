@@ -1,0 +1,108 @@
+{
+  "task": "6.FR",
+  "phase": "independent_A_assessment_of_original_model_repairs",
+  "known_targets_freshly_raised": 4,
+  "known_target_repairs_source_supported": 4,
+  "all_actual_accepted_repairs": [
+    {
+      "stock": "920006.BJ",
+      "work_id": "bp-work-070141e2f3b0b8fd783e9995",
+      "fact_id": "F009",
+      "current_fact_sha256": "5b9f70b2756fa12f1b4019818d07bcd781b2418d8c23194a1ec17521ce38f436",
+      "element": "scale_and_mix",
+      "source_decision": "supported_current_repaired_content",
+      "reason": "原PDF21收入构成及142附注明确公司主营合计110,497,142.43元。修订保主营标签及金额、公司合并范围，不当全部营业收入。",
+      "known_card_target": true,
+      "substantive_semantic_correction": true,
+      "original_true_final_received": true
+    },
+    {
+      "stock": "920006.BJ",
+      "work_id": "bp-work-070141e2f3b0b8fd783e9995",
+      "fact_id": "F021",
+      "current_fact_sha256": "f6c890b38473297adf5330d66b813bc3a7431b0f7ec9bdfb0deeff1ba8bc6951",
+      "element": "customers_channels_markets",
+      "source_decision": "supported_current_repaired_content",
+      "reason": "原PDF14军用领域明确20家/49次/15次；原文限定、指标命名及unclear/具体原因均保，未当公司所有业务统计。",
+      "known_card_target": true,
+      "substantive_semantic_correction": true,
+      "original_true_final_received": true
+    },
+    {
+      "stock": "600177.SH",
+      "work_id": "bp-work-c84f05ea973bec7d76025099",
+      "fact_id": "F002",
+      "current_fact_sha256": "3ceb7b2919ed7215fdee845a8fb166986a3302aaa8ae956c00b068843568d5b9",
+      "element": "products_services",
+      "source_decision": "supported_current_repaired_content",
+      "reason": "原文品牌定位句与全场景升级均有源。新文保原产品场景，没有新无据断言；这是非必要措辞收紧，不把原概述当实质经济错误或计修复收益。",
+      "known_card_target": false,
+      "substantive_semantic_correction": false,
+      "original_true_final_received": true
+    },
+    {
+      "stock": "600177.SH",
+      "work_id": "bp-work-c84f05ea973bec7d76025099",
+      "fact_id": "F005",
+      "current_fact_sha256": "91528907fbe0a96b258658bd5eba966455201dcd301d354486ebbed6cc650811",
+      "element": "revenue_model",
+      "source_decision": "supported_current_repaired_content",
+      "reason": "原PDF20预售95,576.81万元为订单/合作权益口径，明湖懿秋苑交付结转415,688.70万元、亏损10,579.67万元。修订去掉预售与交付共同确认收入断言，保各自口径和亏损raw/null，未混36页项目结转数。",
+      "known_card_target": true,
+      "substantive_semantic_correction": true,
+      "original_true_final_received": true
+    },
+    {
+      "stock": "600177.SH",
+      "work_id": "bp-work-c84f05ea973bec7d76025099",
+      "fact_id": "F013",
+      "current_fact_sha256": "967ec13f70fd0f07f88e9368c3bbc0097c86877364888945c01488b65772b378",
+      "element": "operations_and_inputs",
+      "source_decision": "supported_current_repaired_content",
+      "reason": "原PDF20该研发/DP水洗/供应商弹性供货段落在男装竞争力项下，business_segment较原集团范围更忠实；原经济描述及有据内容保留。",
+      "known_card_target": false,
+      "substantive_semantic_correction": true,
+      "original_true_final_received": true
+    },
+    {
+      "stock": "000039.SZ",
+      "work_id": "bp-work-3a3bb89fa82f1553462f6792",
+      "fact_id": "f-023",
+      "current_fact_sha256": "63fb1da36523a4527b25872adc05ec87ecb7cbd7c921d8d01667e307efaa2256",
+      "element": "material_changes",
+      "source_decision": "supported_current_repaired_content",
+      "reason": "原PDF22为2025年12月签协议，交易完成后将降至45.04%；19页报告年末62.70%。候选fact期间区分签约与条件，各metric交易前/完成后单列且说明完成时点未披露，没有编完成日。",
+      "known_card_target": true,
+      "substantive_semantic_correction": true,
+      "original_true_final_received": true
+    }
+  ],
+  "extra_substantive_scope_corrections": 1,
+  "cosmetic_or_overstrict_original_fault_labels": 1,
+  "positive_controls": {
+    "920006.BJ": [
+      "F001",
+      "F002"
+    ],
+    "600177.SH": [
+      "F001"
+    ],
+    "000039.SZ": [
+      "f-001"
+    ]
+  },
+  "positive_control_main_business_content_unchanged": true,
+  "new_financial_omission_candidates_not_final_checked": {
+    "600177.SH": [
+      "review-add:RF004"
+    ],
+    "000039.SZ": [
+      "review-add:rev-omit-group-revenue"
+    ]
+  },
+  "not_adopted_or_filled_by_A": true,
+  "consolidation_elimination_omission_remains_optional": true,
+  "only_known_three_case_observation_not_new_generalization_accuracy": true,
+  "publication": "pending_guard_consumption_resolution_and_explicit_current_use_decisions",
+  "independent_A_decisions_were_not_model_input": true
+}

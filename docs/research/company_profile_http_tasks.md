@@ -4,7 +4,7 @@
 普通画像 GET、批量查询和计划接口始终只读，不会因为缺项或未核状态自动调用模型。
 配置策略不会自动执行任务，也不代表取得付费、外传或生产授权。6.FL工程验证及后续真实任务各保原范围。
 
-## 当前39股研究读取（2026-11-26，6.FP）
+## 当前39股研究读取（2026-11-27，6.FR）
 
 API进程显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT=/home/python/Quote/data/research/company_profile_research_v1_20261123`。
 该变量必须在服务器端启动API的环境中设置；Postman请求或另一个终端里的export不会改变已运行的进程。
@@ -18,14 +18,21 @@ API进程显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT=/home/python/Quote/dat
 随后6.FP在原reader按原文件内容hash复用严格校验，实际8000端口冷单股23.604秒、重复单股0.589–0.982秒、10股批量0.908秒、39股完整读取2.174秒、4并发墙钟2.917秒。内容变化仍重校，源限制和原完整内容不变；冷读仍慢，客户端建议保留60秒等待。这是本次实测，不承诺稳定时延。
 6.FP只在原私有`.env`新增有限策略路径和专用凭据，其余原字节保持，不改共享模型或调度配置。
 
-普通研究读取无需任务凭据。当前统一39股、1091条可读内容/1669指标，
+普通研究读取无需任务凭据。当前统一39股、1094条可读内容/1677指标，
 原来源、模型、审核、独立限制、缺项及同报告链均保留；数量包含多次读取的重复表述。
 光大证券601788.SH、国信证券002736.SZ尚无画像，显式批量查询列missing，单股返回404；不自动重跑。
 
 [当前研究入口](../../data/research/company_profile_research_v1_20261123/research-current.md) ·
+[晟楠/雅戈尔/中集当前人读版](../../data/research/company_profile_research_v1_20261123/three-reviewed-current-6fr-20261127.md) ·
+[三股当前JSON](../../data/research/company_profile_research_v1_20261123/three-reviewed-current-6fr-20261127.json) ·
 [王府井当前人读版](../../data/research/company_profile_research_v1_20261123/600859-current-6fp-20261126.md) ·
 [王府井当前API快照](../../data/research/company_profile_research_v1_20261123/600859-current-6fp-20261126.json) ·
 [6.FO历史39股快照](../../data/research/company_profile_research_v1_20261123/current-api-6fo-20261126.json)
+
+6.FR复用三股已有稿和原章节做一次真实源核/必要修订/终核，审后安全后继已由原writer交入当前API。
+晟楠主营合计与军用统计、雅戈尔预售/结转、中集交易完成后条件比例均保正确原文范围；不把未定条件改成已实现值。
+三股分别为24条/39指标、20条/28指标、20条/31指标，其余36家公司完整不变；旧限制仅A对当前新内容独核后才解除。
+本轮9次物理请求后已收口，未改变当前live HTTP单次窗口，仍余0；本轮研究增量不计新未见泛化或正式99%。
 
 ### 本次实际补读窗口
 

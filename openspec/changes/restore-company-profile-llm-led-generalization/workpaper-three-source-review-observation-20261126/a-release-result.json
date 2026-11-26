@@ -1,0 +1,104 @@
+{
+  "task": "6.FR",
+  "state": "three_safe_successors_published_by_original_writer",
+  "cases": [
+    {
+      "stock": "920006.BJ",
+      "raw_or_local_source": {
+        "path": "/home/python/Quote/data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-6fr-920006-local-guard-consumption-v1.json",
+        "sha256": "31d80c4ef8944dfeadbe6ee060b3c97dbea19e3b7c5c2c0adad51eea7643c812",
+        "independently_checked_fact_ids": [
+          "F009",
+          "F021"
+        ],
+        "released_old_restriction_fact_ids": [
+          "F009",
+          "F021"
+        ],
+        "limits": "F021 retains military-only wording,unclear scope and reason;not whole-company counts. No other inherited finding or withdrawn fact is restored."
+      },
+      "safe_work_id": "bp-work-6cb5e399db702402f828e710",
+      "A_released_old_limit_fact_ids": [
+        "F009",
+        "F021"
+      ],
+      "A_positive_only_fact_ids": [],
+      "new_A_safety_restrictions": 0,
+      "visible_objects": 24,
+      "visible_metrics": 39,
+      "published_record": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-6cb5e399db702402f828e710.json",
+      "published_record_sha256": "0b528fb3dc45a6ab52189ee27e826f3ad14e732bc294850307822dfa6a851eb5"
+    },
+    {
+      "stock": "600177.SH",
+      "raw_or_local_source": {
+        "path": "/home/python/Quote/data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-c84f05ea973bec7d76025099.json",
+        "sha256": "9d1bb3549f80a41f45829dc0273eb840c0b1807e0214e590ec21b7121be54022",
+        "independently_checked_fact_ids": [
+          "F002",
+          "F005",
+          "F013"
+        ],
+        "released_old_restriction_fact_ids": [
+          "F005"
+        ],
+        "limits": "Brand wording is source-supported but not counted as substantive error repair. Profit addition was locally rejected before final and is not adopted."
+      },
+      "safe_work_id": "bp-work-08d3b45db1dc5251ea73de21",
+      "A_released_old_limit_fact_ids": [
+        "F005"
+      ],
+      "A_positive_only_fact_ids": [
+        "F002",
+        "F013"
+      ],
+      "new_A_safety_restrictions": 0,
+      "visible_objects": 20,
+      "visible_metrics": 28,
+      "published_record": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-08d3b45db1dc5251ea73de21.json",
+      "published_record_sha256": "574e28aa72ab29f4261eaa5d2bf0d0a89d2b29e783f0631ed5cfb8e6da515701"
+    },
+    {
+      "stock": "000039.SZ",
+      "raw_or_local_source": {
+        "path": "/home/python/Quote/data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-3a3bb89fa82f1553462f6792.json",
+        "sha256": "14ae985157cd3352a01582ccaf3e18566a850d7b2bb51e586a7dd94266daba33",
+        "independently_checked_fact_ids": [
+          "f-023"
+        ],
+        "released_old_restriction_fact_ids": [
+          "f-023"
+        ],
+        "limits": "45.04% remains conditional after transaction completion with unknown completion time;not a reported2025 year-end holding. Revenue addition was locally rejected and is not adopted."
+      },
+      "safe_work_id": "bp-work-ddc3409c996dd2bdcfb355eb",
+      "A_released_old_limit_fact_ids": [
+        "f-023"
+      ],
+      "A_positive_only_fact_ids": [],
+      "new_A_safety_restrictions": 0,
+      "visible_objects": 20,
+      "visible_metrics": 31,
+      "published_record": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-ddc3409c996dd2bdcfb355eb.json",
+      "published_record_sha256": "a6458949b4b0a15c7b3e63e1dd6c55efc0af41b8c72feda0f73c64b860835553"
+    }
+  ],
+  "other36_complete_profiles_unchanged": true,
+  "full39_equal_prepublication_expected": true,
+  "original403_files_unchanged_before_navigation": true,
+  "sealed_original_run_and_records_unchanged": true,
+  "current39_visible_objects": 1094,
+  "current39_visible_metrics": 1677,
+  "necessary_sealed_parent_records": [
+    {
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-070141e2f3b0b8fd783e9995.json",
+      "sha256": "acc324d087dac9d27eb437b6d495bfbffa1fac9b190f41936be5c8b8acda7f31",
+      "purpose": "required sealed parent of local guard-consumption successor"
+    }
+  ],
+  "model_detection_vs_A_release": "All4 old target restrictions lifted only after new exact-content A source decisions;not automatic removal of A restrictions",
+  "new_supplier_requests_or_usage": 0,
+  "current_three_JSON": "data/research/company_profile_research_v1_20261123/three-reviewed-current-6fr-20261127.json",
+  "current_three_Markdown": "data/research/company_profile_research_v1_20261123/three-reviewed-current-6fr-20261127.md",
+  "original_scores_unchanged": true
+}

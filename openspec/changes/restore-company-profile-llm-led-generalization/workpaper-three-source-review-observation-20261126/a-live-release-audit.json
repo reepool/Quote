@@ -1,0 +1,39 @@
+{
+  "actual_service": "192.168.188.66:8000",
+  "HTTP_batch": 200,
+  "batch_seconds": 3.714,
+  "all39_complete_profiles_equal_expected": true,
+  "unchanged_other36": true,
+  "still_missing_stocks": [
+    "601788.SH",
+    "002736.SZ"
+  ],
+  "target_details": [
+    {
+      "stock": "920006.BJ",
+      "HTTP": 200,
+      "seconds": 1.293,
+      "visible_facts": 24,
+      "visible_metrics": 39
+    },
+    {
+      "stock": "600177.SH",
+      "HTTP": 200,
+      "seconds": 0.865,
+      "visible_facts": 20,
+      "visible_metrics": 28
+    },
+    {
+      "stock": "000039.SZ",
+      "HTTP": 200,
+      "seconds": 0.739,
+      "visible_facts": 20,
+      "visible_metrics": 31
+    }
+  ],
+  "sealed_original_group_unchanged": true,
+  "source_and_actual_review_and_remaining_gaps_preserved": true,
+  "application_restart_needed_for_new_record_reads": false,
+  "new_model_calls": 0,
+  "note": "Already-running read owner observed3 new source-bound research records by file bytes;the post-run inheritance fix did not require restarting this read-only consumer."
+}

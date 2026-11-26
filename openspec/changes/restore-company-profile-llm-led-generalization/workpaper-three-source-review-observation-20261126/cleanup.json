@@ -1,0 +1,27 @@
+{
+  "task": "6.FR",
+  "state": "all_owned_development_artifacts_removed_after_final_verification",
+  "preflight_previous6FQ_A_B_roots_absent": true,
+  "B_preparation_cleanup": {"removed_files": 48, "removed_logical_bytes": 10606331, "proof": "b-plan.json cleanup;original-owner0-call entry proof retained"},
+  "B_final_cleanup": {"removed_files": 241, "removed_logical_bytes": 56305019, "proof": "b-local-final.json cleanup;3 completed real run DBs and local fixture/test/export artifacts removed"},
+  "interim_duplicate_validation_note": "b-local-validation.json superseded by completed b-local-final.json and removed;no source or original run evidence deleted",
+  "A": {
+    "root": "data/QuoteBak/company-profile-6fr-a-iP5YyWvn",
+    "absent": true,
+    "removed_files": 13,
+    "removed_logical_bytes": 20225514,
+    "contents": "baseline/full39 expected and post-release copies,source/wire/freeze/release/live-read helpers,staging patch/stat;all necessary outcomes retained in compact evidence"
+  },
+  "total_removed_files": 302,
+  "total_removed_logical_bytes": 87136864,
+  "retained_once": [
+    "Original3 real runs:3 plans,started markers,budgets,9 raw request/response wires,result/control and9 original isolated parent/auto records;all sealed before local fix",
+    "One explicit local saved-response Shengnan successor and matching thin replay script;new usage0;6 required prior records preserve original isolated lineage",
+    "Main-root3 safe A-reviewed successors and1 required sealed Shengnan parent,one current3-stock JSON/Markdown projection;no duplicate full39 export",
+    "Compact independent source reference,source/wire/score/resource/protection/release/liveAPI audits and one authoritative B final validation"
+  ],
+  "review": {"P1_found": 1, "P1_fixed": 1, "remaining_blocking": 0, "nonblocking_scope_expanded": false},
+  "verification": {"distinct_related_tests_passed": 78, "new_targeted_cases_included": 16, "new_supplier_requests_after_group": 0, "original_group_physical": 9, "original_group_tokens": 283804, "recoveries": 0, "cost": "unknown", "actual_HTTP_full39_and_details": "equal expected;200", "other36_full_profiles": "unchanged", "old_V1_scores": "unchanged", "openspec_strict": "passed", "changed_Python_correctness_ruff": "passed", "isolated_diff": "passed;original-source Markdown whitespace retained", "local_links_checked": 30, "missing_links": 0},
+  "git": {"original_dirty_paths": 20, "residual_dirty_paths": 20, "owned_staged_paths": 73, "only_owned_blocks_in_management_documents": 4, "private_env_and_liveHTTP_policy": "unchanged;no keys published", "private_credential_scan": "passed"},
+  "recovery": "Removed temporary DBs,fixture/export copies,expected snapshots and helpers are rebuildable from retained source/test code,original raw/checkpoints and exact independent decisions."
+}

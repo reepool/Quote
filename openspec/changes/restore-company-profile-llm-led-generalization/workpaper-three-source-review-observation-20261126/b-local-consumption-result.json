@@ -1,0 +1,148 @@
+{
+  "task": "6.FR",
+  "state": "local_consumption_complete_pending_A_current_hash_decision",
+  "local_consumption_policy": "current_draft_verified_change_guard_consumption.v1",
+  "new_work_id": "bp-work-6fr-920006-local-guard-consumption-v1",
+  "new_record": "/home/python/Quote/data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-6fr-920006-local-guard-consumption-v1.json",
+  "new_record_sha256": "31d80c4ef8944dfeadbe6ee060b3c97dbea19e3b7c5c2c0adad51eea7643c812",
+  "new_workpaper_sha256": "bc2983e2e531a4786e2ab439989c98e1c2a932ec76be870f917436975d3d3322",
+  "original_run": {
+    "policy": "current_draft_verified_change_guard_consumption.v1",
+    "mode": "local_saved_response_consumption",
+    "original_run_id": "6fr-920006-BJ-20261126",
+    "original_work_id": "bp-work-070141e2f3b0b8fd783e9995",
+    "original_record_sha256": "acc324d087dac9d27eb437b6d495bfbffa1fac9b190f41936be5c8b8acda7f31",
+    "original_seed_work_id": "bp-work-9d9c2637afa2f4ffc35c6fcc",
+    "original_seed_record_sha256": "843c1a5915371b8b19a70a1059ddbd2110f4aaadc5f79c68c454bd674e04ae96",
+    "original_run_seal_sha256": "aa784feb1a58b2bc64f37ecd2d25fdba983be1491d5e63ecfe4dae0c7b0c8493",
+    "original_processing_identity_sha256": "4ddcacea91161395dabe3445c5391ae0556c9506634da7d48212039759a0d64d",
+    "original_source_binding": {
+      "current_draft_sha256": "a2a414a6a0fc155372ee30e95d004d2d55303584d8798f0c148c7ad41146d673",
+      "request_draft_sha256": "5f1d6bc96c8f3935d17b7c71f9b004a5152614247f4a18efc6e1277dde3fc0cc",
+      "source_packet_sha256": "caaae6418aeed8b921f6c10f7368bc2d93116ee4636f1e5aff8104a7ec192bae"
+    },
+    "stages": [
+      {
+        "purpose": "review_profile_workpaper",
+        "request_id": "bp-work-070141e2f3b0b8fd783e9995:workpaper:review",
+        "request_hash": "95a17e8131351d6fa461731f05d344088cb87527724b07841f60641b4375d107",
+        "response_hash": "4de6d400fd76d57a05888214141dc5b9dbab6d2fedbec8056b4389cebb4be056",
+        "original_wire": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/920006/executions/6fr-920006-BJ-20261126/receipts/001.json",
+        "original_wire_sha256": "cbeac2198bdd1c730ac36d296ffd5689078fee9138edc4d17987c90be712157c",
+        "original_usage": {
+          "input_tokens": 26083,
+          "output_tokens": 482,
+          "total_tokens": 47848
+        },
+        "consumption": "retained_real_response_not_new_supplier_attempt"
+      },
+      {
+        "purpose": "repair_profile_workpaper",
+        "request_id": "bp-work-070141e2f3b0b8fd783e9995:workpaper:repair",
+        "request_hash": "6f09ae1491e47538c00cc281455d1b874ad1db40b82ac0041ab5d0dc3ce2f9a6",
+        "response_hash": "38a717f1794f4d7d1ddfdf3cf398bfe1bb9ee6a859f2259c31b699d28997492b",
+        "original_wire": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/920006/executions/6fr-920006-BJ-20261126/receipts/002.json",
+        "original_wire_sha256": "f1f4cb946b623d329a7322de065e876ed383eb7e3d977e0c3f68041d6eeae2a9",
+        "original_usage": {
+          "input_tokens": 15810,
+          "output_tokens": 1964,
+          "total_tokens": 17774
+        },
+        "consumption": "retained_real_response_not_new_supplier_attempt"
+      },
+      {
+        "purpose": "verify_profile_workpaper_repair",
+        "request_id": "bp-work-070141e2f3b0b8fd783e9995:workpaper:repair-verify",
+        "request_hash": "da12878cdaec2d58f6e15f698d3c09a6861a84ba2ce79964d67d857b0677bd0e",
+        "response_hash": "1bfe55fbb2ce21d9d04ab3b0b0ca33796c088d1bfafa8f1b4944f04c79596123",
+        "original_wire": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/920006/executions/6fr-920006-BJ-20261126/receipts/003.json",
+        "original_wire_sha256": "881b02f2073dd7b418e183d48053e3ebb3099edad4f3adf8d2234efd50791f45",
+        "original_usage": {
+          "input_tokens": 18939,
+          "output_tokens": 231,
+          "total_tokens": 21538
+        },
+        "consumption": "retained_real_response_not_new_supplier_attempt"
+      }
+    ],
+    "new_supplier_requests": 0,
+    "new_supplier_usage": 0,
+    "new_supplier_cost": "0",
+    "original_supplier_usage_reference": 87160
+  },
+  "removed_outdated_model_guard_ids": [
+    "inherited:WRF-F009",
+    "inherited:WRF-F021"
+  ],
+  "all_model_authored_facts_unchanged": 24,
+  "all_original_calls_and_receipts_unchanged": true,
+  "model_only_delivery": {
+    "counts": {
+      "reviewed": 20,
+      "pending": 0,
+      "limited": 4,
+      "source_only": 0,
+      "withheld": 0,
+      "duplicate": 0
+    },
+    "targets": [
+      {
+        "fact_id": "F009",
+        "state": "reviewed",
+        "review_basis": "model_source_check",
+        "model_review_stage": "final"
+      },
+      {
+        "fact_id": "F021",
+        "state": "limited",
+        "review_basis": "model_source_check",
+        "model_review_stage": "final"
+      }
+    ]
+  },
+  "actual_delivery_with_inherited_A": {
+    "counts": {
+      "reviewed": 19,
+      "pending": 0,
+      "limited": 3,
+      "source_only": 2,
+      "withheld": 0,
+      "duplicate": 0
+    },
+    "targets": [
+      {
+        "fact_id": "F009",
+        "state": "source_only",
+        "review_basis": "independent_source_check",
+        "model_review_stage": null
+      },
+      {
+        "fact_id": "F021",
+        "state": "source_only",
+        "review_basis": "independent_source_check",
+        "model_review_stage": null
+      }
+    ]
+  },
+  "target_fact_hashes": {
+    "F009": "5b9f70b2756fa12f1b4019818d07bcd781b2418d8c23194a1ec17521ce38f436",
+    "F021": "f6c890b38473297adf5330d66b813bc3a7431b0f7ec9bdfb0deeff1ba8bc6951"
+  },
+  "other_model_findings_unchanged": true,
+  "independent_A_decisions_unchanged": true,
+  "writer_reader_export_fresh_equal": true,
+  "new_supplier_requests": 0,
+  "new_supplier_usage": 0,
+  "new_supplier_cost": "0",
+  "LLM_clients_created": 0,
+  "transports_created": 0,
+  "network_connections": 0,
+  "original_seal_files_unchanged": 39,
+  "sealed_b_result_unchanged": true,
+  "other_two_reports_or_rejected_candidates_changed": false,
+  "publication": "isolated_only; target facts still source_only until A binds current hashes",
+  "cleanup": {
+    "local_export_and_test_artifacts": "pending after validation evidence",
+    "real_run_databases": "retained; not part of local cleanup"
+  }
+}

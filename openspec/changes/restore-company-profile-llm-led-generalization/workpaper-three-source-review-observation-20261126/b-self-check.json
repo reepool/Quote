@@ -1,0 +1,1456 @@
+{
+  "schema_version": "company_profile_6fr_B_self_check.v1",
+  "as_of_utc": "2026-11-26T16:48:08.831290+00:00",
+  "state": "three_completed_original_receipts_checked_pending_A_independent_content_decision",
+  "b_plan_sha256": "e2d370f29da53f634d27acb278ebee98264f54eb38b7a8273b7c8d030eb73446",
+  "A_send_freeze_sha256": "3154eb6ae5a3adc69542f5e9d550a3d74871569ae6c5d2998b689c336f413469",
+  "scope": "Read-only original receipts and in-memory projections; no new requests, retries, writer calls, publication, configuration or cleanup.",
+  "attribution_rules": {
+    "new_findings": "Only the fresh review_profile_workpaper raw response. Aggregate inherited findings are listed separately and never counted as new.",
+    "model_only_with_prior_models": "In-memory successor use_review=None; inherited model findings remain.",
+    "current_run_only_diagnostic": "In-memory successor use_review=None and only inherited:-prefixed findings removed. Shows the current run alone; removes known protections only in scratch memory and is never a release candidate.",
+    "actual_with_inherited_A": "Unmodified persisted successor using the existing delivery owner.",
+    "independent_decision": "Model acceptance is not A approval, formal accuracy, a production grant or permission to lift previous restrictions."
+  },
+  "cases": [
+    {
+      "instrument_id": "920006.BJ",
+      "parent_work_id": "bp-work-9d9c2637afa2f4ffc35c6fcc",
+      "successor_work_id": "bp-work-070141e2f3b0b8fd783e9995",
+      "successor_record": "/home/python/Quote/data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-070141e2f3b0b8fd783e9995.json",
+      "successor_record_sha256": "acc324d087dac9d27eb437b6d495bfbffa1fac9b190f41936be5c8b8acda7f31",
+      "review_status": "completed_with_open_findings",
+      "raw_receipts": [
+        {
+          "purpose": "review_profile_workpaper",
+          "receipt": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/920006/executions/6fr-920006-BJ-20261126/receipts/001.json",
+          "receipt_sha256": "cbeac2198bdd1c730ac36d296ffd5689078fee9138edc4d17987c90be712157c",
+          "response_content_sha256": "4de6d400fd76d57a05888214141dc5b9dbab6d2fedbec8056b4389cebb4be056",
+          "model": "grok-4.7",
+          "host": "scorpio.reepool.com",
+          "status_code": 200,
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "physical_timeout_seconds": 1200,
+          "elapsed_seconds": 263.3725446610042,
+          "provider_total_tokens": 47848
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "receipt": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/920006/executions/6fr-920006-BJ-20261126/receipts/002.json",
+          "receipt_sha256": "f1f4cb946b623d329a7322de065e876ed383eb7e3d977e0c3f68041d6eeae2a9",
+          "response_content_sha256": "38a717f1794f4d7d1ddfdf3cf398bfe1bb9ee6a859f2259c31b699d28997492b",
+          "model": "deepseek-flash",
+          "host": "api.deepseek.com",
+          "status_code": 200,
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "physical_timeout_seconds": 600,
+          "elapsed_seconds": 10.28475225299917,
+          "provider_total_tokens": 17774
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "receipt": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/920006/executions/6fr-920006-BJ-20261126/receipts/003.json",
+          "receipt_sha256": "881b02f2073dd7b418e183d48053e3ebb3099edad4f3adf8d2234efd50791f45",
+          "response_content_sha256": "1bfe55fbb2ce21d9d04ab3b0b0ca33796c088d1bfafa8f1b4944f04c79596123",
+          "model": "grok-4.7",
+          "host": "scorpio.reepool.com",
+          "status_code": 200,
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "physical_timeout_seconds": 1200,
+          "elapsed_seconds": 27.759809581999434,
+          "provider_total_tokens": 21538
+        }
+      ],
+      "initial_request_pollution_check": {
+        "draft_sha256": "5f1d6bc96c8f3935d17b7c71f9b004a5152614247f4a18efc6e1277dde3fc0cc",
+        "source_text_sha256": "838c54c1e72081eeae629dc15ac1ae4be18ad6194aa5656e514f98001a48233d",
+        "matches_frozen_inputs": true,
+        "prior_reviews_or_A_reference_fields": false
+      },
+      "fresh_initial_findings": [
+        {
+          "finding_id": "WRF-001",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F009",
+          "evidence_ids": [
+            "source-0013",
+            "source-0024"
+          ],
+          "explanation": "主营业务收入110,497,142.43元是收入构成及财务报表中与其他业务收入并列的公司主营业务合计，不是航空机械、综合电源、代加工劳务等某一产品或行业分部。产品分类四类收入合计等于营业收入112,437,270.64元，而非等于该主营业务行。事实及指标的subject_scope标为business_segment属于错误主体；主营业务合计不能自动当作业务分部。金额、2025年度期间与证据可保留，主体应改为consolidated_group。"
+        },
+        {
+          "finding_id": "WRF-002",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F021",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "新增客户20家、参与投标49次、中标15次均位于“军用领域”段落下，同页另述民用领域，并非公司整体口径。事实及三项指标的subject_scope标为consolidated_group扩大了主体。军用/民用属于客户或市场分类，不能据此标为business_segment。现有标签无法忠实表达“军用领域”，应改为subject_scope=unclear，并在uncertainty_reason中保留“军用领域”原文；“参与投标次数”“中标次数”的指标名称亦应保留该限定。数量本身有原文支持，但错误的确定范围不能仅靠限制指标解决。"
+        }
+      ],
+      "fresh_initial_findings_count": 2,
+      "newly_raised_fixed_card_targets": [
+        "F021",
+        "F009"
+      ],
+      "fresh_initial_checked_ids_count": 24,
+      "inherited_aggregate_findings_not_new": [
+        {
+          "finding_id": "inherited:WRF-F004-1",
+          "affected_fact_id": "F004",
+          "resolution": "unresolved"
+        },
+        {
+          "finding_id": "inherited:WRF-F004-2",
+          "affected_fact_id": "F004",
+          "resolution": "unresolved"
+        },
+        {
+          "finding_id": "inherited:WRF-F009",
+          "affected_fact_id": "F009",
+          "resolution": "quarantined"
+        },
+        {
+          "finding_id": "inherited:WRF-F021",
+          "affected_fact_id": "F021",
+          "resolution": "quarantined"
+        }
+      ],
+      "repair": {
+        "candidate_fact_ids": [
+          "F009",
+          "F021"
+        ],
+        "candidate_count": 2,
+        "candidate_ids_not_sent_to_final": [],
+        "saved_local_rejection_notes": []
+      },
+      "final": {
+        "checked_fact_ids": [
+          "F009",
+          "F021"
+        ],
+        "checks": [
+          {
+            "fact_id": "F009",
+            "accepted": true,
+            "evidence_ids": [
+              "source-0013",
+              "source-0024"
+            ],
+            "explanation": "原文将110,497,142.43元列为与其他业务收入并列的2025年主营业务收入合计，财务报表附注本年发生额一致，并非航空机械等产品分部。候选保留金额、元单位、2025年度及对应证据，并将事实和指标主体改为consolidated_group，已纠正错误主体。"
+          },
+          {
+            "fact_id": "F021",
+            "accepted": true,
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "explanation": "新增客户20家、参与投标49次、中标15次均位于军用领域段落，不能扩大为公司整体，也不能标为业务分部。候选以unclear保留“军用领域”原文限定，指标名称同步保留该限定，数量和2025年度与原文一致，并说明现有标签无法表达该客户或市场分类，已纠正错误的确定范围。"
+          }
+        ]
+      },
+      "current_finding_resolutions": [
+        {
+          "finding_id": "WRF-001",
+          "affected_fact_id": "F009",
+          "resolution": "corrected_pending_trust",
+          "original_fact_sha256": "bdaab97cf6e0fdaf2f0618008b92ffe9f18f9bba8b6e3abeeb5009e3d7be1e4a",
+          "revised_fact_sha256": "5b9f70b2756fa12f1b4019818d07bcd781b2418d8c23194a1ec17521ce38f436"
+        },
+        {
+          "finding_id": "WRF-002",
+          "affected_fact_id": "F021",
+          "resolution": "corrected_pending_trust",
+          "original_fact_sha256": "b8c262bcf089091c30af76a1090d896eb4084b5d9441fd88d6a8ac47fb5500d5",
+          "revised_fact_sha256": "f6c890b38473297adf5330d66b813bc3a7431b0f7ec9bdfb0deeff1ba8bc6951"
+        }
+      ],
+      "fact_changes": {
+        "changed_ids": [
+          "F009",
+          "F021"
+        ],
+        "added_ids": [],
+        "removed_ids": [],
+        "unchanged_original_count": 22,
+        "changed_facts": [
+          {
+            "fact_id": "F009",
+            "before": {
+              "fact_sha256": "bdaab97cf6e0fdaf2f0618008b92ffe9f18f9bba8b6e3abeeb5009e3d7be1e4a",
+              "text": "主营业务收入110,497,142.43元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "metrics": [
+                {
+                  "index": 0,
+                  "name": "主营业务收入",
+                  "raw_value": "110,497,142.43",
+                  "value": "110497142.43",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "uncertainty_reason": null
+                }
+              ],
+              "uncertainty_reason": null
+            },
+            "after": {
+              "fact_sha256": "5b9f70b2756fa12f1b4019818d07bcd781b2418d8c23194a1ec17521ce38f436",
+              "text": "主营业务收入110,497,142.43元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "metrics": [
+                {
+                  "index": 0,
+                  "name": "主营业务收入",
+                  "raw_value": "110,497,142.43",
+                  "value": "110497142.43",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "uncertainty_reason": null
+                }
+              ],
+              "uncertainty_reason": null
+            }
+          },
+          {
+            "fact_id": "F021",
+            "before": {
+              "fact_sha256": "b8c262bcf089091c30af76a1090d896eb4084b5d9441fd88d6a8ac47fb5500d5",
+              "text": "军用领域全年新增客户20家，参与投标49次，中标15次。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "metrics": [
+                {
+                  "index": 0,
+                  "name": "军用领域新增客户数",
+                  "raw_value": "20",
+                  "value": "20",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "uncertainty_reason": null
+                },
+                {
+                  "index": 1,
+                  "name": "参与投标次数",
+                  "raw_value": "49",
+                  "value": "49",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "uncertainty_reason": null
+                },
+                {
+                  "index": 2,
+                  "name": "中标次数",
+                  "raw_value": "15",
+                  "value": "15",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "uncertainty_reason": null
+                }
+              ],
+              "uncertainty_reason": null
+            },
+            "after": {
+              "fact_sha256": "f6c890b38473297adf5330d66b813bc3a7431b0f7ec9bdfb0deeff1ba8bc6951",
+              "text": "军用领域全年新增客户20家，参与投标49次，中标15次。",
+              "subject_scope": "unclear",
+              "period": "2025年度",
+              "metrics": [
+                {
+                  "index": 0,
+                  "name": "军用领域新增客户数",
+                  "raw_value": "20",
+                  "value": "20",
+                  "subject_scope": "unclear",
+                  "period": "2025年度",
+                  "uncertainty_reason": "原文限定为“军用领域”，现有主体范围标签无法忠实表达该客户/市场分类范围；保留原文限定，未扩大至公司整体。"
+                },
+                {
+                  "index": 1,
+                  "name": "军用领域参与投标次数",
+                  "raw_value": "49",
+                  "value": "49",
+                  "subject_scope": "unclear",
+                  "period": "2025年度",
+                  "uncertainty_reason": "原文限定为“军用领域”，现有主体范围标签无法忠实表达该客户/市场分类范围；保留原文限定，未扩大至公司整体。"
+                },
+                {
+                  "index": 2,
+                  "name": "军用领域中标次数",
+                  "raw_value": "15",
+                  "value": "15",
+                  "subject_scope": "unclear",
+                  "period": "2025年度",
+                  "uncertainty_reason": "原文限定为“军用领域”，现有主体范围标签无法忠实表达该客户/市场分类范围；保留原文限定，未扩大至公司整体。"
+                }
+              ],
+              "uncertainty_reason": "原文限定为“军用领域”，现有主体范围标签无法忠实表达该客户/市场分类范围；保留原文限定，未扩大至公司整体。"
+            }
+          }
+        ]
+      },
+      "inherited_A": {
+        "parent_decisions": [
+          {
+            "fact_id": "F009",
+            "fact_sha256": "bdaab97cf6e0fdaf2f0618008b92ffe9f18f9bba8b6e3abeeb5009e3d7be1e4a",
+            "disposition": "source_only",
+            "evidence_ids": [
+              "source-0013",
+              "source-0024"
+            ],
+            "reason": "原PDF21页为合并口径主营业务收入合计，并非单独经营分部；模型虽已隔离指标，事实层仍确定标为business_segment。仅源参考，不改写范围或原值。",
+            "limitation": null
+          },
+          {
+            "fact_id": "F021",
+            "fact_sha256": "b8c262bcf089091c30af76a1090d896eb4084b5d9441fd88d6a8ac47fb5500d5",
+            "disposition": "source_only",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "reason": "原PDF14页20名客户、49投标、15中标均属军用领域；模型已隔离原指标，事实层仍确定扩大为集团整体。仅源参考，其他公司内容保留。",
+            "limitation": null
+          }
+        ],
+        "successor_decisions": [
+          {
+            "fact_id": "F009",
+            "fact_sha256": "5b9f70b2756fa12f1b4019818d07bcd781b2418d8c23194a1ec17521ce38f436",
+            "disposition": "source_only",
+            "evidence_ids": [
+              "source-0013",
+              "source-0024"
+            ],
+            "reason": "继承原独立使用限制，模型接续不自动解除；原PDF21页为合并口径主营业务收入合计，并非单独经营分部；模型虽已隔离指标，事实层仍确定标为business_segment。仅源参考，不改写范围或原值。",
+            "limitation": "修订后仍保留原限制；未进行新的独立原文核查。"
+          },
+          {
+            "fact_id": "F021",
+            "fact_sha256": "f6c890b38473297adf5330d66b813bc3a7431b0f7ec9bdfb0deeff1ba8bc6951",
+            "disposition": "source_only",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "reason": "继承原独立使用限制，模型接续不自动解除；原PDF14页20名客户、49投标、15中标均属军用领域；模型已隔离原指标，事实层仍确定扩大为集团整体。仅源参考，其他公司内容保留。",
+            "limitation": "修订后仍保留原限制；未进行新的独立原文核查。"
+          }
+        ],
+        "successor_reviewer": "program:inherited-use-decisions (not a new source review)",
+        "restrictions_lifted_by_B": false
+      },
+      "projections": {
+        "parent_actual": {
+          "counts": {
+            "reviewed": 19,
+            "pending": 0,
+            "limited": 3,
+            "source_only": 2,
+            "withheld": 0,
+            "duplicate": 0
+          },
+          "visible_fact_count": 22,
+          "visible_metric_count": 35,
+          "targets": [
+            {
+              "fact_id": "F009",
+              "state": "source_only",
+              "review_basis": "independent_source_check",
+              "model_review_stage": null,
+              "reasons": [
+                "原PDF21页为合并口径主营业务收入合计，并非单独经营分部；模型虽已隔离指标，事实层仍确定标为business_segment。仅源参考，不改写范围或原值。"
+              ],
+              "metric_gaps": null
+            },
+            {
+              "fact_id": "F021",
+              "state": "source_only",
+              "review_basis": "independent_source_check",
+              "model_review_stage": null,
+              "reasons": [
+                "原PDF14页20名客户、49投标、15中标均属军用领域；模型已隔离原指标，事实层仍确定扩大为集团整体。仅源参考，其他公司内容保留。"
+              ],
+              "metric_gaps": null
+            }
+          ]
+        },
+        "current_run_only_diagnostic": {
+          "counts": {
+            "reviewed": 20,
+            "pending": 0,
+            "limited": 4,
+            "source_only": 0,
+            "withheld": 0,
+            "duplicate": 0
+          },
+          "visible_fact_count": 24,
+          "visible_metric_count": 39,
+          "targets": [
+            {
+              "fact_id": "F009",
+              "state": "reviewed",
+              "review_basis": "model_source_check",
+              "model_review_stage": "final",
+              "reasons": [],
+              "metric_gaps": null
+            },
+            {
+              "fact_id": "F021",
+              "state": "limited",
+              "review_basis": "model_source_check",
+              "model_review_stage": "final",
+              "reasons": [
+                "原文限定为“军用领域”，现有主体范围标签无法忠实表达该客户/市场分类范围；保留原文限定，未扩大至公司整体。"
+              ],
+              "metric_gaps": null
+            }
+          ]
+        },
+        "model_only_with_prior_models": {
+          "counts": {
+            "reviewed": 19,
+            "pending": 0,
+            "limited": 3,
+            "source_only": 0,
+            "withheld": 2,
+            "duplicate": 0
+          },
+          "visible_fact_count": 22,
+          "visible_metric_count": 35,
+          "targets": [
+            {
+              "fact_id": "F009",
+              "state": "withheld",
+              "review_basis": "not_reviewed",
+              "model_review_stage": null,
+              "reasons": [
+                "继承前稿bp-work-9d9c2637afa2f4ffc35c6fcc的模型意见WRF-F009（非本次模型新判断）；叙述金额110,497,142.43元与收入构成及附注中的主营业务收入本年发生额一致，叙述和证据可以保留。该行是合并口径主营业务收入合计，不是航空机械、综合电源等产品或行业分部。原指标第0项将subject_scope标为business_segment，范围不可靠，不能与产品分部金额并列或加总。本限制不改写叙述、不替换金额。"
+              ],
+              "metric_gaps": null
+            },
+            {
+              "fact_id": "F021",
+              "state": "withheld",
+              "review_basis": "not_reviewed",
+              "model_review_stage": null,
+              "reasons": [
+                "继承前稿bp-work-9d9c2637afa2f4ffc35c6fcc的模型意见WRF-F021（非本次模型新判断）；叙述与军用领域段落一致，新增客户20家、参与投标49次、中标15次均写在“军用领域”项下，叙述可保留。原指标三项的subject_scope均为consolidated_group，后两项名称也未保留军用领域，不能按公司整体客户或投标口径使用；事实级subject_scope同样过宽。限制这三项指标的范围使用，不替换数字。"
+              ],
+              "metric_gaps": null
+            }
+          ]
+        },
+        "actual_with_inherited_A": {
+          "counts": {
+            "reviewed": 19,
+            "pending": 0,
+            "limited": 3,
+            "source_only": 2,
+            "withheld": 0,
+            "duplicate": 0
+          },
+          "visible_fact_count": 22,
+          "visible_metric_count": 35,
+          "targets": [
+            {
+              "fact_id": "F009",
+              "state": "source_only",
+              "review_basis": "independent_source_check",
+              "model_review_stage": null,
+              "reasons": [
+                "继承原独立使用限制，模型接续不自动解除；原PDF21页为合并口径主营业务收入合计，并非单独经营分部；模型虽已隔离指标，事实层仍确定标为business_segment。仅源参考，不改写范围或原值。"
+              ],
+              "metric_gaps": null
+            },
+            {
+              "fact_id": "F021",
+              "state": "source_only",
+              "review_basis": "independent_source_check",
+              "model_review_stage": null,
+              "reasons": [
+                "继承原独立使用限制，模型接续不自动解除；原PDF14页20名客户、49投标、15中标均属军用领域；模型已隔离原指标，事实层仍确定扩大为集团整体。仅源参考，其他公司内容保留。"
+              ],
+              "metric_gaps": null
+            }
+          ]
+        }
+      },
+      "resources": {
+        "physical_requests": 3,
+        "logical_requests": 3,
+        "recoveries": 0,
+        "charged_tokens": 87160,
+        "cost_status": "unknown",
+        "charged_cost_cny": "unknown",
+        "physical_elapsed_sum_seconds": 301.4171064960028,
+        "budget_file": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/920006/executions/6fr-920006-BJ-20261126/budget.json",
+        "budget_sha256": "5935bda1bfd6fbaa464c393eb57b3c408e02fbf00b63ae68cde7af55cb510d6e"
+      },
+      "A_action": "Independently inspect original wording and all actual edits; decide inherited restrictions and publication. These diagnostics do not release content."
+    },
+    {
+      "instrument_id": "600177.SH",
+      "parent_work_id": "bp-work-8316cdd34724f6bb6acdc31a",
+      "successor_work_id": "bp-work-c84f05ea973bec7d76025099",
+      "successor_record": "/home/python/Quote/data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-c84f05ea973bec7d76025099.json",
+      "successor_record_sha256": "9d1bb3549f80a41f45829dc0273eb840c0b1807e0214e590ec21b7121be54022",
+      "review_status": "completed_with_open_findings",
+      "raw_receipts": [
+        {
+          "purpose": "review_profile_workpaper",
+          "receipt": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/600177/executions/6fr-600177-SH-20261126/receipts/001.json",
+          "receipt_sha256": "f4180e2211b4fdd9ddb41c65ef9db4919317b618a04451207b6262eb1378e484",
+          "response_content_sha256": "e93ae352f307af627e4d85425c25b87be0807f9cc5fd94198cbff062603fe6eb",
+          "model": "grok-4.7",
+          "host": "scorpio.reepool.com",
+          "status_code": 200,
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "physical_timeout_seconds": 1200,
+          "elapsed_seconds": 510.36026203000074,
+          "provider_total_tokens": 61757
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "receipt": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/600177/executions/6fr-600177-SH-20261126/receipts/002.json",
+          "receipt_sha256": "fb4db2130e3c49bccc650c6c9436205b40b5e7a806293f59eb652818c76c5fac",
+          "response_content_sha256": "575620b234fed622577ce2abbe7a8778c1d1251935cfc0ba65cdf87aef3be26e",
+          "model": "deepseek-flash",
+          "host": "api.deepseek.com",
+          "status_code": 200,
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "physical_timeout_seconds": 600,
+          "elapsed_seconds": 52.93828529599705,
+          "provider_total_tokens": 25574
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "receipt": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/600177/executions/6fr-600177-SH-20261126/receipts/003.json",
+          "receipt_sha256": "405847323f4b592ee6aee5d009eaed023ab60e5027a01ed6ed97e2336edffb01",
+          "response_content_sha256": "1c4fcd420a54b4638fa637e999ad8b61b256859fa9eec6044b5ede0399e9cedd",
+          "model": "grok-4.7",
+          "host": "scorpio.reepool.com",
+          "status_code": 200,
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "physical_timeout_seconds": 1200,
+          "elapsed_seconds": 84.44772961499984,
+          "provider_total_tokens": 24314
+        }
+      ],
+      "initial_request_pollution_check": {
+        "draft_sha256": "d9381f9214af4db0ad2e622be992cd06f64d343715e7fe28a3eb077b0ad7f860",
+        "source_text_sha256": "b4ebf886c75b4454d0db6b065299a4007756db04d9ed7323aac099a738f58e96",
+        "matches_frozen_inputs": true,
+        "prior_reviews_or_A_reference_fields": false
+      },
+      "fresh_initial_findings": [
+        {
+          "finding_id": "RF001",
+          "element": "products_services",
+          "severity": "minor",
+          "issue_type": "contradicts_source",
+          "action": "correct",
+          "affected_fact_id": "F002",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "explanation": "源文写明主品牌定位为“行政商务人士最受欢迎的品牌”，并另述从传统商务男装向行政商务人士全场景着装升级。草稿将定位写成“行政商务人士全场景着装”，与定位语不符。行政公务、商务社交、商旅通勤、户外休闲等场景，行政商务、婚庆、户外休闲、女装四大系列及男女装双轨，均有源文支持，修正时只改定位表述并保留其余内容。衬衫、西服、裤子、上衣等大类与产销表主要产品一致，不必删除。"
+        },
+        {
+          "finding_id": "RF002",
+          "element": "revenue_model",
+          "severity": "minor",
+          "issue_type": "contradicts_source",
+          "action": "correct",
+          "affected_fact_id": "F005",
+          "evidence_ids": [
+            "source-0002",
+            "source-0003"
+          ],
+          "explanation": "地产业务段落将尾盘预售收入明确限定为订单口径、合作项目按权益比例折算的95,576.81万元，并与交付结转营业收入415,688.70万元并列，没有把预售写成会计确认收入。草稿首句“通过项目预售和交付结转确认收入”把订单口径预售并入收入确认，与源文口径不符。住宅、商业、车位业态、两个金额、存货跌价导致全年亏损10,579.67万元，以及business_segment和2025年度均有支持；应保留金额和订单口径限定，仅将收入确认改为对应交付结转。"
+        },
+        {
+          "finding_id": "RF003",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F013",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "explanation": "该段位于“巩固商务男装行业龙头地位”项下，内容是DP、水洗等服装功能性产品的研发升级，以及与供应商在设计、生产上合作形成的服装弹性供货，不是含地产开发和投资业务的集团整体。局部标题已给出更窄对象，不能因出现“公司”就标为consolidated_group。叙述本身与源文一致，应将subject_scope改为business_segment，不要改写成集团全口径事实。"
+        },
+        {
+          "finding_id": "RF004",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "开篇在公司口径下同时披露营业收入1,158,181.23万元和归属于上市公司股东的净利润244,733.92万元，并写明分别同比下降18.37%、11.57%。草稿已有营业收入及其18.37%下降，但缺少归母净利润及11.57%下降。该利润与投资业务归母净利润247,051.62万元接近但并不相同，缺失后会改变对公司盈利规模的理解，也容易与投资分部利润混淆。应单独补充合并口径2025年度归母净利润及同比下降，不要与营业收入降幅或投资业务利润互换或合并。"
+        }
+      ],
+      "fresh_initial_findings_count": 4,
+      "newly_raised_fixed_card_targets": [
+        "F005"
+      ],
+      "fresh_initial_checked_ids_count": 20,
+      "inherited_aggregate_findings_not_new": [
+        {
+          "finding_id": "inherited:OM-SCALE-NP",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "inherited:OM-REV-DIRECT",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate"
+        }
+      ],
+      "repair": {
+        "candidate_fact_ids": [
+          "F002",
+          "F005",
+          "F013",
+          "review-add:RF004"
+        ],
+        "candidate_count": 4,
+        "candidate_ids_not_sent_to_final": [
+          "review-add:RF004"
+        ],
+        "saved_local_rejection_notes": [
+          "修订源检查隔离：review-add:RF004未进入最终再核或正文；ValueError: uncertain metric original wording is absent from cited source: 归属于上市公司股东的净利润同比变动"
+        ]
+      },
+      "final": {
+        "checked_fact_ids": [
+          "F002",
+          "F005",
+          "F013"
+        ],
+        "checks": [
+          {
+            "fact_id": "F002",
+            "accepted": true,
+            "evidence_ids": [
+              "source-0005",
+              "source-0013"
+            ],
+            "explanation": "已把主品牌定位改回原文“行政商务人士最受欢迎的品牌”，并与“从传统商务男装向行政商务人士全场景着装升级”分开，不再把定位写成全场景着装。行政公务、商务社交、商旅通勤、户外休闲等场景，行政商务、婚庆、户外休闲、女装四大系列及男女装双轨均有原文支持；衬衫、西服、裤子、上衣等大类与产销表主要产品一致。主体为指定品牌及品牌服装业务，期间为报告期，修正解决了原定位表述错误。"
+          },
+          {
+            "fact_id": "F005",
+            "accepted": true,
+            "evidence_ids": [
+              "source-0002",
+              "source-0003",
+              "source-0015"
+            ],
+            "explanation": "候选保留尾盘预售95,576.81万元的订单口径和合作项目按权益比例折算限定，未再把预售并入会计收入确认；415,688.70万元对应明湖懿秋苑交付结转营业收入，与地产业务段落原文一致。住宅、商业、车位业态、存货跌价导致全年亏损10,579.67万元、business_segment和2025年度均有支持。亏损指标因原文只写“亏损”而未给带符号数留空，不改变事实表述，也不构成错误断言。"
+          },
+          {
+            "fact_id": "F013",
+            "accepted": true,
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "explanation": "原文位于“巩固商务男装行业龙头地位”项下，内容是DP、水洗等服装功能性产品的研发升级，以及与供应商在设计、生产上合作形成的服装弹性供货，局部标题已给出窄于集团的对象。候选将subject_scope改为business_segment，叙述与源文一致，未再标成含地产开发和投资业务的合并集团口径，也未改写事实含义。"
+          }
+        ]
+      },
+      "current_finding_resolutions": [
+        {
+          "finding_id": "RF001",
+          "affected_fact_id": "F002",
+          "resolution": "corrected_pending_trust",
+          "original_fact_sha256": "ba376fe2d15b8f2b00ab501693576b89870b0292ce971c3240a5eb56496d407b",
+          "revised_fact_sha256": "3ceb7b2919ed7215fdee845a8fb166986a3302aaa8ae956c00b068843568d5b9"
+        },
+        {
+          "finding_id": "RF002",
+          "affected_fact_id": "F005",
+          "resolution": "corrected_pending_trust",
+          "original_fact_sha256": "fb85adff68f80deeb5a62dafcc53320b9dea1da8b58c814b7e05df538878468c",
+          "revised_fact_sha256": "91528907fbe0a96b258658bd5eba966455201dcd301d354486ebbed6cc650811"
+        },
+        {
+          "finding_id": "RF003",
+          "affected_fact_id": "F013",
+          "resolution": "corrected_pending_trust",
+          "original_fact_sha256": "06ce6c1ba0224fbf9d2916531c4cdaab9f0ba8aaabaa4f8c91bf7ec79dbcd4df",
+          "revised_fact_sha256": "967ec13f70fd0f07f88e9368c3bbc0097c86877364888945c01488b65772b378"
+        },
+        {
+          "finding_id": "RF004",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected",
+          "original_fact_sha256": null,
+          "revised_fact_sha256": "5cce4f33b20aa177c1a72c71dd77c3aff91c336588e5accc5bbc69f56b22facd"
+        }
+      ],
+      "fact_changes": {
+        "changed_ids": [
+          "F002",
+          "F005",
+          "F013"
+        ],
+        "added_ids": [],
+        "removed_ids": [],
+        "unchanged_original_count": 17,
+        "changed_facts": [
+          {
+            "fact_id": "F002",
+            "before": {
+              "fact_sha256": "ba376fe2d15b8f2b00ab501693576b89870b0292ce971c3240a5eb56496d407b",
+              "text": "主品牌YOUNGOR定位行政商务人士全场景着装，覆盖行政公务、商务社交、商旅通勤、户外休闲等场景，形成行政商务、婚庆系列、户外休闲、女装系列四大系列，男女装双轨并行；品牌服装产品大类包括衬衫、西服、裤子、上衣等。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "metrics": [],
+              "uncertainty_reason": null
+            },
+            "after": {
+              "fact_sha256": "3ceb7b2919ed7215fdee845a8fb166986a3302aaa8ae956c00b068843568d5b9",
+              "text": "主品牌YOUNGOR品牌定位“行政商务人士最受欢迎的品牌”，从传统商务男装向行政商务人士全场景着装升级，覆盖行政公务、商务社交、商旅通勤、户外休闲等场景，形成行政商务、婚庆系列、户外休闲、女装系列四大系列，男女装双轨并行；品牌服装产品大类包括衬衫、西服、裤子、上衣等。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "metrics": [],
+              "uncertainty_reason": null
+            }
+          },
+          {
+            "fact_id": "F005",
+            "before": {
+              "fact_sha256": "fb85adff68f80deeb5a62dafcc53320b9dea1da8b58c814b7e05df538878468c",
+              "text": "地产业务以住宅、商业、车位等开发销售为主，通过项目预售和交付结转确认收入；2025年地产业务尾盘预售收入95,576.81万元（订单口径，合作项目按权益比例折算），结转营业收入415,688.70万元；受存货跌价准备计提影响，全年亏损10,579.67万元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "metrics": [
+                {
+                  "index": 0,
+                  "name": "地产业务预售收入（订单口径，合作项目权益折算）",
+                  "raw_value": "95,576.81",
+                  "value": "95576.81",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "uncertainty_reason": null
+                },
+                {
+                  "index": 1,
+                  "name": "地产业务结转营业收入",
+                  "raw_value": "415,688.70",
+                  "value": "415688.70",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "uncertainty_reason": null
+                },
+                {
+                  "index": 2,
+                  "name": "地产业务全年亏损",
+                  "raw_value": "10,579.67",
+                  "value": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "uncertainty_reason": "源文以‘亏损’文字表述金额，未给出带符号数值"
+                }
+              ],
+              "uncertainty_reason": null
+            },
+            "after": {
+              "fact_sha256": "91528907fbe0a96b258658bd5eba966455201dcd301d354486ebbed6cc650811",
+              "text": "地产业务以住宅、商业、车位等开发销售为主；2025年地产业务尾盘实现预售收入95,576.81万元（订单口径，合作项目按权益比例折算），明湖懿秋苑交付结转营业收入415,688.70万元；受存货跌价准备计提影响，全年亏损10,579.67万元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "metrics": [
+                {
+                  "index": 0,
+                  "name": "地产业务预售收入（订单口径，合作项目按权益比例折算）",
+                  "raw_value": "95,576.81",
+                  "value": "95576.81",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "uncertainty_reason": null
+                },
+                {
+                  "index": 1,
+                  "name": "地产业务结转营业收入",
+                  "raw_value": "415,688.70",
+                  "value": "415688.70",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "uncertainty_reason": null
+                },
+                {
+                  "index": 2,
+                  "name": "地产业务全年亏损",
+                  "raw_value": "10,579.67",
+                  "value": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "uncertainty_reason": "源文以‘亏损’文字表述金额，未给出带符号数值"
+                }
+              ],
+              "uncertainty_reason": null
+            }
+          },
+          {
+            "fact_id": "F013",
+            "before": {
+              "fact_sha256": "06ce6c1ba0224fbf9d2916531c4cdaab9f0ba8aaabaa4f8c91bf7ec79dbcd4df",
+              "text": "公司建立产品研发和技术创新体系，强化以DP、水洗等功能性产品为核心的系列化开发和技术升级，探索绿色材料与技术；并与供应商在设计、生产等方面深度合作，形成弹性供货能力。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "metrics": [],
+              "uncertainty_reason": null
+            },
+            "after": {
+              "fact_sha256": "967ec13f70fd0f07f88e9368c3bbc0097c86877364888945c01488b65772b378",
+              "text": "公司建立产品研发和技术创新体系，强化以DP、水洗等功能性产品为核心的系列化开发和技术升级，探索绿色材料与技术；并与供应商在设计、生产等方面深度合作，形成弹性供货能力。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "metrics": [],
+              "uncertainty_reason": null
+            }
+          }
+        ]
+      },
+      "inherited_A": {
+        "parent_decisions": [
+          {
+            "fact_id": "F005",
+            "fact_sha256": "fb85adff68f80deeb5a62dafcc53320b9dea1da8b58c814b7e05df538878468c",
+            "disposition": "source_only",
+            "evidence_ids": [
+              "source-0001",
+              "source-0003",
+              "source-0015"
+            ],
+            "reason": "原PDF20、36页预售明确为订单口径，交付结转收入另列；正文将两者并列为收入确认方式，无据。虽原数字有源，正文错误不能只删指标洗成正确结论，整条仅源参考。",
+            "limitation": null
+          }
+        ],
+        "successor_decisions": [
+          {
+            "fact_id": "F005",
+            "fact_sha256": "91528907fbe0a96b258658bd5eba966455201dcd301d354486ebbed6cc650811",
+            "disposition": "source_only",
+            "evidence_ids": [
+              "source-0002",
+              "source-0003",
+              "source-0015"
+            ],
+            "reason": "继承原独立使用限制，模型接续不自动解除；原PDF20、36页预售明确为订单口径，交付结转收入另列；正文将两者并列为收入确认方式，无据。虽原数字有源，正文错误不能只删指标洗成正确结论，整条仅源参考。",
+            "limitation": "修订后仍保留原限制；未进行新的独立原文核查。"
+          }
+        ],
+        "successor_reviewer": "program:inherited-use-decisions (not a new source review)",
+        "restrictions_lifted_by_B": false
+      },
+      "projections": {
+        "parent_actual": {
+          "counts": {
+            "reviewed": 17,
+            "pending": 0,
+            "limited": 2,
+            "source_only": 1,
+            "withheld": 0,
+            "duplicate": 0
+          },
+          "visible_fact_count": 19,
+          "visible_metric_count": 25,
+          "targets": [
+            {
+              "fact_id": "F005",
+              "state": "source_only",
+              "review_basis": "independent_source_check",
+              "model_review_stage": null,
+              "reasons": [
+                "原PDF20、36页预售明确为订单口径，交付结转收入另列；正文将两者并列为收入确认方式，无据。虽原数字有源，正文错误不能只删指标洗成正确结论，整条仅源参考。"
+              ],
+              "metric_gaps": null
+            }
+          ]
+        },
+        "current_run_only_diagnostic": {
+          "counts": {
+            "reviewed": 17,
+            "pending": 0,
+            "limited": 3,
+            "source_only": 0,
+            "withheld": 0,
+            "duplicate": 0
+          },
+          "visible_fact_count": 20,
+          "visible_metric_count": 28,
+          "targets": [
+            {
+              "fact_id": "F005",
+              "state": "limited",
+              "review_basis": "model_source_check",
+              "model_review_stage": "final",
+              "reasons": [
+                "保留原文主体、数值或近似限定，不作为确定值使用。"
+              ],
+              "metric_gaps": null
+            }
+          ]
+        },
+        "model_only_with_prior_models": {
+          "counts": {
+            "reviewed": 17,
+            "pending": 0,
+            "limited": 3,
+            "source_only": 0,
+            "withheld": 0,
+            "duplicate": 0
+          },
+          "visible_fact_count": 20,
+          "visible_metric_count": 28,
+          "targets": [
+            {
+              "fact_id": "F005",
+              "state": "limited",
+              "review_basis": "model_source_check",
+              "model_review_stage": "final",
+              "reasons": [
+                "保留原文主体、数值或近似限定，不作为确定值使用。"
+              ],
+              "metric_gaps": null
+            }
+          ]
+        },
+        "actual_with_inherited_A": {
+          "counts": {
+            "reviewed": 17,
+            "pending": 0,
+            "limited": 2,
+            "source_only": 1,
+            "withheld": 0,
+            "duplicate": 0
+          },
+          "visible_fact_count": 19,
+          "visible_metric_count": 25,
+          "targets": [
+            {
+              "fact_id": "F005",
+              "state": "source_only",
+              "review_basis": "independent_source_check",
+              "model_review_stage": null,
+              "reasons": [
+                "继承原独立使用限制，模型接续不自动解除；原PDF20、36页预售明确为订单口径，交付结转收入另列；正文将两者并列为收入确认方式，无据。虽原数字有源，正文错误不能只删指标洗成正确结论，整条仅源参考。"
+              ],
+              "metric_gaps": null
+            }
+          ]
+        }
+      },
+      "resources": {
+        "physical_requests": 3,
+        "logical_requests": 3,
+        "recoveries": 0,
+        "charged_tokens": 111645,
+        "cost_status": "unknown",
+        "charged_cost_cny": "unknown",
+        "physical_elapsed_sum_seconds": 647.7462769409976,
+        "budget_file": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/600177/executions/6fr-600177-SH-20261126/budget.json",
+        "budget_sha256": "c7ffdbce5b829f1548bb3e085ad7b95cbb8d5acd82395354a1a61c4f75193eed"
+      },
+      "A_action": "Independently inspect original wording and all actual edits; decide inherited restrictions and publication. These diagnostics do not release content."
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "parent_work_id": "bp-work-cd0afb1f99731027937f26cf",
+      "successor_work_id": "bp-work-3a3bb89fa82f1553462f6792",
+      "successor_record": "/home/python/Quote/data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-3a3bb89fa82f1553462f6792.json",
+      "successor_record_sha256": "14ae985157cd3352a01582ccaf3e18566a850d7b2bb51e586a7dd94266daba33",
+      "review_status": "completed_with_open_findings",
+      "raw_receipts": [
+        {
+          "purpose": "review_profile_workpaper",
+          "receipt": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/000039/executions/6fr-000039-SZ-20261126/receipts/001.json",
+          "receipt_sha256": "b01da2eff5df2de9c2e29dc95390bcff04052cb1522039747ddd9fe5a4f85da9",
+          "response_content_sha256": "2405830b721d5e547d07e2ce2161559aa1a5854878692e1026a7284aab187f77",
+          "model": "grok-4.7",
+          "host": "scorpio.reepool.com",
+          "status_code": 200,
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "physical_timeout_seconds": 1200,
+          "elapsed_seconds": 183.7253193150027,
+          "provider_total_tokens": 39398
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "receipt": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/000039/executions/6fr-000039-SZ-20261126/receipts/002.json",
+          "receipt_sha256": "a1d6e1a939d35072e4b46c4666f78276114fe6ec57e0d33704de5a2eb1a7f38e",
+          "response_content_sha256": "f6f648d2f74043efde2f502d3860e85dd093430259ffcbe4dd154c1b2ce5568d",
+          "model": "deepseek-flash",
+          "host": "api.deepseek.com",
+          "status_code": 200,
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "physical_timeout_seconds": 600,
+          "elapsed_seconds": 46.72690521700133,
+          "provider_total_tokens": 24869
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "receipt": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/000039/executions/6fr-000039-SZ-20261126/receipts/003.json",
+          "receipt_sha256": "17271a67df89fe9c9435895b8da66fc0fafd370e5335fc74a8c069705f7395b4",
+          "response_content_sha256": "ddf28e5fde31913d40c08087a99604dfe53e37cf693c294e227b262bf9cd1f81",
+          "model": "grok-4.7",
+          "host": "scorpio.reepool.com",
+          "status_code": 200,
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "physical_timeout_seconds": 1200,
+          "elapsed_seconds": 32.237152292000246,
+          "provider_total_tokens": 20732
+        }
+      ],
+      "initial_request_pollution_check": {
+        "draft_sha256": "6aafa022468d2b948460a239635c59a9d3a9d216a6a4376ec43b69b10d0bdd5d",
+        "source_text_sha256": "89921d94fb1441bf407ba3ae04d01d7014167154a6aa90a6f83e2bf40acce0ec",
+        "matches_frozen_inputs": true,
+        "prior_reviews_or_A_reference_fields": false
+      },
+      "fresh_initial_findings": [
+        {
+          "finding_id": "rev-f023-conditional-ownership",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "f-023",
+          "evidence_ids": [
+            "source-0012"
+          ],
+          "explanation": "原文写明2025年12月中集世联达“签订相关协议”，并以“交易完成后……持股比例将由62.70%下降至45.04%”“将继续并表”表述附条件、尚未完成的结果。草案删去签约和“将”，把引入投资者及交易后45.04%写成2025年12月已实现的确定持股变动。应保留签约时点与完成后才发生的条件，不得把完成日或已完成股权变动当作报告期既成事实。"
+        },
+        {
+          "finding_id": "rev-omit-group-revenue",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0005",
+            "source-0013"
+          ],
+          "explanation": "原文已列明本集团报告期营业收入：正文为人民币1,566.11亿元，分行业表合计为156,611,446千元、占营业收入比重100.00%。草案只有部分业务分部收入，没有集团营业收入合计，不能据此理解公司收入规模；合计与分部行主体不同，应单独补入，不能用最大分部或分部加总代替。"
+        },
+        {
+          "finding_id": "rev-omit-elimination",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0013"
+          ],
+          "explanation": "分行业表另有“合并抵消”行，2025年营业收入为(2,559,532)千元，占营业收入比重(1.62%)。该行是分部间抵消调整，不是集团合计，也不是普通业务分部。草案未收录该调整，所列分部不能直接轧平至集团营业收入；如补录，须保持抵消自身口径，不要并入其他业务或公司合计。"
+        }
+      ],
+      "fresh_initial_findings_count": 3,
+      "newly_raised_fixed_card_targets": [
+        "f-023"
+      ],
+      "fresh_initial_checked_ids_count": 20,
+      "inherited_aggregate_findings_not_new": [
+        {
+          "finding_id": "inherited:wr-003",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "inherited:wr-004",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate"
+        },
+        {
+          "finding_id": "inherited:wr-005",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate"
+        }
+      ],
+      "repair": {
+        "candidate_fact_ids": [
+          "f-023",
+          "review-add:rev-omit-group-revenue"
+        ],
+        "candidate_count": 2,
+        "candidate_ids_not_sent_to_final": [
+          "review-add:rev-omit-group-revenue"
+        ],
+        "saved_local_rejection_notes": [
+          "修订源检查隔离：review-add:rev-omit-group-revenue未进入最终再核或正文；ValidationError: 1 validation error for WorkpaperFact\nmetrics.0\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '营业收入（...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error"
+        ]
+      },
+      "final": {
+        "checked_fact_ids": [
+          "f-023"
+        ],
+        "checks": [
+          {
+            "fact_id": "f-023",
+            "accepted": true,
+            "evidence_ids": [
+              "source-0012"
+            ],
+            "explanation": "候选完整保留原文“2025年12月签订相关协议”以及“交易完成后……持股比例将由62.70%下降至45.04%”“将继续并表”的条件表述，未把引入投资者或45.04%写成2025年12月已实现的确定持股变动，也未编造完成日。事实主体为指定子公司中集世联达，期间区分签约时点与交易完成条件；两项比例分别对应交易前及交易完成后，单位和证据与source-0012一致，不确定性说明仅保留完成时点未披露这一原文限制。"
+          }
+        ]
+      },
+      "current_finding_resolutions": [
+        {
+          "finding_id": "rev-f023-conditional-ownership",
+          "affected_fact_id": "f-023",
+          "resolution": "corrected_pending_trust",
+          "original_fact_sha256": "77ef92c6d8191237ddc27b0cfb2dddfeb31fa79817392ffc5d1d92afb58a6957",
+          "revised_fact_sha256": "63fb1da36523a4527b25872adc05ec87ecb7cbd7c921d8d01667e307efaa2256"
+        },
+        {
+          "finding_id": "rev-omit-group-revenue",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected",
+          "original_fact_sha256": null,
+          "revised_fact_sha256": null
+        },
+        {
+          "finding_id": "rev-omit-elimination",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate",
+          "original_fact_sha256": null,
+          "revised_fact_sha256": null
+        }
+      ],
+      "fact_changes": {
+        "changed_ids": [
+          "f-023"
+        ],
+        "added_ids": [],
+        "removed_ids": [],
+        "unchanged_original_count": 19,
+        "changed_facts": [
+          {
+            "fact_id": "f-023",
+            "before": {
+              "fact_sha256": "77ef92c6d8191237ddc27b0cfb2dddfeb31fa79817392ffc5d1d92afb58a6957",
+              "text": "2025年12月，中集世联达通过增资扩股和转让少量老股引入战略投资者，交易完成后本集团对中集世联达持股比例由62.70%下降至45.04%，本集团将继续并表中集世联达。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年12月",
+              "metrics": [
+                {
+                  "index": 0,
+                  "name": "中集世联达持股比例（交易前）",
+                  "raw_value": "62.70%",
+                  "value": "62.70",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年12月",
+                  "uncertainty_reason": null
+                },
+                {
+                  "index": 1,
+                  "name": "中集世联达持股比例（交易后）",
+                  "raw_value": "45.04%",
+                  "value": "45.04",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年12月",
+                  "uncertainty_reason": null
+                }
+              ],
+              "uncertainty_reason": null
+            },
+            "after": {
+              "fact_sha256": "63fb1da36523a4527b25872adc05ec87ecb7cbd7c921d8d01667e307efaa2256",
+              "text": "2025年12月，中集世联达签订相关协议，通过增资扩股和转让少量老股的方式引入战略投资者。交易完成后，本集团对中集世联达持股比例将由62.70%下降至45.04%，本集团将继续并表中集世联达。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年12月（签订协议）；交易完成后（条件）",
+              "metrics": [
+                {
+                  "index": 0,
+                  "name": "中集世联达持股比例（交易前）",
+                  "raw_value": "62.70%",
+                  "value": "62.70",
+                  "subject_scope": "named_subsidiary",
+                  "period": "交易前",
+                  "uncertainty_reason": null
+                },
+                {
+                  "index": 1,
+                  "name": "中集世联达持股比例（交易完成后）",
+                  "raw_value": "45.04%",
+                  "value": "45.04",
+                  "subject_scope": "named_subsidiary",
+                  "period": "交易完成后",
+                  "uncertainty_reason": "交易完成时点未披露；45.04%为交易完成后预期持股比例"
+                }
+              ],
+              "uncertainty_reason": "交易完成时点未披露；45.04%为交易完成后预期持股比例，尚待交易完成。"
+            }
+          }
+        ]
+      },
+      "inherited_A": {
+        "parent_decisions": [
+          {
+            "fact_id": "f-023",
+            "fact_sha256": "77ef92c6d8191237ddc27b0cfb2dddfeb31fa79817392ffc5d1d92afb58a6957",
+            "disposition": "source_checked",
+            "evidence_ids": [
+              "source-0012"
+            ],
+            "reason": "原PDF22页为签署协议、交易完成后持股将由62.70%降至45.04%，19页年末仍62.70%；指标1不应作为2025年12月已实现比例。仅限制此原指标，保留条件性正文与原指标0，不推断完成日期。",
+            "limitation": null,
+            "metric_restrictions": [
+              {
+                "metric_index": 1,
+                "reason": "原PDF22页为签署协议、交易完成后持股将由62.70%降至45.04%，19页年末仍62.70%；指标1不应作为2025年12月已实现比例。仅限制此原指标，保留条件性正文与原指标0，不推断完成日期。"
+              }
+            ]
+          }
+        ],
+        "successor_decisions": [
+          {
+            "fact_id": "f-023",
+            "fact_sha256": "63fb1da36523a4527b25872adc05ec87ecb7cbd7c921d8d01667e307efaa2256",
+            "disposition": "withheld",
+            "evidence_ids": [
+              "source-0012"
+            ],
+            "reason": "继承原独立使用限制，模型接续不自动解除；原PDF22页为签署协议、交易完成后持股将由62.70%降至45.04%，19页年末仍62.70%；指标1不应作为2025年12月已实现比例。仅限制此原指标，保留条件性正文与原指标0，不推断完成日期。",
+            "limitation": "修订后仍保留原限制；未进行新的独立原文核查。"
+          }
+        ],
+        "successor_reviewer": "program:inherited-use-decisions (not a new source review)",
+        "restrictions_lifted_by_B": false
+      },
+      "projections": {
+        "parent_actual": {
+          "counts": {
+            "reviewed": 15,
+            "pending": 0,
+            "limited": 5,
+            "source_only": 0,
+            "withheld": 0,
+            "duplicate": 0
+          },
+          "visible_fact_count": 20,
+          "visible_metric_count": 30,
+          "targets": [
+            {
+              "fact_id": "f-023",
+              "state": "limited",
+              "review_basis": "independent_source_check",
+              "model_review_stage": null,
+              "reasons": [
+                "原PDF22页为签署协议、交易完成后持股将由62.70%降至45.04%，19页年末仍62.70%；指标1不应作为2025年12月已实现比例。仅限制此原指标，保留条件性正文与原指标0，不推断完成日期。",
+                "独立源核仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。"
+              ],
+              "metric_gaps": [
+                {
+                  "metric_index": 1,
+                  "name": "中集世联达持股比例（交易后）",
+                  "state": "withheld",
+                  "reason": "原PDF22页为签署协议、交易完成后持股将由62.70%降至45.04%，19页年末仍62.70%；指标1不应作为2025年12月已实现比例。仅限制此原指标，保留条件性正文与原指标0，不推断完成日期。"
+                }
+              ]
+            }
+          ]
+        },
+        "current_run_only_diagnostic": {
+          "counts": {
+            "reviewed": 15,
+            "pending": 0,
+            "limited": 5,
+            "source_only": 0,
+            "withheld": 0,
+            "duplicate": 0
+          },
+          "visible_fact_count": 20,
+          "visible_metric_count": 31,
+          "targets": [
+            {
+              "fact_id": "f-023",
+              "state": "limited",
+              "review_basis": "model_source_check",
+              "model_review_stage": "final",
+              "reasons": [
+                "交易完成时点未披露；45.04%为交易完成后预期持股比例，尚待交易完成。"
+              ],
+              "metric_gaps": null
+            }
+          ]
+        },
+        "model_only_with_prior_models": {
+          "counts": {
+            "reviewed": 15,
+            "pending": 0,
+            "limited": 5,
+            "source_only": 0,
+            "withheld": 0,
+            "duplicate": 0
+          },
+          "visible_fact_count": 20,
+          "visible_metric_count": 31,
+          "targets": [
+            {
+              "fact_id": "f-023",
+              "state": "limited",
+              "review_basis": "model_source_check",
+              "model_review_stage": "final",
+              "reasons": [
+                "交易完成时点未披露；45.04%为交易完成后预期持股比例，尚待交易完成。"
+              ],
+              "metric_gaps": null
+            }
+          ]
+        },
+        "actual_with_inherited_A": {
+          "counts": {
+            "reviewed": 15,
+            "pending": 0,
+            "limited": 4,
+            "source_only": 0,
+            "withheld": 1,
+            "duplicate": 0
+          },
+          "visible_fact_count": 19,
+          "visible_metric_count": 29,
+          "targets": [
+            {
+              "fact_id": "f-023",
+              "state": "withheld",
+              "review_basis": "independent_source_check",
+              "model_review_stage": null,
+              "reasons": [
+                "继承原独立使用限制，模型接续不自动解除；原PDF22页为签署协议、交易完成后持股将由62.70%降至45.04%，19页年末仍62.70%；指标1不应作为2025年12月已实现比例。仅限制此原指标，保留条件性正文与原指标0，不推断完成日期。"
+              ],
+              "metric_gaps": null
+            }
+          ]
+        }
+      },
+      "resources": {
+        "physical_requests": 3,
+        "logical_requests": 3,
+        "recoveries": 0,
+        "charged_tokens": 84999,
+        "cost_status": "unknown",
+        "charged_cost_cny": "unknown",
+        "physical_elapsed_sum_seconds": 262.6893768240043,
+        "budget_file": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/000039/executions/6fr-000039-SZ-20261126/budget.json",
+        "budget_sha256": "b28df4d79326e6d3a084fc5fed95b0b2c59e14133ed630dd6ba6eafda9ebd06f"
+      },
+      "A_action": "Independently inspect original wording and all actual edits; decide inherited restrictions and publication. These diagnostics do not release content."
+    }
+  ],
+  "resources": {
+    "physical_requests": 9,
+    "logical_requests": 9,
+    "recoveries": 0,
+    "charged_tokens": 283804,
+    "provider_reported_total_tokens": 283804,
+    "group_business_elapsed_seconds": 751.5690636450017,
+    "group_limits": {
+      "seconds": 12600,
+      "tokens": 3000000,
+      "physical_requests": 18,
+      "concurrency": 3,
+      "max_logical_per_stock": 3,
+      "per_logical_recoveries": 1,
+      "cost": "unknown",
+      "priced_cny_per_stock": "10"
+    },
+    "cost_status": "unknown"
+  },
+  "summary": {
+    "new_initial_findings": 9,
+    "fixed_card_targets_directly_raised_in_fresh_responses": {
+      "920006.BJ": [
+        "F021",
+        "F009"
+      ],
+      "600177.SH": [
+        "F005"
+      ],
+      "000039.SZ": [
+        "f-023"
+      ]
+    },
+    "final_accepted_current_facts": 6,
+    "typed_or_source_rejected_candidates_not_final_checked": {
+      "920006.BJ": [],
+      "600177.SH": [
+        "review-add:RF004"
+      ],
+      "000039.SZ": [
+        "review-add:rev-omit-group-revenue"
+      ]
+    },
+    "actual_newly_added_fact_ids": {
+      "920006.BJ": [],
+      "600177.SH": [],
+      "000039.SZ": []
+    },
+    "formal_quality_or_full_target_semantic_success_claimed": false
+  },
+  "specific_observations": [
+    "Shengnan fresh initial directly raised F009/F021 scope errors; two revised facts passed fresh final. Actual A source_only restrictions remain; removing A alone still leaves both withheld by inherited model findings. Current-run-only scratch shows the new review independently of those inherited findings.",
+    "Youngor fresh initial directly raised F005 presale-versus-recognized-revenue wording, plus F002/F013 and a profit omission. Three existing-fact edits passed final; added profit candidate was locally rejected before final. F005 still inherits A protection.",
+    "CIMC fresh initial directly raised f-023 conditional/event timing, plus group-revenue and consolidation-elimination omissions. f-023 edit passed final; group-revenue candidate was locally rejected, elimination remained an omission candidate. Independent metric restriction was conservatively inherited as whole-fact withheld after the fact changed.",
+    "These four seen risk targets were mentioned by the new raw reviewer; this is not an independent verdict that every model explanation/edit is correct or that all four are newly consumable.",
+    "No new fact objects were adopted in this group. Additional omissions and inherited model/A limits remain visible; no follow-up request is authorized by this audit.",
+    "Actual isolated successors total 60 visible facts/89 visible metrics versus parent 61/90; the reduction comes from conservatively withholding changed CIMC f-023. The original 39-company main root is unchanged. Scratch counts are diagnostic, not released content."
+  ],
+  "protection": {
+    "frozen_files_checked": 154,
+    "frozen_file_drift": [],
+    "original_403_files_unchanged": true,
+    "original_6_parent_bytes_unchanged": true,
+    "existing_20_dirty_files_match_A_accepted_freeze": true,
+    "env_unchanged": true,
+    "A_reference_sha256_unchanged": true,
+    "stage_or_commit_performed": false,
+    "new_supplier_requests_by_B_self_check": 0,
+    "run_database_cleanup_performed": false,
+    "run_database_root_retained": "/home/python/Quote/data/QuoteBak/company-profile-6fr-b-R3xgUx9z"
+  },
+  "note": "Only b-self-check.json is written by this audit. b-plan/operator/three plans/receipts/results/source/reference/frozen code remain untouched.",
+  "projection_totals": {
+    "parent_actual": {
+      "visible_facts": 61,
+      "visible_metrics": 90
+    },
+    "current_run_only_diagnostic": {
+      "visible_facts": 64,
+      "visible_metrics": 98
+    },
+    "model_only_with_prior_models": {
+      "visible_facts": 62,
+      "visible_metrics": 94
+    },
+    "actual_with_inherited_A": {
+      "visible_facts": 60,
+      "visible_metrics": 89
+    }
+  }
+}

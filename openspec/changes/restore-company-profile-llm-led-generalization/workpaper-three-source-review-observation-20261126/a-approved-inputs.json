@@ -1,0 +1,31 @@
+{
+  "task": "6.FR",
+  "authority": "A independent original-PDF adjudication after sealed real initial/repair/final;not automatic model release of A restrictions",
+  "reference": "a-source-adjudication.json",
+  "cases": {
+    "920006.BJ": {
+      "path": "/home/python/Quote/data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-6fr-920006-local-guard-consumption-v1.json",
+      "sha256": "31d80c4ef8944dfeadbe6ee060b3c97dbea19e3b7c5c2c0adad51eea7643c812",
+      "independently_checked_fact_ids": ["F009", "F021"],
+      "released_old_restriction_fact_ids": ["F009", "F021"],
+      "limits": "F021 retains military-only wording,unclear scope and reason;not whole-company counts. No other inherited finding or withdrawn fact is restored."
+    },
+    "600177.SH": {
+      "path": "/home/python/Quote/data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-c84f05ea973bec7d76025099.json",
+      "sha256": "9d1bb3549f80a41f45829dc0273eb840c0b1807e0214e590ec21b7121be54022",
+      "independently_checked_fact_ids": ["F002", "F005", "F013"],
+      "released_old_restriction_fact_ids": ["F005"],
+      "limits": "Brand wording is source-supported but not counted as substantive error repair. Profit addition was locally rejected before final and is not adopted."
+    },
+    "000039.SZ": {
+      "path": "/home/python/Quote/data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-3a3bb89fa82f1553462f6792.json",
+      "sha256": "14ae985157cd3352a01582ccaf3e18566a850d7b2bb51e586a7dd94266daba33",
+      "independently_checked_fact_ids": ["f-023"],
+      "released_old_restriction_fact_ids": ["f-023"],
+      "limits": "45.04% remains conditional after transaction completion with unknown completion time;not a reported2025 year-end holding. Revenue addition was locally rejected and is not adopted."
+    }
+  },
+  "old_originals_and_scores": "preserved;original real group remains as first-run consumer result;local fix and A releases are separately identified",
+  "new_A_safety_restrictions": 0,
+  "new_model_requests": 0
+}

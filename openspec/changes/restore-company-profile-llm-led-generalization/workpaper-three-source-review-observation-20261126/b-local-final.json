@@ -1,0 +1,134 @@
+{
+  "task": "6.FR post-run zero-model consumption fix",
+  "state": "completed_local_consumption_verified_cleanup_done",
+  "completed_at_utc": "2026-11-26T17:37:02.057843+00:00",
+  "new_work_id": "bp-work-6fr-920006-local-guard-consumption-v1",
+  "new_record": "/home/python/Quote/data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-6fr-920006-local-guard-consumption-v1.json",
+  "new_record_sha256": "31d80c4ef8944dfeadbe6ee060b3c97dbea19e3b7c5c2c0adad51eea7643c812",
+  "local_consumption_result": {
+    "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-source-review-observation-20261126/b-local-consumption-result.json",
+    "sha256": "ceb09d027a255490e34ba57b081990a581c505d92f93e0aab50ec6a60de87504"
+  },
+  "validation": {
+    "direct_tests": {
+      "report": "direct",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "junit_seconds": 4.727,
+      "junit_sha256": "a3f2541bc7eddf64cdd3151212b2012933bb458e5c49d48ae162b78986b6b2cf",
+      "modules": {
+        "tests.unit.test_research.test_company_profile_current_recheck": 16
+      }
+    },
+    "completed_related_tests": {
+      "report": "related",
+      "tests": 78,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "junit_seconds": 925.835,
+      "junit_sha256": "ad9dc6b46a69449efd2b04a46a13271f92bd9530d8879d2ccc31c6bdd823711c",
+      "modules": {
+        "tests.unit.test_research.test_company_profile_current_recheck": 22,
+        "tests.unit.test_research.test_company_profile_review_execution": 30,
+        "tests.unit.test_research.test_company_profile_workpaper_delivery": 26
+      }
+    },
+    "unique_tests": 78,
+    "new_tests_included_in_related_total": 16,
+    "pytest_reported_wall_seconds": 926.14,
+    "commands": [
+      "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_current_recheck.py -k 'own_final_changed or unproven_changed or same_hash_other'",
+      "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_current_recheck.py tests/unit/test_research/test_company_profile_review_execution.py tests/unit/test_research/test_company_profile_workpaper_delivery.py",
+      "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m ruff check --select F,E4,E7,E9 --ignore E731 research/company_profile/workpaper_review.py tests/unit/test_research/test_company_profile_current_recheck.py <evidence>/consume_saved_shengnan.py",
+      "source scripts/quote_dev_env.sh; git diff --check"
+    ],
+    "ruff": "passed; preexisting E731 ignored; intentional post-network-guard imports documented with E402 noqa",
+    "git_diff_check": "passed",
+    "writer_reader_export_fresh_equal": true,
+    "review": "No blocking findings in scoped change; only stale different-hash model metric guards with complete matching source final can retire. Independent A and other defects remain."
+  },
+  "scope": {
+    "application_files_changed": [
+      "research/company_profile/workpaper_review.py"
+    ],
+    "test_files_changed": [
+      "tests/unit/test_research/test_company_profile_current_recheck.py"
+    ],
+    "application_function_changed": "_inherit_current_review_guards",
+    "delivery_or_schema_changed": false,
+    "two_rejected_financial_candidates_changed": false
+  },
+  "source_and_original_protection": {
+    "original_403_file_hashes_unchanged": true,
+    "A_published_additions_treatment": "Only original baseline paths compared; new A-authorized publication files preserved and not treated as drift",
+    "seal_39_files_unchanged": true,
+    "seal_sha256": "aa784feb1a58b2bc64f37ecd2d25fdba983be1491d5e63ecfe4dae0c7b0c8493",
+    "sealed_b_result_unchanged": true,
+    "b_plan_sha256": "e2d370f29da53f634d27acb278ebee98264f54eb38b7a8273b7c8d030eb73446",
+    "original_operator_unchanged": true,
+    "three_original_plans_unchanged": true,
+    "three_PDF_and_native_cache_hashes_unchanged": true,
+    "env_hash_unchanged": true,
+    "local_record_and_24_author_facts_unchanged": true
+  },
+  "source_hashes": {
+    "/home/python/Quote/research/company_profile/workpaper_review.py": "e341cb30da0c6e6a4afa80363f8c771b9ebcda222f2d9f4dbaad0a97fb2d7e03",
+    "/home/python/Quote/tests/unit/test_research/test_company_profile_current_recheck.py": "80114567aa274f461dd6bd93b53b1aed27e9e0a28fa402d54eac2a87bf81cf9a",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-source-review-observation-20261126/consume_saved_shengnan.py": "6ac16c203b33f6eaf0a80fdd11872386dd05983eed9d7646a6c51e2f3e835cdf"
+  },
+  "new_supplier_requests": 0,
+  "new_supplier_usage": 0,
+  "new_supplier_cost": "0",
+  "original_run_cost_status": "unknown; original 9 physical/283804/0 recovery not recounted",
+  "cleanup": {
+    "local_verification_roots_removed": [
+      {
+        "path": "/home/python/Quote/data/QuoteBak/company-profile-6fr-local-IYG7Uepp",
+        "owned_by": "this 6.FR local verification only",
+        "removed_files": 13,
+        "removed_logical_bytes": 1194473,
+        "removed_allocated_bytes": 1220608,
+        "removed_symlinks": 0,
+        "reconstructable_from": "source/tests and sealed original responses; compact test/consumption evidence retained"
+      },
+      {
+        "path": "/home/python/Quote/data/QuoteBak/pytest-of-python/pytest-48",
+        "owned_by": "this 6.FR local verification only",
+        "removed_files": 225,
+        "removed_logical_bytes": 51084178,
+        "removed_allocated_bytes": 51474432,
+        "removed_symlinks": 8,
+        "reconstructable_from": "source/tests and sealed original responses; compact test/consumption evidence retained"
+      }
+    ],
+    "owned_pytest_current_symlink_removed": true,
+    "real_run_DB_cleanup": "3 ended databases removed earlier under explicit A authorization; 4026368 bytes; records/checkpoints/plans/wires retained",
+    "remaining_B_temporary_roots": [],
+    "permanent_evidence_retained": "sealed original evidence, local successor, thin replay script and compact results only",
+    "completed_real_run_database_cleanup": {
+      "scope": "three completed original run DBs; raw/checkpoint/record evidence retained",
+      "paths": [
+        "/home/python/Quote/data/QuoteBak/company-profile-6fr-b-R3xgUx9z/run/920006.BJ/research.db",
+        "/home/python/Quote/data/QuoteBak/company-profile-6fr-b-R3xgUx9z/run/600177.SH/research.db",
+        "/home/python/Quote/data/QuoteBak/company-profile-6fr-b-R3xgUx9z/run/000039.SZ/research.db"
+      ],
+      "files": 3,
+      "logical_bytes": 4026368,
+      "allocated_bytes": 4026368
+    },
+    "total_removed_files": 241,
+    "total_removed_logical_bytes": 56305019,
+    "total_removed_allocated_bytes": 56721408
+  },
+  "git": {
+    "staged_by_B": false,
+    "committed_by_B": false,
+    "pushed_by_B": false,
+    "preexisting_20_dirty_changes_not_written_by_B": true
+  },
+  "publication": "A reports 3 safe successors published with 4 current-hash restrictions released; 36 other profiles preserved and whole39=1094/1677. This B receipt does not duplicate A independent content/API approval.",
+  "supersedes_interim_validation": "b-local-validation.json (direct tests were already sufficient; the additional regression is now completed)"
+}

@@ -1,0 +1,38 @@
+{
+  "task": "6.FR",
+  "phase": "actual_initial_requests",
+  "cases": [
+    {
+      "stock": "920006.BJ",
+      "receipt": "data/checkpoints/company_profile_three_source_review_20261126/920006/executions/6fr-920006-BJ-20261126/receipts/001.json",
+      "wire_draft_equals_frozen_current_author_fields": true,
+      "wire_source_equals_frozen_original_packet": true,
+      "old_review_and_A_reference_or_use_decisions_in_input": false,
+      "reasoning_effort": "high",
+      "max_completion_tokens": 16384,
+      "all_authored_fact_hashes_count": 24
+    },
+    {
+      "stock": "600177.SH",
+      "receipt": "data/checkpoints/company_profile_three_source_review_20261126/600177/executions/6fr-600177-SH-20261126/receipts/001.json",
+      "wire_draft_equals_frozen_current_author_fields": true,
+      "wire_source_equals_frozen_original_packet": true,
+      "old_review_and_A_reference_or_use_decisions_in_input": false,
+      "reasoning_effort": "high",
+      "max_completion_tokens": 16384,
+      "all_authored_fact_hashes_count": 20
+    },
+    {
+      "stock": "000039.SZ",
+      "receipt": "data/checkpoints/company_profile_three_source_review_20261126/000039/executions/6fr-000039-SZ-20261126/receipts/001.json",
+      "wire_draft_equals_frozen_current_author_fields": true,
+      "wire_source_equals_frozen_original_packet": true,
+      "old_review_and_A_reference_or_use_decisions_in_input": false,
+      "reasoning_effort": "high",
+      "max_completion_tokens": 16384,
+      "all_authored_fact_hashes_count": 20
+    }
+  ],
+  "supplier_payload_checked_without_printing_keys_or_source_bodies": true,
+  "new_model_requests_by_this_audit": 0
+}

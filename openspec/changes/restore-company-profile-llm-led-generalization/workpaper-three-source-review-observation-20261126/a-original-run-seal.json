@@ -1,0 +1,72 @@
+{
+  "task": "6.FR",
+  "state": "original_real_group_finished_and_sealed_before_any_local_code_or_release_changes",
+  "original_code_frozen_and_unchanged_through_all_sends": 154,
+  "original_group_result_sha256": "3b11237beb00506d4149bfadd8f9c645470588ed4f9211266911fec467f8b95c",
+  "raw_files": {
+    "data/checkpoints/company_profile_three_source_review_20261126/920006/execution-plan.json": "7d0df517be861ed10af8f204a772f6004135d3807dbaa0097f95e6d22fbb6358",
+    "data/checkpoints/company_profile_three_source_review_20261126/920006/reports/company_profile_research_publication.v1.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "data/checkpoints/company_profile_three_source_review_20261126/920006/executions/6fr-920006-BJ-20261126/result.json": "65ceabbbbf09fdd97efc150dc95379f40204d039c83c4ee2e8377965edc44959",
+    "data/checkpoints/company_profile_three_source_review_20261126/920006/executions/6fr-920006-BJ-20261126/budget.json": "5935bda1bfd6fbaa464c393eb57b3c408e02fbf00b63ae68cde7af55cb510d6e",
+    "data/checkpoints/company_profile_three_source_review_20261126/920006/executions/6fr-920006-BJ-20261126/started.json": "6cded49b575b670fdd1f90ff2fdf784637cc6b1f5575850906a29ba2ad58d46f",
+    "data/checkpoints/company_profile_three_source_review_20261126/920006/executions/6fr-920006-BJ-20261126/receipts/003.json": "881b02f2073dd7b418e183d48053e3ebb3099edad4f3adf8d2234efd50791f45",
+    "data/checkpoints/company_profile_three_source_review_20261126/920006/executions/6fr-920006-BJ-20261126/receipts/001.json": "cbeac2198bdd1c730ac36d296ffd5689078fee9138edc4d17987c90be712157c",
+    "data/checkpoints/company_profile_three_source_review_20261126/920006/executions/6fr-920006-BJ-20261126/receipts/002.json": "f1f4cb946b623d329a7322de065e876ed383eb7e3d977e0c3f68041d6eeae2a9",
+    "data/checkpoints/company_profile_three_source_review_20261126/920006/control/task_control.json": "76becb767949f7c2b2519b655416f4f403b425e2562502cc479694da88411d32",
+    "data/checkpoints/company_profile_three_source_review_20261126/000039/execution-plan.json": "4e11b33791f64f8925c35b662077ff31b38e45aa9cb819350c75d8155e0ee4fc",
+    "data/checkpoints/company_profile_three_source_review_20261126/000039/reports/company_profile_research_publication.v1.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "data/checkpoints/company_profile_three_source_review_20261126/000039/executions/6fr-000039-SZ-20261126/result.json": "869285c7cc90fe9fadef187d4c9e60b901d08667731343e35e24c28fdd10e00a",
+    "data/checkpoints/company_profile_three_source_review_20261126/000039/executions/6fr-000039-SZ-20261126/budget.json": "b28df4d79326e6d3a084fc5fed95b0b2c59e14133ed630dd6ba6eafda9ebd06f",
+    "data/checkpoints/company_profile_three_source_review_20261126/000039/executions/6fr-000039-SZ-20261126/started.json": "28b055afc104023707e5c9dd778f85095e883ae4040816643a363972c376c478",
+    "data/checkpoints/company_profile_three_source_review_20261126/000039/executions/6fr-000039-SZ-20261126/receipts/003.json": "17271a67df89fe9c9435895b8da66fc0fafd370e5335fc74a8c069705f7395b4",
+    "data/checkpoints/company_profile_three_source_review_20261126/000039/executions/6fr-000039-SZ-20261126/receipts/001.json": "b01da2eff5df2de9c2e29dc95390bcff04052cb1522039747ddd9fe5a4f85da9",
+    "data/checkpoints/company_profile_three_source_review_20261126/000039/executions/6fr-000039-SZ-20261126/receipts/002.json": "a1d6e1a939d35072e4b46c4666f78276114fe6ec57e0d33704de5a2eb1a7f38e",
+    "data/checkpoints/company_profile_three_source_review_20261126/000039/control/task_control.json": "edaac56bf9d21bbd8cb09647b1007fcb3432da01e16c67b27db0003e9d6f9f8a",
+    "data/checkpoints/company_profile_three_source_review_20261126/600177/execution-plan.json": "ac750e641b54248b7373ce815fd973c24c996efd3bc4f95dc07f6415a1128e10",
+    "data/checkpoints/company_profile_three_source_review_20261126/600177/reports/company_profile_research_publication.v1.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "data/checkpoints/company_profile_three_source_review_20261126/600177/executions/6fr-600177-SH-20261126/result.json": "2b1eeccc3cef96ccbf50bcfdbc734c9cc48fec4a9ed457a5bfb4bb28251d8df0",
+    "data/checkpoints/company_profile_three_source_review_20261126/600177/executions/6fr-600177-SH-20261126/budget.json": "c7ffdbce5b829f1548bb3e085ad7b95cbb8d5acd82395354a1a61c4f75193eed",
+    "data/checkpoints/company_profile_three_source_review_20261126/600177/executions/6fr-600177-SH-20261126/started.json": "c467adcf577873a3f61d2378c5c33ad76beb016c958c1512cf2042237cdd455f",
+    "data/checkpoints/company_profile_three_source_review_20261126/600177/executions/6fr-600177-SH-20261126/receipts/003.json": "405847323f4b592ee6aee5d009eaed023ab60e5027a01ed6ed97e2336edffb01",
+    "data/checkpoints/company_profile_three_source_review_20261126/600177/executions/6fr-600177-SH-20261126/receipts/001.json": "f4180e2211b4fdd9ddb41c65ef9db4919317b618a04451207b6262eb1378e484",
+    "data/checkpoints/company_profile_three_source_review_20261126/600177/executions/6fr-600177-SH-20261126/receipts/002.json": "fb4db2130e3c49bccc650c6c9436205b40b5e7a806293f59eb652818c76c5fac",
+    "data/checkpoints/company_profile_three_source_review_20261126/600177/control/task_control.json": "52598443773ec79362f3de177edef657e684441283cc05dd42bc5e639cb16bf4",
+    "data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-9d9c2637afa2f4ffc35c6fcc.json": "843c1a5915371b8b19a70a1059ddbd2110f4aaadc5f79c68c454bd674e04ae96",
+    "data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-c84f05ea973bec7d76025099.json": "9d1bb3549f80a41f45829dc0273eb840c0b1807e0214e590ec21b7121be54022",
+    "data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-2d2d4d8fb14d282413fbbb1b.json": "85b839d02976e0be7b7964fd45727dc55cb420475c03e1dcae447f132a8921d0",
+    "data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-b2be2ad9371561029ff7648f.json": "a76b98b9acccec63ccfe376787c8737390bdbf09e3525241d0e6bc0733b67c21",
+    "data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-3a3bb89fa82f1553462f6792.json": "14ae985157cd3352a01582ccaf3e18566a850d7b2bb51e586a7dd94266daba33",
+    "data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-7bec633c2400d091092cd7b3.json": "a5dcc3deb95a9682b0daf85e43a101376c86a45814535f04ec5a09c7f3b8f10e",
+    "data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-8316cdd34724f6bb6acdc31a.json": "e66c1ce309093bd875b75c3ca613f1974cfacf5f1ebaa9c5f42d8919cde0c96a",
+    "data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-cd0afb1f99731027937f26cf.json": "838108f15616b63ecb31001983bab9add15e191ca86b2d11d3997677f2621c9c",
+    "data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/bp-work-070141e2f3b0b8fd783e9995.json": "acc324d087dac9d27eb437b6d495bfbffa1fac9b190f41936be5c8b8acda7f31",
+    "data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/checkpoints/bp-work-c84f05ea973bec7d76025099.json": "a7fb1a5077b7ced13f93b74699083437235d7f5ce221664aef4739069889f14d",
+    "data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/checkpoints/bp-work-3a3bb89fa82f1553462f6792.json": "39f5b684848a190ddc652654f0848c5c35cd91b26eb854df2f6d5326c333bf95",
+    "data/research/company_profile_three_source_review_20261126/company_profile_common_core.v1/checkpoints/bp-work-070141e2f3b0b8fd783e9995.json": "21833be1aaa9307210de6f487c22df04e420c7ce5fcb2370e93832caffb673f0"
+  },
+  "physical_requests": 9,
+  "charged_tokens": 283804,
+  "recoveries": 0,
+  "group_elapsed_seconds": 751.5690636450017,
+  "ledgers": [
+    {
+      "file": "data/checkpoints/company_profile_three_source_review_20261126/920006/executions/6fr-920006-BJ-20261126/budget.json",
+      "physical": 3,
+      "tokens": 87160,
+      "cost_status": "unknown"
+    },
+    {
+      "file": "data/checkpoints/company_profile_three_source_review_20261126/000039/executions/6fr-000039-SZ-20261126/budget.json",
+      "physical": 3,
+      "tokens": 84999,
+      "cost_status": "unknown"
+    },
+    {
+      "file": "data/checkpoints/company_profile_three_source_review_20261126/600177/executions/6fr-600177-SH-20261126/budget.json",
+      "physical": 3,
+      "tokens": 111645,
+      "cost_status": "unknown"
+    }
+  ],
+  "supplier_outcomes_not_recounted_by_future_local_consumption": true
+}

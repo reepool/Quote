@@ -1,0 +1,248 @@
+{
+  "state": "passed",
+  "observations": [
+    {
+      "instrument_id": "920006.BJ",
+      "state": "original_entry_reached_transport_without_send",
+      "input": {
+        "purpose": "review_profile_workpaper",
+        "profile": "semantic_extraction__scorpio_grok",
+        "request_draft_sha256": "5f1d6bc96c8f3935d17b7c71f9b004a5152614247f4a18efc6e1277dde3fc0cc",
+        "source_text_sha256": "838c54c1e72081eeae629dc15ac1ae4be18ad6194aa5656e514f98001a48233d",
+        "keys": [
+          "draft",
+          "fact_hashes",
+          "metric_index_base",
+          "report",
+          "source_text"
+        ],
+        "old_review_or_A_reference_included": false
+      },
+      "wire": {
+        "host": "scorpio.reepool.com",
+        "model": "grok-4.7",
+        "timeout_seconds": 1200.0,
+        "sha256": "e0e150224f88b5f510783751e35236ea9b3cd235c530363ccdd12a1c598e8d14",
+        "keys": [
+          "max_completion_tokens",
+          "messages",
+          "model",
+          "reasoning_effort",
+          "response_format",
+          "stream",
+          "stream_options",
+          "temperature"
+        ],
+        "user_input_keys": [
+          "draft",
+          "fact_hashes",
+          "metric_index_base",
+          "report",
+          "source_text"
+        ],
+        "user_content_sha256": "de25c3434cf2b60404804d2f72a51fac6e135da8d409c69ffa105aa1e4cea5b8",
+        "original_task_entry_receipt_sha256": "60575e4af0b4544a11c2e28f7ee866259be93e5fd696b5605f912643e99dc077"
+      },
+      "bound_profiles": {
+        "semantic_extraction__deepseek": {
+          "model": "deepseek-flash",
+          "attempt_timeout_seconds": 600.0,
+          "logical_timeout_seconds": 2450.0,
+          "reasoning_effort": "high",
+          "max_retries": 1
+        },
+        "semantic_extraction__scorpio_grok": {
+          "model": "grok-4.7",
+          "attempt_timeout_seconds": 1200.0,
+          "logical_timeout_seconds": 2450.0,
+          "reasoning_effort": "high",
+          "max_retries": 1
+        }
+      },
+      "supplier_requests": 0,
+      "native_cache_and_exact_PDF_validated": true,
+      "serialized_wire_matches_current_authors_and_original_source": true
+    },
+    {
+      "instrument_id": "600177.SH",
+      "state": "original_entry_reached_transport_without_send",
+      "input": {
+        "purpose": "review_profile_workpaper",
+        "profile": "semantic_extraction__scorpio_grok",
+        "request_draft_sha256": "d9381f9214af4db0ad2e622be992cd06f64d343715e7fe28a3eb077b0ad7f860",
+        "source_text_sha256": "b4ebf886c75b4454d0db6b065299a4007756db04d9ed7323aac099a738f58e96",
+        "keys": [
+          "draft",
+          "fact_hashes",
+          "metric_index_base",
+          "report",
+          "source_text"
+        ],
+        "old_review_or_A_reference_included": false
+      },
+      "wire": {
+        "host": "scorpio.reepool.com",
+        "model": "grok-4.7",
+        "timeout_seconds": 1200.0,
+        "sha256": "e877031af76088c48a795fbeaf017572beba282db0aa0f9dfa79b454c4db3041",
+        "keys": [
+          "max_completion_tokens",
+          "messages",
+          "model",
+          "reasoning_effort",
+          "response_format",
+          "stream",
+          "stream_options",
+          "temperature"
+        ],
+        "user_input_keys": [
+          "draft",
+          "fact_hashes",
+          "metric_index_base",
+          "report",
+          "source_text"
+        ],
+        "user_content_sha256": "ecf30339fdc9a75c81d5f66156b69798f1b55a0607c0813ef0dd9d30a513991f",
+        "original_task_entry_receipt_sha256": "9b4ddd97e1fd7cb791e64080b685f740498ac95521edf7abe2f46ebb13776d92"
+      },
+      "bound_profiles": {
+        "semantic_extraction__deepseek": {
+          "model": "deepseek-flash",
+          "attempt_timeout_seconds": 600.0,
+          "logical_timeout_seconds": 2450.0,
+          "reasoning_effort": "high",
+          "max_retries": 1
+        },
+        "semantic_extraction__scorpio_grok": {
+          "model": "grok-4.7",
+          "attempt_timeout_seconds": 1200.0,
+          "logical_timeout_seconds": 2450.0,
+          "reasoning_effort": "high",
+          "max_retries": 1
+        }
+      },
+      "supplier_requests": 0,
+      "native_cache_and_exact_PDF_validated": true,
+      "serialized_wire_matches_current_authors_and_original_source": true
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "state": "original_entry_reached_transport_without_send",
+      "input": {
+        "purpose": "review_profile_workpaper",
+        "profile": "semantic_extraction__scorpio_grok",
+        "request_draft_sha256": "6aafa022468d2b948460a239635c59a9d3a9d216a6a4376ec43b69b10d0bdd5d",
+        "source_text_sha256": "89921d94fb1441bf407ba3ae04d01d7014167154a6aa90a6f83e2bf40acce0ec",
+        "keys": [
+          "draft",
+          "fact_hashes",
+          "metric_index_base",
+          "report",
+          "source_text"
+        ],
+        "old_review_or_A_reference_included": false
+      },
+      "wire": {
+        "host": "scorpio.reepool.com",
+        "model": "grok-4.7",
+        "timeout_seconds": 1200.0,
+        "sha256": "b11ae0c21150b144e9eb09f16c9000eda9737b91553b1df389c6f0e3b67dddd1",
+        "keys": [
+          "max_completion_tokens",
+          "messages",
+          "model",
+          "reasoning_effort",
+          "response_format",
+          "stream",
+          "stream_options",
+          "temperature"
+        ],
+        "user_input_keys": [
+          "draft",
+          "fact_hashes",
+          "metric_index_base",
+          "report",
+          "source_text"
+        ],
+        "user_content_sha256": "a29ff8c4dd6c31ceadb8db7eefca0d19ad3842859e01f4cb3526f97c3085c032",
+        "original_task_entry_receipt_sha256": "19c0a72eef69acc5703205695ed9b2dbf692d2c4209cbbd1c3691e9eb609a962"
+      },
+      "bound_profiles": {
+        "semantic_extraction__deepseek": {
+          "model": "deepseek-flash",
+          "attempt_timeout_seconds": 600.0,
+          "logical_timeout_seconds": 2450.0,
+          "reasoning_effort": "high",
+          "max_retries": 1
+        },
+        "semantic_extraction__scorpio_grok": {
+          "model": "grok-4.7",
+          "attempt_timeout_seconds": 1200.0,
+          "logical_timeout_seconds": 2450.0,
+          "reasoning_effort": "high",
+          "max_retries": 1
+        }
+      },
+      "supplier_requests": 0,
+      "native_cache_and_exact_PDF_validated": true,
+      "serialized_wire_matches_current_authors_and_original_source": true
+    }
+  ],
+  "supplier_requests": 0,
+  "DNS_or_TLS_requests": 0,
+  "synthetic_model_responses": 0,
+  "proof_output_and_checkpoint": "temporary_only; excluded from live invocation and scheduled for cleanup",
+  "negative_checks": [
+    {
+      "instrument_id": "920006.BJ",
+      "case": "wrong_report_version",
+      "rejected_before_execution": true
+    },
+    {
+      "instrument_id": "920006.BJ",
+      "case": "unknown_plan_field",
+      "rejected_before_execution": true
+    },
+    {
+      "instrument_id": "920006.BJ",
+      "case": "wrong_source_stock",
+      "rejected_before_execution": true
+    },
+    {
+      "instrument_id": "600177.SH",
+      "case": "wrong_report_version",
+      "rejected_before_execution": true
+    },
+    {
+      "instrument_id": "600177.SH",
+      "case": "unknown_plan_field",
+      "rejected_before_execution": true
+    },
+    {
+      "instrument_id": "600177.SH",
+      "case": "wrong_source_stock",
+      "rejected_before_execution": true
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "case": "wrong_report_version",
+      "rejected_before_execution": true
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "case": "unknown_plan_field",
+      "rejected_before_execution": true
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "case": "wrong_source_stock",
+      "rejected_before_execution": true
+    }
+  ],
+  "assertion_scope": "All three initial requests through real configured entry and gateway serialization; abort at transport; no synthetic responses or real phase completion.",
+  "commands": [
+    "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python <B QuoteBak>/offline_proof.py",
+    "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m ruff check --select F,E4,E7,E9 <evidence>/review_operator.py",
+    "source scripts/quote_dev_env.sh; git diff --check"
+  ]
+}

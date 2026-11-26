@@ -1,0 +1,40 @@
+{
+  "task": "6.FR",
+  "authorized": true,
+  "b_plan_sha256": "e2d370f29da53f634d27acb278ebee98264f54eb38b7a8273b7c8d030eb73446",
+  "accepted_dirty_sha256": {
+    "docs/development/company_profile_delivery_plan.md": "77ca3fd2f3bd668570ee3bde5bd67abff24874f9a91f53dc52cb5a82e381c8c0",
+    "openspec/changes/restore-company-profile-llm-led-generalization/design.md": "9d72c9324680865324d89ce891c035f9550b91834b19be3ba534de5adb5838b5",
+    "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md": "d40773d9967c616d6c838e92f0358e8779df499c40b74732bb048b0ddc82e7ed"
+  },
+  "references": {
+    "920006.BJ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-source-review-observation-20261126/a-source-reference.json",
+      "sha256": "454d1ee9fb471742c856f4f26111c1e9d651e3f530b15bcab572efa92f2c0be2"
+    },
+    "600177.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-source-review-observation-20261126/a-source-reference.json",
+      "sha256": "454d1ee9fb471742c856f4f26111c1e9d651e3f530b15bcab572efa92f2c0be2"
+    },
+    "000039.SZ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-source-review-observation-20261126/a-source-reference.json",
+      "sha256": "454d1ee9fb471742c856f4f26111c1e9d651e3f530b15bcab572efa92f2c0be2"
+    }
+  },
+  "input_checks": {
+    "model_opinions_or_A_answers_in_new_draft": false,
+    "author_draft_and_original_packet_bound": true,
+    "real_entry_started": false,
+    "old39_original403_private_env_unchanged": true
+  },
+  "group_limit": {
+    "seconds": 12600,
+    "tokens": 3000000,
+    "physical_requests": 18,
+    "concurrency": 3,
+    "max_logical_per_stock": 3,
+    "per_logical_recoveries": 1,
+    "cost": "unknown",
+    "priced_cny_per_stock": "10"
+  }
+}

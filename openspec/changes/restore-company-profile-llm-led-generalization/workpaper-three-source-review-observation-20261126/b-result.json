@@ -1,0 +1,108 @@
+{
+  "task": "6.FR",
+  "state": "run_finished_pending_B_content_self_check_and_A_review",
+  "cases": [
+    {
+      "instrument_id": "920006.BJ",
+      "result": {
+        "action": "review_batch",
+        "state": "completed",
+        "items": [
+          {
+            "instrument_id": "920006.BJ",
+            "request_id": "6fr-920006-BJ-20261126",
+            "state": "completed",
+            "work_id": "bp-work-070141e2f3b0b8fd783e9995",
+            "review_status": "completed_with_open_findings"
+          }
+        ],
+        "stop_reason": null,
+        "remaining_request_ids": [],
+        "research_only": true,
+        "production_authorization": "not_authorized",
+        "execution_plan": {
+          "run_id": "6fr-920006-BJ-20261126",
+          "plan_sha256": "c1397310ba43d1fa00f3f798e84223f1f63736d6d0b73d6f4c99057c3a56bfef",
+          "budget_path": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/920006/executions/6fr-920006-BJ-20261126/budget.json",
+          "production_authorization": "not_authorized"
+        }
+      }
+    },
+    {
+      "instrument_id": "600177.SH",
+      "result": {
+        "action": "review_batch",
+        "state": "completed",
+        "items": [
+          {
+            "instrument_id": "600177.SH",
+            "request_id": "6fr-600177-SH-20261126",
+            "state": "completed",
+            "work_id": "bp-work-c84f05ea973bec7d76025099",
+            "review_status": "completed_with_open_findings"
+          }
+        ],
+        "stop_reason": null,
+        "remaining_request_ids": [],
+        "research_only": true,
+        "production_authorization": "not_authorized",
+        "execution_plan": {
+          "run_id": "6fr-600177-SH-20261126",
+          "plan_sha256": "c7261575a16324bb15893805744f3e7e72c4f9f5853156dae7213ae0db3e4d66",
+          "budget_path": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/600177/executions/6fr-600177-SH-20261126/budget.json",
+          "production_authorization": "not_authorized"
+        }
+      }
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "result": {
+        "action": "review_batch",
+        "state": "completed",
+        "items": [
+          {
+            "instrument_id": "000039.SZ",
+            "request_id": "6fr-000039-SZ-20261126",
+            "state": "completed",
+            "work_id": "bp-work-3a3bb89fa82f1553462f6792",
+            "review_status": "completed_with_open_findings"
+          }
+        ],
+        "stop_reason": null,
+        "remaining_request_ids": [],
+        "research_only": true,
+        "production_authorization": "not_authorized",
+        "execution_plan": {
+          "run_id": "6fr-000039-SZ-20261126",
+          "plan_sha256": "3cf041f26b270b1f586dcdd70f1875e166416d7917cf50a182927f8b720c7a33",
+          "budget_path": "/home/python/Quote/data/checkpoints/company_profile_three_source_review_20261126/000039/executions/6fr-000039-SZ-20261126/budget.json",
+          "production_authorization": "not_authorized"
+        }
+      }
+    }
+  ],
+  "elapsed_seconds": 751.5690636450017,
+  "protection": {
+    "head": "0156bb51f7d604f660319196d515f07c2295be68",
+    "dirty_files_matching_A_baseline": 17,
+    "preexisting_dirty_drift_requires_A_freeze": {
+      "docs/development/company_profile_delivery_plan.md": {
+        "A_baseline_sha256": "d34676bde97d20538631b0bc399cad9a2e4528a0896d3570a745b627a9613a0b",
+        "observed_sha256": "77ca3fd2f3bd668570ee3bde5bd67abff24874f9a91f53dc52cb5a82e381c8c0"
+      },
+      "openspec/changes/restore-company-profile-llm-led-generalization/design.md": {
+        "A_baseline_sha256": "ff73408a802e5d61d7d055ed0cbedd85df52821a15e423b60978d720d74579a6",
+        "observed_sha256": "9d72c9324680865324d89ce891c035f9550b91834b19be3ba534de5adb5838b5"
+      },
+      "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md": {
+        "A_baseline_sha256": "e47180b85081f5cba85599fd5f3f2889e3adef2cfda69887bc31d29abf68d905",
+        "observed_sha256": "d40773d9967c616d6c838e92f0358e8779df499c40b74732bb048b0ddc82e7ed"
+      }
+    },
+    "protected_files_unchanged": 403,
+    "env_unchanged": true
+  },
+  "cost": "unknown",
+  "publication": "isolated_only",
+  "automatic_retry_group": false
+}

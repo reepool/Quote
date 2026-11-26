@@ -1,0 +1,77 @@
+{
+  "task": "6.FR",
+  "purpose": "Independent pre-send source reference and assessment criteria;not model input",
+  "reference_policy": "Judge actual economic meaning,own fact and metric scope/time independently;faithful source wording plus explicit uncertainty is acceptable. Do not require the same label or edit phrasing for its own sake. Current legacy restrictions are hypotheses to recheck against source,not answer keys to send to the model.",
+  "cases": [
+    {
+      "instrument_id": "920006.BJ",
+      "document_version": "74903f868606e3b524205c525970e6660879ca416bab162e9c9b9d7e52a4288b",
+      "base_work_id": "bp-work-9d9c2637afa2f4ffc35c6fcc",
+      "pdf": "data/filings/announcements/blobs/74/74903f868606e3b524205c525970e6660879ca416bab162e9c9b9d7e52a4288b.pdf",
+      "risks": [
+        {
+          "fact_id": "F009",
+          "physical_pages": [21, 142],
+          "section": "第四节管理层讨论与分析/经营情况回顾/收入构成；财务会计报告/营业收入和营业成本",
+          "source": "单位元；收入构成列2025年、2024年、变动比例。主营业务收入110,497,142.43元，其他业务收入1,940,128.21元；下方另列按产品分类。142页主营业务收入和成本表重复该主营收入总额。",
+          "issue": "原事实及metric将公司主营业务收入合计标business_segment，没有指定独立业务/产品/行业行。金额与主营标签有源；不能将主营合计改称全部营业收入。",
+          "acceptable": "公司层面的主营合计范围，或有具体理由的unclear并保原文；只限制metric而事实仍确定是独立业务行不算解决。"
+        },
+        {
+          "fact_id": "F021",
+          "physical_pages": [14],
+          "section": "第四节管理层讨论与分析/二、经营情况回顾/军用领域",
+          "source": "军用领域：……全年新增客户20家，产品交付率达90%，参与投标共49次，中标15次，客户满意度93%。后文另列民用领域与战略新业务。",
+          "issue": "原正文已明确军用领域且数字正确，fact及metrics的consolidated_group标签却未保局部对象；依据既有scope合同不能当全业务统计。",
+          "acceptable": "保军用限定及原数字，采用与源一致的较窄业务范围或unclear/原因；无需与A选择同一枚举。仅指标限制而错误的确定事实范围留存不算解决，整条隔离可计安全检出但不是内容恢复。"
+        }
+      ],
+      "positive_controls": [
+        {"fact_id": "F001", "physical_pages": [12, 13], "claim": "公司产品面向国防装备供应单位，有研发/采购/生产/销售体系，自主研发辅以外部合作；不应因军用细分统计问题丢失整个主营/经营模式。"},
+        {"fact_id": "F002", "physical_pages": [21], "claim": "按产品分类有航空机械、综合电源、代加工劳务和其他；这是公司产品列表，不是将某单独行金额扩大。"}
+      ]
+    },
+    {
+      "instrument_id": "600177.SH",
+      "document_version": "f795a05a021e3af7edce80ecce946a9b80ff9323ec299265376c6f2e5f23f17a",
+      "base_work_id": "bp-work-8316cdd34724f6bb6acdc31a",
+      "pdf": "data/filings/announcements/blobs/f7/f795a05a021e3af7edce80ecce946a9b80ff9323ec299265376c6f2e5f23f17a.pdf",
+      "risks": [
+        {
+          "fact_id": "F005",
+          "physical_pages": [20, 36],
+          "section": "管理层讨论与分析/其他业务；房地产行业经营性信息分析/房地产销售和结转",
+          "source": "20页：地产业务尾盘预售收入95,576.81万元（订单口径，合作项目按权益比例折算）；明湖懿秋苑交付，结转营业收入415,688.70万元；全年亏损10,579.67万元。36页另列房地产销售金额95,576.81万元、结转收入437,942.43万元，并说明合作项目按权益折算等项目口径。",
+          "issue": "原文明确区分预售订单销售口径和交付结转营业收入，原F005却写通过项目预售和交付结转确认收入。不能把订单/权益预售销售额直接当当期会计营业收入，也不能把20/36页两个不同结转口径合成一个确定数。",
+          "acceptable": "按原披露分别描述预售订单与交付结转，去掉无据的并列收入确认断言；不要求补全源包外的会计政策。仅删除metrics、变scope或加uncertainty而错误正文仍在不算修正。亏损原词+null和原因可保，不为标准化强填负值。"
+        }
+      ],
+      "positive_controls": [
+        {"fact_id": "F001", "physical_pages": [19, 20, 21], "claim": "公司经营结构包括时尚、地产和投资，时尚多品牌架构有源；不应因一项地产收入确认表述失真而删掉整份主营或多品牌描述。"}
+      ]
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "document_version": "438e2d1c304b24311de907f012108270b38163769ece55d710ddae4b6fc3cf24",
+      "base_work_id": "bp-work-cd0afb1f99731027937f26cf",
+      "pdf": "data/filings/announcements/blobs/43/438e2d1c304b24311de907f012108270b38163769ece55d710ddae4b6fc3cf24.pdf",
+      "risks": [
+        {
+          "fact_id": "f-023",
+          "metric_index": 1,
+          "physical_pages": [19, 22],
+          "section": "第四章董事会报告及管理层讨论与分析/公司业务概要及资本运作",
+          "source": "19页：截至2025年12月31日持有中集世联达约62.70%。22页：2025年12月签订相关协议，通过增资扩股和转让少量老股引入战略投资者；交易完成后持股比例将由62.70%下降至45.04%，将继续并表。",
+          "issue": "签约时间不证明交易完成；原第1位置metric将交易后45.04%的period标2025年12月，不能当该时点已实现持股。原正文已有交易完成后条件，不能为了指标问题不必要重写整个事实。",
+          "acceptable": "正确区分签约事件、年末既有比例与交易完成后条件值；可修订该metric的条件性period/原因，或明确限制该原位置而保正确正文/其他指标。无需猜完成日期或强求恢复该指标。"
+        }
+      ],
+      "positive_controls": [
+        {"fact_id": "f-001", "physical_pages": [16], "claim": "集团为物流与能源行业设备和解决方案供应商，物流/能源两大产业群及相关设备服务业务有源，应保持基本结构而不是仅剩股权事件。"}
+      ]
+    }
+  ],
+  "assessment_units": "Four known risk targets plus four positive-control facts;also independently inspect every actually changed,added or newly restricted object. Do not treat inherited old model/A limits as fresh detections,or mandatory A re-adjudication of old restrictions as a fresh model miss.",
+  "outcomes_to_separate": ["newly_detected", "still_missed", "correct_repair", "safely_limited_but_not_restored", "unnecessary_loss_or_false_positive", "inherited_protection", "new_manual_protection", "independently_released_old_restriction", "substantive_restored_content", "repeated_content"],
+  "method": "A personally read existing official PDF selected pages with project pypdf layout extraction before sends;page numbers are source coordinates. No new model or whole-report extraction used."
+}
