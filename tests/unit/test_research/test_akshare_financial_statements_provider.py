@@ -414,9 +414,9 @@ def test_akshare_financial_statements_provider_merges_target_period_statement_ga
         provider,
         "_akshare",
         lambda mode="direct": SimpleNamespace(
-            stock_financial_debt_new_ths=_ths_balance,
-            stock_financial_benefit_new_ths=_ths_profit,
-            stock_financial_cash_new_ths=_ths_cash,
+            stock_balance_sheet_ths=_ths_balance,
+            stock_profit_sheet_ths=_ths_profit,
+            stock_cash_flow_sheet_ths=_ths_cash,
             stock_financial_report_sina=_sina_report,
         ),
     )
@@ -542,9 +542,9 @@ def test_akshare_financial_statements_provider_merges_missing_fields_from_sina(
         provider,
         "_akshare",
         lambda mode="direct": SimpleNamespace(
-            stock_financial_debt_new_ths=_ths_balance,
-            stock_financial_benefit_new_ths=_ths_profit,
-            stock_financial_cash_new_ths=_ths_cash,
+            stock_balance_sheet_ths=_ths_balance,
+            stock_profit_sheet_ths=_ths_profit,
+            stock_cash_flow_sheet_ths=_ths_cash,
             stock_financial_report_sina=_sina_report,
         ),
     )
@@ -714,9 +714,9 @@ def test_akshare_financial_statements_provider_builds_bundle_from_ths_report(mon
         provider,
         "_akshare",
         lambda mode="direct": SimpleNamespace(
-            stock_financial_debt_new_ths=_ths_frame("balance"),
-            stock_financial_benefit_new_ths=_ths_frame("profit"),
-            stock_financial_cash_new_ths=_ths_frame("cash"),
+            stock_balance_sheet_ths=_ths_frame("balance"),
+            stock_profit_sheet_ths=_ths_frame("profit"),
+            stock_cash_flow_sheet_ths=_ths_frame("cash"),
         ),
     )
 

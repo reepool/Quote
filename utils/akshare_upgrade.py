@@ -101,10 +101,11 @@ def build_upgrade_report(
     requirements_action: Optional[str] = None,
     rollback_smoke_summary: Optional[Dict[str, Any]] = None,
     error: Optional[str] = None,
+    package: str = "akshare",
 ) -> str:
     """组装升级报告文案；outcome ∈ {success, failed, skipped}。"""
     lines = [
-        f"akshare 自动升级 {'成功' if outcome == 'success' else ('跳过' if outcome == 'skipped' else '失败')}",
+        f"{package} 自动升级 {'成功' if outcome == 'success' else ('跳过' if outcome == 'skipped' else '失败')}",
         "",
         f"结果: `{outcome}`",
         f"版本: `{previous_version}` → `{target_version}`",

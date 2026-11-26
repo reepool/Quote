@@ -486,7 +486,7 @@ L4  Research API（新增）
 - **pytdx 更偏底层行情与原始资料接口**，可提供公司信息目录/文本、板块文件、财务信息和除权除息；它可以进入 `company_profile` 与 `financial_summary` 的主备链，但**不能单独承担标准化股东/股权结构主源**。
 - **“申万行业”与“股权结构”都不应寄希望于单一免费直连源一次性解决**，应采用本地归一化与多源拼接。
 - **当前已本地验证可直接更新申万一/二/三级标准层的免费链路是 `AkShare`**：
-  - 已核实接口：`sw_index_first_info / sw_index_second_info / sw_index_third_info / sw_index_third_cons`
+  - 已核实接口：`index_first_info_sw / index_second_info_sw / index_third_info_sw / index_third_cons_sw`
   - `BaoStock / PyTDX / efinance` 当前都更适合作为行业参考层或映射线索层，而不是 strict Shenwan authoritative 主源
 
 #### 5.3.2 能力矩阵
@@ -574,11 +574,11 @@ L4  Research API（新增）
   - 系统输出：**本地归一化行业表**
   - 严格申万口径拟升级为官方分类主源：优先通过 `swsresearch_classification_direct` 下载申万官方 `StockClassifyUse_stock.xls` 与 `SwClassCode_2021.xls`，由官方六位行业分类代码直接维护一/二/三级 taxonomy、全量股票分类历史和 latest authoritative membership
   - `801xxx.SI / 85xxxx.SI` 申万行业指数代码不再作为行业库主键；它们作为指数行情、行业估值、成分股和 index-analysis 数据的 alias 字段保留，避免和官方分类代码混用
-  - `AkShare stock_industry_clf_hist_sw()` 本质上是官方股票分类历史文件的包装，后续应退居官方直连不可用时的股票分类历史 fallback；`sw_index_first_info / second_info / third_info / third_cons` 退居指数 alias、诊断或 legacy fallback，不再作为分类 membership 主事实
+  - `AkShare stock_industry_clf_hist_sw()` 本质上是官方股票分类历史文件的包装，后续应退居官方直连不可用时的股票分类历史 fallback；`index_first_info_sw / index_second_info_sw / index_third_info_sw / index_third_cons_sw` 退居指数 alias、诊断或 legacy fallback，不再作为分类 membership 主事实
   - 迁移时允许清空并重建 strict Shenwan 行业表：`industry_taxonomy / industry_memberships / industry_component_sets / industry_official_classifications / industry_official_code_mappings` 中与旧 index-code 主线相关的数据均可由新官方分类主线重新落库或归档
   - 新结构应补充 source-file manifest 与 full classification history，记录 URL、`ETag`、`Last-Modified`、sha256、行数、最大 `更新日期`、parser version 与 ingestion run id，支持每日刷新时稳定判断文件是否更新
   - 行业估值/指数分析已单独接入 `industry_index_analysis_daily`，字段包括收盘指数、成交量、涨跌幅、换手率、市盈率、市净率、均价、成交额占比、流通市值、平均流通市值、股息率；最新日更由 `swsresearch_index_analysis_direct` 负责，历史区间回补由 AkShare-compatible `index_analysis_daily_sw` 上游语义负责；该表按指数代码落独立指标，不参与股票分类判定
-  - `2026-04-20` 已新增 `industry_component_sets`，用于缓存申万叶子行业成分股集合；provider 优先使用 `sw_index_third_cons`，再 fallback 到 `index_component_sw`
+  - `2026-04-20` 已新增 `industry_component_sets`，用于缓存申万叶子行业成分股集合；provider 优先使用 `index_third_cons_sw`，再 fallback 到 `index_component_sw`
   - `2026-04-23` 已新增东财行业名补源：对当前 AkShare 组件集未覆盖的 12 只钢铁标的，东财 `f127` 均返回 `特钢Ⅱ`，已按本地 taxonomy 名称匹配写入 `801045.SI / 特钢Ⅱ`；因当前本地 taxonomy 中该节点是二级 leaf，`sw_l3_code` 保持为空
   - `2026-04-24` 已新增新浪结构化补源：从新浪财经 `相关资料` 页解析当前有效的申万相关行，优先采用 `85xxxx` 三级行业候选；若只得到 `801xxx` 二级候选，仍沿用本地 taxonomy 的 level-2 leaf-only 校验。东财继续作为轻量行业名 fallback，雪球暂保留为人工复核参考而不进入默认自动链路
   - `2026-04-24` 已优化定向 gap fill：在已有本地 taxonomy 缓存且只修具体 missing instrument ids 时，复用 `industry_taxonomy` 并跳过 audit-only official classification 拉取，避免单标的补缺被远端审计链路拖慢
@@ -609,7 +609,7 @@ L4  Research API（新增）
   - `2026-05-13` 针对 SSE `2025-12-31` 无数值事实完成官方端点定位：新增 `scripts/dev_validation/probe_sse_official_period_availability.py`，直接探测 `COMMON_MAP_INCOMESTATEMENT_C / COMMON_MAP_BALANCESHEET_C / COMMON_MAP_CASHFLOW_C` 和官方脚本使用的 `COMMON_MAP_MAXYEAR_L`。`600000.SH` bounded probe 显示 `2023Q4` 与 `2024Q2` 均返回 structured numeric rows，但 `2024Q4 / 2025Q4` HTTP 200 且空结果；`COMMON_MAP_MAXYEAR_L` 返回 semi-annual `1000 -> 2024`、annual `5000 -> 2023`。第二个样本 `601033.SH` annual max year 同样为 `2023`。因此当前证据支持：SSE commonQuery 端点未整体停更，但 annual report `REPORT_PERIOD_ID=5000` 的官方 XBRL structured data 当前最大年份仍停在 `2023`，`2024Q4 / 2025Q4` 不应作为 SSE commonQuery 可用报告期强制写入
   - `2026-05-18` 已完成东财、同花顺、新浪、CNInfo data20 的小样本源层次复核：
     - 东财 `eastmoney_report` 字段最宽，适合作为完整字段补全和按需远程扩展源，但单标的三表耗时约 `25s-30s`，不适合作为常规本地全量更新主源。
-    - 同花顺新版三表 `stock_financial_debt_new_ths / stock_financial_benefit_new_ths / stock_financial_cash_new_ths` 返回 `metric_name/value/single/yoy/mom/single_yoy` 长表，字段数量少于东财但速度明显更快，代表样本三表约 `1.5s-2s`；适合作为本地核心财务层的候选主源。
+    - 同花顺新版三表 `stock_balance_sheet_ths / stock_profit_sheet_ths / stock_cash_flow_sheet_ths` 返回 `metric_name/value/single/yoy/mom/single_yoy` 长表，字段数量少于东财但速度明显更快，代表样本三表约 `1.5s-2s`；适合作为本地核心财务层的候选主源。
     - 新浪 `stock_financial_report_sina` 返回中文报表宽表，字段数量与同花顺同量级，适合作为本地核心层互备和中文语义校验源，但不能作为东财完整字段互备源。
     - CNInfo data20 返回官方摘要行标签 JSON，字段远少于新浪/同花顺/东财，数值单位为 `CNY_10K`，乘以 `10000` 后可与新浪/同花顺核心大项一致；它应作为官方摘要校验源，不应作为完整三表或本地核心交集主源。
   - `2026-05-18` 已开启 OpenSpec change `build-sina-ths-core-financial-layer` 并进入实现：`config/10_research.json` 新增 `service_layers.local_core / official_summary_check / remote_extension` 配置槽；`AkshareFinancialStatementsProvider` 已新增 `ths_report` 调度和同花顺长表聚合，保留 `metric_name/value/single/yoy/mom/single_yoy` 审计字段；新增 `sina_ths_core_financial_facts.v1` 映射目录模型，按 `bank/nonbank` profile、relationship、unit、value_type、approval flag 和 rejection reason 管理字段关系。
@@ -1003,7 +1003,7 @@ Phase 1 就应落实：
 - 研究表默认落到 `research.db`（或等价独立库文件）
 - 估值日频派生表默认落到 `valuation.db`，通过 storage/repository 层与 `research.db`、`financials.db` 和 `quotes.db` 逻辑拼装
 - `valuation_inputs` 作为独立输入层记录 source、unit、as_of_date、data_as_of 与缺失诊断；不能用金额单位的股本/资本事实冒充股数，也不能从成交额/换手率隐式反推市值
-- A 股初始免费股本输入主线为 CNInfo/AkShare：全量回填使用 `stock_share_change_cninfo(symbol, start_date, end_date)` 获取单标的股本变动历史，日更使用 `stock_hold_change_cninfo(symbol="全部")` 获取全市场最新股本变动快照；`总股本 / 已流通股份` 按万股转换为股后写入 `valuation.db.valuation_inputs`
+- A 股初始免费股本输入主线为 CNInfo/AkShare：全量回填使用 `stock_share_change_cninfo(symbol, start_date, end_date)` 获取单标的股本变动历史，日更使用 `stock_share_change_all_cninfo(symbol="全部")` 获取全市场最新股本变动快照；`总股本 / 已流通股份` 按万股转换为股后写入 `valuation.db.valuation_inputs`
 - `valuation_history.market_cap` 明确为总市值，`float_market_cap` 明确为流通市值，均由本地未复权收盘价和本地显式股数输入计算；这是估值结果层的可复现冗余，不替代 `valuation_inputs` 的源数据 lineage
 - 现有 `quotes.db` 保持读多写少，不让研究域大批量回填直接冲击原生产库
 
@@ -1209,7 +1209,7 @@ Phase 1 就应落实：
 - rollout validation runner 的 CLI 生命周期应负责关闭 `DataManager` 资源，避免 AkShare/YFinance 等数据源的 aiohttp session 在验证结束后泄露
 - `2026-04-21` runner 小样本验证已确认：`akshare:proxy_patch` 可成功完成 refresh 和 `SSE/SZSE` 代表样本 sync；映射缓存为 `433` 行，其中 `304` mapped、`129` unmapped；但 readiness 仍按全市场 `5191` 个目标标的计算，因此在 `--limit-per-exchange 2` 样本运行下返回 `not_ready` 是预期结果
 - 同次验证发现 `480101` 是 official history 审计层的 high-impact unmapped code，样本标的为 `600000.SH`；由于候选 `857821.SI / 857831.SI` overlap 均为 `5`，该 code 不应按 best candidate 自动写入 `manual_overrides`
-- `2026-04-24` 修正后续方向：`stock_industry_clf_hist_sw()` 的六位行业码不能稳定映射到旧 `sw_index_third_info` 指数代码体系，问题根源是“官方分类代码”和“申万行业指数代码”混用；新方案不再要求六位分类码映射到 `801xxx.SI / 85xxxx.SI` 才能判定归属，而是以官方六位分类码作为 strict Shenwan taxonomy 主键，指数代码仅作为 alias
+- `2026-04-24` 修正后续方向：`stock_industry_clf_hist_sw()` 的六位行业码不能稳定映射到旧 `sw_index_third_info`（现接口 `index_third_info_sw`）指数代码体系，问题根源是“官方分类代码”和“申万行业指数代码”混用；新方案不再要求六位分类码映射到 `801xxx.SI / 85xxxx.SI` 才能判定归属，而是以官方六位分类码作为 strict Shenwan taxonomy 主键，指数代码仅作为 alias
 
 #### 3. 行业成分归属表
 

@@ -599,7 +599,7 @@ technical readiness 接口会聚合：
 - 估值日频派生序列的生产物理目标已在 storage 层指向 `data/valuation.db`，而不是继续扩大 `research.db`
 - `valuation.db` 只保存估值输入、`valuation_history`、估值运行审计和必要 lineage，不复制财务大表、行业大表或行情全量数据
 - `valuation_inputs` 必须显式记录 source、source_mode、input_kind、unit、as_of_date、data_as_of 与 diagnostics；金额单位的股本/资本事实不能作为 share-count 输入，除非存在明确 share unit 映射
-- A 股股本输入主线使用 CNInfo/AkShare：全量回填走 `stock_share_change_cninfo(symbol, start_date, end_date)` 拉单标的股本变动历史；日更走 `stock_hold_change_cninfo(symbol="全部")` 拉全市场最新股本变动快照。CNInfo `总股本 / 已流通股份` 按万股转换为股后写入 `valuation_inputs`，`as_of_date` 记录变动日期，`data_as_of` 记录公告日期
+- A 股股本输入主线使用 CNInfo/AkShare：全量回填走 `stock_share_change_cninfo(symbol, start_date, end_date)` 拉单标的股本变动历史；日更走 `stock_share_change_all_cninfo(symbol="全部")` 拉全市场最新股本变动快照。CNInfo `总股本 / 已流通股份` 按万股转换为股后写入 `valuation_inputs`，`as_of_date` 记录变动日期，`data_as_of` 记录公告日期
 - `valuation_history` 更新默认使用 `write_policy=missing_only`：日更、周更和过去 `12` 个季度窗口任务均先轻量推导候选估值日期，再按完整主键 `instrument_id + as_of_date + calc_method + calc_version + parameter_hash` 检查缺失；窗口已完整的标的直接跳过完整 PE/PB/PS 指标计算，存在缺口时只写缺失行；显式 `write_policy=overwrite` 用于股本历史、财务可得日、计算逻辑或参数修复后的受控覆写。`missing_only` 不比较 `valuation_inputs.updated_at`，因此补跑或修复 input 后必须显式 overwrite 受影响窗口，否则已存在的估值历史不会自动重算
 - 估值历史直接重建 runner 为 `scripts/research_valuation_history_rebuild.py`，用于只执行 `valuation_history_rebuild` 而不聚合 readiness。典型修复命令：`python scripts/research_valuation_history_rebuild.py --exchanges SSE,SZSE,BSE --quote-limit-days 7 --window-mode trading_days --write-policy overwrite`。该命令可一次性重算三市最近 `7` 个交易日；若机器内存或数据库写入压力偏高，再按交易所拆分执行
 - 过去 `12` 个季度窗口任务不是无限历史全量重建。当前财务核心事实只保留最近 `12` 个季度，因此 PE/PB/PS 历史派生以这组本地可得事实的最早 `data_available_date` 为边界；早于该边界的长历史估值需要另行扩展财务历史层后再设计
@@ -842,7 +842,7 @@ technical readiness 接口会聚合：
 
 - 严格申万 taxonomy / membership 的代码链路已经落地
 - 申万叶子行业成分股集合已落地到 `industry_component_sets`
-- legacy 逐页 membership 抓取的真实上游曾确认为 `legulegu.com`，当前主线已改为优先使用 `sw_index_third_cons`
+- legacy 逐页 membership 抓取的真实上游曾确认为 `legulegu.com`，当前主线已改为优先使用 `index_third_cons_sw`
 - research 域 `AkShare` provider 现已具备显式的 `direct / proxy_patch` mode 语义
 - `industry_standard_sync` 现可在 direct 失败时保留 taxonomy 进度并继续尝试下一个候选源
 - 提权真实环境复验已经确认：
@@ -877,7 +877,7 @@ technical readiness 接口会聚合：
 
 目标：
 
-- 接入 `AkShare sw_index_first_info / sw_index_second_info / sw_index_third_info` 构建申万一、二、三级 taxonomy
+- 接入 `AkShare index_first_info_sw / index_second_info_sw / index_third_info_sw` 构建申万一、二、三级 taxonomy
 - 接入叶子行业成分股集合，按 `leaf_industry -> symbols` 反向生成当前 `instrument -> sw_l1/sw_l2/sw_l3` membership
 - 将 `stock_industry_clf_hist_sw()` 仅保留为官方历史分类审计层，不再用其六位 `industry_code` 反推当前三级行业
 - 对未出现在叶子行业成分股集合中的标的，先执行配置化行业名称补源，再允许 bounded legacy fallback 补缺
@@ -888,7 +888,7 @@ technical readiness 接口会聚合：
 - 已新增 `OfficialIndustryHistoryProviderRegistry`
 - 已新增 `industry_official_classifications` 原始层表，用于保留官方六位码、官方起始日期、更新时间、映射状态和置信度
 - `industry_standard_sync` 现优先执行：
-  - taxonomy：`sw_index_first_info / second_info / third_info`
+  - taxonomy：`index_first_info_sw / index_second_info_sw / index_third_info_sw`
   - current membership：叶子行业成分股集合反向生成股票当前申万叶子归属，并通过 taxonomy parent links 派生申万二级、一级；若叶子节点本身是二级 leaf，则 `sw_l3_code` 保持为空
   - official history audit：`stock_industry_clf_hist_sw()`
   - official code mapping：仅用于 `industry_official_classifications` 审计字段和 backlog 观察，不再阻塞当前 membership
@@ -937,7 +937,7 @@ technical readiness 接口会聚合：
 - `stock_industry_clf_hist_sw()` 在提权真实环境中可拉取约 `12717` 行股票分类历史
 - 其原始字段当前为 `股票代码 / 计入日期 / 行业代码 / 更新日期`
 - 样本 `600519` 与 `000001` 均存在最新分类记录
-- `stock_industry_clf_hist_sw()` 返回的六位行业分类代码不能稳定映射到旧 `sw_index_third_info` 指数代码体系；`2026-04-24` 后的修正方向是不再把这种映射作为 current membership 前置，而是直接以官方六位分类代码为 strict Shenwan 主键
+- `stock_industry_clf_hist_sw()` 返回的六位行业分类代码不能稳定映射到旧 `sw_index_third_info`（现接口 `index_third_info_sw`）指数代码体系；`2026-04-24` 后的修正方向是不再把这种映射作为 current membership 前置，而是直接以官方六位分类代码为 strict Shenwan 主键
 - 官方分类文件实测覆盖当前 active `SSE/SZSE/BSE` universe；此前 BSE optional-empty 对 `industry_standard` 是缺少稳定上游时的保护策略，官方主源落地后应重新收紧该 readiness 口径
 - `2026-04-23` 对当前剩余钢铁缺口 live 验证：东财 `push2.eastmoney.com/api/qt/stock/get` 的 `f127` 字段对 `600117 / 600399 / 600507 / 603995 / 000708 / 000825 / 002075 / 002318 / 002443 / 002478 / 300881 / 301160` 均返回 `特钢Ⅱ`
 - 因东财返回的是行业名而不是申万代码，补源只允许“本地 taxonomy 名称匹配”；不会把东财结果写入 `industry_component_sets`，也不会凭空构造不存在的申万三级节点
@@ -1010,7 +1010,7 @@ technical readiness 接口会聚合：
 - `proxy_patch` 模式下：
   - 全链路 representative validation 在 `90s` 窗口内未完成
   - 单标的 fallback membership probe 在 `90s` 窗口内同样未完成
-- `sw_index_third_cons` 已作为当前叶子行业成分股主源；`index_component_sw` 仅作为兼容 fallback。早前验证中 `index_component_sw` 对相当数量的三级节点会返回异常列结构，因此不能再作为主路径。
+- `index_third_cons_sw` 已作为当前叶子行业成分股主源；`index_component_sw` 仅作为兼容 fallback。早前验证中 `index_component_sw` 对相当数量的三级节点会返回异常列结构，因此不能再作为主路径。
 
 因此 `2026-04-21` 当时的工程结论曾调整为：
 
@@ -1043,7 +1043,7 @@ technical readiness 接口会聚合：
 - 已扩展映射对象，`unmapped` 行也会保留 `best_taxonomy_industry_code`
 - 已扩展 mapping payload，持久化 `candidate_rankings` top-N 候选诊断
 - `industry_standard_sync` 已不再复用或重建 official-code 映射；当前 membership 只依赖叶子行业成分股集合和 bounded legacy fallback
-- official mapping live rebuild 现已优先复用 `industry_component_sets`；仅在组件集缓存缺失或过期时才调用 live component source，且 provider 优先使用 `sw_index_third_cons`，再 fallback 到 `index_component_sw`
+- official mapping live rebuild 现已优先复用 `industry_component_sets`；仅在组件集缓存缺失或过期时才调用 live component source，且 provider 优先使用 `index_third_cons_sw`，再 fallback 到 `index_component_sw`
 - 已新增独立 refresh 入口 `industry_official_mapping_refresh`
 - `DataManager` 与 scheduler 已可单独触发 official mapping cache refresh；该任务仅用于历史分类审计，不是 current membership 同步前置
 - 已新增审计读链路：

@@ -2025,7 +2025,7 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
     ) -> Dict[str, Any]:
         started = time.monotonic()
         logger.info(
-            "[FX][provider:%s] SAFE historical request start interface=akshare.currency_boc_safe start=%s end=%s series=%s",
+            "[FX][provider:%s] SAFE historical request start interface=akshare.fx_central_parity_safe start=%s end=%s series=%s",
             self.source_profile,
             start_date,
             end_date,
@@ -2038,16 +2038,16 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
             return {
                 "observations": [],
                 "warnings": [f"fx_provider_missing_dependency:akshare:{e}"],
-                "parser_diagnostics": {"live_requests_performed": 0, "source_interface": "akshare.currency_boc_safe"},
+                "parser_diagnostics": {"live_requests_performed": 0, "source_interface": "akshare.fx_central_parity_safe"},
             }
         try:
-            frame = ak.currency_boc_safe()
+            frame = ak.fx_central_parity_safe()
         except Exception as e:
             logger.warning("[FX][provider:%s] SAFE historical request failed error=%s", self.source_profile, e)
             return {
                 "observations": [],
                 "warnings": [f"cfets_safe_historical_request_failed:{e}"],
-                "parser_diagnostics": {"live_requests_performed": 1, "source_interface": "akshare.currency_boc_safe"},
+                "parser_diagnostics": {"live_requests_performed": 1, "source_interface": "akshare.fx_central_parity_safe"},
             }
         start = _as_date(start_date)
         end = _as_date(end_date)
@@ -2096,7 +2096,7 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
                         metadata={
                             "adapter_type": self.adapter_type,
                             "parser_version": self.source_cfg.get("parser_version"),
-                            "source_interface": self.source_cfg.get("safe_historical_source_interface") or "akshare.currency_boc_safe",
+                            "source_interface": self.source_cfg.get("safe_historical_source_interface") or "akshare.fx_central_parity_safe",
                             "source_interface_role": "safe_historical_rmb_fixing",
                             "raw_column": raw_column,
                             "raw_value": raw_value,
@@ -2117,7 +2117,7 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
             "warnings": [],
             "parser_diagnostics": {
                 "live_requests_performed": 1,
-                "source_interface": "akshare.currency_boc_safe",
+                "source_interface": "akshare.fx_central_parity_safe",
                 "source_url": source_url,
                 "rows_seen": rows_seen,
                 "observations_parsed": len(observations),
@@ -2279,7 +2279,7 @@ class AggregatedPublicFxProvider(ConfiguredFxSourceProvider):
         end_date: Optional[str],
     ) -> Dict[str, Any]:
         source_interface = str(self.source_cfg.get("source_interface") or "")
-        if "forex_hist_em" in source_interface:
+        if "fx_hist_em" in source_interface:
             historical_result = self._fetch_akshare_forex_hist_em(
                 series=series,
                 start_date=start_date,
@@ -2334,7 +2334,7 @@ class AggregatedPublicFxProvider(ConfiguredFxSourceProvider):
 
             ak = load_akshare(mode=str(self.source_cfg.get("akshare_mode") or "direct"))
         except Exception as e:
-            logger.warning("[FX][provider:%s] akshare forex_hist_em dependency failed error=%s", self.source_profile, e)
+            logger.warning("[FX][provider:%s] akshare fx_hist_em dependency failed error=%s", self.source_profile, e)
             return {
                 "observations": [],
                 "warnings": [str(e)],
@@ -2353,7 +2353,7 @@ class AggregatedPublicFxProvider(ConfiguredFxSourceProvider):
                 continue
             symbol_started = time.monotonic()
             logger.info(
-                "[FX][provider:%s] AkShare forex_hist_em request start symbol=%s series_id=%s start=%s end=%s",
+                "[FX][provider:%s] AkShare fx_hist_em request start symbol=%s series_id=%s start=%s end=%s",
                 self.source_profile,
                 symbol,
                 selected.series_id,
@@ -2365,7 +2365,7 @@ class AggregatedPublicFxProvider(ConfiguredFxSourceProvider):
                 requests_performed += 1
             except Exception as e:
                 logger.warning(
-                    "[FX][provider:%s] AkShare forex_hist_em request failed symbol=%s error=%s",
+                    "[FX][provider:%s] AkShare fx_hist_em request failed symbol=%s error=%s",
                     self.source_profile,
                     symbol,
                     e,
@@ -2400,7 +2400,7 @@ class AggregatedPublicFxProvider(ConfiguredFxSourceProvider):
                     quote_currency=str(selected.metadata.get("quote_currency") or "").upper(),
                     quote_multiplier=float(selected.metadata.get("quote_multiplier") or 1.0),
                     source_profile=self.source_profile,
-                    source_url="akshare.forex_hist_em",
+                    source_url="akshare.fx_hist_em",
                     quality_flag=str(self.source_cfg.get("quality_flag") or "aggregated_public"),
                     raw_payload_hash=_hash_payload({"symbol": symbol, "row": raw_row}),
                     metadata={
@@ -2416,7 +2416,7 @@ class AggregatedPublicFxProvider(ConfiguredFxSourceProvider):
                 observations.append(observation)
                 parsed_for_symbol += 1
             logger.info(
-                "[FX][provider:%s] AkShare forex_hist_em parsed symbol=%s rows_seen=%s observations=%s elapsed=%.2fs",
+                "[FX][provider:%s] AkShare fx_hist_em parsed symbol=%s rows_seen=%s observations=%s elapsed=%.2fs",
                 self.source_profile,
                 symbol,
                 len(frame),
@@ -2435,7 +2435,7 @@ class AggregatedPublicFxProvider(ConfiguredFxSourceProvider):
         }
 
     def _akshare_forex_hist_em(self, ak: Any, symbol: str):
-        return ak.forex_hist_em(symbol=symbol)
+        return ak.fx_hist_em(symbol=symbol)
 
     def _fetch_yahoo_chart_latest(
         self,

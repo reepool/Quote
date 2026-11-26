@@ -27,10 +27,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-
 def _lme_sina_factory(symbol: str) -> Tuple[str, Callable, Dict[str, Any]]:
     def _call(akshare):
-        return akshare.futures_foreign_hist(symbol=symbol)
+        return akshare.futures_foreign_hist_sina(symbol=symbol)
 
     return (
         f"lme_sina_{symbol.lower()}",
@@ -102,14 +101,26 @@ def build_cases(today: Optional[date] = None) -> List[Tuple[str, Callable, Dict[
 
     def _spot_100ppi_ta(akshare):
         return akshare.futures_spot_price_daily(
-            vars_list=["TA"], start_day=window_start, end_day=window_end
+            symbols=["TA"], start_date=window_start, end_date=window_end
         )
 
-    def _fx_boc_safe(akshare):
-        return akshare.currency_boc_safe()
+    def _fx_central_parity_safe(akshare):
+        return akshare.fx_central_parity_safe()
 
-    def _bond_zh_us_rate(akshare):
-        return akshare.bond_zh_us_rate()
+    def _bond_zh_us_yield_em(akshare):
+        return akshare.bond_zh_us_yield_em()
+
+    def _a_share_hist(akshare):
+        return akshare.stock_zh_a_hist_em(
+            symbol="600519",
+            period="daily",
+            start_date=window_start,
+            end_date=window_end,
+            adjust="",
+        )
+
+    def _trade_calendar(akshare):
+        return akshare.calendar_trade_date_hist_sina()
 
     return [
         _lme_sina_factory("CAD"),
@@ -121,13 +132,13 @@ def build_cases(today: Optional[date] = None) -> List[Tuple[str, Callable, Dict[
             {"min_rows": 1, "required_columns": ["date"]},
         ),
         (
-            "fx_boc_safe",
-            _fx_boc_safe,
+            "fx_central_parity_safe",
+            _fx_central_parity_safe,
             {"min_rows": 1, "required_columns": ["日期"]},
         ),
         (
-            "bond_zh_us_rate",
-            _bond_zh_us_rate,
+            "bond_zh_us_yield_em",
+            _bond_zh_us_yield_em,
             {
                 "min_rows": 1,
                 "required_columns_any": [
@@ -135,6 +146,16 @@ def build_cases(today: Optional[date] = None) -> List[Tuple[str, Callable, Dict[
                     ["中国国债收益率10年", "中国国债收益率10年%"],
                 ],
             },
+        ),
+        (
+            "a_share_hist_600519",
+            _a_share_hist,
+            {"min_rows": 1, "required_columns": ["日期", "收盘"]},
+        ),
+        (
+            "trade_calendar",
+            _trade_calendar,
+            {"min_rows": 1, "required_columns": ["trade_date"]},
         ),
         _cninfo_corporate_action_case(today),
     ]

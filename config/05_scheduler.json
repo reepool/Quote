@@ -797,7 +797,14 @@
           ],
           "timeout_sec": 10.0,
           "notify_when_latest": false,
-          "auto_upgrade_packages": ["akshare"],
+          "auto_upgrade_packages": [
+            "curl_cffi",
+            "akshare_proxy_patch",
+            "akshare",
+            "pytdx",
+            "baostock",
+            "yfinance"
+          ],
           "max_runtime_seconds": 120
         }
       },

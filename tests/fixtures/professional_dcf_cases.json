@@ -1115,10 +1115,10 @@
                 },
                 "industry_standard": {
                     "verified_interfaces": [
-                        "sw_index_first_info",
-                        "sw_index_second_info",
-                        "sw_index_third_info",
-                        "sw_index_third_cons",
+                        "index_first_info_sw",
+                        "index_second_info_sw",
+                        "index_third_info_sw",
+                        "index_third_cons_sw",
                         "stock_industry_clf_hist_sw",
                         "index_component_sw"
                     ],
@@ -1369,7 +1369,7 @@
                     "request_interval_seconds": 0.2,
                     "retry_attempts": 2,
                     "retry_backoff_seconds": 0.5,
-                    "note": "Uses AkShare CNInfo wrappers: stock_hold_change_cninfo(symbol='\u5168\u90e8') for daily all-market snapshots and stock_share_change_cninfo(symbol, start_date, end_date) for per-symbol historical capital-change events. CNInfo share-count fields are 10k shares and are converted to raw shares before persistence."
+                    "note": "Uses AkShare CNInfo wrappers: stock_share_change_all_cninfo(symbol='\u5168\u90e8') for daily all-market snapshots and stock_share_change_cninfo(symbol, start_date, end_date) for per-symbol historical capital-change events. CNInfo share-count fields are 10k shares and are converted to raw shares before persistence."
                 },
                 "announcements": {
                     "request_timeout_seconds": 20.0,

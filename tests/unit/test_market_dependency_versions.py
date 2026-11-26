@@ -2,6 +2,7 @@ import json
 
 import pytest
 
+import scheduler.tasks as scheduler_tasks
 from scheduler.tasks import ScheduledTasks
 from utils import market_dependency_versions as versions
 
@@ -108,3 +109,69 @@ def test_scheduler_config_contains_market_dependency_job():
     assert job["trigger"]["hour"] == 12
     assert job["trigger"]["minute"] == 0
     assert job["parameters"]["notify_when_latest"] is False
+    assert set(job["parameters"]["auto_upgrade_packages"]) == {
+        "curl_cffi",
+        "akshare_proxy_patch",
+        "akshare",
+        "pytdx",
+        "baostock",
+        "yfinance",
+    }
+
+
+@pytest.mark.asyncio
+async def test_scheduler_launches_one_worker_for_due_auto_packages(monkeypatch):
+    result = {
+        "statuses": [],
+        "updates": [
+            {
+                "name": "baostock",
+                "latest_version": "0.9.5",
+                "update_available": True,
+            },
+            {
+                "name": "pytdx",
+                "latest_version": "1.73",
+                "update_available": True,
+            },
+            {
+                "name": "not_auto",
+                "latest_version": "9.0.0",
+                "update_available": True,
+            },
+        ],
+        "errors": [],
+    }
+    monkeypatch.setattr(versions, "check_market_dependency_versions", lambda *_, **__: result)
+    captured = {}
+
+    def fake_popen(command, **_kwargs):
+        captured["command"] = command
+
+        class _Process:
+            pid = 321
+
+        return _Process()
+
+    monkeypatch.setattr(scheduler_tasks.subprocess, "Popen", fake_popen)
+
+    class FakeBot:
+        async def send_task_notification(self, message, task_name=None, level="info"):
+            captured["message"] = message
+            return True
+
+    task = ScheduledTasks.__new__(ScheduledTasks)
+    task._active_tasks = set()
+    task.telegram_enabled = True
+    task.bot = FakeBot()
+
+    assert await task.market_dependency_version_check(
+        auto_upgrade_packages=["baostock", "pytdx", "akshare"]
+    )
+    command = captured["command"]
+    assert command[1].endswith("upgrade_market_dependency.py")
+    assert "baostock==0.9.5" in command
+    assert "pytdx==1.73" in command
+    assert "not_auto" not in " ".join(command)
+    assert "akshare==" not in " ".join(command)
+    assert "已触发自动升级：baostock, pytdx" in captured["message"]

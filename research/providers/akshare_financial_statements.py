@@ -541,15 +541,15 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
             if symbol is None:
                 return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
             return (
-                akshare_module.stock_financial_debt_new_ths(
+                akshare_module.stock_balance_sheet_ths(
                     symbol=symbol,
                     indicator="按报告期",
                 ),
-                akshare_module.stock_financial_benefit_new_ths(
+                akshare_module.stock_profit_sheet_ths(
                     symbol=symbol,
                     indicator="按报告期",
                 ),
-                akshare_module.stock_financial_cash_new_ths(
+                akshare_module.stock_cash_flow_sheet_ths(
                     symbol=symbol,
                     indicator="按报告期",
                 ),

@@ -1,7 +1,7 @@
 """无风险利率序列采集 (REQ-13)。
 
 默认序列: china_treasury_10y —— 中国 10 年期国债到期收益率 (percent_annual)。
-数据源: akshare.bond_zh_us_rate (含中国国债收益率10年列)。
+数据源: akshare.bond_zh_us_yield_em (含中国国债收益率10年列)。
 
 设计:
 - fetch 与 sync 分离, 便于单测 monkeypatch fetch。
@@ -35,7 +35,7 @@ CHINA_TREASURY_10Y = {
     "unit": "percent_annual",
     "frequency": "daily",
     "timezone": "Asia/Shanghai",
-    "source_profile": "akshare.bond_zh_us_rate",
+    "source_profile": "akshare.bond_zh_us_yield_em",
     "source": "akshare",
     "source_mode": "shadow",
 }
@@ -47,11 +47,11 @@ _CN10Y_COLUMNS = ("中国国债收益率10年", "中国国债收益率10年%")
 def fetch_china_treasury_10y() -> List[Dict[str, Any]]:
     """拉取中国 10Y 国债收益率序列; 失败返回空列表。"""
     started = time.monotonic()
-    logger.info("[RiskFreeRate] fetch_china_treasury_10y: requesting akshare.bond_zh_us_rate() ...")
+    logger.info("[RiskFreeRate] fetch_china_treasury_10y: requesting akshare.bond_zh_us_yield_em() ...")
     try:
         import akshare as ak  # type: ignore
 
-        df = ak.bond_zh_us_rate()
+        df = ak.bond_zh_us_yield_em()
     except Exception as exc:  # pragma: no cover - 网络/源不可用
         logger.warning("fetch_china_treasury_10y failed: %s", exc)
         return []
@@ -64,7 +64,7 @@ def fetch_china_treasury_10y() -> List[Dict[str, Any]]:
     value_col = next((c for c in _CN10Y_COLUMNS if c in df.columns), None)
     if date_col is None or value_col is None:
         logger.warning(
-            "bond_zh_us_rate columns unexpected: %s", list(df.columns)
+            "bond_zh_us_yield_em columns unexpected: %s", list(df.columns)
         )
         return []
 

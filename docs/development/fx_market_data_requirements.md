@@ -330,7 +330,7 @@ FX.JPY_CNY.CFETS.MID.DAILY
 在岸人民币数据源采用 `cfets_rmb_fixing` source profile：
 
 - 最新日优先读取中国货币网 / CFETS 当前官方 JSON。
-- 历史回补读取 SAFE 人民币汇率中间价公开页，经 `akshare.currency_boc_safe` 包装。
+- 历史回补读取 SAFE 人民币汇率中间价公开页，经 `akshare.fx_central_parity_safe` 包装。
 - `USD`、`EUR` 字段按 SAFE 百元报价除以 100 后入库为市场惯例 `1 USD/EUR = x CNY`。
 - `JPY` 保留官方常用的 `100 JPY = x CNY` 报价单位，`quote_multiplier=100`。
 
@@ -345,7 +345,7 @@ FX.JPY_CNY.CFETS.MID.DAILY
 
 ### 8.1.2 离岸人民币 CNH 准备顺序
 
-离岸人民币先单独验收 `USD/CNH`、`EUR/CNH`、`JPY/CNH` 三条 market spot，不使用 `rmb_core` 大范围混跑。当前主数据源为 `cnh_market_aggregated_public`，历史回补底层接口为 AkShare `forex_hist_em`（东方财富外汇历史行情）；Yahoo/yfinance chart 只作为最新单点 fallback，不作为全量历史主源：
+离岸人民币先单独验收 `USD/CNH`、`EUR/CNH`、`JPY/CNH` 三条 market spot，不使用 `rmb_core` 大范围混跑。当前主数据源为 `cnh_market_aggregated_public`，历史回补底层接口为 AkShare `fx_hist_em`（东方财富外汇历史行情）；Yahoo/yfinance chart 只作为最新单点 fallback，不作为全量历史主源：
 
 ```text
 FX.USD_CNH.MARKET.SPOT.DAILY -> USDCNH

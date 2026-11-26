@@ -17,17 +17,17 @@ def test_akshare_shenwan_provider_builds_taxonomy_and_authoritative_membership(m
         provider,
         "_akshare",
         lambda mode="direct": SimpleNamespace(
-            sw_index_first_info=lambda: pd.DataFrame(
+            index_first_info_sw=lambda: pd.DataFrame(
                 [
                     {"行业代码": "801120.SI", "行业名称": "食品饮料"},
                 ]
             ),
-            sw_index_second_info=lambda: pd.DataFrame(
+            index_second_info_sw=lambda: pd.DataFrame(
                 [
                     {"行业代码": "801124.SI", "行业名称": "饮料乳品", "上级行业": "食品饮料"},
                 ]
             ),
-            sw_index_third_info=lambda: pd.DataFrame(
+            index_third_info_sw=lambda: pd.DataFrame(
                 [
                     {"行业代码": "850111.SI", "行业名称": "白酒", "上级行业": "饮料乳品"},
                 ]
@@ -100,7 +100,7 @@ def test_akshare_shenwan_provider_fetches_component_sets_from_third_cons(monkeyp
         provider,
         "_akshare",
         lambda mode="direct": SimpleNamespace(
-            sw_index_third_cons=lambda symbol: calls.append(symbol)
+            index_third_cons_sw=lambda symbol: calls.append(symbol)
             or pd.DataFrame([{"股票代码": "600519"}, {"股票代码": "000568"}]),
             index_component_sw=lambda symbol: (_ for _ in ()).throw(
                 AssertionError("fallback should not be used")
@@ -133,7 +133,7 @@ def test_akshare_shenwan_provider_falls_back_to_index_component_sw(monkeypatch):
         provider,
         "_akshare",
         lambda mode="direct": SimpleNamespace(
-            sw_index_third_cons=lambda symbol: (_ for _ in ()).throw(
+            index_third_cons_sw=lambda symbol: (_ for _ in ()).throw(
                 ValueError("primary failed")
             ),
             index_component_sw=lambda symbol: fallback_calls.append(symbol)
@@ -174,17 +174,17 @@ def test_akshare_shenwan_provider_continues_after_single_third_level_page_failur
         provider,
         "_akshare",
         lambda mode="direct": SimpleNamespace(
-            sw_index_first_info=lambda: pd.DataFrame(
+            index_first_info_sw=lambda: pd.DataFrame(
                 [
                     {"行业代码": "801120.SI", "行业名称": "食品饮料"},
                 ]
             ),
-            sw_index_second_info=lambda: pd.DataFrame(
+            index_second_info_sw=lambda: pd.DataFrame(
                 [
                     {"行业代码": "801124.SI", "行业名称": "饮料乳品", "上级行业": "食品饮料"},
                 ]
             ),
-            sw_index_third_info=lambda: pd.DataFrame(
+            index_third_info_sw=lambda: pd.DataFrame(
                 [
                     {"行业代码": "850999.SI", "行业名称": "测试失败行业", "上级行业": "饮料乳品"},
                     {"行业代码": "850111.SI", "行业名称": "白酒", "上级行业": "饮料乳品"},
@@ -233,17 +233,17 @@ def test_akshare_shenwan_provider_aborts_early_after_configured_failure_threshol
         provider,
         "_akshare",
         lambda mode="direct": SimpleNamespace(
-            sw_index_first_info=lambda: pd.DataFrame(
+            index_first_info_sw=lambda: pd.DataFrame(
                 [
                     {"行业代码": "801120.SI", "行业名称": "食品饮料"},
                 ]
             ),
-            sw_index_second_info=lambda: pd.DataFrame(
+            index_second_info_sw=lambda: pd.DataFrame(
                 [
                     {"行业代码": "801124.SI", "行业名称": "饮料乳品", "上级行业": "食品饮料"},
                 ]
             ),
-            sw_index_third_info=lambda: pd.DataFrame(
+            index_third_info_sw=lambda: pd.DataFrame(
                 [
                     {"行业代码": "850999.SI", "行业名称": "测试失败行业", "上级行业": "饮料乳品"},
                     {"行业代码": "850111.SI", "行业名称": "白酒", "上级行业": "饮料乳品"},
@@ -299,17 +299,17 @@ def test_akshare_shenwan_provider_aborts_when_fetch_time_budget_is_exceeded(monk
         provider,
         "_akshare",
         lambda mode="direct": SimpleNamespace(
-            sw_index_first_info=lambda: pd.DataFrame(
+            index_first_info_sw=lambda: pd.DataFrame(
                 [
                     {"行业代码": "801120.SI", "行业名称": "食品饮料"},
                 ]
             ),
-            sw_index_second_info=lambda: pd.DataFrame(
+            index_second_info_sw=lambda: pd.DataFrame(
                 [
                     {"行业代码": "801124.SI", "行业名称": "饮料乳品", "上级行业": "食品饮料"},
                 ]
             ),
-            sw_index_third_info=lambda: pd.DataFrame(
+            index_third_info_sw=lambda: pd.DataFrame(
                 [
                     {"行业代码": "850999.SI", "行业名称": "测试行业一", "上级行业": "饮料乳品"},
                     {"行业代码": "850111.SI", "行业名称": "测试行业二", "上级行业": "饮料乳品"},

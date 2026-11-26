@@ -242,7 +242,7 @@ class AkshareCninfoValuationInputProvider(BaseValuationInputProvider):
         cached = self._all_market_frame_cache.get(mode)
         if cached is not None:
             return cached
-        frame = self._call_with_retry(akshare.stock_hold_change_cninfo, symbol="全部")
+        frame = self._call_with_retry(akshare.stock_share_change_all_cninfo, symbol="全部")
         if frame is None:
             frame = pd.DataFrame()
         _logger.info(

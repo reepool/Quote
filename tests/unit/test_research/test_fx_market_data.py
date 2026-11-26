@@ -80,7 +80,7 @@ def _module_cfg() -> dict:
                 "source": "fixture",
                 "source_type": "aggregated_public",
                 "source_mode": "direct",
-                "source_interface": "akshare.forex_hist_em",
+                "source_interface": "akshare.fx_hist_em",
                 "disable_live_fetch": True,
                 "role": "cnh_spot_fallback",
                 "quality_flag": "aggregated_public",
@@ -749,7 +749,7 @@ def test_cfets_provider_uses_safe_history_for_prior_rmb_fixings(tmp_path, monkey
         ]
     )
     monkeypatch.setattr(provider, "_http_get", lambda *args, **kwargs: _FakeResponse(json_payload=payload))
-    monkeypatch.setattr(ak, "currency_boc_safe", lambda: safe_frame)
+    monkeypatch.setattr(ak, "fx_central_parity_safe", lambda: safe_frame, raising=False)
 
     result = provider.fetch(
         series=[FxSeries.from_dict(row) for row in storage.list_series(active_only=True)],
@@ -779,7 +779,7 @@ def test_cfets_provider_falls_back_to_safe_history_when_current_endpoint_fails(t
     provider = CfetsRmbFixingProvider("cfets_rmb_fixing", source_cfg)
     safe_frame = pd.DataFrame([{"日期": "2026-06-25", "美元": 682.09, "欧元": 773.49, "日元": 4.2124}])
     monkeypatch.setattr(provider, "_http_get", lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("timeout")))
-    monkeypatch.setattr(ak, "currency_boc_safe", lambda: safe_frame)
+    monkeypatch.setattr(ak, "fx_central_parity_safe", lambda: safe_frame, raising=False)
 
     result = provider.fetch(
         series=[FxSeries.from_dict(row) for row in storage.list_series(active_only=True)],

@@ -1029,7 +1029,7 @@
           "quality_flag": "aggregated_foreign_futures",
           "parser_version": "akshare_foreign_futures_provider.v1",
           "akshare_mode": "proxy_patch",
-          "detail_function": "futures_foreign_detail",
+          "detail_function": "futures_foreign_detail_sina",
           "known_primary_symbols": [
             "CAD",
             "AHD",
@@ -1043,7 +1043,7 @@
               "provider_id": "sina",
               "actual_source_profile": "sina_foreign_futures",
               "source_name": "Sina Finance foreign futures",
-              "akshare_function": "futures_foreign_hist",
+              "akshare_function": "futures_foreign_hist_sina",
               "date_column": "date",
               "value_column": "close",
               "open_column": "open",
@@ -2168,12 +2168,12 @@
           "metadata": {
             "akshare_function": "futures_spot_price_daily",
             "akshare_kwargs": {
-              "vars_list": [
+              "symbols": [
                 "TA"
               ]
             },
-            "akshare_start_argument": "start_day",
-            "akshare_end_argument": "end_day",
+            "akshare_start_argument": "start_date",
+            "akshare_end_argument": "end_date",
             "akshare_date_format": "compact",
             "date_column": "date",
             "value_column": "spot_price",
@@ -2199,12 +2199,12 @@
           "metadata": {
             "akshare_function": "futures_spot_price_daily",
             "akshare_kwargs": {
-              "vars_list": [
+              "symbols": [
                 "MA"
               ]
             },
-            "akshare_start_argument": "start_day",
-            "akshare_end_argument": "end_day",
+            "akshare_start_argument": "start_date",
+            "akshare_end_argument": "end_date",
             "akshare_date_format": "compact",
             "date_column": "date",
             "value_column": "spot_price",
@@ -2231,12 +2231,12 @@
           "metadata": {
             "akshare_function": "futures_spot_price_daily",
             "akshare_kwargs": {
-              "vars_list": [
+              "symbols": [
                 "EG"
               ]
             },
-            "akshare_start_argument": "start_day",
-            "akshare_end_argument": "end_day",
+            "akshare_start_argument": "start_date",
+            "akshare_end_argument": "end_date",
             "akshare_date_format": "compact",
             "date_column": "date",
             "value_column": "spot_price",
@@ -2263,12 +2263,12 @@
           "metadata": {
             "akshare_function": "futures_spot_price_daily",
             "akshare_kwargs": {
-              "vars_list": [
+              "symbols": [
                 "V"
               ]
             },
-            "akshare_start_argument": "start_day",
-            "akshare_end_argument": "end_day",
+            "akshare_start_argument": "start_date",
+            "akshare_end_argument": "end_date",
             "akshare_date_format": "compact",
             "date_column": "date",
             "value_column": "spot_price",
@@ -2295,12 +2295,12 @@
           "metadata": {
             "akshare_function": "futures_spot_price_daily",
             "akshare_kwargs": {
-              "vars_list": [
+              "symbols": [
                 "PP"
               ]
             },
-            "akshare_start_argument": "start_day",
-            "akshare_end_argument": "end_day",
+            "akshare_start_argument": "start_date",
+            "akshare_end_argument": "end_date",
             "akshare_date_format": "compact",
             "date_column": "date",
             "value_column": "spot_price",
@@ -2326,9 +2326,9 @@
           "active": true,
           "metadata": {
             "akshare_function": "futures_spot_price_daily",
-            "akshare_kwargs": {"vars_list": ["EB"]},
-            "akshare_start_argument": "start_day",
-            "akshare_end_argument": "end_day",
+            "akshare_kwargs": {"symbols": ["EB"]},
+            "akshare_start_argument": "start_date",
+            "akshare_end_argument": "end_date",
             "akshare_date_format": "compact",
             "date_column": "date",
             "value_column": "spot_price",
@@ -2353,8 +2353,8 @@
           "unit": "CNY/ton",
           "active": true,
           "metadata": {
-            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["UR"]},
-            "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
+            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"symbols": ["UR"]},
+            "akshare_start_argument": "start_date", "akshare_end_argument": "end_date", "akshare_date_format": "compact",
             "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
             "expected_calendar_exchange": "CZCE", "progress_log_interval_seconds": 60,
             "source_available_from": "2019-08-16",
@@ -2368,8 +2368,8 @@
           "venue": "100PPI", "source_profile": "100ppi_public_web", "source_symbol": "SH",
           "frequency": "daily", "quote_type": "spot_reference", "currency": "CNY", "unit": "CNY/ton", "active": true,
           "metadata": {
-            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["SH"]},
-            "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
+            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"symbols": ["SH"]},
+            "akshare_start_argument": "start_date", "akshare_end_argument": "end_date", "akshare_date_format": "compact",
             "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
             "expected_calendar_exchange": "CZCE", "progress_log_interval_seconds": 60,
             "source_available_from": "2023-09-15",
@@ -2383,8 +2383,8 @@
           "venue": "100PPI", "source_profile": "100ppi_public_web", "source_symbol": "SA",
           "frequency": "daily", "quote_type": "spot_reference", "currency": "CNY", "unit": "CNY/ton", "active": true,
           "metadata": {
-            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["SA"]},
-            "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
+            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"symbols": ["SA"]},
+            "akshare_start_argument": "start_date", "akshare_end_argument": "end_date", "akshare_date_format": "compact",
             "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
             "expected_calendar_exchange": "CZCE", "progress_log_interval_seconds": 60,
             "source_available_from": "2020-06-01",
@@ -2398,8 +2398,8 @@
           "venue": "100PPI", "source_profile": "100ppi_public_web", "source_symbol": "FG",
           "frequency": "daily", "quote_type": "spot_reference", "currency": "CNY", "unit": "CNY/ton", "active": true,
           "metadata": {
-            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["FG"]},
-            "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
+            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"symbols": ["FG"]},
+            "akshare_start_argument": "start_date", "akshare_end_argument": "end_date", "akshare_date_format": "compact",
             "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/m2",
             "provider_value_multiplier_from_raw": 80,
             "expected_calendar_exchange": "CZCE", "progress_log_interval_seconds": 60,
@@ -2414,8 +2414,8 @@
           "venue": "100PPI", "source_profile": "100ppi_public_web", "source_symbol": "BU",
           "frequency": "daily", "quote_type": "spot_reference", "currency": "CNY", "unit": "CNY/ton", "active": true,
           "metadata": {
-            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["BU"]},
-            "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
+            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"symbols": ["BU"]},
+            "akshare_start_argument": "start_date", "akshare_end_argument": "end_date", "akshare_date_format": "compact",
             "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
             "expected_calendar_exchange": "SHFE", "progress_log_interval_seconds": 60,
             "source_available_from": "2013-10-09",
@@ -2429,8 +2429,8 @@
           "venue": "100PPI", "source_profile": "100ppi_public_web", "source_symbol": "PG",
           "frequency": "daily", "quote_type": "spot_reference", "currency": "CNY", "unit": "CNY/ton", "active": true,
           "metadata": {
-            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["PG"]},
-            "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
+            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"symbols": ["PG"]},
+            "akshare_start_argument": "start_date", "akshare_end_argument": "end_date", "akshare_date_format": "compact",
             "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
             "expected_calendar_exchange": "DCE", "progress_log_interval_seconds": 60,
             "source_available_from": "2020-03-30",
@@ -2444,8 +2444,8 @@
           "venue": "100PPI", "source_profile": "100ppi_public_web", "source_symbol": "RU",
           "frequency": "daily", "quote_type": "spot_reference", "currency": "CNY", "unit": "CNY/ton", "active": true,
           "metadata": {
-            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["RU"]},
-            "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
+            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"symbols": ["RU"]},
+            "akshare_start_argument": "start_date", "akshare_end_argument": "end_date", "akshare_date_format": "compact",
             "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
             "expected_calendar_exchange": "SHFE", "progress_log_interval_seconds": 60,
             "source_available_from": "2013-01-04",
@@ -2459,8 +2459,8 @@
           "venue": "100PPI", "source_profile": "100ppi_public_web", "source_symbol": "SP",
           "frequency": "daily", "quote_type": "spot_reference", "currency": "CNY", "unit": "CNY/ton", "active": true,
           "metadata": {
-            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["SP"]},
-            "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
+            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"symbols": ["SP"]},
+            "akshare_start_argument": "start_date", "akshare_end_argument": "end_date", "akshare_date_format": "compact",
             "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
             "expected_calendar_exchange": "SHFE", "progress_log_interval_seconds": 60,
             "source_available_from": "2018-11-27",

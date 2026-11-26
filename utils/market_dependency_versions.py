@@ -140,7 +140,7 @@ def format_market_dependency_version_message(result: Dict[str, Any]) -> str:
         lines.append("行情依赖版本检查完成，未发现可升级模块。")
 
     lines.append("")
-    lines.append("本任务只通知，不会自动升级。")
+    lines.append("列入自动升级的依赖会另走升级、冒烟和回滚；其余只通知。")
     return "\n".join(lines)
 
 

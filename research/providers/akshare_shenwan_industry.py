@@ -352,15 +352,14 @@ class AkshareShenwanIndustryProvider(BaseIndustryStandardProvider):
     ) -> pd.DataFrame:
         """Fetch current Shenwan leaf-node constituents.
 
-        `sw_index_third_cons` is preferred when available. `index_component_sw`
-        remains a compatibility fallback for older AkShare builds, second-level
-        leaf nodes, or transient upstream failures.
+        `index_third_cons_sw` is the leaf-constituent source. `index_component_sw`
+        remains a fallback for second-level leaf nodes or transient upstream failures.
         """
         primary_error: Optional[Exception] = None
         primary_frame: Optional[pd.DataFrame] = None
-        if hasattr(akshare_module, "sw_index_third_cons"):
+        if hasattr(akshare_module, "index_third_cons_sw"):
             try:
-                frame = akshare_module.sw_index_third_cons(symbol=str(node.industry_code))
+                frame = akshare_module.index_third_cons_sw(symbol=str(node.industry_code))
                 if frame is not None and not frame.empty:
                     return frame
                 primary_frame = frame
@@ -440,9 +439,9 @@ class AkshareShenwanIndustryProvider(BaseIndustryStandardProvider):
 
     def _build_taxonomy_cache(self) -> _ShenwanTaxonomyCache:
         akshare_module = self._akshare("direct")
-        first_df = akshare_module.sw_index_first_info()
-        second_df = akshare_module.sw_index_second_info()
-        third_df = akshare_module.sw_index_third_info()
+        first_df = akshare_module.index_first_info_sw()
+        second_df = akshare_module.index_second_info_sw()
+        third_df = akshare_module.index_third_info_sw()
 
         taxonomy_nodes: List[IndustryTaxonomySnapshot] = []
         l1_by_code: Dict[str, IndustryTaxonomySnapshot] = {}

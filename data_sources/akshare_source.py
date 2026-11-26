@@ -348,11 +348,11 @@ class AkShareSource(BaseDataSource):
                 try:
                     index_dfs = []
                     if not exchange or exchange == "SSE":
-                        df_sh = await asyncio.to_thread(ak.stock_zh_index_spot_em, symbol="上证系列指数")
+                        df_sh = await asyncio.to_thread(ak.index_zh_spot_em, symbol="上证系列指数")
                         df_sh["exchange_code"] = "SSE"
                         index_dfs.append(df_sh)
                     if not exchange or exchange == "SZSE":
-                        df_sz = await asyncio.to_thread(ak.stock_zh_index_spot_em, symbol="深证系列指数")
+                        df_sz = await asyncio.to_thread(ak.index_zh_spot_em, symbol="深证系列指数")
                         df_sz["exchange_code"] = "SZSE"
                         index_dfs.append(df_sz)
 
@@ -647,16 +647,16 @@ class AkShareSource(BaseDataSource):
                 if instrument_type == 'index':
                     # A 股指数
                     data = await asyncio.to_thread(
-                        ak.index_zh_a_hist,
+                        ak.index_zh_hist_em,
                         symbol=symbol,
                         period="daily",
                         start_date=start_str,
                         end_date=end_str
                     )
                 elif suffix == 'HK':
-                    # 港股: ak.stock_hk_hist — symbol 格式为 5 位数字，如 "00700"
+                    # 港股: ak.stock_hk_hist_em — symbol 格式为 5 位数字，如 "00700"
                     data = await asyncio.to_thread(
-                        ak.stock_hk_hist,
+                        ak.stock_hk_hist_em,
                         symbol=symbol,
                         period="daily",
                         start_date=start_str,
@@ -664,10 +664,10 @@ class AkShareSource(BaseDataSource):
                         adjust=""  # 不复权
                     )
                 elif suffix == 'US':
-                    # 美股: ak.stock_us_hist — symbol 格式为东财前缀代码，如 "105.AAPL"
+                    # 美股: ak.stock_us_hist_em — symbol 格式为东财前缀代码，如 "105.AAPL"
                     # source_symbol 已在 _get_us_instrument_list 阶段存为东财格式
                     data = await asyncio.to_thread(
-                        ak.stock_us_hist,
+                        ak.stock_us_hist_em,
                         symbol=symbol,
                         period="daily",
                         start_date=start_str,
@@ -677,7 +677,7 @@ class AkShareSource(BaseDataSource):
                 else:
                     # A 股（含北交所）
                     data = await asyncio.to_thread(
-                        ak.stock_zh_a_hist,
+                        ak.stock_zh_a_hist_em,
                         symbol=symbol,
                         period="daily",
                         start_date=start_str,
@@ -891,7 +891,7 @@ class AkShareSource(BaseDataSource):
             await self.rate_limiter.acquire()
 
             indices = await asyncio.to_thread(
-                ak.stock_zh_index_spot_em,
+                ak.index_zh_spot_em,
                 symbol="沪深重要指数"  # 可获取多种指数：{"沪深重要指数", "上证系列指数", "深证系列指数", "指数成份", "中证系列指数"}
             )
 
@@ -981,7 +981,7 @@ class AkShareSource(BaseDataSource):
                 return self._generate_local_calendar(exchange, start_date, end_date)
 
             # ---- A 股: 新浪接口 ----
-            trade_days = await asyncio.to_thread(ak.tool_trade_date_hist_sina)
+            trade_days = await asyncio.to_thread(ak.calendar_trade_date_hist_sina)
 
             if trade_days.empty:
                 return []

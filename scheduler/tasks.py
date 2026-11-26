@@ -13925,23 +13925,30 @@ class ScheduledTasks:
             )
             return False
 
-    def _launch_akshare_upgrade_worker(self, targets: Dict[str, Optional[str]]) -> bool:
-        """派生独立 akshare 升级 worker（脱离本进程会话，重启服务不影响其运行）。
+    def _launch_dependency_upgrade_worker(self, targets: Dict[str, Optional[str]]) -> bool:
+        """派生一个独立升级 worker，按包顺序升级、冒烟、回滚，最后重启一次。
 
-        worker 自带 flock 防重入与 no-op 判断；此处只负责拉起并记录日志。
+        worker 自带 flock；此处只负责拉起。多个包放在同一个进程里，避免
+        中途重启服务把后续升级一起杀掉。
         """
         try:
-            script = Path(__file__).resolve().parent.parent / "scripts" / "upgrade_akshare.py"
+            script = (
+                Path(__file__).resolve().parent.parent / "scripts" / "upgrade_market_dependency.py"
+            )
             if not script.exists():
                 scheduler_logger.warning(
-                    "[Scheduler] akshare upgrade worker script missing: %s", script
+                    "[Scheduler] dependency upgrade worker script missing: %s", script
                 )
                 return False
+            command = [sys.executable, str(script)]
+            for name, version in targets.items():
+                spec = f"{name}=={version}" if version else str(name)
+                command.extend(["--package", spec])
             log_dir = Path(__file__).resolve().parent.parent / "log"
             log_dir.mkdir(parents=True, exist_ok=True)
-            worker_log = open(log_dir / "akshare_upgrade.log", "ab")
+            worker_log = open(log_dir / "dependency_upgrade.log", "ab")
             process = subprocess.Popen(
-                [sys.executable, str(script), "--target", "latest"],
+                command,
                 cwd=str(script.parent.parent),
                 stdout=worker_log,
                 stderr=subprocess.STDOUT,
@@ -13949,14 +13956,14 @@ class ScheduledTasks:
                 start_new_session=True,
             )
             scheduler_logger.info(
-                "[Scheduler] akshare upgrade worker launched pid=%s targets=%s",
+                "[Scheduler] dependency upgrade worker launched pid=%s targets=%s",
                 process.pid,
                 targets,
             )
             return True
         except Exception as exc:
             scheduler_logger.error(
-                "[Scheduler] failed to launch akshare upgrade worker: %s", exc
+                "[Scheduler] failed to launch dependency upgrade worker: %s", exc
             )
             return False
 
@@ -13970,9 +13977,9 @@ class ScheduledTasks:
     ) -> bool:
         """检查行情数据相关 Python 包是否有可升级版本，并通过 Telegram 通知。
 
-        auto_upgrade_packages 中的包（当前用于 akshare）在检测到新版时会派生
-        scripts/upgrade_akshare.py 独立 worker：升级 → 冒烟 → 成功重启/失败回滚，
-        结果由 worker 直接报告；其余包维持只报告不升级。
+        auto_upgrade_packages 中的包在检测到新版时会派生
+        scripts/upgrade_market_dependency.py：逐包升级 → 冒烟 → 成功 pin /
+        失败回滚，全部结束后重启一次。结果由 worker 直接报告。
         """
         self._active_tasks.add('market_dependency_version_check')
         try:
@@ -14003,7 +14010,7 @@ class ScheduledTasks:
                     if str(item.get('name')) in auto_names and item.get('update_available')
                 ]
                 if due:
-                    auto_upgrade_launched = self._launch_akshare_upgrade_worker(
+                    auto_upgrade_launched = self._launch_dependency_upgrade_worker(
                         targets={
                             str(item.get('name')): item.get('latest_version')
                             for item in due
@@ -14028,9 +14035,15 @@ class ScheduledTasks:
             if (updates or errors or notify_when_latest or auto_upgrade_launched) and self.telegram_enabled and self.bot:
                 message = format_market_dependency_version_message(result)
                 if auto_upgrade_launched:
+                    launched = ", ".join(
+                        str(item.get("name"))
+                        for item in updates
+                        if str(item.get("name")) in auto_names and item.get("update_available")
+                    )
                     message += (
-                        "\n\nakshare 已触发自动升级流程：升级 → 冒烟验证 → "
-                        "成功自动重启 / 失败自动回滚，结果将单独报告。"
+                        f"\n\n已触发自动升级：{launched}。"
+                        "逐包安装并冒烟，不兼容则回滚该包；全部结束后重启服务，"
+                        "结果将单独报告。"
                     )
                 level = 'warning' if updates or errors else 'success'
                 await self.bot.send_task_notification(

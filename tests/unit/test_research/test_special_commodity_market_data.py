@@ -4801,7 +4801,7 @@ def test_lme_akshare_provider_uses_sina_primary_without_fallback(monkeypatch):
         raise AssertionError("fallback must not run when Sina succeeds")
 
     fake_akshare = SimpleNamespace(
-        futures_foreign_hist=_sina,
+        futures_foreign_hist_sina=_sina,
         futures_global_hist_em=_eastmoney,
         futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(
             [{"symbol": "LME铜3个月", "code": "CAD"}]
@@ -4853,7 +4853,7 @@ def test_lme_akshare_provider_falls_back_to_eastmoney(monkeypatch):
         )
 
     fake_akshare = SimpleNamespace(
-        futures_foreign_hist=_sina,
+        futures_foreign_hist_sina=_sina,
         futures_global_hist_em=_eastmoney,
         futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(
             [{"symbol": "LME铝3个月", "code": "AHD"}]
@@ -4916,7 +4916,7 @@ def test_lme_provider_fills_isolated_primary_date_gap_from_eastmoney(monkeypatch
         )
 
     fake_akshare = SimpleNamespace(
-        futures_foreign_hist=_sina,
+        futures_foreign_hist_sina=_sina,
         futures_global_hist_em=_eastmoney,
         futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(),
     )
@@ -4974,7 +4974,7 @@ def test_lme_provider_excludes_governed_nickel_suspension_from_gap_fill(monkeypa
         return pd.DataFrame(rows)
 
     fake_akshare = SimpleNamespace(
-        futures_foreign_hist=_sina,
+        futures_foreign_hist_sina=_sina,
         futures_global_hist_em=lambda symbol: (_ for _ in ()).throw(
             AssertionError("governed suspension must not request fallback")
         ),
@@ -5024,7 +5024,7 @@ def test_lme_provider_substitutes_inconsistent_ohlc_from_fallback(monkeypatch):
         )
 
     fake_akshare = SimpleNamespace(
-        futures_foreign_hist=_sina,
+        futures_foreign_hist_sina=_sina,
         futures_global_hist_em=_eastmoney,
         futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(),
     )
@@ -5081,7 +5081,7 @@ def test_lme_provider_warns_when_all_sources_ohlc_inconsistent(monkeypatch):
         )
 
     fake_akshare = SimpleNamespace(
-        futures_foreign_hist=_sina,
+        futures_foreign_hist_sina=_sina,
         futures_global_hist_em=_eastmoney,
         futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(),
     )
@@ -5139,7 +5139,7 @@ def test_lme_provider_skips_fallback_rows_without_intraday_range(monkeypatch):
         )
 
     fake_akshare = SimpleNamespace(
-        futures_foreign_hist=_sina,
+        futures_foreign_hist_sina=_sina,
         futures_global_hist_em=_eastmoney,
         futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(),
     )
@@ -5185,7 +5185,7 @@ def test_lme_provider_substitutes_open_outside_intraday_range(monkeypatch):
         )
 
     fake_akshare = SimpleNamespace(
-        futures_foreign_hist=_sina,
+        futures_foreign_hist_sina=_sina,
         futures_global_hist_em=_eastmoney,
         futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(),
     )
@@ -5217,7 +5217,7 @@ def test_lme_governance_precedes_write_and_uses_only_observed_dates(monkeypatch,
     series_id = "CMD.METAL.COPPER.LME3M.DAILY"
 
     fake_akshare = SimpleNamespace(
-        futures_foreign_hist=lambda symbol: pd.DataFrame(
+        futures_foreign_hist_sina=lambda symbol: pd.DataFrame(
             [
                 {"date": "2016-07-11", "open": 4700, "high": 4800, "low": 4650, "close": 4750, "volume": 100, "position": 0},
                 {"date": "2026-01-02", "open": 9000, "high": 9100, "low": 8950, "close": 9050, "volume": 200, "position": 0},
@@ -5226,7 +5226,7 @@ def test_lme_governance_precedes_write_and_uses_only_observed_dates(monkeypatch,
         futures_global_hist_em=lambda symbol: (_ for _ in ()).throw(
             AssertionError("fallback must not run")
         ),
-        futures_foreign_detail=lambda symbol: pd.DataFrame(
+        futures_foreign_detail_sina=lambda symbol: pd.DataFrame(
             [
                 ["交易品种", "伦敦铜(CFD差价合约并非期货)", "交易单位", "每手25吨", "报价单位", "美元/吨"],
                 ["最小变动价位", "电话交易：0.5美元/吨 电子盘：0.25美元/吨", "合约交割月份", "LME三个月期货合约是连续合约，每日都有交割", "交易代码", "CAD"],
