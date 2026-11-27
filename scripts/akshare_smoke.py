@@ -7,8 +7,9 @@
 
 覆盖生产在用的关键行情接口：LME 新浪主源、东财备源、100ppi 现货、
 央行 SAFE 汇率、中美国债收益率、A 股日线、交易日历，以及项目自有的
-CNInfo 公司行动适配器（含 akshare.utils.http 绑定链路）。走项目统一的
-proxy_patch 加载路径，冒烟结果即代表服务运行环境的可用性。
+CNInfo 公司行动适配器（含 akshare.utils.http 绑定链路）。A 股后复权因子和
+港股前复权因子必须调用项目生产取数函数，不能只用名称相近的公开行情接口代替。
+走项目统一的 proxy_patch 加载路径，冒烟结果即代表服务运行环境的可用性。
 
 输出：最后一行打印 JSON 汇总；exit 0 = 全部通过，exit 1 = 存在失败。
 """
@@ -93,6 +94,36 @@ def _cninfo_corporate_action_case(today: date) -> Tuple[str, Callable, Dict[str,
     )
 
 
+def _a_share_sina_hfq_factor_case() -> Tuple[str, Callable, Dict[str, Any]]:
+    """生产 A 股后复权因子入口。升级若挪走 AkShare 内部模块，这里会失败。"""
+
+    def _call(_akshare):
+        from data_sources.akshare_source import AkShareSource
+
+        return AkShareSource._fetch_sina_hfq_factor_frame("sh600519")
+
+    return (
+        "a_share_sina_hfq_factor_600519",
+        _call,
+        {"min_rows": 1, "required_columns": ["date", "hfq_factor"]},
+    )
+
+
+def _hk_sina_qfq_factor_case() -> Tuple[str, Callable, Dict[str, Any]]:
+    """生产港股前复权因子入口，与 A 股因子共用同一类 AkShare 公开接口。"""
+
+    def _call(_akshare):
+        from data_sources.akshare_source import AkShareSource
+
+        return AkShareSource._fetch_sina_hk_qfq_factor_frame("00700")
+
+    return (
+        "hk_sina_qfq_factor_00700",
+        _call,
+        {"min_rows": 1, "required_columns": ["date", "qfq_factor"]},
+    )
+
+
 def build_cases(today: Optional[date] = None) -> List[Tuple[str, Callable, Dict[str, Any]]]:
     """返回冒烟用例表：名称、akshare 调用、结构断言参数。"""
     today = today or date.today()
@@ -158,6 +189,8 @@ def build_cases(today: Optional[date] = None) -> List[Tuple[str, Callable, Dict[
             {"min_rows": 1, "required_columns": ["trade_date"]},
         ),
         _cninfo_corporate_action_case(today),
+        _a_share_sina_hfq_factor_case(),
+        _hk_sina_qfq_factor_case(),
     ]
 
 

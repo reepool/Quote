@@ -23,18 +23,12 @@ from .adjustment_config import AdjustmentConfig
 from utils.exceptions import DataSourceError, NetworkError, ErrorCodes
 from utils import log_execution, data_source_metrics, config_manager, get_shanghai_time, exchange_mapper
 from utils import akshare_logger
-from .sina_factor_parser import (
-    MAX_SINA_FACTOR_BODY_BYTES,
-    SinaFactorParseError,
-    parse_sina_qfq_factor_response,
-)
 
 
 class AkShareSource(BaseDataSource):
     """AkShare数据源 - 支持 A 股 (SSE/SZSE/BSE) + 港股 (HKEX) + 美股 (NASDAQ/NYSE)"""
 
     _A_SHARE_FACTOR_CONFIG_DEFAULTS = {
-        "request_timeout_seconds": 30.0,
         "material_ratio_threshold": 0.0001,
     }
     _HK_FACTOR_CONFIG_DEFAULTS = {
@@ -45,8 +39,6 @@ class AkShareSource(BaseDataSource):
         "fallback_on_invalid_response": True,
         "rounding_tolerance": 0.0001,
         "diagnostic_hfq_check_enabled": False,
-        "request_timeout_seconds": 30.0,
-        "max_response_bytes": MAX_SINA_FACTOR_BODY_BYTES,
     }
     _HK_FACTOR_RATIO_REL_TOL = 0.0005
     _HK_FACTOR_RATIO_ABS_TOL = 0.0005
@@ -1262,7 +1254,7 @@ class AkShareSource(BaseDataSource):
     ) -> List[Dict[str, Any]]:
         """[已废弃] 港股旧路径事件识别：寻找持久平台跃迁。
 
-        生产路径改用新浪 stock_hk_daily(adjust="qfq-factor")。此方法仅保留
+        生产路径改用 AkShare stock_hk_hist_sina(adjust="qfq-factor")。此方法仅保留
         给旧测试和诊断使用。
 
         真实复权事件会使 cumulative_factor 从一个平台永久切换到新平台；
@@ -1391,7 +1383,7 @@ class AkShareSource(BaseDataSource):
     ) -> pd.Series:
         """[已废弃] 基于港股 OHLC 多列比值构造日度累积因子。
 
-        生产路径改用新浪 stock_hk_daily(adjust="qfq-factor")。此方法仅保留
+        生产路径改用 AkShare stock_hk_hist_sina(adjust="qfq-factor")。此方法仅保留
         给旧测试和诊断使用。
 
         单独使用收盘价时，容易把东财按分价格式四舍五入误差放大。
@@ -1431,7 +1423,7 @@ class AkShareSource(BaseDataSource):
     ) -> bool:
         """[已废弃] 港股旧路径结果可靠性检查。
 
-        生产路径改用新浪 stock_hk_daily(adjust="qfq-factor")。此方法仅保留
+        生产路径改用 AkShare stock_hk_hist_sina(adjust="qfq-factor")。此方法仅保留
         给旧测试和诊断使用。
 
         真实港股复权事件通常很稀疏；若在短时间内连续识别出大量事件，
@@ -1500,13 +1492,6 @@ class AkShareSource(BaseDataSource):
 
             await self.rate_limiter.acquire()
             factor_config = self._get_a_share_factor_config()
-            request_timeout_seconds = float(
-                factor_config["request_timeout_seconds"]
-            )
-            if request_timeout_seconds <= 0:
-                raise ValueError(
-                    "A-share Sina factor request_timeout_seconds must be positive"
-                )
             if suffix in {'SH', 'SSE'}:
                 ak_symbol = f"sh{symbol}"
             elif suffix in {'SZ', 'SZSE'}:
@@ -1524,12 +1509,10 @@ class AkShareSource(BaseDataSource):
                 factor_df = await asyncio.to_thread(
                     self._fetch_sina_hfq_factor_frame,
                     ak_symbol,
-                    request_timeout_seconds,
                 )
             except TimeoutError:
                 akshare_logger.warning(
-                    "Sina hfq-factor request timed out after %.1fs for %s",
-                    request_timeout_seconds,
+                    "Sina hfq-factor request timed out for %s",
                     ak_symbol,
                 )
                 return None
@@ -1625,55 +1608,24 @@ class AkShareSource(BaseDataSource):
             return None
 
     @staticmethod
-    def _fetch_sina_hfq_factor_frame(
-        symbol: str,
-        request_timeout_seconds: float,
-    ) -> pd.DataFrame:
-        """Fetch the direct Sina factor payload with bounded socket timeouts.
+    def _fetch_sina_hfq_factor_frame(symbol: str) -> pd.DataFrame:
+        """Load A-share Sina hfq factors from AkShare's public history API."""
+        import requests
 
-        AkShare's public wrapper does not expose ``requests`` timeout arguments.
-        This compatibility boundary uses the same endpoint and decoder while
-        ensuring a stalled request cannot occupy the shared executor forever.
-        """
-        from akshare.stock.stock_zh_a_sina import (
-            demjson,
-            requests as sina_requests,
-            zh_sina_a_stock_hfq_url,
-        )
-
-        timeout_seconds = float(request_timeout_seconds)
-        connect_timeout = min(10.0, timeout_seconds)
         try:
-            response = sina_requests.get(
-                zh_sina_a_stock_hfq_url.format(symbol),
-                timeout=(connect_timeout, timeout_seconds),
-            )
-            response.raise_for_status()
-        except sina_requests.exceptions.Timeout as exc:
+            frame = ak.stock_zh_a_hist_sina(symbol=symbol, adjust="hfq-factor")
+        except requests.exceptions.Timeout as exc:
             raise TimeoutError(
                 f"Sina hfq-factor request timed out for {symbol}"
             ) from exc
-
-        assignment = str(response.text or "").split("=", 1)
-        if len(assignment) != 2:
-            raise ValueError("Sina hfq-factor response has no assignment payload")
-        payload_text = assignment[1].split("\n", 1)[0].strip().rstrip(";")
-        payload = demjson.decode(payload_text)
-        if not isinstance(payload, dict) or not isinstance(payload.get("data"), list):
-            raise ValueError("Sina hfq-factor response has invalid data payload")
-        rows = payload["data"]
-        declared_total = payload.get("total")
-        if declared_total is not None and int(declared_total) != len(rows):
+        if frame is None or frame.empty:
+            raise ValueError(f"Sina hfq-factor response is empty for {symbol}")
+        missing = {"date", "hfq_factor"} - set(frame.columns)
+        if missing:
             raise ValueError(
-                "Sina hfq-factor response is incomplete: "
-                f"declared={declared_total} received={len(rows)}"
+                "Sina hfq-factor response missing columns "
+                f"{sorted(missing)} for {symbol}"
             )
-        if not rows:
-            raise ValueError("Sina hfq-factor response contains no factor rows")
-        frame = pd.DataFrame(rows)
-        if frame.shape[1] != 2:
-            raise ValueError("Sina hfq-factor rows have an unexpected shape")
-        frame.columns = ["date", "hfq_factor"]
         return frame
 
     async def _get_hk_adjustment_factors(
@@ -1701,10 +1653,6 @@ class AkShareSource(BaseDataSource):
             factor_df = await asyncio.to_thread(
                 self._fetch_sina_hk_qfq_factor_frame,
                 symbol,
-                float(cfg.get("request_timeout_seconds", 30.0)),
-                str(base_date.date()),
-                require_base_date,
-                int(cfg.get("max_response_bytes", MAX_SINA_FACTOR_BODY_BYTES)),
             )
 
             if factor_df is None or factor_df.empty:
@@ -1776,25 +1724,6 @@ class AkShareSource(BaseDataSource):
             )
             return factors
 
-        except SinaFactorParseError as e:
-            akshare_logger.warning(
-                "[%s] HK factor parser failure provider=sina endpoint_family=hk_qfq_factor "
-                "symbol=%s status=%s response_hash=%s error_type=%s error_code=%s",
-                self.name,
-                symbol,
-                e.http_status,
-                e.response_hash,
-                type(e).__name__,
-                e.code,
-            )
-            akshare_logger.debug(
-                "[%s] HK factor parser traceback symbol=%s error_code=%s",
-                self.name,
-                symbol,
-                e.code,
-                exc_info=True,
-            )
-            return None if cfg.get("fallback_on_invalid_response", True) else []
         except Exception as e:
             akshare_logger.warning(
                 "[%s] HK factor acquisition failure provider=sina "
@@ -1816,41 +1745,24 @@ class AkShareSource(BaseDataSource):
             return None if cfg.get("fallback_on_invalid_response", True) else []
 
     @staticmethod
-    def _fetch_sina_hk_qfq_factor_frame(
-        symbol: str,
-        request_timeout_seconds: float,
-        base_date: str,
-        require_base_date: bool,
-        max_response_bytes: int,
-    ) -> pd.DataFrame:
-        """Fetch and safely parse Sina's HK qfq-factor assignment payload."""
+    def _fetch_sina_hk_qfq_factor_frame(symbol: str) -> pd.DataFrame:
+        """Load HK Sina qfq factors from AkShare's public history API."""
+        import requests
 
-        from akshare.stock.stock_hk_sina import (
-            hk_sina_stock_hist_qfq_url,
-            requests as sina_requests,
-        )
-
-        timeout_seconds = max(1.0, float(request_timeout_seconds))
-        connect_timeout = min(10.0, timeout_seconds)
         try:
-            response = sina_requests.get(
-                hk_sina_stock_hist_qfq_url.format(symbol),
-                timeout=(connect_timeout, timeout_seconds),
-            )
-        except sina_requests.exceptions.Timeout as exc:
+            frame = ak.stock_hk_hist_sina(symbol=symbol, adjust="qfq-factor")
+        except requests.exceptions.Timeout as exc:
             raise TimeoutError(
                 f"Sina HK qfq-factor request timed out for {symbol}"
             ) from exc
-        rows = parse_sina_qfq_factor_response(
-            response.content,
-            http_status=int(response.status_code),
-            base_date=base_date,
-            require_base_date=require_base_date,
-            max_body_bytes=max_response_bytes,
-        )
-        frame = pd.DataFrame(rows, columns=["date", "qfq_factor"])
-        frame["date"] = pd.to_datetime(frame["date"], errors="raise")
-        frame["qfq_factor"] = pd.to_numeric(frame["qfq_factor"], errors="raise")
+        if frame is None or frame.empty:
+            raise ValueError(f"Sina HK qfq-factor response is empty for {symbol}")
+        missing = {"date", "qfq_factor"} - set(frame.columns)
+        if missing:
+            raise ValueError(
+                "Sina HK qfq-factor response missing columns "
+                f"{sorted(missing)} for {symbol}"
+            )
         return frame
 
     async def close(self):

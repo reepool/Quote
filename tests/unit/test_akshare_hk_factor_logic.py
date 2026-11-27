@@ -316,3 +316,17 @@ class TestAkshareHkDirectQfqFactorFetch:
         assert adjusted[0]["open"] == 75.0
         assert adjusted[1]["close"] == 200.0
         assert adjusted[1]["open"] == 200.0
+
+
+def test_hk_qfq_factor_fetch_uses_public_hist_api():
+    frame = pd.DataFrame({
+        "date": ["1900-01-01", "2026-05-15"],
+        "qfq_factor": [0.16, 1.0],
+    })
+    with patch(
+        "data_sources.akshare_source.ak.stock_hk_hist_sina",
+        return_value=frame,
+    ) as fetch:
+        result = AkShareSource._fetch_sina_hk_qfq_factor_frame("00700")
+    fetch.assert_called_once_with(symbol="00700", adjust="qfq-factor")
+    assert result["qfq_factor"].tolist() == [0.16, 1.0]

@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pandas as pd
 import pytest
@@ -170,7 +170,7 @@ class TestAkshareFactorLogic:
         assert events[0]["factor"] == pytest.approx(1.1)
         assert events[0]["source"] == "akshare"
         assert events[0]["source_profile"] == "sina_hfq_factor"
-        mock_fetch.assert_called_once_with("sh600000", 30.0)
+        mock_fetch.assert_called_once_with("sh600000")
 
     @pytest.mark.asyncio
     async def test_a_share_factor_returns_valid_empty_window(self):
@@ -265,37 +265,27 @@ class TestAkshareFactorLogic:
 
         assert events is None
 
-    def test_sina_factor_transport_applies_socket_timeout_and_row_count(self):
-        response = MagicMock()
-        response.text = (
-            'var factor={"total":2,"data":'
-            '[["1900-01-01","1"],["2020-05-28","1.1"]]};'
-        )
+    def test_sina_factor_fetch_uses_public_hfq_factor_api(self):
+        frame = pd.DataFrame({
+            "date": ["2026-11-26"],
+            "hfq_factor": ["1.1"],
+        })
 
         with patch(
-            "akshare.stock.stock_zh_a_sina.requests.get",
-            return_value=response,
-        ) as mock_get:
-            result = AkShareSource._fetch_sina_hfq_factor_frame(
-                "sz000001",
-                30.0,
-            )
+            "data_sources.akshare_source.ak.stock_zh_a_hist_sina",
+            return_value=frame,
+        ) as fetch:
+            result = AkShareSource._fetch_sina_hfq_factor_frame("sz000001")
 
-        response.raise_for_status.assert_called_once_with()
-        assert result["hfq_factor"].tolist() == ["1", "1.1"]
-        assert mock_get.call_args.kwargs["timeout"] == (10.0, 30.0)
+        fetch.assert_called_once_with(symbol="sz000001", adjust="hfq-factor")
+        assert result["hfq_factor"].tolist() == ["1.1"]
 
-    def test_sina_factor_transport_rejects_incomplete_payload(self):
-        response = MagicMock()
-        response.text = (
-            'var factor={"total":2,"data":[["1900-01-01","1"]]};'
-        )
-
+    def test_sina_factor_fetch_rejects_empty_public_frame(self):
         with (
             patch(
-                "akshare.stock.stock_zh_a_sina.requests.get",
-                return_value=response,
+                "data_sources.akshare_source.ak.stock_zh_a_hist_sina",
+                return_value=pd.DataFrame(columns=["date", "hfq_factor"]),
             ),
-            pytest.raises(ValueError, match="response is incomplete"),
+            pytest.raises(ValueError, match="empty"),
         ):
-            AkShareSource._fetch_sina_hfq_factor_frame("sz000001", 30.0)
+            AkShareSource._fetch_sina_hfq_factor_frame("sz000001")
