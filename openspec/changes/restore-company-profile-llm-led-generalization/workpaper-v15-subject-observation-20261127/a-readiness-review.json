@@ -1,0 +1,22 @@
+{
+  "task": "6.FV",
+  "state": "A_engineering_and_source_identity_review_passed_pending_specific_budget_confirmation",
+  "ready_sha256": "815f6fb60fc42e8ee50d3f97eda5524c2e484d2f5e41ec557ba878789753e734",
+  "original_protected_files_unchanged": 402,
+  "expected_fact_count": 25,
+  "expected_metric_count": 24,
+  "full_index_original_positions_checked": true,
+  "index_UTF8_bytes": 6288,
+  "source_UTF8_bytes": 56722,
+  "new_application_or_prompt_change": false,
+  "prior_valid_regression_reused": {
+    "B_effective_union": 101,
+    "A_direct": 9,
+    "code_and_tests_exact_hash_match": true,
+    "rerun": false
+  },
+  "new_clients_or_model_sends": 0,
+  "new_blocking_P1_P2": 0,
+  "independent_source_reference_sha256": "a5426f6f697d73ac63fa7d47c5ca476a84ef0bc712a4155d420d02e27ed77ddc",
+  "scope": "One unchanged-source/current-draft known-case observation of an already implemented delta, not formal cohort accuracy."
+}

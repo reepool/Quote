@@ -1,0 +1,55 @@
+{
+  "task": "6.FV",
+  "state": "engineering_ready_pending_A_send_freeze_and_specific_human_approval",
+  "entry": "review_operator.run_one -> execute_configured_task -> CompanyProfileTaskService.review_batch -> original writer",
+  "application_delta": "none",
+  "baseline_sha256": "8a04e270603a63f170215172445788b6535412b727cbd893738ca851334a85c3",
+  "plan": "/home/python/Quote/data/checkpoints/company_profile_v15_subject_20261127/600350.SH/execution-plan.json",
+  "plan_sha256": "0b9ff1ac10ced9e4395027ecb5b5fa568ff2ed86fecef53f1dd3e68e41499388",
+  "authorization_status": "planned",
+  "instrument_ids": [
+    "600350.SH"
+  ],
+  "input_contract": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-v15-subject-observation-20261127/b-input-contract.json",
+  "input_contract_sha256": "23177c5882c2a33279d120e301076bc91ccc24c7fd8a0db17a6577c16512d151",
+  "parent_review_policy": "company_profile_workpaper_review.v14",
+  "new_review_policy": "company_profile_workpaper_review.v15",
+  "fact_count": 25,
+  "metric_count": 24,
+  "required_parent_records": 3,
+  "reused_regression": {
+    "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/b-v15-result.json",
+    "sha256": "d4da60296ce9c3fe2ef2cefbb289a50396d52ddb2e7e0b7576a8c9a56b2dd912",
+    "effective_cases": 101,
+    "independent_A_cases": 9,
+    "rerun": false
+  },
+  "frozen_files": {
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-v15-subject-observation-20261127/review_operator.py": "01cfd26ee1f571b3f99f7d7d98fcce4f1fec98baf69823dcf7acc1eba21d6b4f",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/review_operator.py": "2e130b6f328d3600426aa9a1d957f39dd78a6b9d5326ecd351e56750c4541a2f",
+    "/home/python/Quote/data/checkpoints/company_profile_v15_subject_20261127/600350.SH/execution-plan.json": "0b9ff1ac10ced9e4395027ecb5b5fa568ff2ed86fecef53f1dd3e68e41499388",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-v15-subject-observation-20261127/b-input-contract.json": "23177c5882c2a33279d120e301076bc91ccc24c7fd8a0db17a6577c16512d151",
+    "/home/python/Quote/data/research/company_profile_v15_subject_20261127/company_profile_common_core.v1/bp-work-1deffa57365ab12095599a8f.json": "9190ae2b833acf4118a90ece1d2f2ea2f0f5b2d33d89d43c0403625524fc6eb3",
+    "/home/python/Quote/data/research/company_profile_v15_subject_20261127/company_profile_common_core.v1/bp-work-48e5b38db9e2d9737d7a6c78.json": "0e1ac61d276a45ee049c19458fb2c1ec3ac41aecc1c9b61fc19a9be6440eb2eb",
+    "/home/python/Quote/data/research/company_profile_v15_subject_20261127/company_profile_common_core.v1/bp-work-f7e0f0a8da3af9c1e51ec585.json": "f6e526cfc4e6d663eaccd05b8348dd07f023e1a5b9279a43ed46fe701f1f2865",
+    "/home/python/Quote/research/company_profile/task_entry.py": "211a4fa34baa45f8270735a0bf4b460a83cdbe2c2337febaf99d12b364791132",
+    "/home/python/Quote/research/company_profile/reads.py": "609cd005a7e088ad2796bd430f93023ed9b127ea5718319aa695ec21f5d1021d",
+    "/home/python/Quote/research/company_profile/runtime.py": "0ef9958ce9775b8c94fd77db6045319edc87431450233ddcf1ca8fb6aba70e42",
+    "/home/python/Quote/research/company_profile/workpaper_review.py": "d73ba97020df919139b615661f3d8fddb1c6098684161d3f46606909fdcf137d",
+    "/home/python/Quote/research/company_profile/workpaper_llm.py": "4bfe9b8fe4a144fd61ee1b3681ee679210146537ae8fb38ca8d63e1a5e476104",
+    "/home/python/Quote/tests/unit/test_research/test_company_profile_scope_review_index.py": "0b34967744431b5d48cfa0ba12be2f9e9835f6894090953265a657ce3ac31cab",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/b-v15-result.json": "d4da60296ce9c3fe2ef2cefbb289a50396d52ddb2e7e0b7576a8c9a56b2dd912",
+    "/home/python/Quote/data/filings/announcements/blobs/2c/2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059.pdf": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+    "/home/python/Quote/data/filings/announcements/blobs/2c/derived/business_profile_pdfium_recovery.v4/2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059_57e1dd4f16ef40ff.json.gz": "d67d81201ae25dccbaee7480308d5bc7ebd7d383f6a4e418a14f0985f5ae5805"
+  },
+  "protected_files_checked": 402,
+  "new_supplier_requests": 0,
+  "real_client_constructions": 0,
+  "supplier_probes": 0,
+  "A_run_requirements": [
+    "specific human approval",
+    "new authorized plan separate from planned plan",
+    "source/code/configuration frozen by A",
+    "A preflight and before-send cumulative guard"
+  ]
+}

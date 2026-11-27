@@ -1,0 +1,38 @@
+{
+  "task": "6.FV",
+  "state": "engineering_handoff_reviewed_specific_model_approval_pending",
+  "fixed_scope": "600350.SH current draft25 facts24 metrics, original selected public2025 sections, two risk targets and three correct controls.",
+  "finite_review": {
+    "new_P1_P2": 0,
+    "application_or_prompt_changes": false,
+    "same_code_effective_tests_reused": 101,
+    "same_code_A_direct_cases_reused": 9,
+    "repeated_large_tests": 0,
+    "OpenSpec_strict": "passed",
+    "new_local_links_checked": 6,
+    "staged_diff_check": "passed"
+  },
+  "original_research_configuration_files_unchanged": 402,
+  "preexisting_dirty_paths_preserved": 20,
+  "only_own_staged_document_blocks_sha256": {
+    "docs/development/company_profile_acceptance_program.md": "a8fcc0622a376ce99e7662605e17e6911b27270da9ba43d665775672ce215307",
+    "docs/development/company_profile_delivery_plan.md": "46a8368ca81e7f6686333ca446376bf1fa19328c75bf7dfd8734d62b90608538",
+    "openspec/changes/restore-company-profile-llm-led-generalization/proposal.md": "9c50b4e3006cf0945f812d702cdb6bdc607f9797721cd9edd819f2f10387b3f2",
+    "openspec/changes/restore-company-profile-llm-led-generalization/design.md": "ad8621c589a8e8379fa4c4125f325ffd9430aa690b01c13fdf4a641a950b4365",
+    "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md": "06c5c299b40ff7355860d8e08464dee7cd9c74293f3dc23aec7ef989b471a6fa",
+    "openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md": "86b3c78b75513c22ed1a8307dd7793640c1d0719ab00f8479e043f64f248682a"
+  },
+  "specific_model_budget_confirmation": "pending_async_question",
+  "new_real_client_constructions": 0,
+  "new_supplier_probes": 0,
+  "new_model_sends": 0,
+  "three_parent_records_and_one_planned_file_retained": "Required original-owner dependencies for the concretely proposed observation; no39-company database copy.",
+  "cleanup": {
+    "owned_root": "/home/python/Quote/data/QuoteBak/company-profile-6fv-a-YiALnKD6",
+    "files_removed": 23,
+    "logical_bytes_removed": 4585086,
+    "root_absent": true,
+    "scope": "Only A exact baseline copies, temporary reference/readiness/isolation scripts and patch. No B temporary database or full-report copy was created."
+  },
+  "next_action_after_approval": "Create distinct authorized plan, freeze source/code/configuration, DNS/TLS in same authorized network environment, execute once through original TaskService and independently assess actual effect; no repeated unchanged preparation."
+}

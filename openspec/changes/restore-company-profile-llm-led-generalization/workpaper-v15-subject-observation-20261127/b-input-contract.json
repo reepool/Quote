@@ -1,0 +1,642 @@
+{
+  "instrument_id": "600350.SH",
+  "current_work_id": "bp-work-1deffa57365ab12095599a8f",
+  "current_record_sha256": "9190ae2b833acf4118a90ece1d2f2ea2f0f5b2d33d89d43c0403625524fc6eb3",
+  "parent_review_policy": "company_profile_workpaper_review.v14",
+  "new_review_policy": "company_profile_workpaper_review.v15",
+  "source_recheck_policy": "source_review_current_draft.v1",
+  "parents": [
+    {
+      "work_id": "bp-work-1deffa57365ab12095599a8f",
+      "path": "/home/python/Quote/data/research/company_profile_v15_subject_20261127/company_profile_common_core.v1/bp-work-1deffa57365ab12095599a8f.json",
+      "sha256": "9190ae2b833acf4118a90ece1d2f2ea2f0f5b2d33d89d43c0403625524fc6eb3"
+    },
+    {
+      "work_id": "bp-work-48e5b38db9e2d9737d7a6c78",
+      "path": "/home/python/Quote/data/research/company_profile_v15_subject_20261127/company_profile_common_core.v1/bp-work-48e5b38db9e2d9737d7a6c78.json",
+      "sha256": "0e1ac61d276a45ee049c19458fb2c1ec3ac41aecc1c9b61fc19a9be6440eb2eb"
+    },
+    {
+      "work_id": "bp-work-f7e0f0a8da3af9c1e51ec585",
+      "path": "/home/python/Quote/data/research/company_profile_v15_subject_20261127/company_profile_common_core.v1/bp-work-f7e0f0a8da3af9c1e51ec585.json",
+      "sha256": "f6e526cfc4e6d663eaccd05b8348dd07f023e1a5b9279a43ed46fe701f1f2865"
+    }
+  ],
+  "report": {
+    "instrument_id": "600350.SH",
+    "report_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+    "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-03T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "source": {
+    "pdf": "/home/python/Quote/data/filings/announcements/blobs/2c/2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059.pdf",
+    "pdf_sha256": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+    "cache": "/home/python/Quote/data/filings/announcements/blobs/2c/derived/business_profile_pdfium_recovery.v4/2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059_57e1dd4f16ef40ff.json.gz",
+    "cache_sha256": "d67d81201ae25dccbaee7480308d5bc7ebd7d383f6a4e418a14f0985f5ae5805",
+    "native_pages": 417
+  },
+  "resolved_asset_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+  "original_asset_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+  "author": {
+    "purpose": "extract_profile_workpaper",
+    "request_id": "bp-work-f7e0f0a8da3af9c1e51ec585:workpaper:extract",
+    "request_hash": "8c7d316df68285f5b3f30fb937158b0282cf4fa338ab0fd2a5c239df7bf15e63",
+    "response_hash": "ead621134fa09080e1e0b1319fa8b1b772abe841ad7d30d65f212d610fa53f21",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+    "finish_reason": "stop",
+    "reasoning_effort": "high",
+    "contract_status": "accepted",
+    "usage": {
+      "input_tokens": 16496,
+      "output_tokens": 22281,
+      "total_tokens": 38777
+    },
+    "scope_kind": "selected_source_sections",
+    "heading_count": null,
+    "section_ids": [
+      "section-0038",
+      "section-0047",
+      "section-0066",
+      "section-0071",
+      "section-0114",
+      "section-1133"
+    ],
+    "physical_pages": [
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      30,
+      31,
+      32,
+      33,
+      272,
+      273,
+      274,
+      275,
+      276,
+      277
+    ]
+  },
+  "facts": [
+    {
+      "element": "business_structure",
+      "fact_id": "bs-01",
+      "sha256": "bbe923d126b01f3a5c5dd9a6fbbbe591e587976a94cb72e52772957c7918cf21"
+    },
+    {
+      "element": "business_structure",
+      "fact_id": "bs-02",
+      "sha256": "93c7d09ec8b14fa2cea4f9eb1958d2d862092f0e96f17022236734fa537c2229"
+    },
+    {
+      "element": "business_structure",
+      "fact_id": "bs-03",
+      "sha256": "e1fe1d72196db39805c0fbc20a71e70079cd6227441bf3208cedf264e23d8455"
+    },
+    {
+      "element": "products_services",
+      "fact_id": "ps-01",
+      "sha256": "6255cb3d5ee39e2e8b17beed414dddfdbfe09c37534585df2193804a19d6eff3"
+    },
+    {
+      "element": "products_services",
+      "fact_id": "ps-02",
+      "sha256": "73d0feffb0973d454b0ed5e59598e36c7b33e7dd8f181889ee9007fd7d2bf79a"
+    },
+    {
+      "element": "products_services",
+      "fact_id": "ps-03",
+      "sha256": "71ea3d4b406d94545212f57de36d148e7e4caffdbb59aa195a9d6ae4d6cf536f"
+    },
+    {
+      "element": "revenue_model",
+      "fact_id": "rm-01",
+      "sha256": "929fb08024a4714c6974583d962cc5fbdd4886637c2b228494b857daefae7877"
+    },
+    {
+      "element": "scale_and_mix",
+      "fact_id": "sm-01",
+      "sha256": "995b56fced041c01e6fc08ab6c7f7dcd99f22ec1119a73349e4683aa0df4c808"
+    },
+    {
+      "element": "scale_and_mix",
+      "fact_id": "sm-02",
+      "sha256": "d99c8fc181f6de587e3b51d9e57baf8be807eb3dc5921d3cee39a122437091c0"
+    },
+    {
+      "element": "scale_and_mix",
+      "fact_id": "sm-03",
+      "sha256": "7f50004a5001c853b71fccbecdd18db609fdc1dbf1d4cf199b4d4b4f202dbab6"
+    },
+    {
+      "element": "scale_and_mix",
+      "fact_id": "sm-04",
+      "sha256": "f58f525d11176b6fc592ce8ef3171fc72b8140a76e2aefe3de55b837daa42e21"
+    },
+    {
+      "element": "scale_and_mix",
+      "fact_id": "sm-05",
+      "sha256": "b71685e79e6fa2682a6bc19430f35aa5060135b4f3f7a6820d369869d3d09a96"
+    },
+    {
+      "element": "scale_and_mix",
+      "fact_id": "sm-06",
+      "sha256": "a1fe25d0f0e3aa70649efa1c34c138745e0e255088ec795cc038c417ba7c087d"
+    },
+    {
+      "element": "scale_and_mix",
+      "fact_id": "sm-07",
+      "sha256": "65cb4acf0ab3741cc0013dc33a1fd07d8f5b7d899f91e2f568ea9a9cad054e02"
+    },
+    {
+      "element": "scale_and_mix",
+      "fact_id": "sm-08",
+      "sha256": "c682fb32c8fd9efc0c7e14b00f2ddbea7e88e5bf64964576c6222c07009c13ce"
+    },
+    {
+      "element": "scale_and_mix",
+      "fact_id": "sm-09",
+      "sha256": "e2607b1d190842f1b9a8feb3dbdca2214ecd0f9ffe8ab7a4930c8ed4d74e7015"
+    },
+    {
+      "element": "scale_and_mix",
+      "fact_id": "sm-10",
+      "sha256": "f2c964c81194b28043152eec0f60ec3364ef463d7a2c7abd68f800828da1e3c5"
+    },
+    {
+      "element": "scale_and_mix",
+      "fact_id": "sm-11",
+      "sha256": "1e8c2a162b1fa0e72ca605850035616da36ff62f3019e7f78697bb7ca4ef60ee"
+    },
+    {
+      "element": "scale_and_mix",
+      "fact_id": "sm-12",
+      "sha256": "2a896714deae169fc01c1aa2ff0ae5b53948867904561c6d356e500c0d577e08"
+    },
+    {
+      "element": "operations_and_inputs",
+      "fact_id": "op-01",
+      "sha256": "fe1bbbc0814e636484dc5bef523b579a11c948187c6697aa21ef45cc2c53a29d"
+    },
+    {
+      "element": "customers_channels_markets",
+      "fact_id": "cm-01",
+      "sha256": "2567cad8afc854140876eaa1b047966d5c064ca0a484ab49220e99c20dc0400d"
+    },
+    {
+      "element": "operating_drivers",
+      "fact_id": "od-01",
+      "sha256": "373ab8d40534027dae2c97986b3f55227444978047621a1fb876080342aed521"
+    },
+    {
+      "element": "material_changes",
+      "fact_id": "mc-01",
+      "sha256": "cb05314d7e9cc8f830f650b950d69b8ca8cabfd7fb461b3a9dc90e530c2e72c2"
+    },
+    {
+      "element": "position",
+      "fact_id": "sc-pos-01",
+      "sha256": "a4b1a639f4b6f66efb2cee7d55ab3243a33f5022d29e77774ffb126df4a29e52"
+    },
+    {
+      "element": "downstream_customers",
+      "fact_id": "sc-down-01",
+      "sha256": "e1df85aaf7fdc18bb9a904fb7d3864a575b0b56d41a27e8eb1775983fd6458d1"
+    }
+  ],
+  "fact_count": 25,
+  "metric_count": 24,
+  "draft_sha256": "e3cf5149905c375b9cd1a19d25d9dd32704d3d249bd0eda680d9ce6c7012d189",
+  "source_text_sha256": "e502dc9e7a46025144395b6195e2d49f108c3f5d3c6c78b22c576df278fc26fb",
+  "source_bytes": 56722,
+  "scope_review_index": [
+    {
+      "fact_id": "bs-01",
+      "subject_scope": "consolidated_group",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "metrics": []
+    },
+    {
+      "fact_id": "bs-02",
+      "subject_scope": "consolidated_group",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "运营管理的路桥资产总里程",
+          "subject_scope": "consolidated_group",
+          "period": "2025年"
+        },
+        {
+          "metric_index": 1,
+          "name": "所辖自有路桥资产里程",
+          "subject_scope": "consolidated_group",
+          "period": "2025年"
+        },
+        {
+          "metric_index": 2,
+          "name": "受托管理山东高速集团所属路桥资产里程",
+          "subject_scope": "consolidated_group",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "bs-03",
+      "subject_scope": "consolidated_group",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0002",
+        "source-0003",
+        "source-0004",
+        "source-0007"
+      ],
+      "metrics": []
+    },
+    {
+      "fact_id": "ps-01",
+      "subject_scope": "business_segment",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "metrics": []
+    },
+    {
+      "fact_id": "ps-02",
+      "subject_scope": "named_subsidiary",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0007",
+        "source-0013"
+      ],
+      "metrics": []
+    },
+    {
+      "fact_id": "ps-03",
+      "subject_scope": "unclear",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0007",
+        "source-0014"
+      ],
+      "metrics": []
+    },
+    {
+      "fact_id": "rm-01",
+      "subject_scope": "consolidated_group",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0005",
+        "source-0006"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "通行费收入（含税）",
+          "subject_scope": "consolidated_group",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "sm-01",
+      "subject_scope": "consolidated_group",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "营业收入",
+          "subject_scope": "consolidated_group",
+          "period": "2025年"
+        },
+        {
+          "metric_index": 1,
+          "name": "营业收入同比变动",
+          "subject_scope": "consolidated_group",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "sm-02",
+      "subject_scope": "consolidated_group",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "归属于母公司的净利润",
+          "subject_scope": "consolidated_group",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "sm-03",
+      "subject_scope": "business_segment",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0009",
+        "source-0010"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "高速公路通行费收入",
+          "subject_scope": "business_segment",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "sm-04",
+      "subject_scope": "business_segment",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0009",
+        "source-0010"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "铁路运输收入",
+          "subject_scope": "business_segment",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "sm-05",
+      "subject_scope": "business_segment",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0009",
+        "source-0010"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "销售商品收入",
+          "subject_scope": "business_segment",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "sm-06",
+      "subject_scope": "business_segment",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0009",
+        "source-0010"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "工程施工收入",
+          "subject_scope": "business_segment",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "sm-07",
+      "subject_scope": "business_segment",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0009",
+        "source-0010"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "机电工程施工收入",
+          "subject_scope": "business_segment",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "sm-08",
+      "subject_scope": "business_segment",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0009",
+        "source-0010"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "高速公路托管收入",
+          "subject_scope": "business_segment",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "sm-09",
+      "subject_scope": "business_segment",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0009",
+        "source-0010"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "软件、技术服务",
+          "subject_scope": "business_segment",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "sm-10",
+      "subject_scope": "business_segment",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0009",
+        "source-0010"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "建造服务收入",
+          "subject_scope": "business_segment",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "sm-11",
+      "subject_scope": "business_segment",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0016"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "主营业务-其他",
+          "subject_scope": "business_segment",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "sm-12",
+      "subject_scope": "consolidated_group",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0016"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "其他业务收入",
+          "subject_scope": "consolidated_group",
+          "period": "2025年"
+        },
+        {
+          "metric_index": 1,
+          "name": "其他业务-租赁收入",
+          "subject_scope": "consolidated_group",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "op-01",
+      "subject_scope": "consolidated_group",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "全天候通行率",
+          "subject_scope": "consolidated_group",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "cm-01",
+      "subject_scope": "unclear",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0001",
+        "source-0007"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "信息集团全国业务覆盖省份数",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年"
+        },
+        {
+          "metric_index": 1,
+          "name": "轨道交通集团全年货物运量",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年"
+        },
+        {
+          "metric_index": 2,
+          "name": "轨道交通集团货物运量同比变动",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "od-01",
+      "subject_scope": "consolidated_group",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0006",
+        "source-0019"
+      ],
+      "metrics": [
+        {
+          "metric_index": 0,
+          "name": "投资收益",
+          "subject_scope": "consolidated_group",
+          "period": "2025年"
+        },
+        {
+          "metric_index": 1,
+          "name": "投资收益同比变动",
+          "subject_scope": "consolidated_group",
+          "period": "2025年"
+        }
+      ]
+    },
+    {
+      "fact_id": "mc-01",
+      "subject_scope": "consolidated_group",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0006",
+        "source-0008"
+      ],
+      "metrics": []
+    },
+    {
+      "fact_id": "sc-pos-01",
+      "subject_scope": "consolidated_group",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0001",
+        "source-0003"
+      ],
+      "metrics": []
+    },
+    {
+      "fact_id": "sc-down-01",
+      "subject_scope": "consolidated_group",
+      "period": "2025年",
+      "evidence_ids": [
+        "source-0001",
+        "source-0007"
+      ],
+      "metrics": []
+    }
+  ],
+  "scope_review_index_sha256": "36def8454542d9796c55e325b942724a876c57eae31673e15a3bf1bd19eacbe5",
+  "input_binding": {
+    "current_draft_sha256": "e551a3ef794576bb6985994c0e1ea5bacc122aee8ae507b90caf816728a89d63",
+    "request_draft_sha256": "e3cf5149905c375b9cd1a19d25d9dd32704d3d249bd0eda680d9ce6c7012d189",
+    "source_packet_sha256": "9e530899c73fb0f0f509786c7731648556a43e9069adfe80decb4f17e6bc9fb2"
+  },
+  "retained_receipts": [
+    "select_profile_sections",
+    "extract_profile_workpaper"
+  ],
+  "prior_review_in_model_input": false,
+  "independent_reference_in_model_input": false
+}

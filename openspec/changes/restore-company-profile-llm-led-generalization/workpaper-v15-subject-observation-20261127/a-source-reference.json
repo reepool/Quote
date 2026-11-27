@@ -1,0 +1,96 @@
+{
+  "task": "6.FV",
+  "state": "independent_reference_frozen_before_new_model_call",
+  "report": {
+    "instrument_id": "600350.SH",
+    "report_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+    "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-03T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "current_work_id": "bp-work-1deffa57365ab12095599a8f",
+  "record_sha256": "9190ae2b833acf4118a90ece1d2f2ea2f0f5b2d33d89d43c0403625524fc6eb3",
+  "official_pdf": "data/filings/announcements/blobs/2c/2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059.pdf",
+  "official_pdf_sha256": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+  "risks": [
+    {
+      "fact_id": "op-01",
+      "current_raw_fact_sha256": "fe1bbbc0814e636484dc5bef523b579a11c948187c6697aa21ef45cc2c53a29d",
+      "source_evidence_ids": [
+        "source-0005"
+      ],
+      "source_section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ]
+      ],
+      "physical_pages": [
+        17
+      ],
+      "source_semantics": "路桥运营板块段落中的救援/通行率99.54%及收费站托管服务，不是所有集团业务的统一运营指标。",
+      "required_resolution": "独立核事实层主体，即使原metric已经隔离也不能默认为事实正确；修至路桥范围或具体unclear，不能只再次隐藏metric后保错误确定集团范围。",
+      "source_verdict_reuse": "Exact fact content/report/source from A original PDF17/273 reading in6.FU",
+      "previous_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/a-source-reference.json",
+      "previous_reference_sha256": "c8714523377754dabd84ab2401f4d086fbb49681303230ccbeffa01c51238533"
+    },
+    {
+      "fact_id": "sm-12",
+      "current_raw_fact_sha256": "2a896714deae169fc01c1aa2ff0ae5b53948867904561c6d356e500c0d577e08",
+      "source_evidence_ids": [
+        "source-0016"
+      ],
+      "source_section_paths": [
+        [
+          "第八节 财务报告",
+          "主营业务"
+        ]
+      ],
+      "physical_pages": [
+        273
+      ],
+      "source_semantics": "2025其他业务收入合计891806452.78元，其中租赁185065717.54元，其他706740735.24元；租赁为明确较窄行，非全部集团营收。",
+      "required_resolution": "有源描述/原指标0保留，原指标1独立核较窄业务口径，纠正或局部限制；不能借集团表头把全部指标主体复制为集团整体，不能整条丢正确描述来算通过。",
+      "source_verdict_reuse": "Exact fact content/report/source from A original PDF17/273 reading in6.FU",
+      "previous_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/a-source-reference.json",
+      "previous_reference_sha256": "c8714523377754dabd84ab2401f4d086fbb49681303230ccbeffa01c51238533"
+    }
+  ],
+  "positive_controls": [
+    {
+      "fact_id": "bs-01",
+      "current_raw_fact_sha256": "bbe923d126b01f3a5c5dd9a6fbbbe591e587976a94cb72e52772957c7918cf21",
+      "prior_independent_decision": {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-quality-closure-20261127/a-source-decisions.json",
+        "sha256": "94290ed7a788688033f0d89f7651c2d6bbb22e2d5d07fa792b78f91a75717339",
+        "sample_id": "S079"
+      },
+      "expected": "保实质主营/规模或收费机制及全部原正确限定，非所有复核意见绿灯才可交付。"
+    },
+    {
+      "fact_id": "sm-01",
+      "current_raw_fact_sha256": "995b56fced041c01e6fc08ab6c7f7dcd99f22ec1119a73349e4683aa0df4c808",
+      "prior_independent_decision": {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-quality-closure-20261127/a-source-decisions.json",
+        "sha256": "94290ed7a788688033f0d89f7651c2d6bbb22e2d5d07fa792b78f91a75717339",
+        "sample_id": "S082"
+      },
+      "expected": "保实质主营/规模或收费机制及全部原正确限定，非所有复核意见绿灯才可交付。"
+    },
+    {
+      "fact_id": "cm-01",
+      "current_raw_fact_sha256": "2567cad8afc854140876eaa1b047966d5c064ca0a484ab49220e99c20dc0400d",
+      "prior_source_decision": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/a-source-adjudication.json",
+      "prior_source_decision_sha256": "6321d44523c5bd2054e4b24ca8efbb537e2352ebd6ce9abf30634811ac61514c",
+      "expected": "保正确公司/具名子公司限定、source-0001+0007及三个named_subsidiary指标；合理有据澄清不判误伤。"
+    }
+  ],
+  "not_model_input": true,
+  "new_supplier_calls": 0,
+  "decision": {
+    "success": "Two targets substantively resolved with own valid source review/final and unaffected correct content, not identical-label matching.",
+    "failure": "Any missed target, unresolved source/authority or harmful core regression; preserve exact remaining restriction and end observation.",
+    "scope": "Known-case v15 hypothesis observation, not unseen/current-population quality or permission to start another20."
+  }
+}
