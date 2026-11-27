@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+每轮必读的优化方针（2026-11-27用户确认）：发卡和审核先执行[验收计划§4.3](company_profile_acceptance_program.md#43-评估完成与达标及失败驱动的优化方针2026-11-27起生效)及[A/B流程§3.1](ab_role_development_workflow.md#31-未达标后的有据优化与复验强制)。未达标接续卡必须绑定上轮具体差距、原因证据、代码/策略变化、预期改善和验证结果；有界复验前冻结版本，未改善则解释/纠偏或止损。达到固定标准后结束该阶段；没有有效变化不自动续派同类试跑，不把文档或重复测试数量当业务进展。前后清本人垃圾、原结果/旧分及付费/生产边界保持。
+
 2026-11-27[6.FS当前39股质量与交付收口完成](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-quality-closure-20261127/result.md)：A冻原103record/39股及178对象181指标抽样，162精确旧独判复用+16新读源后当前样本均有据；原作者169支持1错6未评2缺，模型审后对应178有据。全部25人工安全限制另核，涵11股14整条/11局部20指标均不外放，不能以样本支持推全稿100%或免人工。原reader/export/fresh及actual8000完整39相等、批量2.584秒；当前1094/1677、320活动缺项/61建议/44指标缺口保留，0新模型/应用修复或重启。结论为当前研究交付继续使用，后续由具体研究问题驱动补读，不追本卡尾项或开新正式组；旧质量/生产边界和清理/Git沿[卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-current-quality-closure-card.md)收口。
 
 2026-11-27[6.FR三类真实源核完成](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-source-review-observation-20261126/result.md)：晟楠/雅戈尔/中集新初核独立指出4风险，6真final修订A独核有源，额外1服装范围实质纠正、1品牌措辞不计经济收益；9物理/283804/0恢复/751.569组秒/unknown。原组封存后零调用修旧模型metric意见重套已终核新hash的P1，独立A限制不自动解除，16直接用例通过；A据新hash放行4旧限制，原writer3安全后继+1必要父链，当前39股1094/1677、其余36完整保持，actual39/三详情200一致。两财务候选未进final留缺，不追字段100%或新正式验收；原run/旧分和live余0保持，先清后做/必要一套后清/Git沿[原卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-three-source-review-observation-card.md)。

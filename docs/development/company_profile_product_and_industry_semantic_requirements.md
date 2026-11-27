@@ -9,6 +9,8 @@
 
 本文件确定“交付什么”；[验收计划v2](company_profile_acceptance_program.md)唯一确定数量、阈值、补救上限与实际进度；[交付路径与任务卡v3](company_profile_delivery_plan.md)确定先后顺序、owner及清理；[A/B流程v3](ab_role_development_workflow.md)确定职责和审核顺序。下一开发唯一change为 `restore-company-profile-llm-led-generalization`。
 
+2026-11-27用户确认的持续优化方针：每轮按固定标准说明达标情况；未达标须先分析原因，实施直接对应的代码或处理策略优化，再验证是否缩小差距。每轮必读并执行[验收计划§4.3](company_profile_acceptance_program.md#43-评估完成与达标及失败驱动的优化方针2026-11-27起生效)及[A/B流程§3.1](ab_role_development_workflow.md#31-未达标后的有据优化与复验强制)。不得以反复测试、换公司或改版本号替代实际改进，也不要求为没有实现缺陷的情况强改代码；业务目标、基础信息取舍和供应链可选政策继续有效。
+
 旧M4双公司轮次、closure v2、owned_page_facts版本、制造六章/固定Gold、仅缺字段才调用LLM等政策，只对其冻结历史身份有效，不能约束新政策或授权下一对样本。OpenSpec该change的delta描述目标行为；主spec中旧行为是迁移基线，适用说明明确区分，不表示新代码已实现。通用LLM/PDF/框架规范继续约束各自领域。
 
 ## 1. 当前状态与保留价值

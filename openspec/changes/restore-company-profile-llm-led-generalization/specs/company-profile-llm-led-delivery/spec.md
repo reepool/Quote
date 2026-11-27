@@ -2,6 +2,20 @@ Current policy: product v9 (2026-11-11), acceptance section 7.109 and company-pr
 
 ## ADDED Requirements
 
+### Requirement: Failed assessments drive bounded evidence-based improvements
+For prospectively frozen contracts after the user's 2026-11-27 instruction, each failed company-profile iteration MUST identify the applicable metric/version/denominator and gap, trace its main causes from actual sources and execution, and implement a corresponding minimal code or processing-policy improvement before using another formal run to validate that improvement. Code defects MUST be fixed in the existing owner; source/prompt/model-policy faults MUST be addressed at their responsible layer. Transient environment failures MAY use the original bounded recovery without speculative code changes. The next task MUST state the actual change, causal evidence, expected effect and verification question. Saved-response replay MUST NOT establish improved new-model semantic understanding. Historical scores, automatic versus independently protected results, and normal request retries versus new assessment windows MUST remain distinct.
+
+#### Scenario: An iteration fails its frozen quality criteria
+- **WHEN** a completed or irreversibly stopped iteration falls below a required criterion
+- **THEN** A and B MUST record the gap, cause, code/policy change, direct verification and whether the gap narrowed in the existing task handoff, and explain a non-improvement rather than merely renaming or repeating the run
+- **AND** formal revalidation MUST freeze the changed version and stay inside explicitly authorized scope/resources; no effective change, explicit unresolved hypothesis or concrete research need means no repeated equivalent trial, while reaching the fixed pass or stop boundary ends the iteration
+- **AND** assessment completion MAY conclude failure, and unknown population-wide accuracy MUST limit claims without silently reopening a completed research delivery or adding new pass requirements
+
+#### Scenario: Compact profiles have fewer actual supplementary objects than the audit target
+- **WHEN** a newly frozen prospective contract uses the twenty-per-company and four-hundred-per-twenty-company supplementary audit targets (two thousand for a hundred-company stage), but its declared actual supplementary population is smaller
+- **THEN** the assessment MUST audit that available population in full and disclose target/population/audited counts, coverage and limited claims without requiring extra generated facts, duplicated units or additional companies
+- **AND** all source-defined core and high-risk checks and the existing ninety-five-percent recall, ninety-nine-percent audited accuracy, eighteen-of-twenty initial and nineteen-of-twenty post-review requirements remain; historical minimum-count contracts and their failures MUST NOT be rescored, and this policy alone authorizes no new model run or production use
+
 ### Requirement: Current-version acceptance separates automatic quality from independent protections
 A newly authorized version-specific acceptance cohort MUST freeze distinct previously unprocessed reports, code/model/prompt/preprocessing identities, independent source-first core references, sampling, cumulative company/group resources and stop rules before semantic execution. First-read and post-review execution MUST share the original company allowance through the authoritative application owner. Initial extraction, automatic review output and later independently restricted delivery MUST retain separate immutable results. Manual source restrictions MUST NOT retroactively improve automatic scores or hide required intervention. Historically failed cohorts remain unchanged and MUST NOT be silently continued as extra samples.
 
