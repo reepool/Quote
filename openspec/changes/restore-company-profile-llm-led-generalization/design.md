@@ -1,5 +1,9 @@
 ## Context
 
+### 6.FS bounded current research-quality closure
+
+Audit the current39-company mixed-version delivery using existing original records/sources, not another model run. Freeze the original-owner snapshot and deterministic first-basic/first-numeric-scale/first-feature sample before grading; keep all existing manual safety restrictions in a separate risk stratum. Match authored, automatic post-review and actual API layers by report/reading/fact/content hash and original metric positions; non-reconstructable layers stay unevaluated. Independent source decisions may carry only across exact compatible identities. Report sample accuracy with coverage, withheld/unknown counts and human dependence; do not relabel the sample as full-population or unseen quality. No new model budget, task window, shared configuration or production authority. Only a demonstrated current P1/P2 justifies a local owner fix. See company-profile-current-quality-closure-card.md.
+
 ### 6.FR one real known-case source-review observation
 
 Freeze the current authored drafts and original source packets for Shengnan, Youngor andCIMC, plus independent source-first risk/positive references excluded from model input. Three individually bounded current-draft review plans reuse the existing task entry/TaskService at concurrency at most3. Raw successors remain isolated until A checks actual detection, repair/limitation, false positives and inherited-versus-new manual intervention. Only approved useful research successors join the original writer/API; no old result is rewritten or used as a new generalization score. No application feature or live HTTP-policy activation is needed. The one group ends with an explicit effectiveness/limits decision, not another per-field repair series. Exact source identity, total resources and cleanup are in the6.FR card.

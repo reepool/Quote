@@ -18,6 +18,12 @@ Every accuracy figure MUST identify its frozen cohort, processing/model policy, 
 - **THEN** the old score remains attributable to its original cohort, current matched audited coverage and limits are reported separately, and unavailable current accuracy is marked unmeasured rather than permanently copied from the old score
 - **AND** formal release thresholds stay unchanged and any new-version unseen evaluation requires its own prospective contract, without rewriting failed stages or treating a small known sample as a new pass
 
+#### Scenario: Existing research profiles receive a bounded current-snapshot source audit
+- **WHEN** the user authorizes a source-grounded quality audit of an existing mixed-version research snapshot without new model calls
+- **THEN** A MUST freeze the snapshot, deterministic sampling rule and separate manual-restriction risk stratum before assigning new labels, and distinguish authored first drafts, precisely reconstructed automatic post-review content and actual independently restricted API delivery
+- **AND** every reused judgment MUST match its current fact/metric content and source identity; missing or non-reconstructable layers remain unevaluated, and deterministic hashes alone MUST NOT establish semantic correctness
+- **AND** the report MUST state audited-unit counts, support/errors/unknowns, sampled coverage and optional gaps separately; sample precision MUST NOT become whole-profile accuracy, current-code generalization, a rewritten historical score or permission to expand production
+
 ### Requirement: Explicit bounded research-task HTTP commands reuse the original owner
 The HTTP adapter MUST accept explicit first_read, review_batch and single-stock enrich submissions with request identity and stock scope; enrich MUST include concrete targets. It MUST return a durable task ID, progress and result links independently of task duration. Only an operator-installed finite authorized policy may enable commands, binding actions, exact stock/report versions, configured model profiles, per-task limits and a maximum submission count. Requests MUST NOT control paths, endpoints, credentials or budgets. New endpoints MUST require a configured research-task credential. Execution MUST generate an original plan and dispatch task_entry/TaskService, without another semantic loop or fact store. The aggregate allowance MUST be finite and visible; each explicit action consumes one submission.
 

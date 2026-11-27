@@ -1,0 +1,296 @@
+{
+  "task": "6.FS",
+  "state": "all_existing_safeguards_retained",
+  "active_restrictive_decisions": 25,
+  "affected_companies": 11,
+  "whole_fact_exclusions": 14,
+  "metric_restricted_facts": 11,
+  "explicit_independent_blocked_metric_positions": 20,
+  "checks": [
+    {
+      "instrument_id": "000338.SZ",
+      "reading_work_id": "bp-work-a5c5ab569526287c392a7482",
+      "fact_id": "F-SM-02",
+      "raw_fact_sha256": "1e56e54f29690ffbd4ee9ea2e3f306623693f56c47965df9ff2d084edb98c896",
+      "current_state": "limited",
+      "blocked_metric_original_indices": [
+        0
+      ],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "reading_work_id": "bp-work-a5c5ab569526287c392a7482",
+      "fact_id": "F-OD-01",
+      "raw_fact_sha256": "db81833fd12c5a73ac9752e16489e8e6747cd675c413aa3ecaff3b37fe5e87d9",
+      "current_state": "source_only",
+      "blocked_metric_original_indices": [],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "reading_work_id": "bp-work-36c6f5ea65d8e2084e4f07d3",
+      "fact_id": "F12",
+      "raw_fact_sha256": "c2af8e2151a2ab701101fb76bed03c96573bb4afd67b07a6d026cc1b1377804d",
+      "current_state": "withheld",
+      "blocked_metric_original_indices": [],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600015.SH",
+      "reading_work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+      "fact_id": "F25",
+      "raw_fact_sha256": "a03f69578150b8a29c757589c058040237823f8e514b63ab8e9530937ff06de9",
+      "current_state": "withheld",
+      "blocked_metric_original_indices": [],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600015.SH",
+      "reading_work_id": "bp-work-0bf9bfd2e2031508d9c45c9f",
+      "fact_id": "F37",
+      "raw_fact_sha256": "58de3998b63a1c10d4eff246afded8c6b001aac7537ac4d08421797cf33dcb0b",
+      "current_state": "withheld",
+      "blocked_metric_original_indices": [],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600015.SH",
+      "reading_work_id": "bp-work-e686d859a2cafd7acc9ab1e4",
+      "fact_id": "F-WEALTH-FEE-INCOME",
+      "raw_fact_sha256": "2efc7f75f4b80eb00d6f13b0b2fe79bc66342177122e3baaea8e860bce223ef8",
+      "current_state": "limited",
+      "blocked_metric_original_indices": [
+        0,
+        1
+      ],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600015.SH",
+      "reading_work_id": "bp-work-e686d859a2cafd7acc9ab1e4",
+      "fact_id": "F-CREDIT-CARD-REVENUE",
+      "raw_fact_sha256": "cd748422d0c8b0f797334165a7227eb8e38b84f92796163d3c9277b5662d440d",
+      "current_state": "limited",
+      "blocked_metric_original_indices": [
+        0,
+        1
+      ],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600348.SH",
+      "reading_work_id": "bp-work-ef3a65cc3407c6e9f844a7cc",
+      "fact_id": "F007",
+      "raw_fact_sha256": "9005f4ea5ab0f6e487c6cddf32ce0b44dd13aa62bffd53b2cde3f4d8fa635bc1",
+      "current_state": "limited",
+      "blocked_metric_original_indices": [
+        0
+      ],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600348.SH",
+      "reading_work_id": "bp-work-ef3a65cc3407c6e9f844a7cc",
+      "fact_id": "F009",
+      "raw_fact_sha256": "226e8c6823636244e8326e7d83239b23e5c71c0cb980ec17d68e51d484e93a52",
+      "current_state": "limited",
+      "blocked_metric_original_indices": [
+        4,
+        5,
+        6
+      ],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600348.SH",
+      "reading_work_id": "bp-work-ef3a65cc3407c6e9f844a7cc",
+      "fact_id": "F023",
+      "raw_fact_sha256": "0b965f3da6d57c456c775d904dcf629c479ee440ab7d9bc1411a4b00d8fe9ecc",
+      "current_state": "limited",
+      "blocked_metric_original_indices": [
+        0,
+        1,
+        2
+      ],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600350.SH",
+      "reading_work_id": "bp-work-48e5b38db9e2d9737d7a6c78",
+      "fact_id": "sm-12",
+      "raw_fact_sha256": "2a896714deae169fc01c1aa2ff0ae5b53948867904561c6d356e500c0d577e08",
+      "current_state": "limited",
+      "blocked_metric_original_indices": [
+        1
+      ],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600350.SH",
+      "reading_work_id": "bp-work-48e5b38db9e2d9737d7a6c78",
+      "fact_id": "op-01",
+      "raw_fact_sha256": "fe1bbbc0814e636484dc5bef523b579a11c948187c6697aa21ef45cc2c53a29d",
+      "current_state": "source_only",
+      "blocked_metric_original_indices": [],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600704.SH",
+      "reading_work_id": "bp-work-e53470a4bfe65c83d9a82b89",
+      "fact_id": "F-CC-01",
+      "raw_fact_sha256": "3f2c82b29f99a5634d0d49b69be9d82edf783de255842f785251a8da003bdcf2",
+      "current_state": "source_only",
+      "blocked_metric_original_indices": [],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600859.SH",
+      "reading_work_id": "bp-work-512bcf3ad6b3e44af3089b56",
+      "fact_id": "F18",
+      "raw_fact_sha256": "5c16b740308142035dd85007a83867f726f33d5842797b41a54855aee2b86959",
+      "current_state": "source_only",
+      "blocked_metric_original_indices": [],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600859.SH",
+      "reading_work_id": "bp-work-512bcf3ad6b3e44af3089b56",
+      "fact_id": "F24",
+      "raw_fact_sha256": "ffef4f1f10f7063b356c6a7c1f8546269d0f15c5adc5ff9975c5f3a8e4972b71",
+      "current_state": "source_only",
+      "blocked_metric_original_indices": [],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600859.SH",
+      "reading_work_id": "bp-work-5189881c12bb58c6aa019be1",
+      "fact_id": "ops-010",
+      "raw_fact_sha256": "9f1216637c4dc107f3918119ab481f9b19683f8aeba404d8270377868c71d9e0",
+      "current_state": "source_only",
+      "blocked_metric_original_indices": [],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600859.SH",
+      "reading_work_id": "bp-work-5189881c12bb58c6aa019be1",
+      "fact_id": "ops-012",
+      "raw_fact_sha256": "2c7b0249fda6deefc64d17b107810bf4885842557ca48f189177515514928ac1",
+      "current_state": "source_only",
+      "blocked_metric_original_indices": [],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600859.SH",
+      "reading_work_id": "bp-work-5189881c12bb58c6aa019be1",
+      "fact_id": "ops-013",
+      "raw_fact_sha256": "6b72d7311970e25ee7b1334f39d9aa0c44afa8ac758857786025eb78cbf40795",
+      "current_state": "source_only",
+      "blocked_metric_original_indices": [],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600859.SH",
+      "reading_work_id": "bp-work-5189881c12bb58c6aa019be1",
+      "fact_id": "ops-014",
+      "raw_fact_sha256": "f1e67825fd84101436b5ffa7bc0ad651c97a171f9cbb957daea3919bbb575120",
+      "current_state": "source_only",
+      "blocked_metric_original_indices": [],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "600901.SH",
+      "reading_work_id": "bp-work-b4e5ee438be22f743e6ce1cd",
+      "fact_id": "F22",
+      "raw_fact_sha256": "3355d9ce4a1ad65a984f6aa5375ca2c8519bf8497bf42ead4c5c071d39f50d6d",
+      "current_state": "limited",
+      "blocked_metric_original_indices": [
+        1
+      ],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "601377.SH",
+      "reading_work_id": "bp-work-016367c43308049bffc006bc",
+      "fact_id": "F34",
+      "raw_fact_sha256": "0700b26dbc502a59f60c02d972b0f24760e9ac88660c7be7edb990be3294ce17",
+      "current_state": "source_only",
+      "blocked_metric_original_indices": [],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "601668.SH",
+      "reading_work_id": "bp-work-ab8677d04a366e40efdf18c2",
+      "fact_id": "F15",
+      "raw_fact_sha256": "03e14d6e992e7b22e2a72ef41c6fcf3092562bb7ec1e04ddb8834b15a9a3c93c",
+      "current_state": "limited",
+      "blocked_metric_original_indices": [
+        1
+      ],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "601668.SH",
+      "reading_work_id": "bp-work-ab8677d04a366e40efdf18c2",
+      "fact_id": "F26",
+      "raw_fact_sha256": "01aaa07dc9bacf127084bff4d591dab3d4586465a4b7a9a9747e30abdbc6e5e5",
+      "current_state": "limited",
+      "blocked_metric_original_indices": [
+        0
+      ],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "601668.SH",
+      "reading_work_id": "bp-work-ab8677d04a366e40efdf18c2",
+      "fact_id": "F20",
+      "raw_fact_sha256": "451dfb6716341c8152733463d1405cc0aff342b7d66d536e7094fdfa54411fba",
+      "current_state": "limited",
+      "blocked_metric_original_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    },
+    {
+      "instrument_id": "920003.BJ",
+      "reading_work_id": "bp-work-0788cd766ed03e2101c554ec",
+      "fact_id": "ccm-2",
+      "raw_fact_sha256": "b0e2197a0ec8f50e842c4166d649675a907d1640efd03b9b5c35f639fb0c20bf",
+      "current_state": "source_only",
+      "blocked_metric_original_indices": [],
+      "unsafe_components_not_exposed": true,
+      "new_semantic_judgment": false
+    }
+  ],
+  "original_files_and_private_configuration_unchanged": 397,
+  "new_safety_decisions_or_writes": 0,
+  "supplier_requests": 0,
+  "limits": "Restriction count is not a measured count of fresh model misses; exact saved model counterparts and unknowns are separated in B mapping."
+}

@@ -1,0 +1,4226 @@
+{
+  "task": "6.FS",
+  "temporary_full_native_pages_state": "deleted_after_A_independent_review; original hash-bound PDF/native cache pointers below remain authoritative",
+  "temporary_full_native_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+  "temporary_sha256": "9f96e6df226d54250068a1b3595f9371f73ac01979662e59f79a42776d2d65da",
+  "scope": "only sampled physical pages, no PDF parsing/download; equality is mechanical not semantic",
+  "documents": [
+    {
+      "instrument_id": "000006.SZ",
+      "document_version": "9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7",
+      "pdf_path": "data/filings/announcements/blobs/9e/9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7.pdf",
+      "pdf_sha256": "9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7",
+      "cache_path": "data/filings/announcements/blobs/9e/derived/business_profile_pdfium_recovery.v4/9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "da4ed30749cac4d5b339f3e8939baa27017e145223769229cf8f5df51677dbb8",
+      "artifact_hash": "29f37c49ac64cb719ca0bdc51aad1fca681f917dd1c466e2603e0dfd513e76ef",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        9,
+        14
+      ],
+      "sample_native_page_status": {
+        "9": "extracted",
+        "14": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "9": "43bb9b04bfdb6d576c9dba994b92fef35cdc2d8e2975c0c3f5d2665aebad459f",
+        "14": "dc711fbf02623128035367c88c6f77e877ebd2f483e9f12709976ce6558c6510"
+      }
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "document_version": "438e2d1c304b24311de907f012108270b38163769ece55d710ddae4b6fc3cf24",
+      "pdf_path": "data/filings/announcements/blobs/43/438e2d1c304b24311de907f012108270b38163769ece55d710ddae4b6fc3cf24.pdf",
+      "pdf_sha256": "438e2d1c304b24311de907f012108270b38163769ece55d710ddae4b6fc3cf24",
+      "cache_path": "data/filings/announcements/blobs/43/derived/business_profile_pdfium_recovery.v4/438e2d1c304b24311de907f012108270b38163769ece55d710ddae4b6fc3cf24_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "645275279525d90ed934f5b31a5835ced8d96949ff008da181fb1ed74458d6f8",
+      "artifact_hash": "8e5c57acdc29786ae0d682f359de2078364f94f4ca1c1b93b3767194a07516d1",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        16,
+        17,
+        18,
+        28
+      ],
+      "sample_native_page_status": {
+        "16": "extracted",
+        "17": "extracted",
+        "18": "extracted",
+        "28": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "16": "61acea347e69e43acd0bbfe9de7a4aa3569a4b013d5f800cb317fa88e5d0b2ce",
+        "17": "c648ae88b8285a2d667e15dd600236164e1e4e90f72c64ac541657217d06321f",
+        "18": "b0d1ecf6949cd41cb31f92fc91d7a601ec36fddba13afbf883d3141cad304518",
+        "28": "93e4bc71032e56e2aeaff590ebf43d327c0ef0a374fe7173c7ad1120cec3a1a8"
+      }
+    },
+    {
+      "instrument_id": "000049.SZ",
+      "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+      "pdf_path": "data/filings/announcements/blobs/b6/b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b.pdf",
+      "pdf_sha256": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+      "cache_path": "data/filings/announcements/blobs/b6/derived/business_profile_pdfium_recovery.v4/b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "8c6b512692e435f18703c1b8a38418b7ba4d7f09137d325074373b2ca1a4cc78",
+      "artifact_hash": "1c13e2a7a2648fbf5fa5df90a8457293bb32c80767c4cf07199da6c90d36232b",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        10,
+        12
+      ],
+      "sample_native_page_status": {
+        "10": "extracted",
+        "12": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "10": "ae726c4a83bc372bebe7ed986206ef11f1d22fce2d92dc8cee75013a825d8e4b",
+        "12": "5bc4eb5b842643ae81fe37a88110c92c125046f587d4143a7a7402ebd53b748c"
+      }
+    },
+    {
+      "instrument_id": "000099.SZ",
+      "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+      "pdf_path": "data/filings/announcements/blobs/67/6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb.pdf",
+      "pdf_sha256": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+      "cache_path": "data/filings/announcements/blobs/67/derived/business_profile_pdfium_recovery.v4/6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "a97d25e6ae99b761e7cab2368caf644cdf1e16bb908f36733fe7c3c247ae6187",
+      "artifact_hash": "ae86b5e87b0bfe1c1a4b5abcf755edd624cf9caf1f3d687c65ace01d6a454399",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        14,
+        15,
+        16
+      ],
+      "sample_native_page_status": {
+        "14": "extracted",
+        "15": "extracted",
+        "16": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "14": "bb1bdcbf3046c83e6dbc6e6e02122233c08297f4c74313d9f3eadec7e110e0a9",
+        "15": "dfbb252abed1a64a1a7d0382b4630e5195ae7a5c30a0d7bddb1fed8f2cc634a6",
+        "16": "d352d62167a07b0a0e0dc51d3f7d2684becc8f257f2951d3fcee4877597b101c"
+      }
+    },
+    {
+      "instrument_id": "000156.SZ",
+      "document_version": "7e797e5291feeb127a02f5367ad92aa435753b882789dcd243acc4ec23c2103a",
+      "pdf_path": "data/filings/announcements/blobs/7e/7e797e5291feeb127a02f5367ad92aa435753b882789dcd243acc4ec23c2103a.pdf",
+      "pdf_sha256": "7e797e5291feeb127a02f5367ad92aa435753b882789dcd243acc4ec23c2103a",
+      "cache_path": "data/filings/announcements/blobs/7e/derived/business_profile_pdfium_recovery.v4/7e797e5291feeb127a02f5367ad92aa435753b882789dcd243acc4ec23c2103a_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "f28a88850aaf3d18950600b1bf64b247ed66adb221c70fecb120bedd5ca9b721",
+      "artifact_hash": "bc4dab6e99b7645c4d250bcddf00c0326382e130f249e38d210d20f0178acc77",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        11,
+        12,
+        15,
+        25
+      ],
+      "sample_native_page_status": {
+        "11": "extracted",
+        "12": "extracted",
+        "15": "extracted",
+        "25": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "11": "ddb123a4b90dd9f7d33fd6bb59340f1f47a51ee7de5c20ab3e047697ce7b0057",
+        "12": "1455a6b2aa662d19d4e0663914f0e7027dd70154f0900e60162775aea54ee2b3",
+        "15": "70f711fca0ea5b87f647527d7c9b7cd86beee0d7c12601b0b44d87faaa78e720",
+        "25": "15448ebf14218d4bf0382faec43ab6d5f9feb8ea9cf4869baa8a4e2b4083dbec"
+      }
+    },
+    {
+      "instrument_id": "000338.SZ",
+      "document_version": "3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba",
+      "pdf_path": "data/filings/announcements/blobs/35/3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba.pdf",
+      "pdf_sha256": "3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba",
+      "cache_path": "data/filings/announcements/blobs/35/derived/business_profile_pdfium_recovery.v4/3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "069d8bbf62a8e5696c422e8f24c82fa5210b90d7b2d2e1371de2f9c970750b8c",
+      "artifact_hash": "e79247368fa4e234b94e8fd4c08fa7f93e3bb3a7ce8403886271dfa141c2d06d",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        12,
+        13,
+        14,
+        16
+      ],
+      "sample_native_page_status": {
+        "12": "extracted",
+        "13": "extracted",
+        "14": "extracted",
+        "16": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "12": "5273f5b7857402112fa4b52115f3842827ce58d56e168860a155fbe42240c66c",
+        "13": "4f5c77d35c99f51056834fc635b1fbe2b488952934d4e7765d850763f81753b5",
+        "14": "bff43aea1fff1d3a43d8c3da912dd4864bd0119142eff7ffaf3dd93e58a9df05",
+        "16": "64b9bbe991e3455d1c5040c539f774f10f80f3d0851e711f08f8e5759162575f"
+      }
+    },
+    {
+      "instrument_id": "000526.SZ",
+      "document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+      "pdf_path": "data/filings/announcements/blobs/a8/a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4.pdf",
+      "pdf_sha256": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+      "cache_path": "data/filings/announcements/blobs/a8/derived/business_profile_pdfium_recovery.v4/a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "6ac6068773e91a11e80a59d64b4390937f192ae7edb533b8487b59633fbd8d2d",
+      "artifact_hash": "2184669425260120c92065a7794a3ccbde7f77b921c86be9463f2c4a57e4b235",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        10,
+        17
+      ],
+      "sample_native_page_status": {
+        "10": "extracted",
+        "17": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "10": "e819a85e261cadcf9875392226e455cd187b0d14af0c7490980dfb884564201d",
+        "17": "86e7910bbe4c33cc3ba88724a57aa871699f2bb9fdebcc69b4595f9c55463060"
+      }
+    },
+    {
+      "instrument_id": "000651.SZ",
+      "document_version": "7cc972f2d199e2ec3797cc5da479e8268afa59b77875770de3bcd3648242fb8c",
+      "pdf_path": "data/filings/announcements/blobs/7c/7cc972f2d199e2ec3797cc5da479e8268afa59b77875770de3bcd3648242fb8c.pdf",
+      "pdf_sha256": "7cc972f2d199e2ec3797cc5da479e8268afa59b77875770de3bcd3648242fb8c",
+      "cache_path": "data/filings/announcements/blobs/7c/derived/business_profile_pdfium_recovery.v4/7cc972f2d199e2ec3797cc5da479e8268afa59b77875770de3bcd3648242fb8c_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "64d27e3755bf94dcbde15ff7b1d60897cd6e1f20cd77743f56c6985a4b0adfbb",
+      "artifact_hash": "ed3d103e7b288dc08519169f8559d3006a574372416e58684e688c686783c6a6",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        10,
+        13,
+        14,
+        24
+      ],
+      "sample_native_page_status": {
+        "10": "extracted",
+        "13": "extracted",
+        "14": "extracted",
+        "24": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "10": "77df67f276a85aff14993e39f11fc2d39e6a40964a01d06db98b5022a5ea63d8",
+        "13": "c9fcab26589e56e689e65771c8999bd205b90aa98234f6550851d16b09874569",
+        "14": "c62f2ea8b66c4d7d1e7530e81ddd0aa3774dd29f0ec9f17d0add8be0e2e3b14d",
+        "24": "2d6c7109e1db6697d4740b3aad61774c63a7b7177aca9744f5020267b073ad23"
+      }
+    },
+    {
+      "instrument_id": "000652.SZ",
+      "document_version": "f9021bfe6b15313105fddf8063675730ad1343277835a3c6af4aa4a63bd33bce",
+      "pdf_path": "data/filings/announcements/blobs/f9/f9021bfe6b15313105fddf8063675730ad1343277835a3c6af4aa4a63bd33bce.pdf",
+      "pdf_sha256": "f9021bfe6b15313105fddf8063675730ad1343277835a3c6af4aa4a63bd33bce",
+      "cache_path": "data/filings/announcements/blobs/f9/derived/business_profile_pdfium_recovery.v4/f9021bfe6b15313105fddf8063675730ad1343277835a3c6af4aa4a63bd33bce_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "6eb0d737cbf60280845ef519e9c35222d5c10136719dfa087190b2bd5489c54c",
+      "artifact_hash": "bb4c1beb09517b89d55cf78cec048d31a89c581c97c24bd4e1813ec946a9a98e",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        12,
+        13,
+        14,
+        16,
+        17,
+        29
+      ],
+      "sample_native_page_status": {
+        "12": "extracted",
+        "13": "extracted",
+        "14": "extracted",
+        "16": "extracted",
+        "17": "extracted",
+        "29": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "12": "f70090e2ba92e9e328a23220405677621231061b304423e622b956da50b9810c",
+        "13": "d26782c9054c06db53426172873e635b263cba19b5bebd929855ddf665b8ee24",
+        "14": "c9422f6c2f29745d939fe3c226337a4f5003f350c34e6ff54d097a51d0d16846",
+        "16": "b56646d939ac4c692186813471295313c04e21a3799a0d6193c224d3f9b22856",
+        "17": "5baa66e4e21f3369110d4260c2525d5f7af22eb04e50ae5a749b54e093a6ed10",
+        "29": "d0c580270ec179aabf31812f5387a711e77111fa01195cd8f4235d3a3386b711"
+      }
+    },
+    {
+      "instrument_id": "300012.SZ",
+      "document_version": "4e595b96aa0d017aef5ee277b17d32ee1b87c8825ced67b1f3a20302340eb754",
+      "pdf_path": "data/filings/announcements/blobs/4e/4e595b96aa0d017aef5ee277b17d32ee1b87c8825ced67b1f3a20302340eb754.pdf",
+      "pdf_sha256": "4e595b96aa0d017aef5ee277b17d32ee1b87c8825ced67b1f3a20302340eb754",
+      "cache_path": "data/filings/announcements/blobs/4e/derived/business_profile_pdfium_recovery.v4/4e595b96aa0d017aef5ee277b17d32ee1b87c8825ced67b1f3a20302340eb754_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "0d4823b4143c5e39cc9d0da9bd36b3b6cb0cf4d377578b086bfd3050dff627c0",
+      "artifact_hash": "7d83ea460fe2a197afd695ef2baa6b0a7ffa29675461d1a6c009d136f27e7184",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        14,
+        15,
+        28
+      ],
+      "sample_native_page_status": {
+        "14": "extracted",
+        "15": "extracted",
+        "28": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "14": "b7051e39a6d67967c3547148c1d872b73180b27481483d769d2cffc1dda18a4e",
+        "15": "dd7f863c231cc1300a04a2579fe66943be2b3a45284afb44aaf4837fa6a679de",
+        "28": "3b8829f8b14440701c025d8bf9838f5e0721289fef952f429d5b912db546eafc"
+      }
+    },
+    {
+      "instrument_id": "300015.SZ",
+      "document_version": "8aa8857331cfc403e60e19e005a94aa67defcba28451b586741dc3757373d41e",
+      "pdf_path": "data/filings/announcements/blobs/8a/8aa8857331cfc403e60e19e005a94aa67defcba28451b586741dc3757373d41e.pdf",
+      "pdf_sha256": "8aa8857331cfc403e60e19e005a94aa67defcba28451b586741dc3757373d41e",
+      "cache_path": "data/filings/announcements/blobs/8a/derived/business_profile_pdfium_recovery.v4/8aa8857331cfc403e60e19e005a94aa67defcba28451b586741dc3757373d41e_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "547cb773e89d86a80b3828610bc4962dd6d4c374b21d7abe0c6e2fb89d0b9d7f",
+      "artifact_hash": "624898c30cbf184f05cc9adb75dc6035f8ac2fde70b18f8801bab4765072a1cd",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        23,
+        35
+      ],
+      "sample_native_page_status": {
+        "23": "extracted",
+        "35": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "23": "7173a2216d5d235d7d18396c11727ef5909f7df544d9e21ad41d1236f335dc53",
+        "35": "17990e7a1cc78b4f5b71656465c3b389c5b7a1e14e8226b0ef7e17c2fa0005eb"
+      }
+    },
+    {
+      "instrument_id": "300124.SZ",
+      "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+      "pdf_path": "data/filings/announcements/blobs/62/622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01.pdf",
+      "pdf_sha256": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+      "cache_path": "data/filings/announcements/blobs/62/derived/business_profile_pdfium_recovery.v4/622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "a801fcfffb59b1bc3d360fe588a4db70cb99149d799aea88be6934efb464afd0",
+      "artifact_hash": "277f5ecf89e46274d0c9064afdf564889920efb80d6afcec54751a78694c3432",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        12,
+        13,
+        17,
+        24,
+        25,
+        28,
+        29,
+        30
+      ],
+      "sample_native_page_status": {
+        "12": "extracted",
+        "13": "extracted",
+        "17": "extracted",
+        "24": "extracted",
+        "25": "extracted",
+        "28": "extracted",
+        "29": "extracted",
+        "30": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "12": "2cfa95bbffccab4a11031304498ac54b96432f706cd54e7e9525def8986ee780",
+        "13": "f3f704be56b6d82b901193ac59b680ea0d4528afec758e934738093957131836",
+        "17": "24cf1fc8c3939e133cdb04efcd6b24f32bc511eaf3c8f2f29a3c2e2081b6e6ce",
+        "24": "6b857f02f3083aa04eac64dd358c7689ab7b0e9410caabab712a6bf519691710",
+        "25": "e544fdcc4cdf9ed1e6221239cb8d2dc44e5c195eb0c72bcab469d81c4c4d885d",
+        "28": "54b22621e9dbbc41d9bdf61318226584142e0023a915d5313c15ab62b4968851",
+        "29": "d920128eecabc9d9ea2122beafef74abae86b843ce50e6fafe12767d58287576",
+        "30": "41c35e794f91bfc4df5e3e2017950a11cc1bb8ab5d47f0ed7357cb7110033ad5"
+      }
+    },
+    {
+      "instrument_id": "600015.SH",
+      "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+      "pdf_path": "data/filings/announcements/blobs/d6/d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3.pdf",
+      "pdf_sha256": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+      "cache_path": "data/filings/announcements/blobs/d6/derived/business_profile_pdfium_recovery.v4/d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "f64e104f0482bf0f269e81e6ae30b1e0ac38d69ce96dc8e5d10e316878fe884b",
+      "artifact_hash": "1cded509e477b890091858e73e4bd817b6d6dd390cf4c10ded229dce75d57fdd",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        13,
+        17,
+        20
+      ],
+      "sample_native_page_status": {
+        "13": "extracted",
+        "17": "extracted",
+        "20": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "13": "257d6371e6189b0e8ecf94e2f2b6ff170b215fd10ba5ae28733b2241795b82ee",
+        "17": "0d9be94031cd03940ba169077dc2ff9fafe6b9f18489afaf0dc4e2001f174534",
+        "20": "38ff42f8c237795e6fa445ed3e3d1d1ef2e537ef77a40b783f9ab558ac2d37a9"
+      }
+    },
+    {
+      "instrument_id": "600153.SH",
+      "document_version": "470448a5b8073540b0a6a722e1dded1558ab9dc06fb44347d0e91d2948b72df2",
+      "pdf_path": "data/filings/announcements/blobs/47/470448a5b8073540b0a6a722e1dded1558ab9dc06fb44347d0e91d2948b72df2.pdf",
+      "pdf_sha256": "470448a5b8073540b0a6a722e1dded1558ab9dc06fb44347d0e91d2948b72df2",
+      "cache_path": "data/filings/announcements/blobs/47/derived/business_profile_pdfium_recovery.v4/470448a5b8073540b0a6a722e1dded1558ab9dc06fb44347d0e91d2948b72df2_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "15211dca2fb48fec6b08fd3a1dd5655ea8c116caeb4845164486d5ae1f919d81",
+      "artifact_hash": "ae72b4489b231503c3d899a64411a244e10595597923c1f126487089ad9ab877",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        8,
+        17,
+        18,
+        19,
+        21,
+        22,
+        23,
+        44,
+        45,
+        46
+      ],
+      "sample_native_page_status": {
+        "8": "extracted",
+        "17": "extracted",
+        "18": "extracted",
+        "19": "extracted",
+        "21": "extracted",
+        "22": "extracted",
+        "23": "extracted",
+        "44": "extracted",
+        "45": "extracted",
+        "46": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "8": "aa37d7f7019e1415ef661798f18dcd99b4d173614dbf8f49e53770d39100e41b",
+        "17": "481725cb267478d945e974b84303457bdc9283c8c8bcd64f24d882d658b5ed01",
+        "18": "5a9e3c7f82921ea26bd6731b54ef954c5f9d8f660a0f92c94b27e83cc9761956",
+        "19": "eb706edd841d3b3d2759796d90d9c7556adeb7b9e98bdcc1e9bafb116e26b3fc",
+        "21": "d23ab182ccfc12a9f5d7bfbd9ffd248bb7f1dd2e68cee0c63ab53ab4751e1781",
+        "22": "9a80ebacebe6a19f0cc0b4faded641d152eb7c51b4c704ad2617ecc6c42c2ea1",
+        "23": "6b9fa676cdd7c4e23118399019fb9871473cb03f819f139b4e980f34411725b9",
+        "44": "577c67bbb113851e3099eab8d3029695945e2306ed7ab19330e13bd09a86b6bc",
+        "45": "8e3f348ae4698c1ae42bd70dc3bfa690b191d5ad8cedb816a2775b56cc54ffe3",
+        "46": "f00f6f6f88016b35079b6134057260638a57e36252079dac97c1e2babbb58e5a"
+      }
+    },
+    {
+      "instrument_id": "600177.SH",
+      "document_version": "f795a05a021e3af7edce80ecce946a9b80ff9323ec299265376c6f2e5f23f17a",
+      "pdf_path": "data/filings/announcements/blobs/f7/f795a05a021e3af7edce80ecce946a9b80ff9323ec299265376c6f2e5f23f17a.pdf",
+      "pdf_sha256": "f795a05a021e3af7edce80ecce946a9b80ff9323ec299265376c6f2e5f23f17a",
+      "cache_path": "data/filings/announcements/blobs/f7/derived/business_profile_pdfium_recovery.v4/f795a05a021e3af7edce80ecce946a9b80ff9323ec299265376c6f2e5f23f17a_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "c3f2fa8b06804b00f2d1a313e0804d928433ec0c8011b35f94a0a488ad124355",
+      "artifact_hash": "10761b1ba4b597e33b107376680f4033b28cc5a766d0119ef6b0668ebc88a5a5",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        19,
+        20,
+        21,
+        22,
+        26,
+        28
+      ],
+      "sample_native_page_status": {
+        "19": "extracted",
+        "20": "extracted",
+        "21": "extracted",
+        "22": "extracted",
+        "26": "extracted",
+        "28": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "19": "4a2a56b290dfeb3a670ad05c86722a7077296b8ed3d9f48150d48d417df218dc",
+        "20": "3c6970b47841c4d822c5385c8796032cfdc2985857ebfce66edb7e4490647ad6",
+        "21": "b66c9ed3e025b3bf3a06486c8d96a00d103599599fd861f7bd12542b8d57d1df",
+        "22": "1ca4808be4db10a1e570dbf3cbec429864bd12954c399a2ce12d2ad2c36b369f",
+        "26": "78379d1db110d0fcbd6cc1c596ab6c6af0dfb54120dd1a6e2d9d0dbfa7e10c04",
+        "28": "4852248d5fc3c64c857ed098a78e82ea9a7b6883a5aff379a863827ba3f141f8"
+      }
+    },
+    {
+      "instrument_id": "600316.SH",
+      "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+      "pdf_path": "data/filings/announcements/blobs/48/4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b.pdf",
+      "pdf_sha256": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+      "cache_path": "data/filings/announcements/blobs/48/derived/business_profile_pdfium_recovery.v4/4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "7a01b13977e2fac671c5aab4f60bf2af23fcf155341c4609981c03868f63762d",
+      "artifact_hash": "452ac1c31283b0de7d52b4f113d96416835a2c1dbb5c29ac16af233ad3b241f3",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        9,
+        11,
+        116
+      ],
+      "sample_native_page_status": {
+        "9": "extracted",
+        "11": "extracted",
+        "116": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "9": "b0a4bfc1a23c08e03e43d7caac5b58e5a79556ccb6e7dbf330eea61ebc598262",
+        "11": "858e2e768ef1fe12ed335bec804091709b37370b490d0bf1ab1d512ed1aeea05",
+        "116": "7137c8d8bbd290a7db55d955a114c76f43a272e4a9e35f5442d1e5ac1e24dab6"
+      }
+    },
+    {
+      "instrument_id": "600348.SH",
+      "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+      "pdf_path": "data/filings/announcements/blobs/82/8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559.pdf",
+      "pdf_sha256": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+      "cache_path": "data/filings/announcements/blobs/82/derived/business_profile_pdfium_recovery.v4/8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "8b2fe3677d85e1517460cb250ef3aa260be855c4127c0f3f9a8c4e79a3b234a7",
+      "artifact_hash": "95ba094de26a069a20e44f07391ad99d5ebace029521bdd8f4bdfed1fcee5cde",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        11,
+        12,
+        14,
+        21,
+        22
+      ],
+      "sample_native_page_status": {
+        "11": "extracted",
+        "12": "extracted",
+        "14": "extracted",
+        "21": "extracted",
+        "22": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "11": "08b90beaea9a28cdfa821fbf6f375efb30bf6e77e5a418f17d00594925909e78",
+        "12": "3de5a2ba2d5b26913102b288cfbe0f6787c4fd938db762a74377bc9addcc9bfb",
+        "14": "9180446cd3bc2be04d367adeeaaae60bca67745d4ff3cd93dc8eb4628aa800df",
+        "21": "b27758189e2b5df7a2e469e8e40e2ef8d449742ca862088264e5cf2491ed2124",
+        "22": "b0ccced59cebd96abe03d086bd0d3258dffbecffb8a9974e2fcac4b9f5e0812b"
+      }
+    },
+    {
+      "instrument_id": "600350.SH",
+      "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+      "pdf_path": "data/filings/announcements/blobs/2c/2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059.pdf",
+      "pdf_sha256": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+      "cache_path": "data/filings/announcements/blobs/2c/derived/business_profile_pdfium_recovery.v4/2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "d67d81201ae25dccbaee7480308d5bc7ebd7d383f6a4e418a14f0985f5ae5805",
+      "artifact_hash": "de8bf832e4cabdd105b6e0625d20693092ac8c173b1e4c7e9be3fb54d1e36aeb",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        14,
+        17,
+        18,
+        20
+      ],
+      "sample_native_page_status": {
+        "14": "extracted",
+        "17": "extracted",
+        "18": "extracted",
+        "20": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "14": "fd1f08c3a403625d13137b23842f50c7cf55d98b84edab1855cd89dc0312c05e",
+        "17": "ade3051f668239fd1145a6f99fc99ae2e0546fb896c905e82774943427284f42",
+        "18": "64c7fe3cf3a4c7f3862b88b40359ef96d2a2e98fd47b822f7741b1fa63458538",
+        "20": "1a28a969964f5169194e471e2512ea2fa9fbcb4ed877d925d334e1d39c0b91ae"
+      }
+    },
+    {
+      "instrument_id": "600390.SH",
+      "document_version": "b0664858d1731c8c62fdaf4ced6edf99937e87fa0a918892519c3db3082dabab",
+      "pdf_path": "data/filings/announcements/blobs/b0/b0664858d1731c8c62fdaf4ced6edf99937e87fa0a918892519c3db3082dabab.pdf",
+      "pdf_sha256": "b0664858d1731c8c62fdaf4ced6edf99937e87fa0a918892519c3db3082dabab",
+      "cache_path": "data/filings/announcements/blobs/b0/derived/business_profile_pdfium_recovery.v4/b0664858d1731c8c62fdaf4ced6edf99937e87fa0a918892519c3db3082dabab_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "ec7707ef9160a27586106a37c67f09d3dfb6f1e3e8402dd4b11f2ec811d2c071",
+      "artifact_hash": "ef729baa929b11ccf24393f84b7fd3573ed4b88a09f48c192421ad1f6f9037d3",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        10,
+        14,
+        22
+      ],
+      "sample_native_page_status": {
+        "10": "extracted",
+        "14": "extracted",
+        "22": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "10": "d6a98ffe26cc3d88dde9bb9fe0814c15aaafbc8124f48326428cbf4aee097059",
+        "14": "f35941224871b2367818a43af6b604ea30094159aaa5c7eb34241ee05f3c6a36",
+        "22": "8241d82a13569ab098111a16dfda491387006ab23f8e722e69ef826d4fbfeed2"
+      }
+    },
+    {
+      "instrument_id": "600690.SH",
+      "document_version": "14186f9f9b47f687c527ba14825664f3b09e51759d581636cddcc248f26e3660",
+      "pdf_path": "data/filings/announcements/blobs/14/14186f9f9b47f687c527ba14825664f3b09e51759d581636cddcc248f26e3660.pdf",
+      "pdf_sha256": "14186f9f9b47f687c527ba14825664f3b09e51759d581636cddcc248f26e3660",
+      "cache_path": "data/filings/announcements/blobs/14/derived/business_profile_pdfium_recovery.v4/14186f9f9b47f687c527ba14825664f3b09e51759d581636cddcc248f26e3660_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "8925fe09d384bb0b8883880688eee00d013bb62f132a0455bdf750781e1f1267",
+      "artifact_hash": "739654de6ce96741e5ef47fcf245fcf33438e28e8a85e5e4d647ad6c938398ae",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        16,
+        17,
+        23,
+        25,
+        41,
+        42
+      ],
+      "sample_native_page_status": {
+        "16": "extracted",
+        "17": "extracted",
+        "23": "extracted",
+        "25": "extracted",
+        "41": "extracted",
+        "42": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "16": "e99b8681dfc598fcf2e48b76dcbbcc309250b098524b70e79740416b15737363",
+        "17": "e3f3cbf7fea41076c1688bbb287df1877380d9446afe6aef066cd86151875fa5",
+        "23": "a15bb8b1e3d3368d9731ff08d06abc73b2ce0ce717805991894cd3af61e64798",
+        "25": "f9d51e28ece82b221f48521ff78b9ae773e8d9fced1538ba417c3ba9f5e12beb",
+        "41": "f0412b9f21e19ccfe6747021173e036d82db81fe40a36c3996a8e02bde2b7fe2",
+        "42": "957af8c5dc0104106a8e9490a61fc6234d4282642606ed8f0842a2b3f7187935"
+      }
+    },
+    {
+      "instrument_id": "600704.SH",
+      "document_version": "be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd",
+      "pdf_path": "data/filings/announcements/blobs/be/be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd.pdf",
+      "pdf_sha256": "be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd",
+      "cache_path": "data/filings/announcements/blobs/be/derived/business_profile_pdfium_recovery.v4/be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "ab29424351eb0de46bb038ec578e397c126d9c84053026682e9926c3c37b27a2",
+      "artifact_hash": "e998ab968a9e72dd6d6bedc6fceb1f43b9a92709024aedaf8d3f5e9be60e04b5",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        10,
+        11,
+        14,
+        16,
+        21
+      ],
+      "sample_native_page_status": {
+        "10": "extracted",
+        "11": "extracted",
+        "14": "extracted",
+        "16": "extracted",
+        "21": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "10": "bd9ea0519f1144902aecc2582a0535008ea4e2736c761b8eacef9c630010d949",
+        "11": "611ab0c97a0a777044a7a54bcef52d7d355f4fff15fbd86579a3d2837c8e5c61",
+        "14": "ccce49c59781dda9b9029a84c72fd9133aec1761a886df1fce433f22cbe1ff37",
+        "16": "8ad58d58d96292b1ce2bbce3ff2ecbcdf41e3d3a23a23a3e608b5018cb3c17fe",
+        "21": "3c2217801a112a2602eef3086332505847b7b5c732fa1f19329be5f13134d754"
+      }
+    },
+    {
+      "instrument_id": "600754.SH",
+      "document_version": "836803180b4f26c9fc35c64a80ff3fbc043b84a9640c98eb4eb758f19d105e30",
+      "pdf_path": "data/filings/announcements/blobs/83/836803180b4f26c9fc35c64a80ff3fbc043b84a9640c98eb4eb758f19d105e30.pdf",
+      "pdf_sha256": "836803180b4f26c9fc35c64a80ff3fbc043b84a9640c98eb4eb758f19d105e30",
+      "cache_path": "data/filings/announcements/blobs/83/derived/business_profile_pdfium_recovery.v4/836803180b4f26c9fc35c64a80ff3fbc043b84a9640c98eb4eb758f19d105e30_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "621e8aa1ea800929830b2330282e8e7b118067564b39f40d8bdc3c58213f1c7a",
+      "artifact_hash": "fe252ee41518c815a22b638669b87c604323224ec55cdea45df886fa9c248ac8",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        11,
+        19,
+        20
+      ],
+      "sample_native_page_status": {
+        "11": "extracted",
+        "19": "extracted",
+        "20": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "11": "756e58a75607786f3f64dfdd491ef75675239e2e0cca58ca7a571fc2696ec11b",
+        "19": "0d99313fdc4222a4441613643443b9531280b7e1d8fb17094983879c357c6d09",
+        "20": "456259f103533c1715aca92d8486468c8f4b180cb052d4603480187d8b5a3f82"
+      }
+    },
+    {
+      "instrument_id": "600859.SH",
+      "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+      "pdf_path": "data/filings/announcements/blobs/e9/e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca.pdf",
+      "pdf_sha256": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+      "cache_path": "data/filings/announcements/blobs/e9/derived/business_profile_pdfium_recovery.v4/e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "b2a34cdf15049295a78496fe6a641e53f6a7b84f05a0ca297c0a88bc4a1d20e6",
+      "artifact_hash": "4a5413f25847a04d20b900b3a2370fab290c108fa9b331c472fc5168b877bde5",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        11,
+        14,
+        16,
+        17,
+        18
+      ],
+      "sample_native_page_status": {
+        "11": "extracted",
+        "14": "extracted",
+        "16": "extracted",
+        "17": "extracted",
+        "18": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "11": "dd03b3e5f58b414474bdaf575a1dfea6c130f91e284e17865d6b492552727da9",
+        "14": "b90f572e0aaaa3c9a17a07b2757c941462ede5848c7e1367548f033aaa81b0ad",
+        "16": "702a2ff46a50f7fb19fbe3e4591768f005f5a6c917f0ba818a6e889350587ae1",
+        "17": "078acaaf282ab9e5ce5b75160d7a84611f9344e6b1e89c20bf6a5681b5beb4d1",
+        "18": "1f46689338f71fdbf062a299faa9d2d1fffa109296d7da1d240caa13e5d87af2"
+      }
+    },
+    {
+      "instrument_id": "600887.SH",
+      "document_version": "d17b8c541c42f65d092317093eb0cfbb5aeed4f44eafa2d2f6182041cdcdbaac",
+      "pdf_path": "data/filings/announcements/blobs/d1/d17b8c541c42f65d092317093eb0cfbb5aeed4f44eafa2d2f6182041cdcdbaac.pdf",
+      "pdf_sha256": "d17b8c541c42f65d092317093eb0cfbb5aeed4f44eafa2d2f6182041cdcdbaac",
+      "cache_path": "data/filings/announcements/blobs/d1/derived/business_profile_pdfium_recovery.v4/d17b8c541c42f65d092317093eb0cfbb5aeed4f44eafa2d2f6182041cdcdbaac_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "c329e308f59f3457c263164a361f1b97267b8ea552dba2c22d26caa7ffe33582",
+      "artifact_hash": "86f36ac89196da4f71e40203c955665524abbe507078ab3fc5686f656edea7d7",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        7,
+        10,
+        11,
+        15,
+        29
+      ],
+      "sample_native_page_status": {
+        "7": "extracted",
+        "10": "extracted",
+        "11": "extracted",
+        "15": "extracted",
+        "29": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "7": "5f44c27a39d79d38f993868395baf373db155fa9ddd2d1149faf2daac93fd10f",
+        "10": "414fe25331bb4c71694b2a3c30d679e894109a1bca37fde7a3a231119b946e5b",
+        "11": "76854dd11221419e0929df676bb64dc353edccc85794f616b717c6ddf793a1be",
+        "15": "359bc96361d2f2fab8ddb2698de7ffae33ba16485f3a92f9220b3fc6af20f35c",
+        "29": "4bb30297c5a95c74bafdc5a39dabaf1e14690851a18a4761b91585f6703ba99d"
+      }
+    },
+    {
+      "instrument_id": "600893.SH",
+      "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+      "pdf_path": "data/filings/announcements/blobs/23/23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f.pdf",
+      "pdf_sha256": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+      "cache_path": "data/filings/announcements/blobs/23/derived/business_profile_pdfium_recovery.v4/23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "34f9a83f4ab0a9a4753e3a6e19c5e9ace7fc01208bceebd2a34917fb80634d7d",
+      "artifact_hash": "161bbe682a58774182285f5a4493a2249871bb3e8810abb1d5648923c5d71450",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        7,
+        10,
+        14
+      ],
+      "sample_native_page_status": {
+        "7": "extracted",
+        "10": "extracted",
+        "14": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "7": "07b79e49a72f459c4b4ac7762cbfd1681aeb52bf9e7804056e2d4642a4af8a8e",
+        "10": "e2077b0ae8d5458f5c5ea17a65f00fe14f2798e3800e499f229b0b4b869ed718",
+        "14": "d8a0fd43621af031fec41697fb18e113f2de044a91974117b46c9a9af1c04117"
+      }
+    },
+    {
+      "instrument_id": "600900.SH",
+      "document_version": "aa0cdb92e3aad81b1e6454594a64cacbcfeb9013b10dd31f47a93a94e7a70f91",
+      "pdf_path": "data/filings/announcements/blobs/aa/aa0cdb92e3aad81b1e6454594a64cacbcfeb9013b10dd31f47a93a94e7a70f91.pdf",
+      "pdf_sha256": "aa0cdb92e3aad81b1e6454594a64cacbcfeb9013b10dd31f47a93a94e7a70f91",
+      "cache_path": "data/filings/announcements/blobs/aa/derived/business_profile_pdfium_recovery.v4/aa0cdb92e3aad81b1e6454594a64cacbcfeb9013b10dd31f47a93a94e7a70f91_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "cf91701aa7eb1f24db01818081056b324904d9656c63bdaf29dfbbe8ad0ec1a9",
+      "artifact_hash": "a2527157e2b4d9f751a554a7f6b058d3b5033f0c71bcb0e43116a23a5d0bac63",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        9,
+        10,
+        12
+      ],
+      "sample_native_page_status": {
+        "9": "extracted",
+        "10": "extracted",
+        "12": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "9": "49a2c125ea720d1fe647a58add3fc3d37d56f3914cbcff376566aa971744adbc",
+        "10": "fd6b537a0af7511d68464e7f95ce88e1e62262b267ac14c8f8dccb011946d65d",
+        "12": "e7a352cef3f0529efbe8fa07469288f690bf2f609e596d34a26454a1e96c8f07"
+      }
+    },
+    {
+      "instrument_id": "600901.SH",
+      "document_version": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6",
+      "pdf_path": "data/filings/announcements/blobs/e4/e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6.pdf",
+      "pdf_sha256": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6",
+      "cache_path": "data/filings/announcements/blobs/e4/derived/business_profile_pdfium_recovery.v4/e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "8e45e0695feb473dd0a5c31460fa543e4c3afc396313043a7ef6e1774510a498",
+      "artifact_hash": "58a432e8862820bf09fb3421809a680a9e26de0ec499cd608884226f7a3bd1e6",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        17,
+        19,
+        20,
+        22
+      ],
+      "sample_native_page_status": {
+        "17": "extracted",
+        "19": "extracted",
+        "20": "extracted",
+        "22": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "17": "f41a52c01b938c6965d0a677680d065f27767c7a8281bdaf1b0ca1f4c973ceae",
+        "19": "20052c27b9b6cdb617a461521797cec6f684bf15fe71129a775487653a4d1ede",
+        "20": "2901400cb60db5c7e77e0ee69716a7a02fad809f55ce7dbb0558e4ef39fe340f",
+        "22": "556fb847d97184acb87579d3c5be20b16cd6c96ec1b846f9705a33aaabb52e9b"
+      }
+    },
+    {
+      "instrument_id": "601006.SH",
+      "document_version": "14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695",
+      "pdf_path": "data/filings/announcements/blobs/14/14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695.pdf",
+      "pdf_sha256": "14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695",
+      "cache_path": "data/filings/announcements/blobs/14/derived/business_profile_pdfium_recovery.v4/14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "161f2abe8599c1d88c2044f39b268b57ac2b4eb3ed845578dd407f57722bf04e",
+      "artifact_hash": "6799998a00772f3b4c401e09d944141e815e8abae23a3e35d9ed07e97811f4f5",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "sample_native_page_status": {
+        "8": "extracted",
+        "9": "extracted",
+        "10": "extracted",
+        "11": "extracted",
+        "12": "extracted",
+        "13": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "8": "acb6c72a8a8da9de2f3cb4ee065fb7ee4cff93d6f6db8e87ba416f19d199da87",
+        "9": "392ccd1e9af8f9b7594a4352a2bb5a2947c29cd91c6d0572539c719f3d1f2380",
+        "10": "c20234f7cb702d7199dde2d10ecab1629f7e562bf658e37bb1f1175babc877db",
+        "11": "4969842d8c2f917de61d8b54435817894d76b159f68543c79c37309990ab9c62",
+        "12": "4433fa15df00f6088bdc4a5447889b549ca8df43f3d77085216ebc2aa294f703",
+        "13": "8b22e4c8230ac73f3795feffbd5a838c9f3f8d6b78aac40096e0ef89e29146bc"
+      }
+    },
+    {
+      "instrument_id": "601166.SH",
+      "document_version": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c",
+      "pdf_path": "data/filings/announcements/blobs/8a/8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c.pdf",
+      "pdf_sha256": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c",
+      "cache_path": "data/filings/announcements/blobs/8a/derived/business_profile_pdfium_recovery.v4/8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "2d485ecad33cfb5ceec1588f88e22b096228c6e602314acbf0c623e1c71c4bfb",
+      "artifact_hash": "241dcaea01eb8d755a292ebf6fdf2da9d669fcf975e08dd1d5bab8ab69522ef6",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        18,
+        76,
+        103,
+        104
+      ],
+      "sample_native_page_status": {
+        "18": "extracted",
+        "76": "extracted",
+        "103": "extracted",
+        "104": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "18": "d3acd470802ecd0516d8f2e4e0887b449ad5b96281cdf73f471a788196659d1c",
+        "76": "a58ae415d3621bfcf47d016f72f5be4543912e1780b3a76b5a5f520044421cc8",
+        "103": "a44b8c6050d66cdcdc5840657e0c8be089bfc6471c6c5d2ff1686459ef160864",
+        "104": "4fa72358f4b701202a26fdcbb55d7d50385f06352a4d362f76be354ec9a46116"
+      }
+    },
+    {
+      "instrument_id": "601328.SH",
+      "document_version": "df52361e0a40791e9a37634437700b168eb2f76a2db41fe70b6d17099a549963",
+      "pdf_path": "data/filings/announcements/blobs/df/df52361e0a40791e9a37634437700b168eb2f76a2db41fe70b6d17099a549963.pdf",
+      "pdf_sha256": "df52361e0a40791e9a37634437700b168eb2f76a2db41fe70b6d17099a549963",
+      "cache_path": "data/filings/announcements/blobs/df/derived/business_profile_pdfium_recovery.v4/df52361e0a40791e9a37634437700b168eb2f76a2db41fe70b6d17099a549963_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "f33791cac775d67f452967607bedd2904220c138b69e57a8da46ca91fe8853d9",
+      "artifact_hash": "d63ac4f0097ce06e449ad721bbecf8c4fc3fe19f423fe63dd1c30201cc827317",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        8,
+        11,
+        21,
+        22,
+        23,
+        24,
+        25,
+        37,
+        38
+      ],
+      "sample_native_page_status": {
+        "8": "extracted",
+        "11": "extracted",
+        "21": "extracted",
+        "22": "extracted",
+        "23": "extracted",
+        "24": "extracted",
+        "25": "extracted",
+        "37": "extracted",
+        "38": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "8": "ef85276f3ad98edc5f0db111aaf71372a01fabe85691f0a9f67f5ecf080f23a2",
+        "11": "a596bf3be44561a90642a24b3b3d4559705f5426018e6189ced54c4c3c22b26f",
+        "21": "204c34398017f3f0209ed15c063fb02a71752dc4468a1642e53cbff35bc6513b",
+        "22": "b5c2d4ee6b2f637f6d7cf3b9b9c3efaac5a5002ea26617ed7447893b45465af2",
+        "23": "b6fe4f8f0f14dee44c6f98dbbf73bbd4fa314c76ddef67c155482ffd8fda3203",
+        "24": "365195053db4a57cb6aa34df4276782186a12603cad44594d41e587448d646e5",
+        "25": "c6621e7986039576463d8ac0b40785b2ed6f6d67cfab4f89a689b1fc30eea525",
+        "37": "a39be5d927cbca9e8227c5c7fd2d0f27c6d40306ea62ea23cabb542a23017071",
+        "38": "85da5755e481e374f68555af395279fa335870ad6103da1d7ae357011274faef"
+      }
+    },
+    {
+      "instrument_id": "601377.SH",
+      "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+      "pdf_path": "data/filings/announcements/blobs/71/71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb.pdf",
+      "pdf_sha256": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+      "cache_path": "data/filings/announcements/blobs/71/derived/business_profile_pdfium_recovery.v4/71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "b863bd85566fa1209250bf2eb4a45879d44aed9caee844f715945445f995b736",
+      "artifact_hash": "ef676fa955c2104a322f897ec243daad6d1135c4b9ec9a8ce78488dddcb1d613",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        34,
+        35,
+        46
+      ],
+      "sample_native_page_status": {
+        "34": "extracted",
+        "35": "extracted",
+        "46": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "34": "dfdce5cc9f4f859cd71f8ae21991cab9473e7edf307d45b41433057491d18745",
+        "35": "d9e15274e125a6935e6f0fccc425b3c0e7762a31d23ad8cd3d046744019eaefc",
+        "46": "1b44a7f28b0a8607899bae177d56eff21208406cb399675da29e0f96f2ce31bf"
+      }
+    },
+    {
+      "instrument_id": "601628.SH",
+      "document_version": "575a833fd7b83ad3568483273645236eddb751a92ab89f7e1c09105d92cedb27",
+      "pdf_path": "data/filings/announcements/blobs/57/575a833fd7b83ad3568483273645236eddb751a92ab89f7e1c09105d92cedb27.pdf",
+      "pdf_sha256": "575a833fd7b83ad3568483273645236eddb751a92ab89f7e1c09105d92cedb27",
+      "cache_path": "data/filings/announcements/blobs/57/derived/business_profile_pdfium_recovery.v4/575a833fd7b83ad3568483273645236eddb751a92ab89f7e1c09105d92cedb27_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "cbdc9a667ee0b40d0c73d2611fb0149bfd88a32437cb6bf68046f804e8d66f0e",
+      "artifact_hash": "756a0d6897eaa0b55db2b4776d07580229de90d87818bc61a5679f292aff49ed",
+      "artifact_status": "ocr_required",
+      "sample_pages": [
+        13,
+        14,
+        15,
+        18,
+        19,
+        20
+      ],
+      "sample_native_page_status": {
+        "13": "extracted",
+        "14": "extracted",
+        "15": "extracted",
+        "18": "extracted",
+        "19": "extracted",
+        "20": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "13": "90543f759b456d3b40ef65cd887da3d324aa0be5d8a61d09160b2f3b141c7ba1",
+        "14": "390d06b43e8f73bc89d6027962258267e84a7433839aca043a29e863e4e73b55",
+        "15": "8a4238a64468bb54476df3809be81fffb0c2822d1bd51a9fd2feb17d10ed874f",
+        "18": "12078623891adcf38a4456d8125f86f25eb2f9cb8cfbc957b66462b707e21883",
+        "19": "573c589c10512b243216dbfe62b6b7f75e0dbe0e2046371637e3fd399b8bac38",
+        "20": "9344c7522634cddfeb7c5764a7b5395651ca37fc9be6de17fbf4c8440c49d041"
+      }
+    },
+    {
+      "instrument_id": "601668.SH",
+      "document_version": "be7c5a9a87af23f0f08405942c4159aac7be9dbb72c6979da56b81e69f588815",
+      "pdf_path": "data/filings/announcements/blobs/be/be7c5a9a87af23f0f08405942c4159aac7be9dbb72c6979da56b81e69f588815.pdf",
+      "pdf_sha256": "be7c5a9a87af23f0f08405942c4159aac7be9dbb72c6979da56b81e69f588815",
+      "cache_path": "data/filings/announcements/blobs/be/derived/business_profile_pdfium_recovery.v4/be7c5a9a87af23f0f08405942c4159aac7be9dbb72c6979da56b81e69f588815_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "de292a6cf1eb01c4033932489660351da1c4a0a296881fd4cab96b2047bb8433",
+      "artifact_hash": "560808e627352c5a9e77a0f6af5e09a25b60de66310434318100994fc4458a08",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        17,
+        22,
+        28,
+        32,
+        33
+      ],
+      "sample_native_page_status": {
+        "17": "extracted",
+        "22": "extracted",
+        "28": "extracted",
+        "32": "extracted",
+        "33": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "17": "21fa347428dd3ad939534a38bd88f189008ac483885de67ca9fd94e08d26ada9",
+        "22": "5a0b44a663bb8ca6500f57ff585a03da5f40be41d5febe2e3765ec2010b0768e",
+        "28": "0773f488c8b79ae5f1823d859f53d223d4c3cef36353170c1fd598c3f1547eb5",
+        "32": "fdaa7fdba1cce8b66c0864ef11bbcd10f9779b49a4a64738f8b0d4aeb15ba9c2",
+        "33": "e97f2a6c391f7f3ba090f7a14e1ab334cdfeec85a4ed9485742a0af3a1973c40"
+      }
+    },
+    {
+      "instrument_id": "601872.SH",
+      "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+      "pdf_path": "data/filings/announcements/blobs/3f/3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18.pdf",
+      "pdf_sha256": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+      "cache_path": "data/filings/announcements/blobs/3f/derived/business_profile_pdfium_recovery.v4/3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "4c6c133fdf82cb32184c29d03183722b49463d0c6f1717e8e5151632f0ace9da",
+      "artifact_hash": "0017400147e1661aa4b92aa657defc66319474fdc0e396d45338145f10de6a85",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        9,
+        12,
+        20,
+        21
+      ],
+      "sample_native_page_status": {
+        "9": "extracted",
+        "12": "extracted",
+        "20": "extracted",
+        "21": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "9": "de98813d864fe6490160027ef64d18236e2fb5ed850f5ee51c3c84be46965d2e",
+        "12": "1126af49a0dc3c531a682dc51336cf6917e30efa8b6116efc9fde65f38de29a2",
+        "20": "5a23b4cfd86d6098b550e82d6e806ce06c78db638e5051e495bfd099e0a75327",
+        "21": "c6d00a69062ae9bc9c4e5e3709f287daada12be245a73eb8d507a6026433206e"
+      }
+    },
+    {
+      "instrument_id": "920003.BJ",
+      "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+      "pdf_path": "data/filings/announcements/blobs/e5/e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101.pdf",
+      "pdf_sha256": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+      "cache_path": "data/filings/announcements/blobs/e5/derived/business_profile_pdfium_recovery.v4/e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "10e6172cc5568ec64b9c6866ecc9df1cd91d9e708745989614277a0fc48c90c9",
+      "artifact_hash": "a9200de0d7c001eb7eeb4315e71ef8fb637078c070259b451db4c736735c5f0f",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        12,
+        14,
+        15,
+        21,
+        22
+      ],
+      "sample_native_page_status": {
+        "12": "extracted",
+        "14": "extracted",
+        "15": "extracted",
+        "21": "extracted",
+        "22": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "12": "8bed391f877c9a2e2f106ca5bc0246ae75b893160591d2be03b64bff13126fc0",
+        "14": "de93e2ce39e0a20b148ef9d8f8fcc3eb06fdb7870ee3966e453080009c82e6f4",
+        "15": "8d96a6c1317a89869dc696b67b0af31f530b52cac97cd14d59ec36984116ea17",
+        "21": "ae6d2b191d5ad58f74eb56d698eced21356291278d2ccef1b50c1d908c5dc6f8",
+        "22": "d9d92b5a5f8e0ea158b290d2a8f0eaca547340c13adf67d610ae6eb4dca81a69"
+      }
+    },
+    {
+      "instrument_id": "920006.BJ",
+      "document_version": "74903f868606e3b524205c525970e6660879ca416bab162e9c9b9d7e52a4288b",
+      "pdf_path": "data/filings/announcements/blobs/74/74903f868606e3b524205c525970e6660879ca416bab162e9c9b9d7e52a4288b.pdf",
+      "pdf_sha256": "74903f868606e3b524205c525970e6660879ca416bab162e9c9b9d7e52a4288b",
+      "cache_path": "data/filings/announcements/blobs/74/derived/business_profile_pdfium_recovery.v4/74903f868606e3b524205c525970e6660879ca416bab162e9c9b9d7e52a4288b_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "7107bcfd7b66b2434dbf8f21aa359cf08424df2b936aa9e9f813958e00253358",
+      "artifact_hash": "414771283000156a9f1fbe1669e26a5da535f4a51405ad2dd5c0a4b996143a05",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        8,
+        12,
+        13,
+        19,
+        21
+      ],
+      "sample_native_page_status": {
+        "8": "extracted",
+        "12": "extracted",
+        "13": "extracted",
+        "19": "extracted",
+        "21": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "8": "7a1b373e81f9568b541813448550d80c2d9782d6f05755242be8dd4d34059a5a",
+        "12": "c63983e5f21794002dfed67516c50a5b0161654e5180d40522da2052c0026e97",
+        "13": "adcd1f7d1c7ed41f722f50264ed1067d6f08f34799ab81bbb710ef8777c5afaa",
+        "19": "062ff0ef167d6a451aeb0e03e0b220bb3e79e3e8e2895df2170b271d2631e836",
+        "21": "2deba2a835844ba84ca4768f3c1869739ec2dfecdd4e1e30995926ff445f1ad1"
+      }
+    },
+    {
+      "instrument_id": "920007.BJ",
+      "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+      "pdf_path": "data/filings/announcements/blobs/1f/1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897.pdf",
+      "pdf_sha256": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+      "cache_path": "data/filings/announcements/blobs/1f/derived/business_profile_pdfium_recovery.v4/1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "b60d84cd88e325469d48b742247081a1e8720b42e568c304809f5d138730d828",
+      "artifact_hash": "396bffa252d07a20b33629b123003b1e1418c3914b18da03372ec4bb1cc1718f",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        14,
+        15,
+        17,
+        131
+      ],
+      "sample_native_page_status": {
+        "14": "extracted",
+        "15": "extracted",
+        "17": "extracted",
+        "131": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "14": "e4f8751772a99dc175d7bfb0eeeb6821deb2f431d197608580774a9b21177f99",
+        "15": "5a6b94ce4916b98ee11a7d6f9f3ff42769bbfa3dc0752598a8835c79cd2be92f",
+        "17": "4c293767aa2b7c29e9384604677908e71929dfcd628d8dc290ddf3706ee69476",
+        "131": "f7ab4e7010a0964ac8ad2b096d1e0de8630757814885c72c054edc7ec299da91"
+      }
+    },
+    {
+      "instrument_id": "920014.BJ",
+      "document_version": "47352cc1d78e2d659a274d098613ec706b5bda4d856cfb26322b91b90701d715",
+      "pdf_path": "data/filings/announcements/blobs/47/47352cc1d78e2d659a274d098613ec706b5bda4d856cfb26322b91b90701d715.pdf",
+      "pdf_sha256": "47352cc1d78e2d659a274d098613ec706b5bda4d856cfb26322b91b90701d715",
+      "cache_path": "data/filings/announcements/blobs/47/derived/business_profile_pdfium_recovery.v4/47352cc1d78e2d659a274d098613ec706b5bda4d856cfb26322b91b90701d715_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "8b19af3fdf0ae92fd51f96628a5645d6e9d00df188e81072ec084dacbd6eeff4",
+      "artifact_hash": "2094bf3f00317f81dbe1cea9ed94dfe67696c6f7cf2bd55e3e98e877e8238d77",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        12,
+        20,
+        21,
+        26,
+        154
+      ],
+      "sample_native_page_status": {
+        "12": "extracted",
+        "20": "extracted",
+        "21": "extracted",
+        "26": "extracted",
+        "154": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "12": "62bb5b097a454aa5ec6724b0383c90f7a80cb9b4e674473b972ba0c77647e02a",
+        "20": "698d5938e5fbaf8c7f8f762b1e0d880174ecb8078d3fa834987148322a76da17",
+        "21": "c42f1f5b8552cc67a4f336a7132ad397bcfb7e9a1c61d9780e6f9e0da19704c6",
+        "26": "c0632493e14faffe58530df70f6ed466fa9cb7399e2758bcbf20d32abcbd59a1",
+        "154": "54b503808ab7f5ba3a08ef4a554d4d2df11c6a019e636374487b554cb760b2a5"
+      }
+    },
+    {
+      "instrument_id": "920017.BJ",
+      "document_version": "aad092ae485ec06175a640bbd497c2fa360bffb485cd008a9cd5c616db64d3c7",
+      "pdf_path": "data/filings/announcements/blobs/aa/aad092ae485ec06175a640bbd497c2fa360bffb485cd008a9cd5c616db64d3c7.pdf",
+      "pdf_sha256": "aad092ae485ec06175a640bbd497c2fa360bffb485cd008a9cd5c616db64d3c7",
+      "cache_path": "data/filings/announcements/blobs/aa/derived/business_profile_pdfium_recovery.v4/aad092ae485ec06175a640bbd497c2fa360bffb485cd008a9cd5c616db64d3c7_57e1dd4f16ef40ff.json.gz",
+      "cache_sha256": "774dbf78ced7c4b54b35fcad988890bdc7caddadef5639cb44dda40ab6f6ad19",
+      "artifact_hash": "fdc35ec49bd5f43c9ab622d2523cf3e6353ba8aa6a1ecf94ffe26969aedb6c15",
+      "artifact_status": "parsed",
+      "sample_pages": [
+        11,
+        13,
+        64
+      ],
+      "sample_native_page_status": {
+        "11": "extracted",
+        "13": "extracted",
+        "64": "extracted"
+      },
+      "full_native_sample_pages": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-native-sample-pages.json",
+      "page_sha256": {
+        "11": "023275bc04b3c9c048caaaa3fafe1ff2b2374ae0046de1cf473fb78b94bed267",
+        "13": "554b3535fdb7cc934d75365758f7d7a3c147960ecc73e6541b6d004d376e1208",
+        "64": "25cbb566b5c23e4d0b559b461f0da544cef84b0957a8629535db435fe87ad1a3"
+      }
+    }
+  ],
+  "samples": [
+    {
+      "sample_id": "S001",
+      "document_version": "9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        9
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S002",
+      "document_version": "9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        9
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S003",
+      "document_version": "9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S004",
+      "document_version": "9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        9
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S005",
+      "document_version": "9e9998c2505439ca52461d9b48298b910c02d87c828c90d7b88e7347dfbb38b7",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        9
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S006",
+      "document_version": "438e2d1c304b24311de907f012108270b38163769ece55d710ddae4b6fc3cf24",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        16
+      ],
+      "section_paths": [
+        [
+          "第四章 董事会报告及管理层讨论与分析",
+          "一、公司业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S007",
+      "document_version": "438e2d1c304b24311de907f012108270b38163769ece55d710ddae4b6fc3cf24",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        16,
+        17,
+        18
+      ],
+      "section_paths": [
+        [
+          "第四章 董事会报告及管理层讨论与分析",
+          "二、报告期主营业务回顾"
+        ],
+        [
+          "第四章 董事会报告及管理层讨论与分析",
+          "二、报告期主营业务回顾"
+        ],
+        [
+          "第四章 董事会报告及管理层讨论与分析",
+          "一、公司业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S008",
+      "document_version": "438e2d1c304b24311de907f012108270b38163769ece55d710ddae4b6fc3cf24",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        16
+      ],
+      "section_paths": [
+        [
+          "第四章 董事会报告及管理层讨论与分析",
+          "二、报告期主营业务回顾"
+        ],
+        [
+          "第四章 董事会报告及管理层讨论与分析",
+          "一、公司业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S009",
+      "document_version": "438e2d1c304b24311de907f012108270b38163769ece55d710ddae4b6fc3cf24",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        28
+      ],
+      "section_paths": [
+        [
+          "第四章 董事会报告及管理层讨论与分析",
+          "五、财务数据分析",
+          "（一）主营业务分析",
+          "1、按照行业、业务及地区划分的各项指标"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S010",
+      "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S011",
+      "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S012",
+      "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S013",
+      "document_version": "b6cb989e6e3432cf3c82dcdf1ebb32df7293fe702b01b7b139ebba61c0c6291b",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S014",
+      "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14,
+        15
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "二、报告期内公司所处行业情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S015",
+      "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S016",
+      "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        16
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S017",
+      "document_version": "6763089dcf067c07fd8bfec29a56ce134ecc4c68988d4d7247ae0fba6f2c0ebb",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S018",
+      "document_version": "7e797e5291feeb127a02f5367ad92aa435753b882789dcd243acc4ec23c2103a",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S019",
+      "document_version": "7e797e5291feeb127a02f5367ad92aa435753b882789dcd243acc4ec23c2103a",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S020",
+      "document_version": "7e797e5291feeb127a02f5367ad92aa435753b882789dcd243acc4ec23c2103a",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S021",
+      "document_version": "7e797e5291feeb127a02f5367ad92aa435753b882789dcd243acc4ec23c2103a",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        15
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S022",
+      "document_version": "7e797e5291feeb127a02f5367ad92aa435753b882789dcd243acc4ec23c2103a",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        25
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "七、投资状况分析",
+          "4、金融资产投资"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S023",
+      "document_version": "3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S024",
+      "document_version": "3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S025",
+      "document_version": "3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        16
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S026",
+      "document_version": "3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        13
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "新能源汽车整车及零部件的生产经营情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S027",
+      "document_version": "3541dbf8f49275eb161afaab322dd8ef4919faa56e297690a22c0197639de1ba",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S028",
+      "document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S029",
+      "document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S030",
+      "document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        17
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S031",
+      "document_version": "a87e510442422ac8c316b13c54635a81b267872f767f8f15b0905a98f3df95f4",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S032",
+      "document_version": "7cc972f2d199e2ec3797cc5da479e8268afa59b77875770de3bcd3648242fb8c",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S033",
+      "document_version": "7cc972f2d199e2ec3797cc5da479e8268afa59b77875770de3bcd3648242fb8c",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        13,
+        14
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S034",
+      "document_version": "7cc972f2d199e2ec3797cc5da479e8268afa59b77875770de3bcd3648242fb8c",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        24
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S035",
+      "document_version": "7cc972f2d199e2ec3797cc5da479e8268afa59b77875770de3bcd3648242fb8c",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S036",
+      "document_version": "f9021bfe6b15313105fddf8063675730ad1343277835a3c6af4aa4a63bd33bce",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12,
+        16,
+        17
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "6.90 亿度，同比增长 42.07%"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "6.90 亿度，同比增长 42.07%"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S037",
+      "document_version": "f9021bfe6b15313105fddf8063675730ad1343277835a3c6af4aa4a63bd33bce",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12,
+        13
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S038",
+      "document_version": "f9021bfe6b15313105fddf8063675730ad1343277835a3c6af4aa4a63bd33bce",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S039",
+      "document_version": "f9021bfe6b15313105fddf8063675730ad1343277835a3c6af4aa4a63bd33bce",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        29
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S040",
+      "document_version": "f9021bfe6b15313105fddf8063675730ad1343277835a3c6af4aa4a63bd33bce",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12,
+        16
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "6.90 亿度，同比增长 42.07%"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S041",
+      "document_version": "4e595b96aa0d017aef5ee277b17d32ee1b87c8825ced67b1f3a20302340eb754",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14,
+        28
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "营业收入整体情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S042",
+      "document_version": "4e595b96aa0d017aef5ee277b17d32ee1b87c8825ced67b1f3a20302340eb754",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S043",
+      "document_version": "4e595b96aa0d017aef5ee277b17d32ee1b87c8825ced67b1f3a20302340eb754",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        15,
+        28
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "营业收入整体情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S044",
+      "document_version": "4e595b96aa0d017aef5ee277b17d32ee1b87c8825ced67b1f3a20302340eb754",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        28
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "营业收入整体情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S045",
+      "document_version": "8aa8857331cfc403e60e19e005a94aa67defcba28451b586741dc3757373d41e",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        23
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S046",
+      "document_version": "8aa8857331cfc403e60e19e005a94aa67defcba28451b586741dc3757373d41e",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        23
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S047",
+      "document_version": "8aa8857331cfc403e60e19e005a94aa67defcba28451b586741dc3757373d41e",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        35
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "营业收入整体情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S048",
+      "document_version": "8aa8857331cfc403e60e19e005a94aa67defcba28451b586741dc3757373d41e",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        23,
+        35
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "营业收入整体情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S049",
+      "document_version": "8aa8857331cfc403e60e19e005a94aa67defcba28451b586741dc3757373d41e",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        23
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S050",
+      "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12,
+        25,
+        30
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "营业收入整体情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S051",
+      "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12,
+        13,
+        24,
+        25
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S052",
+      "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        17
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S053",
+      "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        29
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "营业收入整体情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S054",
+      "document_version": "622e4c655a31d41eca5e18fde18be214aeddef7d8a29a51d429efa1f322f8f01",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        28,
+        29
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "四、主营业务分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S055",
+      "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        13
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "3.1 业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S056",
+      "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        13
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "3.1 业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S057",
+      "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        20
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "3.4 利润表分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S058",
+      "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        17
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "3.3 总体经营情况讨论与分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S059",
+      "document_version": "d600c3cb931b19fb1d17bd46c419d4da54e7e9169ff3a6ab391a48cbc08d24e3",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        13
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "3.1 业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S060",
+      "document_version": "470448a5b8073540b0a6a722e1dded1558ab9dc06fb44347d0e91d2948b72df2",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        17,
+        18,
+        23
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S061",
+      "document_version": "470448a5b8073540b0a6a722e1dded1558ab9dc06fb44347d0e91d2948b72df2",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        17,
+        19,
+        21,
+        22
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S062",
+      "document_version": "470448a5b8073540b0a6a722e1dded1558ab9dc06fb44347d0e91d2948b72df2",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        8,
+        44,
+        45
+      ],
+      "section_paths": [
+        [
+          "第二节 公司简介和主要财务指标",
+          "七、 近三年主要会计数据和财务指标"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S063",
+      "document_version": "470448a5b8073540b0a6a722e1dded1558ab9dc06fb44347d0e91d2948b72df2",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        46
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "主营业务分产品情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S064",
+      "document_version": "f795a05a021e3af7edce80ecce946a9b80ff9323ec299265376c6f2e5f23f17a",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        19,
+        21
+      ],
+      "section_paths": [
+        [
+          "三、经营情况讨论与分析"
+        ],
+        [
+          "四、报告期内核心竞争力分析",
+          "(二)其他业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S065",
+      "document_version": "f795a05a021e3af7edce80ecce946a9b80ff9323ec299265376c6f2e5f23f17a",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        22,
+        28
+      ],
+      "section_paths": [
+        [
+          "四、报告期内核心竞争力分析",
+          "(二)其他业务"
+        ],
+        [
+          "主营业务分地区情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S066",
+      "document_version": "f795a05a021e3af7edce80ecce946a9b80ff9323ec299265376c6f2e5f23f17a",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        26
+      ],
+      "section_paths": [
+        [
+          "四、报告期内核心竞争力分析",
+          "(二)其他业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S067",
+      "document_version": "f795a05a021e3af7edce80ecce946a9b80ff9323ec299265376c6f2e5f23f17a",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        19
+      ],
+      "section_paths": [
+        [
+          "三、经营情况讨论与分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S068",
+      "document_version": "f795a05a021e3af7edce80ecce946a9b80ff9323ec299265376c6f2e5f23f17a",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        20
+      ],
+      "section_paths": [
+        [
+          "四、报告期内核心竞争力分析",
+          "(二)其他业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S069",
+      "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        9,
+        116
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第八节 财务报告",
+          "二、将重分类进",
+          "33、 营业收入和营业成本"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S070",
+      "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        9
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S071",
+      "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11,
+        116
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ],
+        [
+          "第八节 财务报告",
+          "二、将重分类进",
+          "33、 营业收入和营业成本"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S072",
+      "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S073",
+      "document_version": "4883f1eb099f50ba7c32da096aa8807caa0000f141587c047f04a0e8754bf84b",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        9
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S074",
+      "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S075",
+      "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11,
+        22
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "煤炭行业经营性信息分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S076",
+      "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        21
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "煤炭行业经营性信息分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S077",
+      "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S078",
+      "document_version": "8214af8c64e4351b2bfe706971ab4154909248cae82dd4016c85be5af74bc559",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S079",
+      "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S080",
+      "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S081",
+      "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        17,
+        18
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S082",
+      "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        20
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S083",
+      "document_version": "b0664858d1731c8c62fdaf4ced6edf99937e87fa0a918892519c3db3082dabab",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S084",
+      "document_version": "b0664858d1731c8c62fdaf4ced6edf99937e87fa0a918892519c3db3082dabab",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S085",
+      "document_version": "b0664858d1731c8c62fdaf4ced6edf99937e87fa0a918892519c3db3082dabab",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S086",
+      "document_version": "b0664858d1731c8c62fdaf4ced6edf99937e87fa0a918892519c3db3082dabab",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10,
+        22
+      ],
+      "section_paths": [
+        [
+          "第二节 公司简介和主要财务指标",
+          "七、 近三年主要会计数据和财务指标"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S087",
+      "document_version": "14186f9f9b47f687c527ba14825664f3b09e51759d581636cddcc248f26e3660",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        16
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S088",
+      "document_version": "14186f9f9b47f687c527ba14825664f3b09e51759d581636cddcc248f26e3660",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        16
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S089",
+      "document_version": "14186f9f9b47f687c527ba14825664f3b09e51759d581636cddcc248f26e3660",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        17,
+        23,
+        25,
+        42
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "主营业务分销售模式情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S090",
+      "document_version": "14186f9f9b47f687c527ba14825664f3b09e51759d581636cddcc248f26e3660",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        41
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析",
+          "1、 利润表及现金流量表相关科目变动分析表"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S091",
+      "document_version": "be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10,
+        14,
+        16
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S092",
+      "document_version": "be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10,
+        11
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S093",
+      "document_version": "be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10,
+        14,
+        16
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S094",
+      "document_version": "be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        21
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S095",
+      "document_version": "836803180b4f26c9fc35c64a80ff3fbc043b84a9640c98eb4eb758f19d105e30",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11,
+        19
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S096",
+      "document_version": "836803180b4f26c9fc35c64a80ff3fbc043b84a9640c98eb4eb758f19d105e30",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S097",
+      "document_version": "836803180b4f26c9fc35c64a80ff3fbc043b84a9640c98eb4eb758f19d105e30",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S098",
+      "document_version": "836803180b4f26c9fc35c64a80ff3fbc043b84a9640c98eb4eb758f19d105e30",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        20
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "分行业情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S099",
+      "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S100",
+      "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11,
+        14
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S101",
+      "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11,
+        18
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "主营业务分销售模式情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S102",
+      "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        17
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S103",
+      "document_version": "e9d746bc70fa3d4b0c1ca6e866868be86bfc90ae1110918c4e0d5c04c88c98ca",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11,
+        16
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S104",
+      "document_version": "d17b8c541c42f65d092317093eb0cfbb5aeed4f44eafa2d2f6182041cdcdbaac",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S105",
+      "document_version": "d17b8c541c42f65d092317093eb0cfbb5aeed4f44eafa2d2f6182041cdcdbaac",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11,
+        15
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S106",
+      "document_version": "d17b8c541c42f65d092317093eb0cfbb5aeed4f44eafa2d2f6182041cdcdbaac",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10,
+        29
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "食品行业经营性信息分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S107",
+      "document_version": "d17b8c541c42f65d092317093eb0cfbb5aeed4f44eafa2d2f6182041cdcdbaac",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        7
+      ],
+      "section_paths": [
+        [
+          "第二节 公司简介和主要财务指标",
+          "七、近三年主要会计数据和财务指标"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S108",
+      "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S109",
+      "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S110",
+      "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S111",
+      "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        7,
+        14
+      ],
+      "section_paths": [
+        [
+          "第二节 公司简介和主要财务指标",
+          "七、 近三年主要会计数据和财务指标"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S112",
+      "document_version": "23b3a1257e77c2d834d37d3587086bbc1fc9092f12185b059f9f4c69eb97640f",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S113",
+      "document_version": "aa0cdb92e3aad81b1e6454594a64cacbcfeb9013b10dd31f47a93a94e7a70f91",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        9
+      ],
+      "section_paths": [
+        [
+          "第二节 公司简介和主要财务指标",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S114",
+      "document_version": "aa0cdb92e3aad81b1e6454594a64cacbcfeb9013b10dd31f47a93a94e7a70f91",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        9
+      ],
+      "section_paths": [
+        [
+          "第二节 公司简介和主要财务指标",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S115",
+      "document_version": "aa0cdb92e3aad81b1e6454594a64cacbcfeb9013b10dd31f47a93a94e7a70f91",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12
+      ],
+      "section_paths": [
+        [
+          "第二节 公司简介和主要财务指标",
+          "四、报告期内主要经营情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S116",
+      "document_version": "aa0cdb92e3aad81b1e6454594a64cacbcfeb9013b10dd31f47a93a94e7a70f91",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        9,
+        12
+      ],
+      "section_paths": [
+        [
+          "第二节 公司简介和主要财务指标",
+          "四、报告期内主要经营情况"
+        ],
+        [
+          "第二节 公司简介和主要财务指标",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S117",
+      "document_version": "aa0cdb92e3aad81b1e6454594a64cacbcfeb9013b10dd31f47a93a94e7a70f91",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        9,
+        10
+      ],
+      "section_paths": [
+        [
+          "第二节 公司简介和主要财务指标",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第二节 公司简介和主要财务指标",
+          "二、经营情况讨论与分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S118",
+      "document_version": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        19
+      ],
+      "section_paths": [
+        [
+          "四 报告期内核心竞争力分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S119",
+      "document_version": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        22
+      ],
+      "section_paths": [
+        [
+          "五、净利润 325,135.97 294,346.50 10.46"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S120",
+      "document_version": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        22
+      ],
+      "section_paths": [
+        [
+          "五、净利润 325,135.97 294,346.50 10.46"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S121",
+      "document_version": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        17
+      ],
+      "section_paths": [
+        [
+          "三 经营情况讨论与分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S122",
+      "document_version": "e4c64cb959a66cf45d6cea2567799351ec7ab59c3acf5c3461dbf7ca1f0d13f6",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        20
+      ],
+      "section_paths": [
+        [
+          "四 报告期内核心竞争力分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S123",
+      "document_version": "14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        8
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S124",
+      "document_version": "14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        8
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S125",
+      "document_version": "14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12,
+        13
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S126",
+      "document_version": "14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        10,
+        11
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S127",
+      "document_version": "14167934c9ce7efffc4a90382498498f65f1c69219f7ec72e2275c46f5e0b695",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        8,
+        9,
+        11
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S128",
+      "document_version": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        18
+      ],
+      "section_paths": [
+        [
+          "第一章 公司简介",
+          "1.1 公司概况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S129",
+      "document_version": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        103,
+        104
+      ],
+      "section_paths": [
+        [
+          "第三章 管理层讨论与分析",
+          "业务情况分析",
+          "3.6.2 业务分析"
+        ],
+        [
+          "第三章 管理层讨论与分析",
+          "业务情况分析",
+          "3.6.2 业务分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S130",
+      "document_version": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        76
+      ],
+      "section_paths": [
+        [
+          "第三章 管理层讨论与分析",
+          "3.5 财务报表分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S131",
+      "document_version": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        76
+      ],
+      "section_paths": [
+        [
+          "第三章 管理层讨论与分析",
+          "3.5 财务报表分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S132",
+      "document_version": "8ad7c2264a38441715cafd485a9214f0c180bc1eb037837bb0403013fadd586c",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        18
+      ],
+      "section_paths": [
+        [
+          "第一章 公司简介",
+          "1.1 公司概况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S133",
+      "document_version": "df52361e0a40791e9a37634437700b168eb2f76a2db41fe70b6d17099a549963",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        8
+      ],
+      "section_paths": [
+        [
+          "二、公司简介及主要业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S134",
+      "document_version": "df52361e0a40791e9a37634437700b168eb2f76a2db41fe70b6d17099a549963",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        22,
+        23,
+        24,
+        25
+      ],
+      "section_paths": [
+        [
+          "二、业务回顾"
+        ],
+        [
+          "二、业务回顾"
+        ],
+        [
+          "二、业务回顾"
+        ],
+        [
+          "二、业务回顾"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S135",
+      "document_version": "df52361e0a40791e9a37634437700b168eb2f76a2db41fe70b6d17099a549963",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11,
+        38
+      ],
+      "section_paths": [
+        [
+          "一、主要会计数据和财务指标"
+        ],
+        [
+          "三、财务报表分析",
+          "（一）利润表主要项目分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S136",
+      "document_version": "df52361e0a40791e9a37634437700b168eb2f76a2db41fe70b6d17099a549963",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11,
+        37
+      ],
+      "section_paths": [
+        [
+          "一、主要会计数据和财务指标"
+        ],
+        [
+          "三、财务报表分析",
+          "（一）利润表主要项目分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S137",
+      "document_version": "df52361e0a40791e9a37634437700b168eb2f76a2db41fe70b6d17099a549963",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        21
+      ],
+      "section_paths": [
+        [
+          "二、业务回顾"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S138",
+      "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        34
+      ],
+      "section_paths": [
+        [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S139",
+      "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        34
+      ],
+      "section_paths": [
+        [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S140",
+      "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        34
+      ],
+      "section_paths": [
+        [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S141",
+      "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        46
+      ],
+      "section_paths": [
+        [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "五、报告期内主要经营情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S142",
+      "document_version": "71d43a5c850c23f2b582bf67b0a9b0cee0b6a4321d98106456b8cb42fd0badfb",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        35
+      ],
+      "section_paths": [
+        [
+          "第九节 证券公司信息披露 ----------------------------------------249",
+          "三、经营情况讨论与分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S143",
+      "document_version": "575a833fd7b83ad3568483273645236eddb751a92ab89f7e1c09105d92cedb27",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        15,
+        20
+      ],
+      "section_paths": [
+        [
+          "保险业务分析"
+        ],
+        [
+          "投资业务分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S144",
+      "document_version": "575a833fd7b83ad3568483273645236eddb751a92ab89f7e1c09105d92cedb27",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        13,
+        18
+      ],
+      "section_paths": [
+        [
+          "讨论与分析"
+        ],
+        [
+          "分渠道业务分析"
+        ],
+        [
+          "保险产品分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S145",
+      "document_version": "575a833fd7b83ad3568483273645236eddb751a92ab89f7e1c09105d92cedb27",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        13,
+        14,
+        15
+      ],
+      "section_paths": [
+        [
+          "讨论与分析"
+        ],
+        [
+          "讨论与分析"
+        ],
+        [
+          "讨论与分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S146",
+      "document_version": "575a833fd7b83ad3568483273645236eddb751a92ab89f7e1c09105d92cedb27",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        13
+      ],
+      "section_paths": [
+        [
+          "讨论与分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S147",
+      "document_version": "575a833fd7b83ad3568483273645236eddb751a92ab89f7e1c09105d92cedb27",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        19
+      ],
+      "section_paths": [
+        [
+          "保险产品分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S148",
+      "document_version": "be7c5a9a87af23f0f08405942c4159aac7be9dbb72c6979da56b81e69f588815",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        17
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司所从事的业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S149",
+      "document_version": "be7c5a9a87af23f0f08405942c4159aac7be9dbb72c6979da56b81e69f588815",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        28
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、建筑业务"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S150",
+      "document_version": "be7c5a9a87af23f0f08405942c4159aac7be9dbb72c6979da56b81e69f588815",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        32,
+        33
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "五、ﾠ报告期内主要经营情况"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "2.　收入和成本分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S151",
+      "document_version": "be7c5a9a87af23f0f08405942c4159aac7be9dbb72c6979da56b81e69f588815",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        22
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S152",
+      "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S153",
+      "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S154",
+      "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        21
+      ],
+      "section_paths": [
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S155",
+      "document_version": "3fe6f99980f9f0c2ac241e2f826660141d118af2fe53eafab49e146ef9464a18",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        9,
+        20
+      ],
+      "section_paths": [
+        [
+          "第二节 公司简介和主要财务指标",
+          "七、 近三年主要会计数据和财务指标"
+        ],
+        [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S156",
+      "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S157",
+      "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S158",
+      "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S159",
+      "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        21,
+        22
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "境外资产占比较高的情况",
+          "2. 营业情况分析"
+        ],
+        [
+          "第四节 管理层讨论与分析",
+          "境外资产占比较高的情况",
+          "2. 营业情况分析"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S160",
+      "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14,
+        15
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "二、 经营情况回顾"
+        ],
+        [
+          "第四节 管理层讨论与分析",
+          "二、 经营情况回顾"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S161",
+      "document_version": "74903f868606e3b524205c525970e6660879ca416bab162e9c9b9d7e52a4288b",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12,
+        13
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ],
+        [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S162",
+      "document_version": "74903f868606e3b524205c525970e6660879ca416bab162e9c9b9d7e52a4288b",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        21
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "境外资产占比较高的情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S163",
+      "document_version": "74903f868606e3b524205c525970e6660879ca416bab162e9c9b9d7e52a4288b",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12,
+        13
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ],
+        [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S164",
+      "document_version": "74903f868606e3b524205c525970e6660879ca416bab162e9c9b9d7e52a4288b",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        8,
+        19
+      ],
+      "section_paths": [
+        [
+          "第三节 会计数据和财务指标"
+        ],
+        [
+          "第四节 管理层讨论与分析",
+          "境外资产占比较高的情况"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S165",
+      "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14,
+        15
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ],
+        [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S166",
+      "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        14
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S167",
+      "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        131
+      ],
+      "section_paths": [
+        [
+          "第十一节 财务会计报告",
+          "账面余额 账面价值 受限类型 受限情况 账面余额 账面价值 受限类型 受限情况",
+          "(三十七)营业收入和营业成本"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S168",
+      "document_version": "1f834b2b1e26af448a20cb41b825fb864e439e9473d97bca1222a79efcf32897",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        17,
+        131
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "境外资产占比较高的情况",
+          "2. 营业情况分析"
+        ],
+        [
+          "第十一节 财务会计报告",
+          "账面余额 账面价值 受限类型 受限情况 账面余额 账面价值 受限类型 受限情况",
+          "(三十七)营业收入和营业成本"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S169",
+      "document_version": "47352cc1d78e2d659a274d098613ec706b5bda4d856cfb26322b91b90701d715",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S170",
+      "document_version": "47352cc1d78e2d659a274d098613ec706b5bda4d856cfb26322b91b90701d715",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        12
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S171",
+      "document_version": "47352cc1d78e2d659a274d098613ec706b5bda4d856cfb26322b91b90701d715",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        26,
+        154
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "境外资产占比较高的情况"
+        ],
+        [
+          "第十一节 财务会计报告",
+          "① 类别明细情况",
+          "(二) 合并利润表项目注释",
+          "1. 营业收入/营业成本"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S172",
+      "document_version": "47352cc1d78e2d659a274d098613ec706b5bda4d856cfb26322b91b90701d715",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        20
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "二、 经营情况回顾"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S173",
+      "document_version": "47352cc1d78e2d659a274d098613ec706b5bda4d856cfb26322b91b90701d715",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        21
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "二、 经营情况回顾"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S174",
+      "document_version": "aad092ae485ec06175a640bbd497c2fa360bffb485cd008a9cd5c616db64d3c7",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S175",
+      "document_version": "aad092ae485ec06175a640bbd497c2fa360bffb485cd008a9cd5c616db64d3c7",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S176",
+      "document_version": "aad092ae485ec06175a640bbd497c2fa360bffb485cd008a9cd5c616db64d3c7",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        11,
+        64
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ],
+        [
+          "第九节 行业信息",
+          "三、 主要药（产）品"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S177",
+      "document_version": "aad092ae485ec06175a640bbd497c2fa360bffb485cd008a9cd5c616db64d3c7",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        13
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "二、 经营情况回顾"
+        ]
+      ]
+    },
+    {
+      "sample_id": "S178",
+      "document_version": "aad092ae485ec06175a640bbd497c2fa360bffb485cd008a9cd5c616db64d3c7",
+      "span_coordinate_space": "saved selected-layout transcription; not native-cache offsets",
+      "native_source_binding": "same PDF document hash and physical pages, not quote equality",
+      "pages": [
+        13
+      ],
+      "section_paths": [
+        [
+          "第四节 管理层讨论与分析",
+          "二、 经营情况回顾"
+        ]
+      ]
+    }
+  ],
+  "sample_page_count": 171
+}

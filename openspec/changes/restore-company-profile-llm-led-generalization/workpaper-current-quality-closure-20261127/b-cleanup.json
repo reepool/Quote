@@ -1,0 +1,37 @@
+{
+  "task": "6.FS",
+  "state": "B_owned_temporary_artifacts_removed_after_A_finished_source_review",
+  "owned_root": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG",
+  "owned_root_absent": true,
+  "pre_cleanup": {
+    "previous_6FR_exact_known_A_B_roots_present": [],
+    "unrelated_unknown_or_parallel_artifacts_removed": false
+  },
+  "phase_one": {
+    "scope": "84 hash-verified original-owner export files and two duplicate reading indexes",
+    "files_removed": 86,
+    "logical_bytes_removed": 39499400,
+    "retained_until_A_finished": ["current39.json", "a-native-sample-pages.json"]
+  },
+  "phase_two": {
+    "scope": "exact two complete-profile/native-page temporary copies, verified hashes before removal, then empty owned root",
+    "files_removed": 2,
+    "logical_bytes_removed": 14003142,
+    "remaining_temporary_files": 0
+  },
+  "B_only_bytecode": {
+    "directory": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-quality-closure-20261127/__pycache__",
+    "files_removed": 4,
+    "logical_bytes_removed": 87032,
+    "empty_directory_removed": true,
+    "names": ["b-freeze.cpython-311.pyc", "b-layers.cpython-311.pyc", "b-match-sources.cpython-311.pyc", "b-mechanical.cpython-311.pyc"]
+  },
+  "total_files_removed": 92,
+  "total_logical_bytes_removed": 53589574,
+  "original_protected_file_hashes_checked_before_final_cleanup": 397,
+  "original_protected_files_changed_by_B": 0,
+  "recovery": "Temporary projections/exports are rebuildable from original runtime records and original PDF/native cache. Sample identities and source pointers, three-layer mapping, old-A decision pointers, safety-risk layer and mechanical file hashes remain in this evidence directory. No original runtime, model receipt, source PDF/cache, A artifact or pre-existing working-tree content was deleted.",
+  "new_model_requests": 0,
+  "new_service_or_configuration_changes": 0,
+  "Git_mutations_by_B": 0
+}

@@ -1,0 +1,3277 @@
+{
+  "task": "6.FS",
+  "sample_freeze_sha256": "f2135fa0199526cf48bb033453b9a1f1da2331c4d2eaa88ea33d0a2c92b4a76b",
+  "mapping_sha256": "52032edc8944683a43aa815abe2574076f68058b8493ea34a306791fa9859cd0",
+  "A_current_decisions_sha256": "94290ed7a788688033f0d89f7651c2d6bbb22e2d5d07fa792b78f91a75717339",
+  "layers": {
+    "original_author": {
+      "frozen_corresponding_sample_slots": 178,
+      "counts": {
+        "supported": 169,
+        "not_assessed": 6,
+        "error": 1,
+        "absent": 2
+      },
+      "independently_judged": 170,
+      "audited_slot_coverage_percent": 95.50561797752809,
+      "judged_sample_precision_percent": 99.41176470588235,
+      "rows": [
+        {
+          "sample_id": "S001",
+          "instrument_id": "000006.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c278017604d4525278f2a99277b39387635e0d3bafd5a52f15decf748db5c159",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S002",
+          "instrument_id": "000006.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "6fb72d281058fc42528cd27bc8a3a98eb1fd1e5825cc628505f7e4994347d109",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S003",
+          "instrument_id": "000006.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "not_assessed",
+          "reason": "Changed historical content lacks an unambiguous exact independent verdict",
+          "fact_sha256": "cc4a55fa422fde8959b70354dc3980844321e9a2ac0e37e06d1a2b0b020a34d1"
+        },
+        {
+          "sample_id": "S004",
+          "instrument_id": "000006.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "829c9b7de7309a56e385fa72bccbdc5fd14b618a5cb9ed4ba1f723365fd6f114",
+          "metric_count": 3
+        },
+        {
+          "sample_id": "S005",
+          "instrument_id": "000006.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "7a79b35ca4350676ed21b097f272f7c4f92e217b5870f8da7c4fa9c7f0fe07c7",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S006",
+          "instrument_id": "000039.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "80f230d2ef0f410df3bded515970550a78fff3fd729443a9592d3689aa025f54",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S007",
+          "instrument_id": "000039.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "63297f6c912b418640dd8d493040bbc83630689a6b029528c53c920394a0c284",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S008",
+          "instrument_id": "000039.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "83977732ef4808fe70eafbc09b7e24f8d20047af9313e752985825796e3fc797",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S009",
+          "instrument_id": "000039.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "e4a83c33bb19b1630116688647ca34bace09e261eb408464ac7da1dc95341fc9",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S010",
+          "instrument_id": "000049.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c5adfddc4ba643f5684bf8be879ce9af96d0eea7a2abc002abc9b02783d4d398",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S011",
+          "instrument_id": "000049.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "db01b9d2a7e94a0154a903fa898f656b8f5bac3d1e7dffb7267d48d119370a6d",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S012",
+          "instrument_id": "000049.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "2ffac6f26ca0047062c03c20af0239b352aee26ae38bd91cfca0768469f1c83b",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S013",
+          "instrument_id": "000049.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "25ca0492d94433d4181b5779c223c7b3da44036ad72b6abce2cf5e8618ad7711",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S014",
+          "instrument_id": "000099.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "507825b250ce9b5b75c864387f5ff821bfd8e9d1d02f86146cf699efdc0cab8a",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S015",
+          "instrument_id": "000099.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "b3a1783a4224ca1a645de6b76869bf5f59b478015aa0d8b8bef3c707924e65f7",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S016",
+          "instrument_id": "000099.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "not_assessed",
+          "reason": "Changed historical content lacks an unambiguous exact independent verdict",
+          "fact_sha256": "3c248782dbe6d97aa8abe4c265c7497d5d6b846d7f74e13cc186521b92a32794"
+        },
+        {
+          "sample_id": "S017",
+          "instrument_id": "000099.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "94f9d3f294f30e22a20785d82b70c705096259ae541f1d669011e8206da0b533",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S018",
+          "instrument_id": "000156.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c4a860b33e615a5785c82ff5d276c52f05b60d650ad2fbbec84782ec398f7304",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S019",
+          "instrument_id": "000156.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "97f7190dbebfdebf47cd0f87a525fcb0259524217bd2948d6396e0a8abd07037",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S020",
+          "instrument_id": "000156.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "7a09fc9d4468ed324867808cdadf9293e57a6aaf02338a21bb72ad7ca3c848df",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S021",
+          "instrument_id": "000156.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "962cf965db96048bb392f1ae90888b114403b53b229fe054022b2c69e7ac2c16",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S022",
+          "instrument_id": "000156.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "not_assessed",
+          "reason": "Changed historical content lacks an unambiguous exact independent verdict",
+          "fact_sha256": "fe61b4c6671abf903eecb969a2fef1696e7088e855c36b870f1155be2ee48246"
+        },
+        {
+          "sample_id": "S023",
+          "instrument_id": "000338.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "00714acc750e93aabb223e8bd524e625200513584f95ce5115b2e77278aa27b6",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S024",
+          "instrument_id": "000338.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "b01e1691ae66cde837a4392291b7a1d7dc4b7284768cf7e811ae9d50af57b0b8",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S025",
+          "instrument_id": "000338.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "8a4b926c95a8b862bd40d5c1d71453a6eb0441efc1d9946cc30cf4425e620cdd",
+          "metric_count": 1
+        },
+        {
+          "sample_id": "S026",
+          "instrument_id": "000338.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "6a8dfe0c54e98264da55bb1b65917b98a26dd9cfa5f8fef4626f0a6ae66fed67",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S027",
+          "instrument_id": "000338.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "716b6b34e6b92a3207b388f0a17ee4c2445f7dd3fa690b1152d15f93e8f9e26b",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S028",
+          "instrument_id": "000526.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_prior_independent_source_judgment",
+          "fact_sha256": "a0222772d4c1d4ec0a59ca9d0be678caafa2eb3c736d2956d242dafe8590624c",
+          "metric_count": 0,
+          "prior_decision": {
+            "source_audit_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-path-validation-20261122/a-semantic-decisions.json",
+            "source_audit_sha256": "64da2dd6d2bc7d7bda7c7ceabe857faa6b6c8eb5cdedf38abe64244b5eabb588",
+            "locator": "/companies/9/supported/0",
+            "stage": "original-automatic-final"
+          }
+        },
+        {
+          "sample_id": "S029",
+          "instrument_id": "000526.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "6ccb74b73a845124091e5b7cbed16c7b347a77d1e178a774908c55641ea10047",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S030",
+          "instrument_id": "000526.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "8bc053e1798871787eddbede0f8924b9ec46f6a02f014285bd098dbaa2272479",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S031",
+          "instrument_id": "000526.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "4310838bc11b3de1335eb8ac363b6979974818d7173dc089af532d2bad59d151",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S032",
+          "instrument_id": "000651.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c77d4634ac89d1aa9e553a8c103d1f4bf48c0f0377b67202214c05591f08c57d",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S033",
+          "instrument_id": "000651.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "e4bd419b2a6c2d1513980279a37684b2b8d2ad9f4e2dfdc789468bf21114e4b1",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S034",
+          "instrument_id": "000651.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "28e6aacc0217d48025911ab9ca867274843a7f2e1c714c8a8772d3311c2cdefb",
+          "metric_count": 6
+        },
+        {
+          "sample_id": "S035",
+          "instrument_id": "000651.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "35254c188ac59449d81a9a831c371ba81b62a722fbc4ad6e2687fa961c0ca18e",
+          "metric_count": 6
+        },
+        {
+          "sample_id": "S036",
+          "instrument_id": "000652.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "a600c3b8ca6cdefd0459c7441ca5e85a949fbd910b2e96f2f8efe0fb6b8eb1eb",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S037",
+          "instrument_id": "000652.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "0f40d5359d4e1ec99df1108e66b07e5926161027eb5284c555ad51d6146b2bd9",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S038",
+          "instrument_id": "000652.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "69b5f1f774a9a20dde03609eb2de496c248b52906abe059bfd9a73327a03fa38",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S039",
+          "instrument_id": "000652.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c64faa40c194c859aa78fecf0cc49ba5eae7a9c185602ebae049543fe338bf41",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S040",
+          "instrument_id": "000652.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "fe13030541169dd522e143e0de9147a924d3e448390a653369b1d9e1ee6bdc12",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S041",
+          "instrument_id": "300012.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "07f001b4a668a40175db2e682b25d2546e11e4531fb02dd6ced0d34256ca6505",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S042",
+          "instrument_id": "300012.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "bf470667a4745ef6add758102905174ecede030d6852246e1890b2585732b77b",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S043",
+          "instrument_id": "300012.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "25bd2fd5ef96bac13979bfb0e5a0409bf97a95bcbb368f4dc1cf9d27c9cf84a9",
+          "metric_count": 1
+        },
+        {
+          "sample_id": "S044",
+          "instrument_id": "300012.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "077f891031f3ad23ecb19bce0edafbb60e4a56791dae93cd711eece8b53ed95c",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S045",
+          "instrument_id": "300015.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "17863ce8862272bc594176bfdc896bc0fe25e73c9df56edad157ef2b8fda2772",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S046",
+          "instrument_id": "300015.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "9051759e8b583994d86e8ba67f4a2a957f15688a1fe581e6b9e7cbba63ca424f",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S047",
+          "instrument_id": "300015.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "0e0d65ee32d0d94bace7614e5e387843eb944f133725483cc709a93c77cd692e",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S048",
+          "instrument_id": "300015.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "6d84d8dddddbaa89a6cc8f68694ea885789ea0ba7ff80998fa510338a02dcb79",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S049",
+          "instrument_id": "300015.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c6508bf2b7bb3e2f3942cc70957813f1b6db0e66a5abb9289fcb3338baa63553",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S050",
+          "instrument_id": "300124.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "a123db6955fec6f6158ea48fd4a2473dde256ad9e9f6f116e723f22a8a400739",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S051",
+          "instrument_id": "300124.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "595070a0c014028b9ef86a01963dc4a7f85674c58cae7b35038d80ac2948b658",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S052",
+          "instrument_id": "300124.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "51265639167453491d5ede864573ef682b77eccd4d87ba74b9abe311524eadab",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S053",
+          "instrument_id": "300124.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "2bd99067d835befa61d7f612bff48e36edb69941b67b242b206e5599b0ffed8f",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S054",
+          "instrument_id": "300124.SZ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "e3e232cf9fd7ed187f3a4d0b36ad818795f7baf20c69d94874499004d5181d84",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S055",
+          "instrument_id": "600015.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "94e049a4a3be4a6254b9fd03a39406c29958b6d2fbfc0aedf59a83a117585d02",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S056",
+          "instrument_id": "600015.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "ae48f880fce126929dc0c89922bcd827121f7f7275cb4eb6b647dee16457b279",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S057",
+          "instrument_id": "600015.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "1f34fe21cd9c0310d48543f90715f7e79da75017432c67e29cea6b1ea86bc51f",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S058",
+          "instrument_id": "600015.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c467379640cad867bbc987636a1f939792ff671ff49b247b815ca3584c01ed0b",
+          "metric_count": 3
+        },
+        {
+          "sample_id": "S059",
+          "instrument_id": "600015.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "306fc5e00dba6ee968218190686e2ee320d71e1a684852a562595df717869e41",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S060",
+          "instrument_id": "600153.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_prior_independent_source_judgment",
+          "fact_sha256": "d85b58e72e35926fedad776dd0cc64192c3002737eed33394e78fdde452577f1",
+          "metric_count": 0,
+          "prior_decision": {
+            "source_audit_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-audit-group-3.json",
+            "source_audit_sha256": "974ac54967a1b39d1a55699dd42808ec4f3666a26881d19c44419d70669e1f65",
+            "locator": "/companies/1/stages/first/objects/0",
+            "stage": "first"
+          }
+        },
+        {
+          "sample_id": "S061",
+          "instrument_id": "600153.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "5bac7a3f82f104466d01ba3850694e2b2bcbbd9861c39a2b773db9273244c5f1",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S062",
+          "instrument_id": "600153.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "3d0648011ffaf550894b897ca9501a511d234766c484d9577b10f3e28af67f32",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S063",
+          "instrument_id": "600153.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d673ebcff6345019de2b5d7d1c6cff6eaf0593d9364cb79030ef4143717157c0",
+          "metric_count": 3
+        },
+        {
+          "sample_id": "S064",
+          "instrument_id": "600177.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "b9d7223d337b014898b72307fcd44d8ea135e8429068add0d20c02df061a0d90",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S065",
+          "instrument_id": "600177.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_prior_independent_source_judgment",
+          "fact_sha256": "ba376fe2d15b8f2b00ab501693576b89870b0292ce971c3240a5eb56496d407b",
+          "metric_count": 0,
+          "prior_decision": {
+            "source_audit_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-audit-group-3.json",
+            "source_audit_sha256": "974ac54967a1b39d1a55699dd42808ec4f3666a26881d19c44419d70669e1f65",
+            "locator": "/companies/3/stages/first/objects/1",
+            "stage": "first"
+          }
+        },
+        {
+          "sample_id": "S066",
+          "instrument_id": "600177.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "0f5398468041c7b506cb1f5693f7d00fea1b2fd8fa109938aed096c48e6d8afc",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S067",
+          "instrument_id": "600177.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "e09b9d5aa32ff5f18a60843c8c07ece5226548d733690aa6b8ea15631112f2b2",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S068",
+          "instrument_id": "600177.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "8beff2a2441ab83554f5b6bca10d24e1ecc33cca64c27d0ee564e988f78f5be6",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S069",
+          "instrument_id": "600316.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "not_assessed",
+          "reason": "Changed historical content lacks an unambiguous exact independent verdict",
+          "fact_sha256": "74f89ba226f81ee90aff41f7facc03323cdb4d70efdfbd68898b720fb397f16d"
+        },
+        {
+          "sample_id": "S070",
+          "instrument_id": "600316.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "fb7a868b6adae09d8e9a38c80c54177e601ced974cee6915a42c097279e192ba",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S071",
+          "instrument_id": "600316.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "0e77c718fed66d7318e268271cf2fdbb73443032e9d94647623d76e0a149f6f5",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S072",
+          "instrument_id": "600316.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c6b0dc16cffb1a8eb6240d65fd1fe6f4270b530827b016ee7361d8b1212ab92d",
+          "metric_count": 3
+        },
+        {
+          "sample_id": "S073",
+          "instrument_id": "600316.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "4ca78c6740a59b2ed77f512fa57ae084d0e7dd282001283536a582403701b62e",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S074",
+          "instrument_id": "600348.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "50170fe2cb0188cd83452a7805f5e8b28a4cafd188361a9d709c01b789a147eb",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S075",
+          "instrument_id": "600348.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "eb9f134d54330d1033eebdb015c1de90444121f8263b1bad22ee306dd75eb075",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S076",
+          "instrument_id": "600348.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "e082746feef9f4288abe388b179e02382735d695eb2713010f33615c99bf2310",
+          "metric_count": 5
+        },
+        {
+          "sample_id": "S077",
+          "instrument_id": "600348.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d48f3ba456f1eb2a4bdc685343f47ad70d40cd12ad2e59f249d2d3b28ed09264",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S078",
+          "instrument_id": "600348.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c0d3804c5be031833f5656c9a151126e09dd4d432e42c2e6871c8f0e1e6eb95b",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S079",
+          "instrument_id": "600350.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "bbe923d126b01f3a5c5dd9a6fbbbe591e587976a94cb72e52772957c7918cf21",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S080",
+          "instrument_id": "600350.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "6255cb3d5ee39e2e8b17beed414dddfdbfe09c37534585df2193804a19d6eff3",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S081",
+          "instrument_id": "600350.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "929fb08024a4714c6974583d962cc5fbdd4886637c2b228494b857daefae7877",
+          "metric_count": 1
+        },
+        {
+          "sample_id": "S082",
+          "instrument_id": "600350.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "995b56fced041c01e6fc08ab6c7f7dcd99f22ec1119a73349e4683aa0df4c808",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S083",
+          "instrument_id": "600390.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "29178c63b5f2abce65ff417a553bb7e74cae8609736332e2e702b2ab6366d6d7",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S084",
+          "instrument_id": "600390.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "1f6cf4ebcde9b479205012514abedddba6c2e671b1dd44da0b68796ca58c854b",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S085",
+          "instrument_id": "600390.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "419b669b47da31ba3d804fc2618ff3159804a2db818e9706f07596665796fc68",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S086",
+          "instrument_id": "600390.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "190abc1f69e12a2c1769589400a6be3dea416ff46e8eeb8b2ea488bd951caf44",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S087",
+          "instrument_id": "600690.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "e731cb356710e6ce959129d25f9a0588349783bdeca2e5bfd6e758f6b7f166f0",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S088",
+          "instrument_id": "600690.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "06e80b3c942917eeb439af93fff29e2d8741430f8093ad452443f3c8c9573cad",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S089",
+          "instrument_id": "600690.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "47ae17a32270c080600596b2af60bc57e80e5f3abe6ea28a149074ad7f8a7de5",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S090",
+          "instrument_id": "600690.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "228eedc9770b713c9e0eb8bf0400064f0b801d9b8d11f9086184f4672c284dc7",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S091",
+          "instrument_id": "600704.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "5c03645cc3aa1068d744c80b964fe4ff2cd2c52f7cc78c3f40f991db39b98c2c",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S092",
+          "instrument_id": "600704.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "2a4c06cc8b7f10ce8a4eeb5728160da00a29f81bcc8b28fa8681840de58104ef",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S093",
+          "instrument_id": "600704.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "7c49b4d93d93fb0c508ff04154011eda19b992138a94bd1912705069e7c2150c",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S094",
+          "instrument_id": "600704.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d6e2707687ee6d4e3c05b01c9100d25b6b3cb4bf631f659d85f4fcae6ea63017",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S095",
+          "instrument_id": "600754.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "8e102ea59c2d93543a6fe6243cf946f5899208e1021dabe5cbdcce3686f347db",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S096",
+          "instrument_id": "600754.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "57fc7671cf022b634b60d073bdde285a5eb6e980a50b455d89a117c5b541ff2f",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S097",
+          "instrument_id": "600754.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c0431e6bf0910a8a515c2c7b6a8b4280f2ecc3b8a7857780b92dd7bf53d8def2",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S098",
+          "instrument_id": "600754.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d782838afc454f4d4d5bb856735dc5c4c0afb327399b21801b7d9418d8560173",
+          "metric_count": 3
+        },
+        {
+          "sample_id": "S099",
+          "instrument_id": "600859.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "55794716ea04f315d12adde5adea265d9d6400a526bda5108601be5564f6ede3",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S100",
+          "instrument_id": "600859.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d7cb12b59213304e11e708f87f24837c92b6c1bad4e52922a8e70fcb4e00f8fc",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S101",
+          "instrument_id": "600859.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "5e6658404d7303b4483ac754df88529f69fdbddcc1e4f3c4d4ac3656c70c49e4",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S102",
+          "instrument_id": "600859.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d26afeaf809dda3c6559cead0dca4229b1db9661b50813119757a1cc83ffa14f",
+          "metric_count": 1
+        },
+        {
+          "sample_id": "S103",
+          "instrument_id": "600859.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "4fc276ad22149a662ebd9136040ca403fd3530f210355f9ec13619a882a254fa",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S104",
+          "instrument_id": "600887.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "b31928ff1493eb615613df72e46b225d561bee65fed2f6dd294fb51c5fd9d692",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S105",
+          "instrument_id": "600887.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "error",
+          "basis": "exact_prior_independent_source_judgment",
+          "fact_sha256": "fa45432002cee2dbe66608e5cbf3cf23dad776b9bb41fbde28700b36ef2523fc",
+          "metric_count": 0,
+          "prior_decision": {
+            "source_audit_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-audit-group-1.json",
+            "source_audit_sha256": "43e8014561f354b2f5624051732f15cccfe97ae4af395beb4e7ae0dc5e9afa5d",
+            "locator": "/companies/2/stages/first/objects/1",
+            "stage": "first"
+          }
+        },
+        {
+          "sample_id": "S106",
+          "instrument_id": "600887.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "bfe36e7d7360b4c6f0556cfcad094dc902a04e39adfae504f038c0e7659084e2",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S107",
+          "instrument_id": "600887.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "bfcc07a4087ccc08c2e84a335b468dc421f32f05ba459c16c69f5eb7a056aee1",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S108",
+          "instrument_id": "600893.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c497f620a9d0ff7a7d906e18d0f8a6b9c24da52690fc8232e9cb84977ac4d164",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S109",
+          "instrument_id": "600893.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "325c27d6663b39e89ef61881ab461f8068301b14631d1923e381fdabaf016acf",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S110",
+          "instrument_id": "600893.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c27ce28ce00641806522b5bd38c45e6f553eafea68bf783540629611c0dcb3b0",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S111",
+          "instrument_id": "600893.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "730f942af75b4db9ef853caf192b98a4667fa2b56295111c33566ef8a39407b5",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S112",
+          "instrument_id": "600893.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "ef9cb3d0aec141dbdb0ea0ec26363bdcd49c5423d7bc10e94fe53f79ab32b141",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S113",
+          "instrument_id": "600900.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d210524ee437c94a8f8856a4416e79ed59e42b04f7442dc7bf006824a04f419a",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S114",
+          "instrument_id": "600900.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "cde5c2ded8a74d40bb800beea637714bf8409711d3865de2ee52388a8c5baf75",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S115",
+          "instrument_id": "600900.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "347cdb68a6bde9d605ab06c59672e80074a21825ddeb288936ced042d53a4dea",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S116",
+          "instrument_id": "600900.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "44cd507eb54b2f46e1f67e44efe6a3a09a5d7ff0e23a4c211ba5c4c7a66d0ac9",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S117",
+          "instrument_id": "600900.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "7e99a246115368e7b9564919f274b218d0f45f73a57f786c484f17853a68a804",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S118",
+          "instrument_id": "600901.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "not_assessed",
+          "reason": "Changed historical content lacks an unambiguous exact independent verdict",
+          "fact_sha256": "37ad60a34be5bc0703335ec6b2896d74727da1399f14bfc2a0a7234bc4cfb0c7"
+        },
+        {
+          "sample_id": "S119",
+          "instrument_id": "600901.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "ca060d4fe373efd6276436fd9e41257a14c1b1beac2467f0cd324dbff55de667",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S120",
+          "instrument_id": "600901.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "1a0a6310a039c4c1d2bb1a252ec3f219a28200d0ae5c7ddb16bd8c187efbc5f1",
+          "metric_count": 3
+        },
+        {
+          "sample_id": "S121",
+          "instrument_id": "600901.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "9a9e370742ee5e99665a0836342d85346942ae5435f7f26c0aee0d88f0bea040",
+          "metric_count": 6
+        },
+        {
+          "sample_id": "S122",
+          "instrument_id": "600901.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "ddb9c231c35d3dc39e1588a9336349b3c0fed823acca84ea02ad575c6a90ba1a",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S123",
+          "instrument_id": "601006.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "716d69b579b06322fdb13841e4704b8ed355906db9c07401a06750408bba8ce7",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S124",
+          "instrument_id": "601006.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "5a7748b496aea385ff6d5e4e3056d5e3679834b4bb5529bc3eb1870700ca6d09",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S125",
+          "instrument_id": "601006.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "0e7be1100917586573b1f38ab79cc7e9cc344a1fbd66672a17cb8de61741a701",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S126",
+          "instrument_id": "601006.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "72f3ad01aff4d874892d3d7f7a892a087eb75460c16622ce6fdd0221845d896c",
+          "metric_count": 5
+        },
+        {
+          "sample_id": "S127",
+          "instrument_id": "601006.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "5f1816fb68028a81e442cce306cd8fc78d89032e74148764c7d75ee17ceeabb9",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S128",
+          "instrument_id": "601166.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d9c4fee03c0dc5ca89aac52c70470e17c0817dd3e1ca533c16793512f0680df1",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S129",
+          "instrument_id": "601166.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "4680e67554ad37ac5856ad43a9d70acb533a47946b7e7e01df53dd703808ddeb",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S130",
+          "instrument_id": "601166.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "2e40fbf98715ea8c2da5ceeb1cc648b8ae866afeb8343bda73ed6baa08f3607b",
+          "metric_count": 3
+        },
+        {
+          "sample_id": "S131",
+          "instrument_id": "601166.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "fc088c287a85e5987fc2dfcab2b364e1922975e11290ce0ca0342e7c22b8b7f1",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S132",
+          "instrument_id": "601166.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "not_assessed",
+          "reason": "Changed historical content lacks an unambiguous exact independent verdict",
+          "fact_sha256": "ac884f36414add03d9abb4b03fe55094ed097f01fca0f536b45331f16ef6e7d4"
+        },
+        {
+          "sample_id": "S133",
+          "instrument_id": "601328.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "983bd8008a5bc186858f44ce52bb6a62ad1acca73e1ee1a0d7d43a592df6ad5a",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S134",
+          "instrument_id": "601328.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "76257b069d165f35fdcad0846203ab2b11d7d234e253c8afc40a349847161489",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S135",
+          "instrument_id": "601328.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "4c42128fa1b74d1417a8599006eacb90c48cb0b4f64e73603ba5f7e72a379175",
+          "metric_count": 1
+        },
+        {
+          "sample_id": "S136",
+          "instrument_id": "601328.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "a86c15dbb540fd4378921cb3b486ad272a8ccd5cba2833d8f828ab307b98d46b",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S137",
+          "instrument_id": "601328.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_prior_independent_source_judgment",
+          "fact_sha256": "4e105cc76a959022238e6ec27f34cb500e44e049e7592a38a8b3d1fa95243a7e",
+          "metric_count": 0,
+          "prior_decision": {
+            "source_audit_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-audit-main.json",
+            "source_audit_sha256": "7895779e07ef4fc6ed93251c13e47895048716b0b4ad4c9639ccd9c2b08ee86c",
+            "locator": "/companies/3/phases/first/objects/21",
+            "stage": "first"
+          }
+        },
+        {
+          "sample_id": "S138",
+          "instrument_id": "601377.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "eb44492bc595d63285885c0ccb22ec37e34249b547fdbd6e17ec640698fabe8e",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S139",
+          "instrument_id": "601377.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "941f34560ea2769b6fa5f63e75143d29f5420e411b3db78bdeb03822ee30236d",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S140",
+          "instrument_id": "601377.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "05fde177ce8918094c397676442960eb77189ab9e08156c5962b27575151679d",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S141",
+          "instrument_id": "601377.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "850edf1e9015b9945198db91860736863c073e36d66e1ed9dbd53bb4eb785524",
+          "metric_count": 6
+        },
+        {
+          "sample_id": "S142",
+          "instrument_id": "601377.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "04f9e31ea5bf1059f392dfec4b0b343b8424792db70ad8c5e4541ac6b86cf779",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S143",
+          "instrument_id": "601628.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "43e116651d4a65fd7893b406a91fd4e20c6200abd1a56b400511c905bf7b5295",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S144",
+          "instrument_id": "601628.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "3bea9fef35a6b671cc075a21f73ba63d52b87129aae3bf1b50ab333928994f50",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S145",
+          "instrument_id": "601628.SH",
+          "counterpart_state": "absent_in_original_author_first_read",
+          "status": "absent",
+          "reason": "same original extraction has no selected factID; do not substitute another fact"
+        },
+        {
+          "sample_id": "S146",
+          "instrument_id": "601628.SH",
+          "counterpart_state": "absent_in_original_author_first_read",
+          "status": "absent",
+          "reason": "same original extraction has no selected factID; do not substitute another fact"
+        },
+        {
+          "sample_id": "S147",
+          "instrument_id": "601628.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "afe66c817c23d8470e7510dc3e876b23a92350a23e65cd3d32eb0587fd775fd2",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S148",
+          "instrument_id": "601668.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "7f6194c3d825f99908722866ec67a3ac298c86b204abfa63b45d9b4a932ecba7",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S149",
+          "instrument_id": "601668.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "21623ad9f9a75d8e12184336ac622b8f3bad11b06259c87b9cfa3789c8f56dc4",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S150",
+          "instrument_id": "601668.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "9a058149c942e4be44ace93b70959f9b55b65b0a2ccff80a308e514386df5f2d",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S151",
+          "instrument_id": "601668.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "7c8dc68d6af4a3bb6bf04e52d7982c71c1bf6251d33f3f451bc1031928abd607",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S152",
+          "instrument_id": "601872.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "b52e61239488bc31c36be116ffc395debccecc7b18493e948911c0164a560c9e",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S153",
+          "instrument_id": "601872.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "e4039aa30fbc26e1781421b3462f9512b1018dc964480c686046317353c4e8db",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S154",
+          "instrument_id": "601872.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "a3b38dd4bcb7a2140de85bb053bce90b4a972db062b1073a0f7f45b6e769402b",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S155",
+          "instrument_id": "601872.SH",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d66b5b7ab82d051424e2063ce56e0a04e7e0802a224fb997e8d55440374ac5c8",
+          "metric_count": 1
+        },
+        {
+          "sample_id": "S156",
+          "instrument_id": "920003.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_prior_independent_source_judgment",
+          "fact_sha256": "353cea9a1b5df65f1144760117d276f1bcef4c807addbf73a446fc9a97079080",
+          "metric_count": 0,
+          "prior_decision": {
+            "source_audit_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-audit-group-3.json",
+            "source_audit_sha256": "974ac54967a1b39d1a55699dd42808ec4f3666a26881d19c44419d70669e1f65",
+            "locator": "/companies/4/stages/first/objects/0",
+            "stage": "first"
+          }
+        },
+        {
+          "sample_id": "S157",
+          "instrument_id": "920003.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c2396de81288543366e47d4f0c0b291718050f4fa4d47e88b8a4a6bbeb2a7287",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S158",
+          "instrument_id": "920003.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "fe1fc2ecd6aa86528af2a3a30a222e11ec7a67825f08da1bf42fe2da01e4179b",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S159",
+          "instrument_id": "920003.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "fd93779aa0cdf4ef66a993dddb643447e053e26a039945ec054de477953caee9",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S160",
+          "instrument_id": "920003.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "10f85c46b5a5e8c2588e857f103a56aa0e6c97fa50222e4b81edb1f724e9306d",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S161",
+          "instrument_id": "920006.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "f4145299a315a6bbb31f60bcb882c646b832af487207752c7e5b0a66eba69a88",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S162",
+          "instrument_id": "920006.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "352f18008f957d06de0180b4219f1897b641c3b1d6ab2376c0dd1b79775dd4e8",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S163",
+          "instrument_id": "920006.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "e6e4531211de808298f4866d4bcb16b76d6d93d2733f757b0db8643d2a8a792a",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S164",
+          "instrument_id": "920006.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "3a8178f013a07afce73f970b9af495e071379ead04f26314f795c25265eaa3dd",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S165",
+          "instrument_id": "920007.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "f20f8baf1d17190d0636c4c1d09f0da12e92d0584e865e79036c3cc1044d3040",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S166",
+          "instrument_id": "920007.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "255519b72bb91e0987f73eab87ec8501f213b0c92951dad047904c0f719580bf",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S167",
+          "instrument_id": "920007.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "cca01b2d6b5d9c9e346d5ff02944bf90d35b716fabfb911e9a59bf2cb656c416",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S168",
+          "instrument_id": "920007.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "be6de41c5fc7a686acddc338451605ea942f904935f2e9badfd0c9312252b2ef",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S169",
+          "instrument_id": "920014.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "864efeb9e972382aad20deac16845d0b14b12d8db32e061e39856003bf837cca",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S170",
+          "instrument_id": "920014.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "1f7bd59685f771e4765b7a3f8b0ddb601b4a7dcf5d1791f679a860cf6622aac2",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S171",
+          "instrument_id": "920014.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "4470c1c5d69af3f6289b89c9fb88eade915e950d6ba122e9800995bef6da530c",
+          "metric_count": 6
+        },
+        {
+          "sample_id": "S172",
+          "instrument_id": "920014.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "4969cc74706426d18c38e4719220a2aa2a2f7cdb12d8f11066ec16655b18a038",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S173",
+          "instrument_id": "920014.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "916a88b2732451e69c9e1cdc478c46adcf3e462970b5108921abd6fd80f7c9dc",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S174",
+          "instrument_id": "920017.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d3a6b7fd77c7ba358a3dcd839dc005ad51e69b266363de2c63bfd9308d77a97a",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S175",
+          "instrument_id": "920017.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "72b5c1f924993a52279d5bd98fa013309fee1dc8ffffcded57c294fe02ad368b",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S176",
+          "instrument_id": "920017.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "49278cb58f5476518388b7f714645c574b1cef9bc9dc14f2b864379c399541a5",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S177",
+          "instrument_id": "920017.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "b85d9cfced4c26f64848e97690fc3ce0eb0b28d3f655fb2edc736d3f5e63232e",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S178",
+          "instrument_id": "920017.BJ",
+          "counterpart_state": "exact_saved_first_read",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "085c255ac8501166000244de571247eb626bbe612e89c4d37ca2651af77ab769",
+          "metric_count": 0
+        }
+      ]
+    },
+    "model_after_review": {
+      "frozen_corresponding_sample_slots": 178,
+      "counts": {
+        "supported": 178
+      },
+      "independently_judged": 178,
+      "audited_slot_coverage_percent": 100.0,
+      "judged_sample_precision_percent": 100.0,
+      "rows": [
+        {
+          "sample_id": "S001",
+          "instrument_id": "000006.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c278017604d4525278f2a99277b39387635e0d3bafd5a52f15decf748db5c159",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S002",
+          "instrument_id": "000006.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "6fb72d281058fc42528cd27bc8a3a98eb1fd1e5825cc628505f7e4994347d109",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S003",
+          "instrument_id": "000006.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "fa912535770d4404518bf06ba249ce0783b0e211a36a4a40af8f4c01b873ca37",
+          "metric_count": 6
+        },
+        {
+          "sample_id": "S004",
+          "instrument_id": "000006.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "829c9b7de7309a56e385fa72bccbdc5fd14b618a5cb9ed4ba1f723365fd6f114",
+          "metric_count": 3
+        },
+        {
+          "sample_id": "S005",
+          "instrument_id": "000006.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "7a79b35ca4350676ed21b097f272f7c4f92e217b5870f8da7c4fa9c7f0fe07c7",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S006",
+          "instrument_id": "000039.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "80f230d2ef0f410df3bded515970550a78fff3fd729443a9592d3689aa025f54",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S007",
+          "instrument_id": "000039.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "63297f6c912b418640dd8d493040bbc83630689a6b029528c53c920394a0c284",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S008",
+          "instrument_id": "000039.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "83977732ef4808fe70eafbc09b7e24f8d20047af9313e752985825796e3fc797",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S009",
+          "instrument_id": "000039.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "e4a83c33bb19b1630116688647ca34bace09e261eb408464ac7da1dc95341fc9",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S010",
+          "instrument_id": "000049.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c5adfddc4ba643f5684bf8be879ce9af96d0eea7a2abc002abc9b02783d4d398",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S011",
+          "instrument_id": "000049.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "db01b9d2a7e94a0154a903fa898f656b8f5bac3d1e7dffb7267d48d119370a6d",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S012",
+          "instrument_id": "000049.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "2ffac6f26ca0047062c03c20af0239b352aee26ae38bd91cfca0768469f1c83b",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S013",
+          "instrument_id": "000049.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "25ca0492d94433d4181b5779c223c7b3da44036ad72b6abce2cf5e8618ad7711",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S014",
+          "instrument_id": "000099.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "507825b250ce9b5b75c864387f5ff821bfd8e9d1d02f86146cf699efdc0cab8a",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S015",
+          "instrument_id": "000099.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "b3a1783a4224ca1a645de6b76869bf5f59b478015aa0d8b8bef3c707924e65f7",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S016",
+          "instrument_id": "000099.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "65e920b23935234b2fb07716168ed43ea66b59094b14ff8acc4979517ddab96a",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S017",
+          "instrument_id": "000099.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "94f9d3f294f30e22a20785d82b70c705096259ae541f1d669011e8206da0b533",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S018",
+          "instrument_id": "000156.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c4a860b33e615a5785c82ff5d276c52f05b60d650ad2fbbec84782ec398f7304",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S019",
+          "instrument_id": "000156.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "97f7190dbebfdebf47cd0f87a525fcb0259524217bd2948d6396e0a8abd07037",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S020",
+          "instrument_id": "000156.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "7a09fc9d4468ed324867808cdadf9293e57a6aaf02338a21bb72ad7ca3c848df",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S021",
+          "instrument_id": "000156.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "962cf965db96048bb392f1ae90888b114403b53b229fe054022b2c69e7ac2c16",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S022",
+          "instrument_id": "000156.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "125763ed8c218da47be1124602bdd606b989deb6ce3029eb3a3b5607c5480f9a",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S023",
+          "instrument_id": "000338.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "00714acc750e93aabb223e8bd524e625200513584f95ce5115b2e77278aa27b6",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S024",
+          "instrument_id": "000338.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "b01e1691ae66cde837a4392291b7a1d7dc4b7284768cf7e811ae9d50af57b0b8",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S025",
+          "instrument_id": "000338.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "8a4b926c95a8b862bd40d5c1d71453a6eb0441efc1d9946cc30cf4425e620cdd",
+          "metric_count": 1
+        },
+        {
+          "sample_id": "S026",
+          "instrument_id": "000338.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "6a8dfe0c54e98264da55bb1b65917b98a26dd9cfa5f8fef4626f0a6ae66fed67",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S027",
+          "instrument_id": "000338.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "716b6b34e6b92a3207b388f0a17ee4c2445f7dd3fa690b1152d15f93e8f9e26b",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S028",
+          "instrument_id": "000526.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "a005943f80db9a749d293b4cdcf905f2d7c931a980163414711c616344a09218",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S029",
+          "instrument_id": "000526.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "6ccb74b73a845124091e5b7cbed16c7b347a77d1e178a774908c55641ea10047",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S030",
+          "instrument_id": "000526.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "8bc053e1798871787eddbede0f8924b9ec46f6a02f014285bd098dbaa2272479",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S031",
+          "instrument_id": "000526.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "4310838bc11b3de1335eb8ac363b6979974818d7173dc089af532d2bad59d151",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S032",
+          "instrument_id": "000651.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c77d4634ac89d1aa9e553a8c103d1f4bf48c0f0377b67202214c05591f08c57d",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S033",
+          "instrument_id": "000651.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "e4bd419b2a6c2d1513980279a37684b2b8d2ad9f4e2dfdc789468bf21114e4b1",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S034",
+          "instrument_id": "000651.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "28e6aacc0217d48025911ab9ca867274843a7f2e1c714c8a8772d3311c2cdefb",
+          "metric_count": 6
+        },
+        {
+          "sample_id": "S035",
+          "instrument_id": "000651.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "35254c188ac59449d81a9a831c371ba81b62a722fbc4ad6e2687fa961c0ca18e",
+          "metric_count": 6
+        },
+        {
+          "sample_id": "S036",
+          "instrument_id": "000652.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "a600c3b8ca6cdefd0459c7441ca5e85a949fbd910b2e96f2f8efe0fb6b8eb1eb",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S037",
+          "instrument_id": "000652.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "0f40d5359d4e1ec99df1108e66b07e5926161027eb5284c555ad51d6146b2bd9",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S038",
+          "instrument_id": "000652.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "69b5f1f774a9a20dde03609eb2de496c248b52906abe059bfd9a73327a03fa38",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S039",
+          "instrument_id": "000652.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c64faa40c194c859aa78fecf0cc49ba5eae7a9c185602ebae049543fe338bf41",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S040",
+          "instrument_id": "000652.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "fe13030541169dd522e143e0de9147a924d3e448390a653369b1d9e1ee6bdc12",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S041",
+          "instrument_id": "300012.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "07f001b4a668a40175db2e682b25d2546e11e4531fb02dd6ced0d34256ca6505",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S042",
+          "instrument_id": "300012.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "bf470667a4745ef6add758102905174ecede030d6852246e1890b2585732b77b",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S043",
+          "instrument_id": "300012.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "25bd2fd5ef96bac13979bfb0e5a0409bf97a95bcbb368f4dc1cf9d27c9cf84a9",
+          "metric_count": 1
+        },
+        {
+          "sample_id": "S044",
+          "instrument_id": "300012.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "077f891031f3ad23ecb19bce0edafbb60e4a56791dae93cd711eece8b53ed95c",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S045",
+          "instrument_id": "300015.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "17863ce8862272bc594176bfdc896bc0fe25e73c9df56edad157ef2b8fda2772",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S046",
+          "instrument_id": "300015.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "9051759e8b583994d86e8ba67f4a2a957f15688a1fe581e6b9e7cbba63ca424f",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S047",
+          "instrument_id": "300015.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "0e0d65ee32d0d94bace7614e5e387843eb944f133725483cc709a93c77cd692e",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S048",
+          "instrument_id": "300015.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "6d84d8dddddbaa89a6cc8f68694ea885789ea0ba7ff80998fa510338a02dcb79",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S049",
+          "instrument_id": "300015.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c6508bf2b7bb3e2f3942cc70957813f1b6db0e66a5abb9289fcb3338baa63553",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S050",
+          "instrument_id": "300124.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "a123db6955fec6f6158ea48fd4a2473dde256ad9e9f6f116e723f22a8a400739",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S051",
+          "instrument_id": "300124.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "595070a0c014028b9ef86a01963dc4a7f85674c58cae7b35038d80ac2948b658",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S052",
+          "instrument_id": "300124.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "51265639167453491d5ede864573ef682b77eccd4d87ba74b9abe311524eadab",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S053",
+          "instrument_id": "300124.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "2bd99067d835befa61d7f612bff48e36edb69941b67b242b206e5599b0ffed8f",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S054",
+          "instrument_id": "300124.SZ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "e3e232cf9fd7ed187f3a4d0b36ad818795f7baf20c69d94874499004d5181d84",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S055",
+          "instrument_id": "600015.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "94e049a4a3be4a6254b9fd03a39406c29958b6d2fbfc0aedf59a83a117585d02",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S056",
+          "instrument_id": "600015.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "ae48f880fce126929dc0c89922bcd827121f7f7275cb4eb6b647dee16457b279",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S057",
+          "instrument_id": "600015.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "1f34fe21cd9c0310d48543f90715f7e79da75017432c67e29cea6b1ea86bc51f",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S058",
+          "instrument_id": "600015.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c467379640cad867bbc987636a1f939792ff671ff49b247b815ca3584c01ed0b",
+          "metric_count": 3
+        },
+        {
+          "sample_id": "S059",
+          "instrument_id": "600015.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "306fc5e00dba6ee968218190686e2ee320d71e1a684852a562595df717869e41",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S060",
+          "instrument_id": "600153.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "a6b49fe1fd99edd963ed5973ddf4ba00470449e961bb7cb046f76cda0b87fadc",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S061",
+          "instrument_id": "600153.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "5bac7a3f82f104466d01ba3850694e2b2bcbbd9861c39a2b773db9273244c5f1",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S062",
+          "instrument_id": "600153.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "3d0648011ffaf550894b897ca9501a511d234766c484d9577b10f3e28af67f32",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S063",
+          "instrument_id": "600153.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d673ebcff6345019de2b5d7d1c6cff6eaf0593d9364cb79030ef4143717157c0",
+          "metric_count": 3
+        },
+        {
+          "sample_id": "S064",
+          "instrument_id": "600177.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "b9d7223d337b014898b72307fcd44d8ea135e8429068add0d20c02df061a0d90",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S065",
+          "instrument_id": "600177.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "3ceb7b2919ed7215fdee845a8fb166986a3302aaa8ae956c00b068843568d5b9",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S066",
+          "instrument_id": "600177.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "0f5398468041c7b506cb1f5693f7d00fea1b2fd8fa109938aed096c48e6d8afc",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S067",
+          "instrument_id": "600177.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "e09b9d5aa32ff5f18a60843c8c07ece5226548d733690aa6b8ea15631112f2b2",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S068",
+          "instrument_id": "600177.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "8beff2a2441ab83554f5b6bca10d24e1ecc33cca64c27d0ee564e988f78f5be6",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S069",
+          "instrument_id": "600316.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "71586869e354d5ca3e44ca4ca20a95d6979f39cd6ece9259a8799f7752b1bf87",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S070",
+          "instrument_id": "600316.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "fb7a868b6adae09d8e9a38c80c54177e601ced974cee6915a42c097279e192ba",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S071",
+          "instrument_id": "600316.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "0e77c718fed66d7318e268271cf2fdbb73443032e9d94647623d76e0a149f6f5",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S072",
+          "instrument_id": "600316.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c6b0dc16cffb1a8eb6240d65fd1fe6f4270b530827b016ee7361d8b1212ab92d",
+          "metric_count": 3
+        },
+        {
+          "sample_id": "S073",
+          "instrument_id": "600316.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "4ca78c6740a59b2ed77f512fa57ae084d0e7dd282001283536a582403701b62e",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S074",
+          "instrument_id": "600348.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "50170fe2cb0188cd83452a7805f5e8b28a4cafd188361a9d709c01b789a147eb",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S075",
+          "instrument_id": "600348.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "eb9f134d54330d1033eebdb015c1de90444121f8263b1bad22ee306dd75eb075",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S076",
+          "instrument_id": "600348.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "e082746feef9f4288abe388b179e02382735d695eb2713010f33615c99bf2310",
+          "metric_count": 5
+        },
+        {
+          "sample_id": "S077",
+          "instrument_id": "600348.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d48f3ba456f1eb2a4bdc685343f47ad70d40cd12ad2e59f249d2d3b28ed09264",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S078",
+          "instrument_id": "600348.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c0d3804c5be031833f5656c9a151126e09dd4d432e42c2e6871c8f0e1e6eb95b",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S079",
+          "instrument_id": "600350.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "bbe923d126b01f3a5c5dd9a6fbbbe591e587976a94cb72e52772957c7918cf21",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S080",
+          "instrument_id": "600350.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "6255cb3d5ee39e2e8b17beed414dddfdbfe09c37534585df2193804a19d6eff3",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S081",
+          "instrument_id": "600350.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "929fb08024a4714c6974583d962cc5fbdd4886637c2b228494b857daefae7877",
+          "metric_count": 1
+        },
+        {
+          "sample_id": "S082",
+          "instrument_id": "600350.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "995b56fced041c01e6fc08ab6c7f7dcd99f22ec1119a73349e4683aa0df4c808",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S083",
+          "instrument_id": "600390.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "29178c63b5f2abce65ff417a553bb7e74cae8609736332e2e702b2ab6366d6d7",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S084",
+          "instrument_id": "600390.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "1f6cf4ebcde9b479205012514abedddba6c2e671b1dd44da0b68796ca58c854b",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S085",
+          "instrument_id": "600390.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "419b669b47da31ba3d804fc2618ff3159804a2db818e9706f07596665796fc68",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S086",
+          "instrument_id": "600390.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "190abc1f69e12a2c1769589400a6be3dea416ff46e8eeb8b2ea488bd951caf44",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S087",
+          "instrument_id": "600690.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "e731cb356710e6ce959129d25f9a0588349783bdeca2e5bfd6e758f6b7f166f0",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S088",
+          "instrument_id": "600690.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "06e80b3c942917eeb439af93fff29e2d8741430f8093ad452443f3c8c9573cad",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S089",
+          "instrument_id": "600690.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "47ae17a32270c080600596b2af60bc57e80e5f3abe6ea28a149074ad7f8a7de5",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S090",
+          "instrument_id": "600690.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "228eedc9770b713c9e0eb8bf0400064f0b801d9b8d11f9086184f4672c284dc7",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S091",
+          "instrument_id": "600704.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "5c03645cc3aa1068d744c80b964fe4ff2cd2c52f7cc78c3f40f991db39b98c2c",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S092",
+          "instrument_id": "600704.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "2a4c06cc8b7f10ce8a4eeb5728160da00a29f81bcc8b28fa8681840de58104ef",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S093",
+          "instrument_id": "600704.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "7c49b4d93d93fb0c508ff04154011eda19b992138a94bd1912705069e7c2150c",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S094",
+          "instrument_id": "600704.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d6e2707687ee6d4e3c05b01c9100d25b6b3cb4bf631f659d85f4fcae6ea63017",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S095",
+          "instrument_id": "600754.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "8e102ea59c2d93543a6fe6243cf946f5899208e1021dabe5cbdcce3686f347db",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S096",
+          "instrument_id": "600754.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "57fc7671cf022b634b60d073bdde285a5eb6e980a50b455d89a117c5b541ff2f",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S097",
+          "instrument_id": "600754.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c0431e6bf0910a8a515c2c7b6a8b4280f2ecc3b8a7857780b92dd7bf53d8def2",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S098",
+          "instrument_id": "600754.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d782838afc454f4d4d5bb856735dc5c4c0afb327399b21801b7d9418d8560173",
+          "metric_count": 3
+        },
+        {
+          "sample_id": "S099",
+          "instrument_id": "600859.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "55794716ea04f315d12adde5adea265d9d6400a526bda5108601be5564f6ede3",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S100",
+          "instrument_id": "600859.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d7cb12b59213304e11e708f87f24837c92b6c1bad4e52922a8e70fcb4e00f8fc",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S101",
+          "instrument_id": "600859.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "5e6658404d7303b4483ac754df88529f69fdbddcc1e4f3c4d4ac3656c70c49e4",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S102",
+          "instrument_id": "600859.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d26afeaf809dda3c6559cead0dca4229b1db9661b50813119757a1cc83ffa14f",
+          "metric_count": 1
+        },
+        {
+          "sample_id": "S103",
+          "instrument_id": "600859.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "4fc276ad22149a662ebd9136040ca403fd3530f210355f9ec13619a882a254fa",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S104",
+          "instrument_id": "600887.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "b31928ff1493eb615613df72e46b225d561bee65fed2f6dd294fb51c5fd9d692",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S105",
+          "instrument_id": "600887.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "fa0bfdbeaf2279a69d5e494829c90c7cf176f189673ae203b2d20504f1a7cdb2",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S106",
+          "instrument_id": "600887.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "bfe36e7d7360b4c6f0556cfcad094dc902a04e39adfae504f038c0e7659084e2",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S107",
+          "instrument_id": "600887.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "bfcc07a4087ccc08c2e84a335b468dc421f32f05ba459c16c69f5eb7a056aee1",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S108",
+          "instrument_id": "600893.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c497f620a9d0ff7a7d906e18d0f8a6b9c24da52690fc8232e9cb84977ac4d164",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S109",
+          "instrument_id": "600893.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "325c27d6663b39e89ef61881ab461f8068301b14631d1923e381fdabaf016acf",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S110",
+          "instrument_id": "600893.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c27ce28ce00641806522b5bd38c45e6f553eafea68bf783540629611c0dcb3b0",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S111",
+          "instrument_id": "600893.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "730f942af75b4db9ef853caf192b98a4667fa2b56295111c33566ef8a39407b5",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S112",
+          "instrument_id": "600893.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "ef9cb3d0aec141dbdb0ea0ec26363bdcd49c5423d7bc10e94fe53f79ab32b141",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S113",
+          "instrument_id": "600900.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d210524ee437c94a8f8856a4416e79ed59e42b04f7442dc7bf006824a04f419a",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S114",
+          "instrument_id": "600900.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "cde5c2ded8a74d40bb800beea637714bf8409711d3865de2ee52388a8c5baf75",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S115",
+          "instrument_id": "600900.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "347cdb68a6bde9d605ab06c59672e80074a21825ddeb288936ced042d53a4dea",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S116",
+          "instrument_id": "600900.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "44cd507eb54b2f46e1f67e44efe6a3a09a5d7ff0e23a4c211ba5c4c7a66d0ac9",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S117",
+          "instrument_id": "600900.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "7e99a246115368e7b9564919f274b218d0f45f73a57f786c484f17853a68a804",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S118",
+          "instrument_id": "600901.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "bb66994f9cdd4de3d1416e9a8f9de8f804d6eb37863e6cb6be0caad80eeff373",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S119",
+          "instrument_id": "600901.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "ca060d4fe373efd6276436fd9e41257a14c1b1beac2467f0cd324dbff55de667",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S120",
+          "instrument_id": "600901.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "1a0a6310a039c4c1d2bb1a252ec3f219a28200d0ae5c7ddb16bd8c187efbc5f1",
+          "metric_count": 3
+        },
+        {
+          "sample_id": "S121",
+          "instrument_id": "600901.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "9a9e370742ee5e99665a0836342d85346942ae5435f7f26c0aee0d88f0bea040",
+          "metric_count": 6
+        },
+        {
+          "sample_id": "S122",
+          "instrument_id": "600901.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "ddb9c231c35d3dc39e1588a9336349b3c0fed823acca84ea02ad575c6a90ba1a",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S123",
+          "instrument_id": "601006.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "716d69b579b06322fdb13841e4704b8ed355906db9c07401a06750408bba8ce7",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S124",
+          "instrument_id": "601006.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "5a7748b496aea385ff6d5e4e3056d5e3679834b4bb5529bc3eb1870700ca6d09",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S125",
+          "instrument_id": "601006.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "0e7be1100917586573b1f38ab79cc7e9cc344a1fbd66672a17cb8de61741a701",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S126",
+          "instrument_id": "601006.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "72f3ad01aff4d874892d3d7f7a892a087eb75460c16622ce6fdd0221845d896c",
+          "metric_count": 5
+        },
+        {
+          "sample_id": "S127",
+          "instrument_id": "601006.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "5f1816fb68028a81e442cce306cd8fc78d89032e74148764c7d75ee17ceeabb9",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S128",
+          "instrument_id": "601166.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d9c4fee03c0dc5ca89aac52c70470e17c0817dd3e1ca533c16793512f0680df1",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S129",
+          "instrument_id": "601166.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "4680e67554ad37ac5856ad43a9d70acb533a47946b7e7e01df53dd703808ddeb",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S130",
+          "instrument_id": "601166.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "2e40fbf98715ea8c2da5ceeb1cc648b8ae866afeb8343bda73ed6baa08f3607b",
+          "metric_count": 3
+        },
+        {
+          "sample_id": "S131",
+          "instrument_id": "601166.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "fc088c287a85e5987fc2dfcab2b364e1922975e11290ce0ca0342e7c22b8b7f1",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S132",
+          "instrument_id": "601166.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "ae9535c8559dd23d6770380bdb5b47f188faddd8bf4c54876d7e9b2ac247a9b8",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S133",
+          "instrument_id": "601328.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "983bd8008a5bc186858f44ce52bb6a62ad1acca73e1ee1a0d7d43a592df6ad5a",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S134",
+          "instrument_id": "601328.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "76257b069d165f35fdcad0846203ab2b11d7d234e253c8afc40a349847161489",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S135",
+          "instrument_id": "601328.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "4c42128fa1b74d1417a8599006eacb90c48cb0b4f64e73603ba5f7e72a379175",
+          "metric_count": 1
+        },
+        {
+          "sample_id": "S136",
+          "instrument_id": "601328.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "a86c15dbb540fd4378921cb3b486ad272a8ccd5cba2833d8f828ab307b98d46b",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S137",
+          "instrument_id": "601328.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "4c7e3c843ab55aa360d1784d518fc5a9cb5a435da9a244c21f775b436daf17b2",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S138",
+          "instrument_id": "601377.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "eb44492bc595d63285885c0ccb22ec37e34249b547fdbd6e17ec640698fabe8e",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S139",
+          "instrument_id": "601377.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "941f34560ea2769b6fa5f63e75143d29f5420e411b3db78bdeb03822ee30236d",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S140",
+          "instrument_id": "601377.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "05fde177ce8918094c397676442960eb77189ab9e08156c5962b27575151679d",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S141",
+          "instrument_id": "601377.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "850edf1e9015b9945198db91860736863c073e36d66e1ed9dbd53bb4eb785524",
+          "metric_count": 6
+        },
+        {
+          "sample_id": "S142",
+          "instrument_id": "601377.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "04f9e31ea5bf1059f392dfec4b0b343b8424792db70ad8c5e4541ac6b86cf779",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S143",
+          "instrument_id": "601628.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "43e116651d4a65fd7893b406a91fd4e20c6200abd1a56b400511c905bf7b5295",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S144",
+          "instrument_id": "601628.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "3bea9fef35a6b671cc075a21f73ba63d52b87129aae3bf1b50ab333928994f50",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S145",
+          "instrument_id": "601628.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "7e4eec0102141df2d2e72f9cb674d9e996201250ef20e49f2cb5b5b58119226f",
+          "metric_count": 7
+        },
+        {
+          "sample_id": "S146",
+          "instrument_id": "601628.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "1d379f08fd9fdcae6b1e79ce948f6e9fcc12916e0f84ba9ebfc2efb93ad58ee3",
+          "metric_count": 1
+        },
+        {
+          "sample_id": "S147",
+          "instrument_id": "601628.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "afe66c817c23d8470e7510dc3e876b23a92350a23e65cd3d32eb0587fd775fd2",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S148",
+          "instrument_id": "601668.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "7f6194c3d825f99908722866ec67a3ac298c86b204abfa63b45d9b4a932ecba7",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S149",
+          "instrument_id": "601668.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "21623ad9f9a75d8e12184336ac622b8f3bad11b06259c87b9cfa3789c8f56dc4",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S150",
+          "instrument_id": "601668.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "9a058149c942e4be44ace93b70959f9b55b65b0a2ccff80a308e514386df5f2d",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S151",
+          "instrument_id": "601668.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "7c8dc68d6af4a3bb6bf04e52d7982c71c1bf6251d33f3f451bc1031928abd607",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S152",
+          "instrument_id": "601872.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "b52e61239488bc31c36be116ffc395debccecc7b18493e948911c0164a560c9e",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S153",
+          "instrument_id": "601872.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "e4039aa30fbc26e1781421b3462f9512b1018dc964480c686046317353c4e8db",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S154",
+          "instrument_id": "601872.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "a3b38dd4bcb7a2140de85bb053bce90b4a972db062b1073a0f7f45b6e769402b",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S155",
+          "instrument_id": "601872.SH",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d66b5b7ab82d051424e2063ce56e0a04e7e0802a224fb997e8d55440374ac5c8",
+          "metric_count": 1
+        },
+        {
+          "sample_id": "S156",
+          "instrument_id": "920003.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "dfb7089402b27a36e0fafe4ba9c0875ca5118d8a7d41372e66685e0f9f9a2ddb",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S157",
+          "instrument_id": "920003.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "c2396de81288543366e47d4f0c0b291718050f4fa4d47e88b8a4a6bbeb2a7287",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S158",
+          "instrument_id": "920003.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "fe1fc2ecd6aa86528af2a3a30a222e11ec7a67825f08da1bf42fe2da01e4179b",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S159",
+          "instrument_id": "920003.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "fd93779aa0cdf4ef66a993dddb643447e053e26a039945ec054de477953caee9",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S160",
+          "instrument_id": "920003.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "10f85c46b5a5e8c2588e857f103a56aa0e6c97fa50222e4b81edb1f724e9306d",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S161",
+          "instrument_id": "920006.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "f4145299a315a6bbb31f60bcb882c646b832af487207752c7e5b0a66eba69a88",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S162",
+          "instrument_id": "920006.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "352f18008f957d06de0180b4219f1897b641c3b1d6ab2376c0dd1b79775dd4e8",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S163",
+          "instrument_id": "920006.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "e6e4531211de808298f4866d4bcb16b76d6d93d2733f757b0db8643d2a8a792a",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S164",
+          "instrument_id": "920006.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "3a8178f013a07afce73f970b9af495e071379ead04f26314f795c25265eaa3dd",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S165",
+          "instrument_id": "920007.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "f20f8baf1d17190d0636c4c1d09f0da12e92d0584e865e79036c3cc1044d3040",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S166",
+          "instrument_id": "920007.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "255519b72bb91e0987f73eab87ec8501f213b0c92951dad047904c0f719580bf",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S167",
+          "instrument_id": "920007.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "cca01b2d6b5d9c9e346d5ff02944bf90d35b716fabfb911e9a59bf2cb656c416",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S168",
+          "instrument_id": "920007.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "be6de41c5fc7a686acddc338451605ea942f904935f2e9badfd0c9312252b2ef",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S169",
+          "instrument_id": "920014.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "864efeb9e972382aad20deac16845d0b14b12d8db32e061e39856003bf837cca",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S170",
+          "instrument_id": "920014.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "1f7bd59685f771e4765b7a3f8b0ddb601b4a7dcf5d1791f679a860cf6622aac2",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S171",
+          "instrument_id": "920014.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "4470c1c5d69af3f6289b89c9fb88eade915e950d6ba122e9800995bef6da530c",
+          "metric_count": 6
+        },
+        {
+          "sample_id": "S172",
+          "instrument_id": "920014.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "4969cc74706426d18c38e4719220a2aa2a2f7cdb12d8f11066ec16655b18a038",
+          "metric_count": 4
+        },
+        {
+          "sample_id": "S173",
+          "instrument_id": "920014.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "916a88b2732451e69c9e1cdc478c46adcf3e462970b5108921abd6fd80f7c9dc",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S174",
+          "instrument_id": "920017.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "d3a6b7fd77c7ba358a3dcd839dc005ad51e69b266363de2c63bfd9308d77a97a",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S175",
+          "instrument_id": "920017.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "72b5c1f924993a52279d5bd98fa013309fee1dc8ffffcded57c294fe02ad368b",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S176",
+          "instrument_id": "920017.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "49278cb58f5476518388b7f714645c574b1cef9bc9dc14f2b864379c399541a5",
+          "metric_count": 0
+        },
+        {
+          "sample_id": "S177",
+          "instrument_id": "920017.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "b85d9cfced4c26f64848e97690fc3ce0eb0b28d3f655fb2edc736d3f5e63232e",
+          "metric_count": 2
+        },
+        {
+          "sample_id": "S178",
+          "instrument_id": "920017.BJ",
+          "counterpart_state": "exact_saved_model_projection",
+          "status": "supported",
+          "basis": "exact_same_content_report_and_evidence_as_A_current_sample",
+          "fact_sha256": "085c255ac8501166000244de571247eb626bbe612e89c4d37ca2651af77ab769",
+          "metric_count": 0
+        }
+      ]
+    }
+  },
+  "current_API": {
+    "slots": 178,
+    "supported": 178,
+    "error": 0,
+    "not_assessed": 0,
+    "metrics_supported": 181
+  },
+  "limits": [
+    "Selection was frozen from current visible delivery, so excluded historical objects are absent from the ordinary sample; all active A restrictions are a separate risk stratum.",
+    "This is retained-content comparison, not a new A-free end-to-end run; upstream manual limitations remain acknowledged.",
+    "Historical changed or missing content is never assigned the current corrected content verdict.",
+    "Slot coverage and conditional precision are separate; neither proves full-population or new-code accuracy."
+  ],
+  "supplier_requests": 0
+}

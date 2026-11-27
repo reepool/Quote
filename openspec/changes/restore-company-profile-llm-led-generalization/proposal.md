@@ -34,6 +34,8 @@
 
 ## Why
 
+6.FS承接用户对当前39股研究质量确认和交付收口的实施授权：复用已有原稿、源文及独立证据，先冻混合版本快照/确定性抽样，再分当前选中阅读的原作者、模型审后和API安全稿核内容/指标、未评及人工依赖。新增模型预算0，只修实际阻塞使用的共性P1/P2；不把样本支持率当全量或新代码未见准确率、不回算旧6.FN或开启新组。卡内完成原reader/export/actual API、规范及清理/Git，详company-profile-current-quality-closure-card.md。
+
 6.EZ接用户在6.EY后“继续推进”：20份基础画像可用而原已审指标对象97.8967%不达99%，本轮不再整批付费。正确正文不应被局部metric口径/方向错误连带隐藏；显式独立使用决定可严格绑定原fact/hash和指标位置，API/导出保原描述及安全指标、局部缺项仍可见。同时在既有选定章节供源中结构化分开可确定的PDF脚注与正文数量，新身份不追改旧源包。零新模型复用保存真实内容交新研究副本与必要验证，旧分/旧源/生产权限不改，不建设指标平台或新parser，见company-profile-metric-safe-consumption-card.md。
 
 6.EX将已验证的窄格式恢复接回新版普通首读，避免同一种纯形状错误仍需人工救稿和额外模型重试。仅复用既有算法与原provider/runtime/writer，保原raw/rejected/作者/usage及typed/source约束，原deferred/inline复核继续有效；保存真实失败与混合批量从日常磁盘计划离线验证，不重抽现20股。A独审并准备前瞻验收范围/质量/累计资源，新的真实调用具体范围另行合并批准；旧失败/95%/99%及生产权限不改。见company-profile-automatic-recovery-card.md。

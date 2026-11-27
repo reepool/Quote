@@ -1,0 +1,61 @@
+{
+  "task": "6.FS",
+  "state": "finite_review_and_cleanup_complete",
+  "validation": {
+    "json_files_parsed": 14,
+    "audit_script_AST_checks": 4,
+    "local_document_links_checked": 28,
+    "snapshot_and_layer_hashes_match": true,
+    "independent_reference_hashes_match": true,
+    "source_decisions": 178,
+    "metrics": 181,
+    "OpenSpec_strict": "passed",
+    "staged_diff_check": "passed"
+  },
+  "review": {
+    "new_blocking_P1_P2": 0,
+    "application_fixes": [],
+    "nonblocking": [
+      "Current full-population accuracy remains unmeasured.",
+      "Six changed original-author counterparts lack exact independent judgments.",
+      "Feature explanation value varies; no new model call or per-field rule."
+    ],
+    "unrelated_existing_changes": "preserved"
+  },
+  "protected_original_files_unchanged": 396,
+  "only_authorized_navigation_changed": {
+    "data/research/company_profile_research_v1_20261123/research-current.md": {
+      "before": "300f99edd70a1c40dbc5cee9b5dbe6e15c9867cd9a76044b8947036eb1d7f2d0",
+      "after": "50ec8d12ff5db68c23a9c4ebec74e732d97a5a9948b00110801e0075f6c7a37e"
+    }
+  },
+  "preexisting_tracked_change_count": 20,
+  "staged_dirty_document_own_blocks_only_sha256": {
+    "docs/development/company_profile_acceptance_program.md": "95b00105e81a145c2f190ff8eb696c3454f1af8323dc9a1345753e86186d773a",
+    "docs/development/company_profile_delivery_plan.md": "30d8b96cb677e9f7f5435882a48b85455f02f8681d8d88042a83fee6db62885d",
+    "openspec/changes/restore-company-profile-llm-led-generalization/proposal.md": "b0db776ff9025009f853da666a5a8521a594e8aa42bbb34d1736d3efa8622230",
+    "openspec/changes/restore-company-profile-llm-led-generalization/design.md": "9f68cb400f223fb6e1ebbe8d32f002079e88c1456665d6fcf3a9fc7bd1866a66",
+    "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md": "a016f7f4ea8ed760f47aeb0721f8c965701d4e68c5c8b7de04e518121bf802a2",
+    "openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md": "13a06cd62c5368ba53847d046e47ae7b05f4a27e96884ac165bfd1139c2f69f6"
+  },
+  "new_supplier_calls": 0,
+  "new_task_submissions": 0,
+  "service_or_configuration_changes": false,
+  "A_cleanup": {
+    "owned_root": "/home/python/Quote/data/QuoteBak/company-profile-6fs-a-yzPXros2",
+    "root_removed": true,
+    "files_removed": 32,
+    "logical_bytes_removed": 15185698,
+    "extra_owned_CLI_output": "/home/python/Quote/data/QuoteBak/company-profile-apply-instructions-current.json",
+    "extra_owned_CLI_output_sha256": "e517c807205eff1a3e168106c68a7b029ce2295cc65624d0266831d6c8b69686",
+    "scope": "Own complete live read copies, scripts, exact dirty-baseline copies and CLI output; no original runtime/PDF/cache or unrelated/parallel artifacts."
+  },
+  "B_cleanup": {
+    "files_removed": 92,
+    "logical_bytes_removed": 53589574,
+    "owned_root_absent": true
+  },
+  "total_files_removed": 124,
+  "total_logical_bytes_removed": 68775272,
+  "retained": "One bounded sample/identity/source-pointer/independent-decision/layer/API/safety result set in this directory; original source and historical failures stay in their existing owners."
+}

@@ -1,0 +1,14 @@
+{
+  "task": "6.FS",
+  "sample_freeze_sha256": "f2135fa0199526cf48bb033453b9a1f1da2331c4d2eaa88ea33d0a2c92b4a76b",
+  "temporary_A_reading_index": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG/a-reading-sources.md",
+  "sha256": "914679078954eda4b174d46b42e72d601c947df7fa9abaf2712c759c2a5059d8",
+  "temporary_index_state": "deleted_after_A_finished_review; source payload retained once in b-sample-freeze.json",
+  "source_of_truth": "b-sample-freeze.json.sources",
+  "source_note": "saved excerpt pointers only, not an independent semantic judgment",
+  "pre_cleanup": {
+    "previous_6fr_known_owned_roots_present": [],
+    "new_owned_root": "/home/python/Quote/data/QuoteBak/company-profile-6fs-b-ELKBNcFG",
+    "unrelated_and_A_roots_untouched": true
+  }
+}
