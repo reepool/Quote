@@ -1,0 +1,554 @@
+{
+  "task": "6.FU",
+  "role": "B actual-run mechanical self-check; A alone scores original source semantics and decides release",
+  "state": "completed_all_three_runtime_self_check",
+  "observed_at": "2026-11-27T15:17:06+08:00",
+  "anchors": {
+    "b-ready.json": "3ee68f9682e181ba1a1b99f956cbd931b88ed50404e8a1803cf6d4ecdc6251e9",
+    "a-send-freeze.json": "48a60fa23abbb300b0cbafd3a5b0c32871c5bfebe3e7b0b93491d6ab8b00e3a5",
+    "a-run-result.json": "2b914e893ac9ed6400917d38005fba9e60b60de02dae5c349ee37bff523f7b95",
+    "b-runtime-input-audit.json": "dba977e2b241a5247b71d4b2c556231b34e93cc3246ed8f3a2bb3559a044bb05"
+  },
+  "method": "Read actual execution results, immutable original parents, provider wire response content and owner receipts; independently validate failed/accepted response JSON against frozen schemas. No provider/operator entry or test run. Count new findings only from actual current initial-review response payloads, separating inherited model/A restrictions.",
+  "cases": [
+    {
+      "instrument_id": "920003.BJ",
+      "result_file": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/920003.BJ/executions/6fu-920003-BJ-20261127/result.json",
+      "result_sha256": "2fa5e134f8ea439305ea2850e698274ea5c840abdc94db3277fcd3b10e935c02",
+      "budget_file": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/920003.BJ/executions/6fu-920003-BJ-20261127/budget.json",
+      "budget_sha256": "545d705d74b199baf81749b80f89c75cdc7a9e596fcf764972744bc4e8040416",
+      "work_id": "bp-work-69d683022dd1747f88f9c631",
+      "record_sha256": "5d90630dd2cb50e42ca290b9d224872528cf72baa8a66cb8d5bb43db87824298",
+      "owner_state": "completed",
+      "review_status": "completed_with_open_findings",
+      "review_policy": "company_profile_workpaper_review.v14",
+      "first_review_checked_facts": 23,
+      "new_initial_findings": [
+        {
+          "finding_id": "ccm2-geo-not-segment",
+          "affected_fact_id": "ccm-2",
+          "action": "correct",
+          "issue_type": "wrong_subject"
+        }
+      ],
+      "inherited_findings": [
+        {
+          "finding_id": "inherited:f-lim-1",
+          "affected_fact_id": null,
+          "resolution": "unresolved"
+        }
+      ],
+      "target_trace": [
+        {
+          "fact_id": "ccm-2",
+          "new_initial_finding_ids": [
+            "ccm2-geo-not-segment"
+          ],
+          "inherited_model_finding_ids": [],
+          "author_fact_changed": true,
+          "independent_source_score": "A_pending"
+        }
+      ],
+      "content_comparison": {
+        "before_facts": 23,
+        "after_facts": 23,
+        "changed_fact_ids": [
+          "ccm-2"
+        ],
+        "unchanged_facts": 22,
+        "new_fact_ids": [],
+        "repaired_fact_ids": [
+          "ccm-2"
+        ],
+        "final_model_accepted_ids": [
+          "ccm-2"
+        ],
+        "positive_controls_unchanged": true,
+        "report_reading_scope_evidence_generation_unchanged": true,
+        "original_extraction_attribution_preserved": {
+          "request_id": "bp-work-3365870b26619438dab9801d:workpaper:extract",
+          "request_hash": "253a4bc71d8116ed15221c3008dfd953c0583b1d46a55bdc90adadba41bc3414",
+          "response_hash": "fc9b08b3a35c2af8e8bd9d4795f5b39445d902a851281f88a1855b86d79341d1",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek"
+        },
+        "two_original_author_receipts_preserved": true,
+        "initial_checked_fact_hashes_match_original": true,
+        "actual_final_revised_facts_equal_persisted_facts": true
+      },
+      "independent_guards": [
+        {
+          "fact_id": "ccm-2",
+          "disposition": "source_only",
+          "current_fact_hash_bound": true,
+          "metric_indices": []
+        }
+      ],
+      "independent_guards_automatically_lifted": false,
+      "physical_requests": 3,
+      "charged_tokens": 46673,
+      "recoveries": 0,
+      "cost": "unknown",
+      "attempts": [
+        {
+          "sequence": 1,
+          "wire": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/920003.BJ/executions/6fu-920003-BJ-20261127/receipts/001.json",
+          "wire_sha256": "c237e147fcbe0520ef4756fed5d0fe1e9da0c11b1412aa3adcb30b3186ae91e9",
+          "attempt": 1,
+          "model": "grok-4.7",
+          "purpose": "review_profile_workpaper",
+          "charged_tokens": 26265,
+          "error_code": null,
+          "http_status": 200,
+          "finish_reason": "stop",
+          "elapsed_seconds": 132.51333315500233,
+          "physical_timeout_seconds": 1200,
+          "content_sha256": "da607fdfdf5f4b5fd28a90a6619825bcc61bb4c2b6a48431abb0be0357e5d57d",
+          "owner_accepted_response": true
+        },
+        {
+          "sequence": 2,
+          "wire": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/920003.BJ/executions/6fu-920003-BJ-20261127/receipts/002.json",
+          "wire_sha256": "ee6c95853e4a3cca3d235dc2961d0b59a7fd103d0c219658597e728412e69bc0",
+          "attempt": 1,
+          "model": "deepseek-flash",
+          "purpose": "repair_profile_workpaper",
+          "charged_tokens": 9324,
+          "error_code": null,
+          "http_status": 200,
+          "finish_reason": "stop",
+          "elapsed_seconds": 8.749007057995186,
+          "physical_timeout_seconds": 600,
+          "content_sha256": "3996a25a66bb4dd143998751f7562dca51f8517552f768573df7f99a0c396aa9",
+          "owner_accepted_response": true
+        },
+        {
+          "sequence": 3,
+          "wire": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/920003.BJ/executions/6fu-920003-BJ-20261127/receipts/003.json",
+          "wire_sha256": "860db1c30a7b72aca27b6d83f1e10dc320825f8e15877b76a3448bcadc51f144",
+          "attempt": 1,
+          "model": "grok-4.7",
+          "purpose": "verify_profile_workpaper_repair",
+          "charged_tokens": 11084,
+          "error_code": null,
+          "http_status": 200,
+          "finish_reason": "stop",
+          "elapsed_seconds": 23.95486675000575,
+          "physical_timeout_seconds": 1200,
+          "content_sha256": "9a41816e45d482b205143e1ba3be087a6e147e871906d2fc4837434d0e96a712",
+          "owner_accepted_response": true
+        }
+      ]
+    },
+    {
+      "instrument_id": "600350.SH",
+      "result_file": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/600350.SH/executions/6fu-600350-SH-20261127/result.json",
+      "result_sha256": "bfdcc4958a9913da0a677807dd82c98ea4f655a6b56177a1ffd7569b42ad7817",
+      "budget_file": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/600350.SH/executions/6fu-600350-SH-20261127/budget.json",
+      "budget_sha256": "568c00f72e9d1ec740136a512f7f8c386848e6d6f7d13ff68b030a26cd3f29b2",
+      "work_id": "bp-work-bd3f12e057b1b13c7ce3243c",
+      "record_sha256": "ec8f62b029d1a97b360014deb53497ad47ac6c9a899a3411afb5c41ec9ff647d",
+      "owner_state": "completed",
+      "review_status": "completed_with_open_findings",
+      "review_policy": "company_profile_workpaper_review.v14",
+      "first_review_checked_facts": 25,
+      "new_initial_findings": [
+        {
+          "finding_id": "f001",
+          "affected_fact_id": "cm-01",
+          "action": "correct",
+          "issue_type": "wrong_subject"
+        },
+        {
+          "finding_id": "f002",
+          "affected_fact_id": "cm-01",
+          "action": "correct",
+          "issue_type": "other"
+        },
+        {
+          "finding_id": "f003",
+          "affected_fact_id": null,
+          "action": "correct",
+          "issue_type": "unsupported_claim"
+        }
+      ],
+      "inherited_findings": [
+        {
+          "finding_id": "inherited:f-op-01",
+          "affected_fact_id": "op-01",
+          "resolution": "metrics_limited"
+        }
+      ],
+      "target_trace": [
+        {
+          "fact_id": "op-01",
+          "new_initial_finding_ids": [],
+          "inherited_model_finding_ids": [
+            "inherited:f-op-01"
+          ],
+          "author_fact_changed": false,
+          "independent_source_score": "A_pending"
+        },
+        {
+          "fact_id": "sm-12",
+          "new_initial_finding_ids": [],
+          "inherited_model_finding_ids": [],
+          "author_fact_changed": false,
+          "independent_source_score": "A_pending"
+        }
+      ],
+      "content_comparison": {
+        "before_facts": 25,
+        "after_facts": 25,
+        "changed_fact_ids": [
+          "cm-01"
+        ],
+        "unchanged_facts": 24,
+        "new_fact_ids": [],
+        "repaired_fact_ids": [
+          "cm-01"
+        ],
+        "final_model_accepted_ids": [
+          "cm-01"
+        ],
+        "positive_controls_unchanged": true,
+        "report_reading_scope_evidence_generation_unchanged": true,
+        "original_extraction_attribution_preserved": {
+          "request_id": "bp-work-f7e0f0a8da3af9c1e51ec585:workpaper:extract",
+          "request_hash": "8c7d316df68285f5b3f30fb937158b0282cf4fa338ab0fd2a5c239df7bf15e63",
+          "response_hash": "ead621134fa09080e1e0b1319fa8b1b772abe841ad7d30d65f212d610fa53f21",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek"
+        },
+        "two_original_author_receipts_preserved": true,
+        "initial_checked_fact_hashes_match_original": true,
+        "actual_final_revised_facts_equal_persisted_facts": true
+      },
+      "independent_guards": [
+        {
+          "fact_id": "sm-12",
+          "disposition": "source_checked",
+          "current_fact_hash_bound": true,
+          "metric_indices": [
+            1
+          ]
+        },
+        {
+          "fact_id": "op-01",
+          "disposition": "source_only",
+          "current_fact_hash_bound": true,
+          "metric_indices": []
+        }
+      ],
+      "independent_guards_automatically_lifted": false,
+      "physical_requests": 3,
+      "charged_tokens": 105798,
+      "recoveries": 0,
+      "cost": "unknown",
+      "attempts": [
+        {
+          "sequence": 1,
+          "wire": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/600350.SH/executions/6fu-600350-SH-20261127/receipts/001.json",
+          "wire_sha256": "720fca15b64aeac8b5588739041d74b872ec43d986673e11a312fb028de0b8c6",
+          "attempt": 1,
+          "model": "grok-4.7",
+          "purpose": "review_profile_workpaper",
+          "charged_tokens": 70956,
+          "error_code": null,
+          "http_status": 200,
+          "finish_reason": "stop",
+          "elapsed_seconds": 631.9445992320107,
+          "physical_timeout_seconds": 1200,
+          "content_sha256": "1bb5ffa1ed010593e3ad6acd5ac6f2582857b6ad25fa1aa17495bf5468bf3ad2",
+          "owner_accepted_response": true
+        },
+        {
+          "sequence": 2,
+          "wire": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/600350.SH/executions/6fu-600350-SH-20261127/receipts/002.json",
+          "wire_sha256": "3e743820355e15080eec216996eda64ca7c1d65d0c905ffa4b56fefde8e907b9",
+          "attempt": 1,
+          "model": "deepseek-flash",
+          "purpose": "repair_profile_workpaper",
+          "charged_tokens": 15416,
+          "error_code": null,
+          "http_status": 200,
+          "finish_reason": "stop",
+          "elapsed_seconds": 12.798386688999017,
+          "physical_timeout_seconds": 600,
+          "content_sha256": "9b69e06742b2e52845db6fbecd8224c1b96e688370fb236ded21b6fd51845879",
+          "owner_accepted_response": true
+        },
+        {
+          "sequence": 3,
+          "wire": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/600350.SH/executions/6fu-600350-SH-20261127/receipts/003.json",
+          "wire_sha256": "8d3147d1ed9eca7daab80c4026d9643bd614cd426f04fa5b924c78e5d6c74467",
+          "attempt": 1,
+          "model": "grok-4.7",
+          "purpose": "verify_profile_workpaper_repair",
+          "charged_tokens": 19426,
+          "error_code": null,
+          "http_status": 200,
+          "finish_reason": "stop",
+          "elapsed_seconds": 38.805725122991134,
+          "physical_timeout_seconds": 1200,
+          "content_sha256": "20b579237aa95db726ec85c0e2b0c3dcaaea0d9ce3b7ebab0a8c9009b099cab4",
+          "owner_accepted_response": true
+        }
+      ]
+    },
+    {
+      "instrument_id": "600704.SH",
+      "result_file": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/600704.SH/executions/6fu-600704-SH-20261127/result.json",
+      "result_sha256": "f34dc63af3d20de331688c52e21ff17aa93bcc6ab6340fbfb6cd890841b6980a",
+      "budget_file": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/600704.SH/executions/6fu-600704-SH-20261127/budget.json",
+      "budget_sha256": "6f639a4378e5bcf6c2203a36ec516b4c307707f02cb071b08b8cb1b075f80c38",
+      "work_id": "bp-work-1f7e53d7850980ccb83ad64e",
+      "record_sha256": "b7c1f4a9ee87a8d1718d012ff323e041101022682c3c5e3581797b15b6065d5b",
+      "owner_state": "completed",
+      "review_status": "completed_with_open_findings",
+      "review_policy": "company_profile_workpaper_review.v14",
+      "first_review_checked_facts": 27,
+      "new_initial_findings": [
+        {
+          "finding_id": "RF-001",
+          "affected_fact_id": "F-CC-01",
+          "action": "correct",
+          "issue_type": "wrong_subject"
+        }
+      ],
+      "inherited_findings": [
+        {
+          "finding_id": "inherited:FR-005",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate"
+        }
+      ],
+      "target_trace": [
+        {
+          "fact_id": "F-CC-01",
+          "new_initial_finding_ids": [
+            "RF-001"
+          ],
+          "inherited_model_finding_ids": [],
+          "author_fact_changed": true,
+          "independent_source_score": "A_pending"
+        }
+      ],
+      "content_comparison": {
+        "before_facts": 27,
+        "after_facts": 27,
+        "changed_fact_ids": [
+          "F-CC-01"
+        ],
+        "unchanged_facts": 26,
+        "new_fact_ids": [],
+        "repaired_fact_ids": [
+          "F-CC-01"
+        ],
+        "final_model_accepted_ids": [
+          "F-CC-01"
+        ],
+        "positive_controls_unchanged": true,
+        "report_reading_scope_evidence_generation_unchanged": true,
+        "original_extraction_attribution_preserved": {
+          "request_id": "bp-work-b37054c9acc8953c37d6a3fa:workpaper:extract",
+          "request_hash": "959752617125fbfd077817e387465017cf951da7fe76ce0894607770bf1bbd6d",
+          "response_hash": "c4b215345e381c006ddbd7b35311c30e6b7ac839c845157eae8df2d59049e6b5",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek"
+        },
+        "two_original_author_receipts_preserved": true,
+        "initial_checked_fact_hashes_match_original": true,
+        "actual_final_revised_facts_equal_persisted_facts": true
+      },
+      "independent_guards": [
+        {
+          "fact_id": "F-CC-01",
+          "disposition": "source_only",
+          "current_fact_hash_bound": true,
+          "metric_indices": []
+        }
+      ],
+      "independent_guards_automatically_lifted": false,
+      "physical_requests": 4,
+      "charged_tokens": 120151,
+      "recoveries": 1,
+      "cost": "unknown",
+      "attempts": [
+        {
+          "sequence": 1,
+          "wire": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/600704.SH/executions/6fu-600704-SH-20261127/receipts/001.json",
+          "wire_sha256": "1637a87a3f084bc633538ef6853761571f1fb7e0ca5e1963d12683b6d34b4168",
+          "attempt": 1,
+          "model": "grok-4.7",
+          "purpose": "review_profile_workpaper",
+          "charged_tokens": 48142,
+          "error_code": "schema_validation_error",
+          "http_status": 200,
+          "finish_reason": "stop",
+          "elapsed_seconds": 287.82122218600125,
+          "physical_timeout_seconds": 1200,
+          "content_sha256": "4deeb26dc6d837f6a44fe45c4b9ad629db3eec61d87c5fc93ff2b36fb348f37b",
+          "owner_accepted_response": false
+        },
+        {
+          "sequence": 2,
+          "wire": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/600704.SH/executions/6fu-600704-SH-20261127/receipts/002.json",
+          "wire_sha256": "59e53dded252b4ddc7d07e8e765bf2a08af89ebef23b56e21c6e92867ddcf022",
+          "attempt": 2,
+          "model": "grok-4.7",
+          "purpose": "review_profile_workpaper",
+          "charged_tokens": 38297,
+          "error_code": null,
+          "http_status": 200,
+          "finish_reason": "stop",
+          "elapsed_seconds": 145.61997157800943,
+          "physical_timeout_seconds": 1200,
+          "content_sha256": "51685d76b21521f228a03f6efe03bd1e5ae767990bceccdb7e7835ba548fcbb0",
+          "owner_accepted_response": true
+        },
+        {
+          "sequence": 3,
+          "wire": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/600704.SH/executions/6fu-600704-SH-20261127/receipts/003.json",
+          "wire_sha256": "e3c33c24c3a818ba23f86d53e40cb75377070d5a8e7aa53ba6edb098f8aa6631",
+          "attempt": 1,
+          "model": "deepseek-flash",
+          "purpose": "repair_profile_workpaper",
+          "charged_tokens": 14015,
+          "error_code": null,
+          "http_status": 200,
+          "finish_reason": "stop",
+          "elapsed_seconds": 4.349652732009417,
+          "physical_timeout_seconds": 600,
+          "content_sha256": "df3d8c09b12ec32e8a7bbff68433cbe7afaec4774ace1cc246cabffc1a645365",
+          "owner_accepted_response": true
+        },
+        {
+          "sequence": 4,
+          "wire": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/600704.SH/executions/6fu-600704-SH-20261127/receipts/004.json",
+          "wire_sha256": "7fa17734be925271fc86bb677dedc1619618d5b8b900f9c588e277f2afb0b122",
+          "attempt": 1,
+          "model": "grok-4.7",
+          "purpose": "verify_profile_workpaper_repair",
+          "charged_tokens": 19697,
+          "error_code": null,
+          "http_status": 200,
+          "finish_reason": "stop",
+          "elapsed_seconds": 43.315713568998035,
+          "physical_timeout_seconds": 1200,
+          "content_sha256": "e6f5f9c3195fc33b3509c3753d479a3809ffadb85f517d116a29913d46fe49df",
+          "owner_accepted_response": true
+        }
+      ]
+    }
+  ],
+  "one_recovery": {
+    "instrument_id": "600704.SH",
+    "stage": "initial_review",
+    "cause": "HTTP 200 / finish_reason=stop but response violated JSON Schema; not a network timeout",
+    "original_failure_preserved": true,
+    "first_response_schema_errors": [
+      {
+        "path": [
+          "findings",
+          0
+        ],
+        "validator": "additionalProperties",
+        "message": "Additional properties are not allowed ('affected_metric_indices', 'fact_id', 'required_fix' were unexpected)"
+      },
+      {
+        "path": [
+          "findings",
+          0,
+          "issue_type"
+        ],
+        "validator": "enum",
+        "message": "'wrong_subject_scope' is not one of ['unsupported_claim', 'contradicts_source', 'wrong_subject', 'wrong_period', 'wrong_column', 'wrong_unit_or_denominator', 'unsupported_causality', 'material_omission', 'other']"
+      }
+    ],
+    "repair_feedback": "schema validation failed at findings.0 (additionalProperties)",
+    "retry_original_messages_identical": true,
+    "retry_appended_only_original_failed_reply_and_schema_feedback": true,
+    "second_response_schema_valid": true,
+    "same_logical_request": true,
+    "retry_is_physical_request_2": true,
+    "failed_first_attempt_charged_tokens": 48142,
+    "failed_first_attempt_in_total": true
+  },
+  "resources": {
+    "physical_requests": 10,
+    "logical_requests": 9,
+    "recoveries": 1,
+    "charged_tokens": 272622,
+    "supplier_reported_total_tokens": 272622,
+    "usage_basis": "Sum provider total_tokens including schema-rejected first response; normalize prompt/completion field names, do not recompute totals from input/output",
+    "group_elapsed_seconds": 767.6073249449983,
+    "transport_send_attempts": 10,
+    "group_stop_set": false,
+    "all_physical_replies_http_200_and_stop": true,
+    "timeout_attempts": 0,
+    "cost": "unknown",
+    "authorized_group_seconds": 12600,
+    "authorized_group_tokens": 3000000,
+    "authorized_group_physical_requests": 18,
+    "inside_frozen_resource_limits": true
+  },
+  "business_observations_without_A_source_scoring": {
+    "input_and_initial_review_fact_count": 75,
+    "output_fact_count": 75,
+    "unchanged_facts": 72,
+    "changed_fact_ids_total": 3,
+    "new_fact_ids_total": 0,
+    "new_initial_findings_total": 5,
+    "target_ids_newly_flagged": [
+      "920003.BJ:ccm-2",
+      "600704.SH:F-CC-01"
+    ],
+    "target_ids_without_new_initial_finding": [
+      "600350.SH:op-01",
+      "600350.SH:sm-12"
+    ],
+    "additional_repaired_fact": "600350.SH:cm-01 (two initial findings, one fact, one final accepted repair)",
+    "all_three_revised_facts_have_own_final_model_acceptance": true,
+    "positive_controls_unchanged": 6,
+    "independent_guard_decisions_preserved": 4,
+    "inherited_findings_total": 3,
+    "completed_with_open_findings_interpretation": "Inherited findings and the new upstream-status observation remain explicit; this status alone is not a new error/miss or an independent semantic verdict",
+    "known_targets_fully_closed": false,
+    "A_source_scoring": "not performed by B",
+    "formal_accuracy_or_unseen_acceptance_claim": false
+  },
+  "protection": {
+    "b_ready_frozen": {
+      "checked": 91,
+      "mismatches": []
+    },
+    "send_frozen": {
+      "checked": 99,
+      "mismatches": []
+    },
+    "protected_main39_and_config": {
+      "checked": 397,
+      "mismatches": []
+    }
+  },
+  "audit_operations": {
+    "new_model_calls": 0,
+    "new_provider_clients_explicitly_constructed": 0,
+    "operator_or_execution_entry_invoked": false,
+    "tests_rerun": 0,
+    "application_config_plan_or_original_result_files_changed": false,
+    "main39_writes": false,
+    "git_commit_or_push": false,
+    "write_set": [
+      "b-runtime-input-audit.json",
+      "b-real-self-check.json"
+    ],
+    "temp_work_directories_created": 0,
+    "temp_files_to_remove": 0,
+    "prior_B_root_absent": true,
+    "A_and_parallel_scratch_untouched": true,
+    "note": "Initial model-only input reconstruction initialized existing package logging under mandated QuoteBak environment; shared concurrent logs were not removed. Subsequent terminal checks use standard-library JSON and frozen JSON Schema."
+  },
+  "handoff": "Mechanical runtime/receipt/source-identity/consumption checks pass. Actual initial responses newly flag two of four known targets; the two Shandong targets are not new findings. Three revised facts have actual final model acceptance. Old independent restrictions remain, main39 is untouched, and A must adjudicate original-source semantics and any safe successor before release. No additional model request or test run is recommended by this self-check."
+}

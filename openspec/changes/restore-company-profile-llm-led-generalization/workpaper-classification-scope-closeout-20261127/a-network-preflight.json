@@ -1,0 +1,8 @@
+{
+  "task": "6.FU",
+  "hosts": {
+    "api.deepseek.com": "DNS_TLS_OK_same_authorized_network_environment",
+    "scorpio.reepool.com": "DNS_TLS_OK_same_authorized_network_environment"
+  },
+  "supplier_requests": 0
+}

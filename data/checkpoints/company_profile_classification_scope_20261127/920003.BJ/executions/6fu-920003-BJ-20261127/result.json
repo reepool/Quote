@@ -1,0 +1,23 @@
+{
+  "action": "review_batch",
+  "state": "completed",
+  "items": [
+    {
+      "instrument_id": "920003.BJ",
+      "request_id": "6fu-920003-BJ-20261127",
+      "state": "completed",
+      "work_id": "bp-work-69d683022dd1747f88f9c631",
+      "review_status": "completed_with_open_findings"
+    }
+  ],
+  "stop_reason": null,
+  "remaining_request_ids": [],
+  "research_only": true,
+  "production_authorization": "not_authorized",
+  "execution_plan": {
+    "run_id": "6fu-920003-BJ-20261127",
+    "plan_sha256": "0423774460fc10a830b7cac3c791a494afa4e0f591db76c047255d364bc8f5cd",
+    "budget_path": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/920003.BJ/executions/6fu-920003-BJ-20261127/budget.json",
+    "production_authorization": "not_authorized"
+  }
+}

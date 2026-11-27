@@ -225,6 +225,12 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 - **THEN** source review, repair and final verification MUST judge the asserted fact and each metric against its own local classification and object; a region or customer category alone MUST NOT establish an operating business segment, and the group heading MUST NOT turn a local operating fact or revenue row into the entire group total
 - **AND** supported source-native descriptions MAY remain with specific uncertainty when existing labels cannot represent their scope faithfully, without company-specific rules, invented normalized replacements or new mandatory fields; accepted corrections still require their own matching source-final response and existing independent restrictions remain separate
 
+#### Scenario: Reviewed IDs conceal missed subject metadata in a completed real observation
+- **WHEN** a prospectively versioned new initial review uses a compact scope review index to address observed fact/metric subject omissions
+- **THEN** the index MUST include every supplied current fact's original ID, scope, period and evidence references and every metric's original index, name, scope and period, without inferred verdicts, added source text, copied values or company-specific target selection
+- **AND** the reviewer MUST treat those metadata as untrusted assertions and prioritize their source-based review before optional omission suggestions; the existing response Schema, acceptance/repair/final-check contracts and independent restrictions remain unchanged, and index presence MUST NOT establish correctness
+- **AND** retained initial responses preserve their original review-policy attribution rather than being relabeled as a new-index review; offline request and consumption checks MUST NOT be scored as improved real-model detection or reopen an exhausted run
+
 #### Scenario: A changed fact has its own final after an older model metric limit
 - **WHEN** a current-draft recheck has its own accepted complete initial, repair and final source calls for the same report/sections/pages, and a non-inherited accepted revision binds the exact original and current fact-content hashes
 - **THEN** a prior model metric-only limitation bound to that exact old original hash MUST NOT be retargeted as a whole-fact defect on the newly source-verified changed content

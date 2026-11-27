@@ -30,7 +30,7 @@ from .models import ReportIdentity
 from .workpaper_sections import SectionPacket, extract_selected_layout, index_sections
 from .workpaper_metric_format import METRIC_FORMAT_FLAG, normalize_directional_metric_format
 
-REVIEW_POLICY = "company_profile_workpaper_review.v14"
+REVIEW_POLICY = "company_profile_workpaper_review.v15"
 METRIC_LIMIT_POLICY = "source_review_exact_metric_limits.v1"
 CURRENT_DRAFT_REVIEW_POLICY = "source_review_current_draft.v1"
 RECOVERED_REPAIR_POLICY = "source_review_recovered_repair_batch.v1"
@@ -236,6 +236,36 @@ do NOT use limit_metrics: use the existing
 whole-fact correct/quarantine/human_review action. Model limits cannot lift any
 independent use restriction and do not establish complete metric coverage.
 """
+
+SCOPE_REVIEW_INDEX_INSTRUCTIONS = """Use scope_review_index as the review queue for EVERY supplied draft fact.
+It repeats only original metadata, not source conclusions or correct answers.
+Before considering optional omissions or disclosure-status suggestions, complete
+the scope/period check for every indexed fact and every listed metric_index against
+the ORIGINAL governing source. Check the fact itself even when its metrics are
+empty, already limited or individually correct. Then check each metric separately;
+do not let the enclosing fact's scope substitute for a metric's source object.
+The index labels are untrusted assertions to review, not evidence or a proposed fix.
+Return only the existing response contract; no index verdicts or extra fields.
+"""
+
+
+def _scope_review_index(paper: CompanyProfileWorkpaper) -> list[dict]:
+    """List original scope metadata without copying amounts, prose or source text."""
+    return [
+        {
+            "fact_id": fact.fact_id,
+            "subject_scope": fact.subject_scope,
+            "period": fact.period,
+            "evidence_ids": list(fact.evidence_ids),
+            "metrics": [
+                {"metric_index": index, "name": metric.name,
+                 "subject_scope": metric.subject_scope, "period": metric.period}
+                for index, metric in enumerate(fact.metrics)
+            ],
+        }
+        for element in workpaper_elements(paper).values()
+        for fact in element.facts
+    ]
 
 
 def workpaper_hash(workpaper: CompanyProfileWorkpaper) -> str:
@@ -522,6 +552,7 @@ def prepare_review_recovery(record, *, source_recheck_policy=None, current_draft
         ids = {stage["request_id"] for stage in follow_up["retained_stages"]}
         retained = [dict(item) for item in record.workpaper_receipts if item.get("request_id") in ids]
         resume = {"mode": follow_up["resume_mode"], "original_draft_hash": workpaper_hash(seed),
+                  "review_policy_version": paper.quality_review.policy_version,
                   "document_version": paper.report.document_version, "receipts": retained}
         for item in retained:
             key = "review_response" if item["purpose"] == "review_profile_workpaper" else "repair_response"
@@ -878,6 +909,8 @@ def review_workpaper(
     call_ids = {review_id, repair_id, verify_id}
     real = identity.get("execution_mode") == "provider"
     metric_limits_enabled = identity.get("workpaper_metric_limit_policy") == METRIC_LIMIT_POLICY
+    review_policy = ((resume or {}).get("review_policy_version")
+                     or identity.get("workpaper_review_policy") or REVIEW_POLICY)
 
     prior_receipts = tuple((resume or {}).get("receipts") or ())
     prior_by_purpose = {item.get("purpose"): item for item in prior_receipts}
@@ -942,6 +975,9 @@ def review_workpaper(
     def request(request_id, purpose, response_model, instructions, content):
         nonlocal active_purpose
         active_purpose = purpose
+        if purpose == "review_profile_workpaper" and review_policy == REVIEW_POLICY:
+            content = {**content, "scope_review_index": _scope_review_index(paper)}
+            instructions = SCOPE_REVIEW_INDEX_INSTRUCTIONS + "\n" + instructions
         profile = identity.get("repair_profile" if purpose == "repair_profile_workpaper" else "quality_review_profile")
         options = {"profile_override": profile} if profile else {}
         enrichment = identity.get("workpaper_enrichment")
@@ -1187,7 +1223,7 @@ def review_workpaper(
                     "repair_profile" if active_purpose == "repair_profile_workpaper" else "quality_review_profile"),
             )
     quality = WorkpaperQualityReview(
-        status=status, policy_version=REVIEW_POLICY, original_draft_hash=original_hash,
+        status=status, policy_version=review_policy, original_draft_hash=original_hash,
         checked_fact_ids=checked, findings=tuple(findings), calls=tuple(calls), error=error,
         retained_request_ids=tuple(item["request_id"] for item in prior_receipts),
         locally_revalidated_request_ids=tuple(locally_revalidated),

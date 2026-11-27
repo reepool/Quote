@@ -1,0 +1,138 @@
+{
+  "task": "6.FU",
+  "role": "B runtime input audit support; A owns source-semantic adjudication and release",
+  "state": "passed_first_review_inputs_only",
+  "observed_at": "2026-11-27T15:04:13+08:00",
+  "scope": "Read existing first review request envelopes and original parent workpapers; no execution, polling, model requests, or application/configuration/plan changes.",
+  "anchors": {
+    "b-ready.json": "3ee68f9682e181ba1a1b99f956cbd931b88ed50404e8a1803cf6d4ecdc6251e9",
+    "a-send-freeze.json": "48a60fa23abbb300b0cbafd3a5b0c32871c5bfebe3e7b0b93491d6ab8b00e3a5",
+    "a-source-reference.json": "c8714523377754dabd84ab2401f4d086fbb49681303230ccbeffa01c51238533",
+    "b-payload-contracts.json": "81bb1dccf8e6cb1d8e186c5160e4515fd976dce82d60dfda7a0523e49a15fc2e"
+  },
+  "method": {
+    "request": "Parse the single user message in each actual receipts/001.json request; canonical hash is SHA256(json.dumps(value, ensure_ascii=False, sort_keys=True)). Request-envelope hash excludes the changing wire response.",
+    "draft_and_binding": "Reconstruct current_review_draft and current_review_binding from the unchanged current workpaper with quality_review/use_review cleared on an in-memory seed; compare to actual request, b-ready input binding, and authorized disk plan current_review_binding.",
+    "source": "Reconstruct original SectionPacket.model_text from report/reading_scope/evidence; require byte-identical actual source_text, source-text SHA256 and source-packet SHA256. PDF and native-cache hashes also match frozen inputs.",
+    "facts": "Compare every actual supplied fact and fact_hashes to b-ready fact hashes and the original parent; separately locate all four A risk IDs and six positive controls without sending A material.",
+    "contract": "Both actual system messages and response_format equal the existing b-payload-contracts review_profile_workpaper contract for v14; no provider/operator entry is executed."
+  },
+  "common_checks": {
+    "actual_user_keys": ["report", "source_text", "draft", "fact_hashes", "metric_index_base"],
+    "actual_draft_keys": ["elements", "supply_chain", "company_features", "limitations"],
+    "metric_index_base": 0,
+    "actual_host": "scorpio.reepool.com",
+    "actual_model": "grok-4.7",
+    "actual_reasoning_effort": "high",
+    "actual_physical_timeout_seconds": 1200,
+    "all_current_facts_preserved": true,
+    "all_supplied_fact_hashes_match_original": true,
+    "all_original_authors_match_b_ready": true,
+    "all_report_and_source_attribution_preserved": true,
+    "all_reconstructed_bindings_match_b_ready_and_authorized_plan": true,
+    "all_system_messages_and_response_formats_match_engineering_contract": true,
+    "quality_review_or_use_review_objects_sent": false,
+    "draft_and_all_element_limitations_empty": true,
+    "A_reference_or_old_review_answer_appended": false,
+    "answer_exclusion_basis": "The entire actual payload equals the reconstruction of original report/source/current authored facts and original fact hashes, with only the frozen generic system contract. A source reference, prior quality/use_review and free-text limitations are not payload components. Original authored uncertainty text is preserved as part of unchanged facts."
+  },
+  "cases": [
+    {
+      "instrument_id": "920003.BJ",
+      "current_work_id": "bp-work-0788cd766ed03e2101c554ec",
+      "wire": "data/checkpoints/company_profile_classification_scope_20261127/920003.BJ/executions/6fu-920003-BJ-20261127/receipts/001.json",
+      "request_payload_sha256": "91dbb614f007cf419aba03e552c67c88cc23038ce9bb4734df43aa17033cf287",
+      "user_json_sha256": "d6754ae87abf7c2ca50f574a9ed426d9995216c1db9cd84397bceaac9dfd7daf",
+      "fact_count": 23,
+      "current_record_sha256": "863fcd266bc830c1284eb570044d64edf646eb445a71631c0f90b67886d47a72",
+      "current_draft_sha256": "15ac7974112f116d8bf847b44b2a2ed9ca360cdde07b4526ce084dd37d9560b9",
+      "request_draft_sha256": "88282c49db4822dff936225a620997f213455fbd6c96effe2168c410361f28e0",
+      "source_text_sha256": "2134a5986d82285e1252194cf49d73b92e5c3f08da7b8ce0f347d4b8605487e2",
+      "source_packet_sha256": "f43182510343328d79fb4e7754ba5a76722a58567541892a37af3bccfcb82a2b",
+      "source_bytes": 26866,
+      "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+      "original_author": {
+        "request_id": "bp-work-3365870b26619438dab9801d:workpaper:extract",
+        "request_hash": "253a4bc71d8116ed15221c3008dfd953c0583b1d46a55bdc90adadba41bc3414",
+        "response_hash": "fc9b08b3a35c2af8e8bd9d4795f5b39445d902a851281f88a1855b86d79341d1",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek"
+      },
+      "risk_targets_in_original_form": [
+        {"fact_id": "ccm-2", "fact_sha256": "b0e2197a0ec8f50e842c4166d649675a907d1640efd03b9b5c35f639fb0c20bf", "fact_scope": "business_segment", "metric_scopes": ["business_segment", "business_segment", "business_segment", "business_segment"]}
+      ],
+      "positive_control_fact_hashes_match": true
+    },
+    {
+      "instrument_id": "600350.SH",
+      "current_work_id": "bp-work-48e5b38db9e2d9737d7a6c78",
+      "wire": "data/checkpoints/company_profile_classification_scope_20261127/600350.SH/executions/6fu-600350-SH-20261127/receipts/001.json",
+      "request_payload_sha256": "fe0d7a5d3aa5af33dbf3df1b32d69dff318f01e681f557162ae5a3732130d6bd",
+      "user_json_sha256": "074087b2f984a4af12c96c9222aec9fbf25125fb3fe4e7e2933b7404d071375a",
+      "fact_count": 25,
+      "current_record_sha256": "0e1ac61d276a45ee049c19458fb2c1ec3ac41aecc1c9b61fc19a9be6440eb2eb",
+      "current_draft_sha256": "67282d7d91d47fdf21497d671c9e65b7ca05cf793eb77883df2d5c516328dabc",
+      "request_draft_sha256": "555028039843ce24c72c8066ae34e08d5b4a47b0002b379712473eea9eaa942a",
+      "source_text_sha256": "e502dc9e7a46025144395b6195e2d49f108c3f5d3c6c78b22c576df278fc26fb",
+      "source_packet_sha256": "9e530899c73fb0f0f509786c7731648556a43e9069adfe80decb4f17e6bc9fb2",
+      "source_bytes": 56722,
+      "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+      "original_author": {
+        "request_id": "bp-work-f7e0f0a8da3af9c1e51ec585:workpaper:extract",
+        "request_hash": "8c7d316df68285f5b3f30fb937158b0282cf4fa338ab0fd2a5c239df7bf15e63",
+        "response_hash": "ead621134fa09080e1e0b1319fa8b1b772abe841ad7d30d65f212d610fa53f21",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek"
+      },
+      "risk_targets_in_original_form": [
+        {"fact_id": "op-01", "fact_sha256": "fe1bbbc0814e636484dc5bef523b579a11c948187c6697aa21ef45cc2c53a29d", "fact_scope": "consolidated_group", "metric_scopes": ["consolidated_group"]},
+        {"fact_id": "sm-12", "fact_sha256": "2a896714deae169fc01c1aa2ff0ae5b53948867904561c6d356e500c0d577e08", "fact_scope": "consolidated_group", "metric_scopes": ["consolidated_group", "consolidated_group"]}
+      ],
+      "positive_control_fact_hashes_match": true
+    },
+    {
+      "instrument_id": "600704.SH",
+      "current_work_id": "bp-work-e53470a4bfe65c83d9a82b89",
+      "wire": "data/checkpoints/company_profile_classification_scope_20261127/600704.SH/executions/6fu-600704-SH-20261127/receipts/001.json",
+      "request_payload_sha256": "68771920a1a5cf574451101dec729027f2db8bc38942eb83d15aef3310e77e44",
+      "user_json_sha256": "21a830a42deffc31f964687a1539a408b06451961c3888be601bf8cf90d06332",
+      "fact_count": 27,
+      "current_record_sha256": "ad57cc52815437c2b6a679f89194c56b18af9e81204501b1d724db9c05cacc27",
+      "current_draft_sha256": "5600ee7e25f8283aeea359da2bece180fb406dab48ea0714d371adfc930e992d",
+      "request_draft_sha256": "f801557cad5ddd022d4dc2acb70165ba569406e2a5f45f25fe38219b2f85f60f",
+      "source_text_sha256": "ee7c217a3574b633496256ca80d3bd9fd80423e5697bd50c0e8d3be8d5724ea5",
+      "source_packet_sha256": "96aa36d9d707f0d7be48846580915b814cbde04741294ed3fe43efdeaf9c153c",
+      "source_bytes": 57186,
+      "document_version": "be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd",
+      "original_author": {
+        "request_id": "bp-work-b37054c9acc8953c37d6a3fa:workpaper:extract",
+        "request_hash": "959752617125fbfd077817e387465017cf951da7fe76ce0894607770bf1bbd6d",
+        "response_hash": "c4b215345e381c006ddbd7b35311c30e6b7ac839c845157eae8df2d59049e6b5",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek"
+      },
+      "risk_targets_in_original_form": [
+        {"fact_id": "F-CC-01", "fact_sha256": "3f2c82b29f99a5634d0d49b69be9d82edf783de255842f785251a8da003bdcf2", "fact_scope": "business_segment", "metric_scopes": ["business_segment", "business_segment"]}
+      ],
+      "positive_control_fact_hashes_match": true
+    }
+  ],
+  "totals": {"companies": 3, "facts": 75, "risk_targets": 4, "positive_controls": 6},
+  "preservation": {
+    "b_ready_frozen_files_checked": 91,
+    "send_frozen_files_checked": 99,
+    "protected_files_checked": 397,
+    "mismatches": [],
+    "prior_B_temp_root_absent": "data/QuoteBak/company-profile-6fu-b-BiUg3JVN",
+    "audit_temp_files_created": 0,
+    "audit_temp_files_deleted": 0,
+    "audit_new_supplier_requests": 0,
+    "audit_provider_or_operator_execution": false,
+    "audit_git_commit_or_push": false
+  },
+  "limitations": [
+    "This file audits actual first-review inputs, not final model accuracy or independent source semantics.",
+    "No group completion is inferred from partially available stock results; no a-run-result is fabricated.",
+    "Final outputs, retries and inherited restrictions are checked separately only for stocks explicitly assigned by A; A owns source scoring and safe successor decisions."
+  ]
+}

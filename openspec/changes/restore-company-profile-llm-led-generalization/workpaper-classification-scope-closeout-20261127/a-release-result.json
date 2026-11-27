@@ -1,0 +1,81 @@
+{
+  "task": "6.FU",
+  "state": "three_A_approved_safe_successors_published_by_original_writer",
+  "cases": [
+    {
+      "instrument_id": "920003.BJ",
+      "source_work_id": "bp-work-69d683022dd1747f88f9c631",
+      "safe_work_id": "bp-work-77a6890bfb9ac399535def87",
+      "staged_sha256": "6d61129a45ed047be74db0075b8bf8b76003194fca753876f1f0e46c8db6799c",
+      "published_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-77a6890bfb9ac399535def87.json",
+      "published_sha256": "6d61129a45ed047be74db0075b8bf8b76003194fca753876f1f0e46c8db6799c",
+      "before": {
+        "visible_objects": 22,
+        "visible_metrics": 27
+      },
+      "after": {
+        "visible_objects": 23,
+        "visible_metrics": 31
+      },
+      "changed_and_independently_checked_fact_ids": [
+        "ccm-2"
+      ]
+    },
+    {
+      "instrument_id": "600704.SH",
+      "source_work_id": "bp-work-1f7e53d7850980ccb83ad64e",
+      "safe_work_id": "bp-work-6f945480c7728b21b0e977f1",
+      "staged_sha256": "9aa399e74471a10afd232770b74f89c737be38fa34587dcbe0962468ea18e011",
+      "published_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-6f945480c7728b21b0e977f1.json",
+      "published_sha256": "9aa399e74471a10afd232770b74f89c737be38fa34587dcbe0962468ea18e011",
+      "before": {
+        "visible_objects": 26,
+        "visible_metrics": 43
+      },
+      "after": {
+        "visible_objects": 27,
+        "visible_metrics": 45
+      },
+      "changed_and_independently_checked_fact_ids": [
+        "F-CC-01"
+      ]
+    },
+    {
+      "instrument_id": "600350.SH",
+      "source_work_id": "bp-work-bd3f12e057b1b13c7ce3243c",
+      "safe_work_id": "bp-work-1deffa57365ab12095599a8f",
+      "staged_sha256": "9190ae2b833acf4118a90ece1d2f2ea2f0f5b2d33d89d43c0403625524fc6eb3",
+      "published_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-1deffa57365ab12095599a8f.json",
+      "published_sha256": "9190ae2b833acf4118a90ece1d2f2ea2f0f5b2d33d89d43c0403625524fc6eb3",
+      "before": {
+        "visible_objects": 24,
+        "visible_metrics": 22
+      },
+      "after": {
+        "visible_objects": 24,
+        "visible_metrics": 22
+      },
+      "changed_and_independently_checked_fact_ids": [
+        "cm-01"
+      ]
+    }
+  ],
+  "current_companies": 39,
+  "current_visible_objects": 1096,
+  "current_visible_metrics": 1683,
+  "other36_complete_profiles_unchanged": true,
+  "all_397_original_files_and_sealed_real_runs_unchanged": true,
+  "three_complete_profiles_equal_approved_projection": true,
+  "new_supplier_requests": 0,
+  "new_negative_safety_restrictions": 0,
+  "old_restrictions_lifted_only_by_new_exact_A_decisions": [
+    "920003.BJ:ccm-2",
+    "600704.SH:F-CC-01"
+  ],
+  "retained_safety": [
+    "600350.SH:op-01",
+    "600350.SH:sm-12:metric1"
+  ],
+  "three_current_json": "data/research/company_profile_research_v1_20261123/three-reviewed-current-6fu-20261127.json",
+  "three_current_markdown": "data/research/company_profile_research_v1_20261123/three-reviewed-current-6fu-20261127.md"
+}

@@ -49,7 +49,7 @@ def authorize():
     cases=[]
     for row in prepared['cases']:
         old=CompanyProfileTaskPlan.model_validate_json(Path(row['plan']).read_text())
-        assert old.authorization_status=='planned' and old.instrument_ids==[row['instrument_id']]
+        assert old.authorization_status=='planned' and tuple(old.instrument_ids)==(row['instrument_id'],)
         assert old.budget.seconds==6000 and old.budget.tokens==1000000 and old.budget.physical_requests==6
         assert old.budget.recoveries==3 and old.budget.logical_seconds==2450
         assert old.review.attempt_seconds==1200 and old.extract.attempt_seconds==600
@@ -62,7 +62,7 @@ def authorize():
         body.update(authorization_status='authorized',approval_reference=approval['approval_reference'])
         path=Path(row['plan']).with_name('execution-plan-authorized.json')
         assert not path.exists()
-        new=CompanyProfileTaskPlan.model_validate(body)
+        new=CompanyProfileTaskPlan.model_validate_json(json.dumps(body))
         op.save(path,new.model_dump(mode='json'))
         frozen[str(path)]=op.digest(path)
         cases.append({'instrument_id':row['instrument_id'],'plan':str(path),'plan_sha256':op.digest(path)})

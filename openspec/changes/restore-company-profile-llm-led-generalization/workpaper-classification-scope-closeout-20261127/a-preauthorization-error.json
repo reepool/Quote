@@ -1,0 +1,13 @@
+{
+  "task": "6.FU",
+  "phase": "authorize_before_client_construction_and_group_start",
+  "error_type": "AssertionError",
+  "cause": "A dispatch wrapper compared the typed instrument_ids tuple to a list. Saved planned authority and stock scope were unchanged; no authorized plan was created.",
+  "fix": "Compare the exact singleton stock tuple, and validate serialized plan bodies through the original strict model_validate_json boundary rather than model_validate on JSON-shaped dictionaries. Scope, limits and application code are unchanged.",
+  "second_preparation_error": "Strict plan validation rejected JSON-shaped lists/date/path/decimal strings passed to the Python-object validator. No authorized plan had been saved; corrected to the same JSON validation boundary used by the original task entry.",
+  "new_real_clients": 0,
+  "new_model_sends": 0,
+  "group_started": false,
+  "original_planned_files_preserved": true,
+  "classification": "local A operator preparation error, not provider/model failure or a used semantic run"
+}

@@ -1,0 +1,14 @@
+{
+  "task": "6.FU",
+  "authorized": true,
+  "human_reply": "确认",
+  "approval_reference": "human-20261127-6FU-three-existing-public-source-reviews-approved",
+  "stocks": ["920003.BJ", "600350.SH", "600704.SH"],
+  "scope": "One current-draft source-review closure per saved public2025 workpaper, existing Grok high initial/final and at most one necessary DeepSeek repair; selected public sections and public derived drafts only.",
+  "per_company": {"seconds": 6000, "conservative_tokens": 1000000, "physical_requests": 6, "recoveries": 3, "recoveries_per_logical": 1},
+  "group": {"seconds": 12600, "conservative_tokens": 3000000, "physical_requests": 18, "concurrency": 3},
+  "timeouts": {"high_tier_physical_seconds": 1200, "high_tier_logical_seconds": 2450, "flash_physical_seconds": 600},
+  "priced_cost_cny_per_company": "10",
+  "unpriced_cost": "unknown",
+  "limits": "No additional window/company/source extraction, recharge, shared configuration changes or production. Original failures/scores and independent restrictions remain. Run only in the authorized network environment."
+}

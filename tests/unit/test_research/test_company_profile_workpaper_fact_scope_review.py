@@ -188,6 +188,6 @@ def test_default_review_identity_changes_without_rewriting_saved_v13():
     old_hash = workpaper_hash(paper)
     assert paper.quality_review.policy_version == "company_profile_workpaper_review.v13"
     identity = workpaper_processing_identity(real=False, review=True)
-    assert identity["workpaper_review_policy"] == "company_profile_workpaper_review.v14"
+    assert identity["workpaper_review_policy"] == "company_profile_workpaper_review.v15"
     assert workpaper_hash(paper) == old_hash
     assert hashlib.sha256(path.read_bytes()).digest() == hashlib.sha256(before).digest()

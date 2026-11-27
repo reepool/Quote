@@ -1,6 +1,6 @@
 # 公司画像交付路径与开发任务卡
 
-当前[6.FU分类维度/主体口径合并卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-classification-scope-closeout-card.md)工程已就绪：三股4旧错来自v13，v14已有针对性改动；B三非空原TaskService闭环/79相关测试及已修正常入口核查通过，A独核实际系统消息/Schema、4风险6正控、91输入及397原件。没有新增应用P1/P2，不为代码量重复改提示或版本；三份planned真实计划及6必要父链保留，具体累计预算确认已询问，当前0新真实调用，4目标新检错效果未评。A实际运行/独核和安全发布仍待授权及结果，不自动新20/S3/生产，当前39/旧分/人工保护不变；B本人临时物115文件清，A必要证据一套后清/Git先收工程段，详[result](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/result.md)。
+当前[6.FU分类维度/主体口径卡已收口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/result.md)：用户确认后真实三股10物理/272622/1恢复/767.607秒unknown费用，v14实际修正中诚/物产2个目标、山东2目标仍漏，额外cm-01修订有源。A独核3final/6正控，安全3后继主root39现1096/1683、其他36不变、actual39及三详情200相等；两未解安全限制继续。按验收§4.3原run封存后零调用实现v15主体审查索引/优先级，工程101有效并集+A9直接通过，不算2→4模型提升。当前不因一组已见观察宣称前瞻正式验收就绪；下一真实验证需针对这次新增策略及未解问题另有明确版本/预算，不追加旧窗/重抽三家/自动新20或生产。必要证据一套后清本人产物、保护旧分并隔离Git同卡。
 
 每轮必读的优化方针（2026-11-27用户确认）：发卡和审核先执行[验收计划§4.3](company_profile_acceptance_program.md#43-评估完成与达标及失败驱动的优化方针2026-11-27起生效)及[A/B流程§3.1](ab_role_development_workflow.md#31-未达标后的有据优化与复验强制)。未达标接续卡必须绑定上轮具体差距、原因证据、代码/策略变化、预期改善和验证结果；有界复验前冻结版本，未改善则解释/纠偏或止损。达到固定标准后结束该阶段；没有有效变化不自动续派同类试跑，不把文档或重复测试数量当业务进展。前后清本人垃圾、原结果/旧分及付费/生产边界保持。
 

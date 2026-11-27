@@ -1,0 +1,81 @@
+{
+  "task": "6.FU",
+  "state": "bounded_real_observation_and_offline_causal_optimization_closed",
+  "real_group": {
+    "physical_requests": 10,
+    "logical_requests": 9,
+    "supplier_total_tokens": 272622,
+    "recoveries": 1,
+    "group_seconds": 767.6073249449983,
+    "cost": "unknown",
+    "closed_no_more_sends": true
+  },
+  "business": {
+    "targets_resolved": 2,
+    "targets_total": 4,
+    "still_missed": 2,
+    "actual_supported_repairs": 3,
+    "current_companies": 39,
+    "current_visible_objects": 1096,
+    "current_visible_metrics": 1683,
+    "other36_complete_profiles_unchanged": true,
+    "new_negative_safety_restrictions": 0
+  },
+  "finite_review": {
+    "new_code_blocking_P1_P2": 0,
+    "reviewed_code_delta": "v15 compact original-metadata scope queue; initial only, old retained policy attribution preserved.",
+    "B_effective_related_test_union": 101,
+    "A_new_direct_cases": 9,
+    "A_seconds": 5.61,
+    "OpenSpec_strict": "passed",
+    "staged_diff_check": "passed",
+    "new_local_links_checked": 31,
+    "known_semantic_misses": "Shandong op-01 and sm-12 metric1 retain existing independent restrictions; no false all-pass claim.",
+    "nonblocking": [
+      "v15 semantic effectiveness unmeasured until separately authorized fresh observation.",
+      "Population-wide quality and S3/production remain outside this known-case group."
+    ]
+  },
+  "original_run_files_unchanged": 43,
+  "original_research_private_configuration_files_unchanged_except_navigation": 396,
+  "preexisting_tracked_changes_preserved": 20,
+  "only_own_dirty_doc_blocks_staged_sha256": {
+    "docs/development/company_profile_acceptance_program.md": "80047ae4246a477d930ec14deca01c251239d493ab15f742bdcd3c9b52c7bdc4",
+    "docs/development/company_profile_delivery_plan.md": "8d1ba6a4a5610a1cc7a97b1b02830ade4a7aadb0306cf36be72d24a84557b7ad",
+    "openspec/changes/restore-company-profile-llm-led-generalization/proposal.md": "c06162f0aa44959697f5f11a3e8803fe9348ca06dffd6f6b245abd340d6440bb",
+    "openspec/changes/restore-company-profile-llm-led-generalization/design.md": "0bdf313057a995e0d9850fdd117c52dd7504c9fbda7c301a09cb9919ac53113a",
+    "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md": "b0b9988ea3e44665d1af744974fc5241734cf8695153e74eced49d154d674fb8",
+    "openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md": "aacfc2679c02e81048e683da537cf7bd4a1d85dea244b707c171b4dcd258a0fb"
+  },
+  "v15_code_group_aftercare_not_original_execution": true,
+  "live_service_restart": false,
+  "A_cleanup": [
+    {
+      "owned_root": "/home/python/Quote/data/QuoteBak/company-profile-6fu-run-ewHS6C6Y",
+      "files_removed": 3,
+      "logical_bytes_removed": 4014080,
+      "root_absent": true,
+      "scope": "Own transient SQLite working databases, approved temporary projections, before/expected39 copies, direct-test artifacts and baseline/helper files."
+    },
+    {
+      "owned_root": "/home/python/Quote/data/QuoteBak/company-profile-6fu-close-SufIAD5d",
+      "files_removed": 43,
+      "logical_bytes_removed": 27381779,
+      "root_absent": true,
+      "scope": "Own transient SQLite working databases, approved temporary projections, before/expected39 copies, direct-test artifacts and baseline/helper files."
+    }
+  ],
+  "B_v15_cleanup": {
+    "owned_root": "/home/python/Quote/data/QuoteBak/company-profile-6fu-v15-b.rypG4yKz",
+    "files": 22,
+    "logical_bytes": 154177,
+    "state": "completed_owned_root_removed_after_compact_evidence_saved",
+    "A_parallel_and_shared_temp_untouched": true
+  },
+  "this_authorized_followup_files_removed": 68,
+  "this_authorized_followup_logical_bytes_removed": 31550036,
+  "previous_engineering_cleanup_reference": "a-engineering-close.json (139 files/22032724 logical bytes), not included again in followup totals.",
+  "retained": "One original checkpoint/wire/budget/started set and sealed runtime lineage, three safe successors, current three-company JSON/Markdown plus compact source adjudication/quality/engineering results; original PDF/cache untouched.",
+  "derived_markdown_formatting": "Only trailing whitespace/extra blank EOF in new human-readable derivative normalized; original JSON/source quotes and table content unchanged.",
+  "future_execution": "No automatic second window, full redraw, new cohort or production. New semantic test must measure the declared v15 change under a new explicit finite authority."
+}

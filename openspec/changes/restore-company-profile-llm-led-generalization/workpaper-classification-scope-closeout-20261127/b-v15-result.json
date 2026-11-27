@@ -1,0 +1,288 @@
+{
+  "task": "6.FU",
+  "stage": "A-authorized post-group zero-call v15 processing-policy optimization",
+  "state": "A_limited_engineering_acceptance_B_handoff_complete",
+  "date": "2026-11-27",
+  "hypothesis": {
+    "observed_gap": "v14 actual initial responses flagged only two of four fixed targets. Shandong op-01/sm-12 had no new initial finding while optional cm-01/upstream-status findings were produced.",
+    "intervention": "Expose every draft fact/metric scope and period as a compact review queue, prioritizing source-grounded scope checks before optional omissions/status suggestions.",
+    "semantic_effect": "Not evaluated; no claim of 2-to-4 detection improvement."
+  },
+  "delta": [
+    {
+      "file": "research/company_profile/workpaper_review.py",
+      "change": "REVIEW_POLICY v14 -> v15; new _scope_review_index and queue instructions; append index/instructions only to a fresh initial review under the v15 identity."
+    },
+    {
+      "file": "research/company_profile/workpaper_review.py",
+      "change": "prepare_review_recovery records original review_policy_version on retained resume; quality-review policy honors that original policy, so old initial responses are not relabelled v15. No resumed initial call or new index is synthesized."
+    },
+    {
+      "file": "tests/unit/test_research/test_company_profile_scope_review_index.py",
+      "change": "Nine direct cases prove exact scope/period/evidence/metric positions across all element types; no repeated amount/quote fields, unchanged response schema, no gate/auto-fix, initial-only queue, both retained modes and original policy propagation, v13/v14 byte/decoder preservation."
+    },
+    {
+      "file": "tests/unit/test_research/test_company_profile_workpaper_review.py",
+      "change": "One current-default version assertion follows REVIEW_POLICY."
+    },
+    {
+      "file": "tests/unit/test_research/test_company_profile_workpaper_fact_scope_review.py",
+      "change": "One default processing-identity assertion expects v15; historical v13 assertion remains."
+    }
+  ],
+  "identity": {
+    "default": "company_profile_workpaper_review.v15",
+    "existing_default_owner": "workpaper_llm.workpaper_processing_identity already imports REVIEW_POLICY; workpaper_llm.py is unchanged.",
+    "legacy_initial_requests": "Explicit v13/v14 identities receive no v15 index or queue instructions.",
+    "retained_initial": "Its original policy is propagated by the existing prepare_review_recovery path; retained_request_ids remain and checked_fact_hashes stays null when the initial response is retained."
+  },
+  "unchanged": [
+    "Response schemas and parsers",
+    "Metric normalization and source literal acceptance",
+    "Repair and final verification request contracts",
+    "Single TaskService/writer/read ownership",
+    "Original three-company plans/wires/budgets/results and old scores",
+    "Company/scope correctness remains the model's source judgment; index only copies original metadata",
+    "No company allowlist or four-risk special handling",
+    "No new response fields, gate, automatic metadata fix or request loop"
+  ],
+  "validation": {
+    "unique_cases_passed": 101,
+    "new_direct_cases": 9,
+    "related_existing_cases": 92,
+    "commands": [
+      "source scripts/quote_dev_env.sh; python -B -m pytest tests/unit/test_research/test_company_profile_scope_review_index.py tests/unit/test_research/test_company_profile_workpaper_review.py tests/unit/test_research/test_company_profile_workpaper_fact_scope_review.py tests/unit/test_research/test_company_profile_review_metric_limits.py -q -o cache_dir=<owned QuoteBak root>/cache --basetemp=<owned QuoteBak root>/pytest-final --junitxml=<owned QuoteBak root>/final-tests.xml",
+      "source scripts/quote_dev_env.sh; python -B -m pytest tests/unit/test_research/test_company_profile_scope_review_index.py -q -o cache_dir=<owned QuoteBak root>/cache --basetemp=<owned QuoteBak root>/pytest-direct-final --junitxml=<owned QuoteBak root>/direct-final.xml"
+    ],
+    "result_accounting": "Combined run: 100 passed, 1 new test-fixture failure. Only the new test file changed afterward; corrected direct suite: 9 passed. The 92 unchanged existing regressions remain valid. Unique passing union is 101, not 109 or a new all-101 rerun.",
+    "runs": [
+      {
+        "file": "new-tests.xml",
+        "tests": 8,
+        "failures": 3,
+        "errors": 0,
+        "seconds": 4.185,
+        "failing_cases": [
+          "test_actual_initial_gateway_wire_queues_every_original_scope_without_values_or_new_gate[v13]",
+          "test_actual_initial_gateway_wire_queues_every_original_scope_without_values_or_new_gate[v14]",
+          "test_actual_initial_gateway_wire_queues_every_original_scope_without_values_or_new_gate[v15]"
+        ]
+      },
+      {
+        "file": "final-tests.xml",
+        "tests": 101,
+        "failures": 1,
+        "errors": 0,
+        "seconds": 165.544,
+        "failing_cases": [
+          "test_prepared_continuation_carries_original_initial_review_policy"
+        ]
+      },
+      {
+        "file": "direct-final.xml",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "seconds": 5.276,
+        "failing_cases": []
+      }
+    ],
+    "fixture_failures_resolved": [
+      "Empty synthetic supply-chain elements now carry the required missing-information reason.",
+      "Synthetic mutation of a strict runtime record is decoded with model_validate_json, matching persisted JSON semantics."
+    ],
+    "actual_gateway_wire": {
+      "evidence_kind": "actual CommonGatewaySemanticProvider wire with synthetic ScriptedTransport only; no saved real 6.FU response replay",
+      "processing_policy": "company_profile_workpaper_review.v15",
+      "result_policy": "company_profile_workpaper_review.v15",
+      "scripted_sends": 1,
+      "real_provider_clients": 0,
+      "real_sends": 0,
+      "fact_count": 4,
+      "index": [
+        {
+          "fact_id": "main",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "revenue",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "metrics": [
+            {
+              "metric_index": 0,
+              "name": "营业收入",
+              "subject_scope": "consolidated_group",
+              "period": "2025"
+            },
+            {
+              "metric_index": 1,
+              "name": "租赁业务收入",
+              "subject_scope": "consolidated_group",
+              "period": "2025"
+            }
+          ]
+        },
+        {
+          "fact_id": "service-role",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "future-service",
+          "subject_scope": "unclear",
+          "period": "2026年计划",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": []
+        }
+      ],
+      "user_payload_keys": [
+        "report",
+        "source_text",
+        "draft",
+        "fact_hashes",
+        "metric_index_base",
+        "scope_review_index"
+      ],
+      "user_payload_sha256": "b8d451ef8cc8ec5f2179314fc4bb13955834eb100e0152de9a59465ede775114",
+      "index_sha256": "17819ddde9a2e2817ba42ac6c64b7286d7157d6b6bc5118a2fbf4ae737a4d10b",
+      "incremental_index_json_bytes": 713,
+      "draft_sha256": "4c71f63b391ea04b721c19ee862abfaf19dc821d2fc3f84e04f4d5172e3249e6",
+      "source_text_sha256": "47118bf2970350be7931873cc94c33ddb22a2a21921bcf4876d662be4810b37f",
+      "source_text_occurrences": 1,
+      "amount_or_quote_fields_in_index": false,
+      "response_schema_sha256": "7271b7ff330a44ecbaa867757f11bd6eff550721547bacab4d7dacc21a225dcb",
+      "response_schema_unchanged": true,
+      "underlying_metadata_unchanged_without_a_model_finding": true,
+      "known_wrong_scope_kept_in_synthetic_no_finding_response": "the narrower leasing metric deliberately retains original consolidated_group; index does not decide semantics or repair it",
+      "new_gate_or_requests_added": false,
+      "limits": "Proves request/consumption wiring only; no new semantic detection rate, no improvement claim for the four original targets."
+    },
+    "static_checks": "Tracked diff --check passed; untracked new-file whitespace check emitted no issues. No schema/model contracts modified."
+  },
+  "review": {
+    "blocking_findings": 0,
+    "scope": "Only requested request construction, original policy attribution and directly affected regression behavior reviewed.",
+    "nonblocking": "No additional framework/refactor or company rules introduced."
+  },
+  "preservation": {
+    "original_run": {
+      "physical_requests": 10,
+      "supplier_total_tokens": 272622,
+      "elapsed_seconds": 767.6073249449983,
+      "seal": "a-original-run-seal.json",
+      "sealed_files": 43,
+      "mismatches": []
+    },
+    "protected_files_checked": 397,
+    "protected_mismatches": [],
+    "code_and_test_hashes": {
+      "research/company_profile/workpaper_review.py": "d73ba97020df919139b615661f3d8fddb1c6098684161d3f46606909fdcf137d",
+      "research/company_profile/workpaper_llm.py": "4bfe9b8fe4a144fd61ee1b3681ee679210146537ae8fb38ca8d63e1a5e476104",
+      "tests/unit/test_research/test_company_profile_scope_review_index.py": "0b34967744431b5d48cfa0ba12be2f9e9835f6894090953265a657ce3ac31cab",
+      "tests/unit/test_research/test_company_profile_workpaper_review.py": "f616265ef9d2bf8ca3aaa00787146c3326d6f52cc476ca27785c0e46e315a688",
+      "tests/unit/test_research/test_company_profile_workpaper_fact_scope_review.py": "27c89026f9cc4de92b3d6c06ce990d62115a95d4f034cc223aa293d59a8b8c59"
+    },
+    "original_frozen_execution_not_reusable": "Source code intentionally changes under A's post-group authorization; old send-freeze remains historical and must not be used to continue/replay the original group."
+  },
+  "resources": {
+    "new_real_provider_clients": 0,
+    "new_model_requests": 0,
+    "new_external_payloads": 0,
+    "original_group_replayed_or_resumed": false,
+    "verification": "Offline ScriptedTransport and local JSON/schema checks only."
+  },
+  "cleanup": {
+    "owned_root": "/home/python/Quote/data/QuoteBak/company-profile-6fu-v15-b.rypG4yKz",
+    "files": 22,
+    "logical_bytes": 154177,
+    "state": "completed_owned_root_removed_after_compact_evidence_saved",
+    "A_parallel_and_shared_temp_untouched": true
+  },
+  "git": {
+    "commit": false,
+    "push": false,
+    "reason": "Explicit B scope prohibits commit/push; A owns isolated integration.",
+    "preexisting_dirty_files": "Preserved, not included or edited by this v15 implementation."
+  },
+  "A_release_boundary_closeout": {
+    "v15_code_test_hashes_match": {
+      "research/company_profile/workpaper_review.py": true,
+      "research/company_profile/workpaper_llm.py": true,
+      "tests/unit/test_research/test_company_profile_scope_review_index.py": true,
+      "tests/unit/test_research/test_company_profile_workpaper_review.py": true,
+      "tests/unit/test_research/test_company_profile_workpaper_fact_scope_review.py": true
+    },
+    "actual_scripted_wire_allowed_top_keys_only": true,
+    "index_only_original_metadata_and_zero_based_positions": true,
+    "index_helper_has_no_company_or_correctness_branches": true,
+    "response_schema_unchanged": true,
+    "prior_direct_results_reused": {
+      "new_direct_cases": 9,
+      "related_cases": 92,
+      "no_changed_code_or_test_since_valid_result": true
+    },
+    "original_sealed_files": 43,
+    "sealed_mismatches": [],
+    "protected_excluding_A_authorized_navigation": 396,
+    "protected_mismatches": [],
+    "A_authorized_changes_excluded": [
+      "research-current.md navigation",
+      "three safe successor records and three exports"
+    ],
+    "new_calls_or_reconsumption": 0,
+    "temp_root_absent": true,
+    "current_research_delivery": {
+      "basis": "A-reported independently adjudicated and published result; B does not rescore it",
+      "companies": 39,
+      "facts": 1096,
+      "metrics": 1683,
+      "v14_targets_resolved": 2,
+      "v14_targets_total": 4,
+      "extra_repair": "600350.SH:cm-01",
+      "v15_semantic_effect": "not evaluated"
+    }
+  },
+  "A_final_review": {
+    "basis": "A's explicit final review and independently reported verification in this task",
+    "engineering_verdict": "limited_acceptance",
+    "independent_direct_tests": {"passed": 9, "seconds": 5.61},
+    "verified": ["Initial scope index contains only original metadata", "Response Schema unchanged", "Legacy initial wire receives no index", "Retained initial-review identity remains v14"],
+    "new_blocking_findings": 0,
+    "actual_API_verification_by_A": "39 complete profiles equal expected 1096 facts / 1683 metrics; three detail responses HTTP 200",
+    "v15_semantic_effect": "Unmeasured hypothesis; engineering acceptance does not establish 2-to-4 target detection",
+    "original_v14_seal": "Unchanged; not rescored or consumed under v15",
+    "navigation_and_document_updates": "A-owned",
+    "B_cleanup_and_exit": "Owned temporary root already removed. No additional cases, broader regression, model calls, commit or push. Return to A."
+  },
+  "final_execution_source_boundary": {
+    "original_v14_workpaper_review_sha256": "e341cb30da0c6e6a4afa80363f8c771b9ebcda222f2d9f4dbaad0a97fb2d7e03",
+    "authorized_post_group_v15_workpaper_review_sha256": "d73ba97020df919139b615661f3d8fddb1c6098684161d3f46606909fdcf137d",
+    "original_91_and_99_hash_sets": "Historical execution snapshots only. Current workpaper_review.py intentionally differs under A's post-group v15 authorization; do not claim the full original execution-code hash sets still match, and do not resume or consume the original run under this new policy.",
+    "original_data_preservation": "All 43 sealed original files remain byte-identical, including nine original runtime records and three runtime checkpoint records, plus the original run/receipts/budgets/results.",
+    "A_release_boundary": "A's three safe successor records, three exports and separately authorized research-current.md navigation update are permitted additions/changes. The other 396 original protected files remain the preservation baseline.",
+    "test_handoff": "Reuse the documented 101-case passing union (92 related regressions plus nine final direct cases). A independently reruns the nine direct cases; B adds no broader test run.",
+    "cleanup": "Owned v15 QuoteBak root removed; no pending B temporary artifacts. No commit or push."
+  },
+  "limits": [
+    "v15 is an offline-tested hypothesis, not a new real initial review or an accuracy score.",
+    "No old response is counted as a v15 semantic success; no A source score or safe-release decision is made here.",
+    "A's independent review and publication of the completed v14 group are separate and do not depend on this new code.",
+    "Any future real validation needs a new frozen version/plan/authorization and finite budget; the original group is closed."
+  ]
+}

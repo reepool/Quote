@@ -1,0 +1,142 @@
+{
+  "task": "6.FU",
+  "authority": "A independent original-PDF adjudication after sealed v14 real run",
+  "known_targets": 4,
+  "newly_detected_and_resolved_targets": 2,
+  "still_missed_targets": 2,
+  "supported_actual_repairs": [
+    {
+      "instrument_id": "920003.BJ",
+      "work_id": "bp-work-69d683022dd1747f88f9c631",
+      "fact_id": "ccm-2",
+      "current_fact_sha256": "341a9b0caa8bbdd83f26c7ce45a5143b031ab91c9fa8c10b108481e06cd454a0",
+      "evidence_ids": [
+        "source-0007",
+        "source-0008"
+      ],
+      "own_final_response_hash": "9a41816e45d482b205143e1ba3be087a6e147e871906d2fc4837434d0e96a712",
+      "status": "supported_current_repaired_content",
+      "source_pages": [
+        23,
+        24
+      ],
+      "reason": "原PDF按区域分类与收入构成说明支持江苏省内362444827.01元/98.09%、省外7047586.82元/1.91%。新事实及四指标保地区原名、原值、2025期及具体unclear原因，不当业务分部或集团总额。",
+      "card_target": true,
+      "substantive_scope_correction": true
+    },
+    {
+      "instrument_id": "600704.SH",
+      "work_id": "bp-work-1f7e53d7850980ccb83ad64e",
+      "fact_id": "F-CC-01",
+      "current_fact_sha256": "c80505a4adae93bc53be0d9371dea4e0259d243a42031333a518d070494ebe10",
+      "evidence_ids": [
+        "source-0011",
+        "source-0014"
+      ],
+      "own_final_response_hash": "e6f5f9c3195fc33b3509c3753d479a3809ffadb85f517d116a29913d46fe49df",
+      "status": "supported_current_repaired_content",
+      "source_pages": [
+        21,
+        22
+      ],
+      "reason": "原PDF主营业务分销售模式表为对企业/个人客户5423.67/540.96亿元，另有真实分行业表。候选按公司收入客户分类表达、保两指标各自名称，不当独立经营分部；consolidated_group作为公司报告主体且原句保按销售模式限定，未冒称两行分别为公司总额。对公司/企业客户措辞不另计经济错误收益。",
+      "card_target": true,
+      "substantive_scope_correction": true
+    },
+    {
+      "instrument_id": "600350.SH",
+      "work_id": "bp-work-bd3f12e057b1b13c7ce3243c",
+      "fact_id": "cm-01",
+      "current_fact_sha256": "2567cad8afc854140876eaa1b047966d5c064ca0a484ab49220e99c20dc0400d",
+      "evidence_ids": [
+        "source-0001",
+        "source-0007"
+      ],
+      "own_final_response_hash": "20b579237aa95db726ec85c0e2b0c3dcaaea0d9ce3b7ebab0a8c9009b099cab4",
+      "status": "supported_current_repaired_content",
+      "source_pages": [
+        14,
+        19
+      ],
+      "reason": "A另直接读原PDF14/19：智慧运营为过往车辆通行、受托其他企业路桥，信息集团覆盖31省/海外项目及轨道交通集团运量1.156亿吨/增长2.5%均有源。新增source-0001补足前句引用，事实unclear解释混合主体，三个metric保named_subsidiary。范围澄清和引用补足有用，不将其冒充原4项目标的解决。",
+      "card_target": false,
+      "substantive_scope_correction": true
+    }
+  ],
+  "cases": [
+    {
+      "instrument_id": "920003.BJ",
+      "source_work_id": "bp-work-69d683022dd1747f88f9c631",
+      "source_record": "data/research/company_profile_classification_scope_20261127/company_profile_common_core.v1/bp-work-69d683022dd1747f88f9c631.json",
+      "source_record_sha256": "5d90630dd2cb50e42ca290b9d224872528cf72baa8a66cb8d5bb43db87824298",
+      "changed_fact_ids": [
+        "ccm-2"
+      ],
+      "unchanged_author_facts": 22
+    },
+    {
+      "instrument_id": "600704.SH",
+      "source_work_id": "bp-work-1f7e53d7850980ccb83ad64e",
+      "source_record": "data/research/company_profile_classification_scope_20261127/company_profile_common_core.v1/bp-work-1f7e53d7850980ccb83ad64e.json",
+      "source_record_sha256": "b7c1f4a9ee87a8d1718d012ff323e041101022682c3c5e3581797b15b6065d5b",
+      "changed_fact_ids": [
+        "F-CC-01"
+      ],
+      "unchanged_author_facts": 26
+    },
+    {
+      "instrument_id": "600350.SH",
+      "source_work_id": "bp-work-bd3f12e057b1b13c7ce3243c",
+      "source_record": "data/research/company_profile_classification_scope_20261127/company_profile_common_core.v1/bp-work-bd3f12e057b1b13c7ce3243c.json",
+      "source_record_sha256": "ec8f62b029d1a97b360014deb53497ad47ac6c9a899a3411afb5c41ec9ff647d",
+      "changed_fact_ids": [
+        "cm-01"
+      ],
+      "unchanged_author_facts": 24
+    }
+  ],
+  "unchanged_author_facts": 72,
+  "source_supported_positive_controls_unchanged": 6,
+  "missed_target_details": [
+    {
+      "instrument_id": "600350.SH",
+      "fact_id": "op-01",
+      "source_pages": [
+        17
+      ],
+      "reason": "本次初核列入reviewed_fact_ids但没有新的事实主体finding，原确定集团事实范围未改；已有旧模型指标限制和A整条仅源参考不能算本次抓错。"
+    },
+    {
+      "instrument_id": "600350.SH",
+      "fact_id": "sm-12",
+      "source_pages": [
+        273
+      ],
+      "reason": "原租赁行指标1仍确定group，新初核无相关finding/修订；保原A仅指标1限制，原正文与合计继续可用。"
+    }
+  ],
+  "other_new_source_observations": [
+    {
+      "instrument_id": "600350.SH",
+      "finding_id": "f003",
+      "assessment": "可选上游not_disclosed状态的范围提醒，未形成修订，不当第3个目标解决或确定经济错误收益。"
+    }
+  ],
+  "independent_release_decision": {
+    "lift_old_whole_limits": [
+      "920003.BJ:ccm-2",
+      "600704.SH:F-CC-01"
+    ],
+    "retain_old_safety_limits": [
+      "600350.SH:op-01",
+      "600350.SH:sm-12:metric1"
+    ],
+    "new_positive_decisions": [
+      "600350.SH:cm-01"
+    ],
+    "new_negative_safety_restrictions": 0
+  },
+  "progress_claim": "本组4目标2/4解决，另1对象范围/引文改善；不是全组99%或未见成绩。",
+  "post_run_strategy": "v15零调用改进主体审查输入索引及优先级，尚无真实效果；不得回算本组。",
+  "new_supplier_calls": 0
+}
