@@ -1,5 +1,9 @@
 ## Context
 
+### 6.FU validate the existing fact-scope fix against four remaining historical failures
+
+The current safe drafts for Wuchan Zhongda, Zhongcheng and Shandong Expressway still bind v13 review receipts. Current v14 already independently checks fact and metric scope/period, the governing classification axis and local narrower objects. Diagnose whether that implemented delta reaches the actual request and consumption path before adding any new code or prompt version. Use original-source nonempty direct checks and retained receipts for engineering proof; new semantic effectiveness requires a separately authorized bounded current-draft review group. Freeze four independent source risks and correct core controls outside model input. Preserve old scores and A restrictions, publish only independently approved safe successors, and end with an effectiveness/readiness decision rather than per-field retries. See company-profile-classification-scope-closeout-card.md.
+
 ### 6.FS bounded current research-quality closure
 
 Audit the current39-company mixed-version delivery using existing original records/sources, not another model run. Freeze the original-owner snapshot and deterministic first-basic/first-numeric-scale/first-feature sample before grading; keep all existing manual safety restrictions in a separate risk stratum. Match authored, automatic post-review and actual API layers by report/reading/fact/content hash and original metric positions; non-reconstructable layers stay unevaluated. Independent source decisions may carry only across exact compatible identities. Report sample accuracy with coverage, withheld/unknown counts and human dependence; do not relabel the sample as full-population or unseen quality. No new model budget, task window, shared configuration or production authority. Only a demonstrated current P1/P2 justifies a local owner fix. See company-profile-current-quality-closure-card.md.

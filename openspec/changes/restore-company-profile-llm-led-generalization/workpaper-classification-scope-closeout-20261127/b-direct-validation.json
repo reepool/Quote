@@ -1,0 +1,194 @@
+{
+  "state": "passed",
+  "counts": {
+    "controlled_clients": 2,
+    "scripted_sends": 9,
+    "real_clients": 0,
+    "real_sends": 0,
+    "reused_saved_controlled_executions": 1
+  },
+  "cases": [
+    {
+      "instrument_id": "920003.BJ",
+      "state": "passed",
+      "facts": 23,
+      "request_stages": [
+        {
+          "purpose": "review_profile_workpaper",
+          "model": "grok-4.7",
+          "timeout_seconds": 1200.0,
+          "payload_sha256": "91dbb614f007cf419aba03e552c67c88cc23038ce9bb4734df43aa17033cf287",
+          "source_text_sha256": "2134a5986d82285e1252194cf49d73b92e5c3f08da7b8ce0f347d4b8605487e2",
+          "source_bytes": 26866,
+          "system_sha256": "1cedd9cac6488b16b19773d9cd99143087bda3d209ceed04bc5455abe4146ea6",
+          "schema_sha256": "7271b7ff330a44ecbaa867757f11bd6eff550721547bacab4d7dacc21a225dcb",
+          "user_top_level_keys": [
+            "draft",
+            "fact_hashes",
+            "metric_index_base",
+            "report",
+            "source_text"
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "model": "deepseek-flash",
+          "timeout_seconds": 600.0,
+          "payload_sha256": "56d9c358d2775b1d2da8f221effdae847690e7a733160f9962813a0cb5969329",
+          "source_text_sha256": "2134a5986d82285e1252194cf49d73b92e5c3f08da7b8ce0f347d4b8605487e2",
+          "source_bytes": 26866,
+          "system_sha256": "f64b5588e6689c9f99d77b6c9ee20c50fdcbc9c722e4e761c38f70b642c4420a",
+          "schema_sha256": "53c182ff7bba714b27d74b4f98ace2f52b77096b2fffc88692970ea73434bfa4",
+          "user_top_level_keys": [
+            "repair_targets",
+            "report",
+            "source_text"
+          ]
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "model": "grok-4.7",
+          "timeout_seconds": 1200.0,
+          "payload_sha256": "3d5ef648c400633baccb19dd5122d82fd9d35651ac67e74d7226587fcb5f4a3b",
+          "source_text_sha256": "2134a5986d82285e1252194cf49d73b92e5c3f08da7b8ce0f347d4b8605487e2",
+          "source_bytes": 26866,
+          "system_sha256": "e7dff44bf392571df8773baa8cd28c642cd69b182011ffcf98e38f0a17452026",
+          "schema_sha256": "10b47ba18e02e4f236d84a1c1eaa4a0956f318901088d24718e929e4549054e5",
+          "user_top_level_keys": [
+            "candidates",
+            "initial_findings",
+            "report",
+            "source_text"
+          ]
+        }
+      ],
+      "retained_A_limits": true,
+      "unchanged_other_facts": 22,
+      "model_only_final_scope": "unclear",
+      "normal_writer_export_fresh_equal": true,
+      "source_packet_exactly_matches_planned_source": true
+    },
+    {
+      "instrument_id": "600350.SH",
+      "state": "passed",
+      "facts": 25,
+      "request_stages": [
+        {
+          "purpose": "review_profile_workpaper",
+          "model": "grok-4.7",
+          "timeout_seconds": 1200.0,
+          "payload_sha256": "fe0d7a5d3aa5af33dbf3df1b32d69dff318f01e681f557162ae5a3732130d6bd",
+          "source_text_sha256": "e502dc9e7a46025144395b6195e2d49f108c3f5d3c6c78b22c576df278fc26fb",
+          "source_bytes": 56722,
+          "system_sha256": "1cedd9cac6488b16b19773d9cd99143087bda3d209ceed04bc5455abe4146ea6",
+          "schema_sha256": "7271b7ff330a44ecbaa867757f11bd6eff550721547bacab4d7dacc21a225dcb",
+          "user_top_level_keys": [
+            "draft",
+            "fact_hashes",
+            "metric_index_base",
+            "report",
+            "source_text"
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "model": "deepseek-flash",
+          "timeout_seconds": 600.0,
+          "payload_sha256": "3ea994631497b53b3fb8172ec51ef3001ddf906e60c694e63718801c66734341",
+          "source_text_sha256": "e502dc9e7a46025144395b6195e2d49f108c3f5d3c6c78b22c576df278fc26fb",
+          "source_bytes": 56722,
+          "system_sha256": "f64b5588e6689c9f99d77b6c9ee20c50fdcbc9c722e4e761c38f70b642c4420a",
+          "schema_sha256": "53c182ff7bba714b27d74b4f98ace2f52b77096b2fffc88692970ea73434bfa4",
+          "user_top_level_keys": [
+            "repair_targets",
+            "report",
+            "source_text"
+          ]
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "model": "grok-4.7",
+          "timeout_seconds": 1200.0,
+          "payload_sha256": "b605768188da5047048b5b23c57648511a0daf3bc80f64c4d608a3731e23d13b",
+          "source_text_sha256": "e502dc9e7a46025144395b6195e2d49f108c3f5d3c6c78b22c576df278fc26fb",
+          "source_bytes": 56722,
+          "system_sha256": "e7dff44bf392571df8773baa8cd28c642cd69b182011ffcf98e38f0a17452026",
+          "schema_sha256": "10b47ba18e02e4f236d84a1c1eaa4a0956f318901088d24718e929e4549054e5",
+          "user_top_level_keys": [
+            "candidates",
+            "initial_findings",
+            "report",
+            "source_text"
+          ]
+        }
+      ],
+      "retained_A_limits": true,
+      "unchanged_other_facts": 24,
+      "model_only_final_scope": "unclear",
+      "normal_writer_export_fresh_equal": true,
+      "source_packet_exactly_matches_planned_source": true
+    },
+    {
+      "instrument_id": "600704.SH",
+      "state": "passed",
+      "facts": 27,
+      "request_stages": [
+        {
+          "purpose": "review_profile_workpaper",
+          "model": "grok-4.7",
+          "timeout_seconds": 1200.0,
+          "payload_sha256": "68771920a1a5cf574451101dec729027f2db8bc38942eb83d15aef3310e77e44",
+          "source_text_sha256": "ee7c217a3574b633496256ca80d3bd9fd80423e5697bd50c0e8d3be8d5724ea5",
+          "source_bytes": 57186,
+          "system_sha256": "1cedd9cac6488b16b19773d9cd99143087bda3d209ceed04bc5455abe4146ea6",
+          "schema_sha256": "7271b7ff330a44ecbaa867757f11bd6eff550721547bacab4d7dacc21a225dcb",
+          "user_top_level_keys": [
+            "draft",
+            "fact_hashes",
+            "metric_index_base",
+            "report",
+            "source_text"
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "model": "deepseek-flash",
+          "timeout_seconds": 600.0,
+          "payload_sha256": "ee16e4b3cbb4917494cdfb7fd81be3797ce806d58911e236f262aa49d3c3476b",
+          "source_text_sha256": "ee7c217a3574b633496256ca80d3bd9fd80423e5697bd50c0e8d3be8d5724ea5",
+          "source_bytes": 57186,
+          "system_sha256": "f64b5588e6689c9f99d77b6c9ee20c50fdcbc9c722e4e761c38f70b642c4420a",
+          "schema_sha256": "53c182ff7bba714b27d74b4f98ace2f52b77096b2fffc88692970ea73434bfa4",
+          "user_top_level_keys": [
+            "repair_targets",
+            "report",
+            "source_text"
+          ]
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "model": "grok-4.7",
+          "timeout_seconds": 1200.0,
+          "payload_sha256": "819a88d379aeb9898c62d86f438160adabaa8e9a05c397f4f12836fe600fd6af",
+          "source_text_sha256": "ee7c217a3574b633496256ca80d3bd9fd80423e5697bd50c0e8d3be8d5724ea5",
+          "source_bytes": 57186,
+          "system_sha256": "e7dff44bf392571df8773baa8cd28c642cd69b182011ffcf98e38f0a17452026",
+          "schema_sha256": "10b47ba18e02e4f236d84a1c1eaa4a0956f318901088d24718e929e4549054e5",
+          "user_top_level_keys": [
+            "candidates",
+            "initial_findings",
+            "report",
+            "source_text"
+          ]
+        }
+      ],
+      "retained_A_limits": true,
+      "unchanged_other_facts": 26,
+      "model_only_final_scope": "unclear",
+      "normal_writer_export_fresh_equal": true,
+      "source_packet_exactly_matches_planned_source": true
+    }
+  ],
+  "application_delta": "none; v14 reused unchanged",
+  "source_only_A_guards_not_lifted": true
+}

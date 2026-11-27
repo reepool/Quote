@@ -1,0 +1,3435 @@
+{
+  "schema_version": "company_profile_common_core_runtime.v3",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "production_authorization": "not_authorized",
+  "work_id": "bp-work-0788cd766ed03e2101c554ec",
+  "report": {
+    "instrument_id": "920003.BJ",
+    "report_id": "asset_4be790b0218414e3166dea111c8c52b6",
+    "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-20T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "assessment": {
+    "mapping_version": "company_profile_common_core_mapping.v1",
+    "production_authorization": "not_authorized",
+    "report": {
+      "instrument_id": "920003.BJ",
+      "report_id": "asset_4be790b0218414e3166dea111c8c52b6",
+      "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-20T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "principal_business": {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "products_services": {
+      "dimension_id": "products_services",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "revenue_model": {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "core_complete": false
+  },
+  "activated_chapters": [],
+  "evidence_gap_codes": [],
+  "provider_calls": [
+    "select_profile_sections",
+    "extract_profile_workpaper",
+    "review_profile_workpaper",
+    "repair_profile_workpaper",
+    "verify_profile_workpaper_repair"
+  ],
+  "provider_blocked": false,
+  "execution": {
+    "schema_version": "company_profile_execution_record.v1",
+    "production_authorization": "not_authorized",
+    "input_identity": {
+      "instrument_id": "920003.BJ",
+      "report_id": "asset_4be790b0218414e3166dea111c8c52b6",
+      "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+      "report_period": "2025-12-31",
+      "policy_version": "company_profile_common_core_mapping.v2",
+      "processing_identity": {
+        "execution_mode": "provider",
+        "logical_request_timeout_seconds": 2450,
+        "max_layout_characters": 500000,
+        "max_section_characters": 160000,
+        "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+        "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "quality_review_profile": "semantic_extraction__scorpio_grok",
+        "reading_strategy": "chapter_workpaper_v1",
+        "repair_profile": "semantic_extraction__deepseek",
+        "review_existing_draft_hash": "44200cb23836fc919692211e71e40af8a198c002ef10d98fbf53b8385e224f12",
+        "review_max_output_tokens": 16384,
+        "review_seed_receipts_hash": "a16abb928245e0ec0477908e823b798b6e639032cc03cc21060a8bd9ee278edf",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "semantic_policy": "company_profile_llm_led.v2",
+        "semantic_reuse": false,
+        "source_binding_policy": "company_workpaper_source_literals.column-wrapped-amounts.v8",
+        "workpaper_format_recovery": "local_shape_before_retry.v3",
+        "workpaper_max_output_tokens": 12000,
+        "workpaper_metric_format_policy": "source_metric_unparsed_value_null.v1",
+        "workpaper_metric_limit_policy": "source_review_exact_metric_limits.v1",
+        "workpaper_review_policy": "company_profile_workpaper_review.v13",
+        "workpaper_review_recovery": {
+          "base_work_id": "bp-work-3365870b26619438dab9801d",
+          "base_workpaper_sha256": "44200cb23836fc919692211e71e40af8a198c002ef10d98fbf53b8385e224f12",
+          "plan_sha256": "a5822b24a852a4e978c02526c32da4012922a3e57db0c61043ff58a9d2acad68",
+          "prior_use_review": null,
+          "report": {
+            "document_type": "annual_report",
+            "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+            "instrument_id": "920003.BJ",
+            "published_at": "2026-04-20T16:00:00+00:00",
+            "report_id": "asset_4be790b0218414e3166dea111c8c52b6",
+            "report_period": "2025-12-31"
+          },
+          "request_id": "6fn-review-920003-BJ"
+        }
+      }
+    },
+    "scope_digests": {},
+    "model_attempts": [],
+    "token_budget": {
+      "total_token_budget": 1000000,
+      "extract_max_output_tokens": 4000,
+      "verify_max_output_tokens": 2000,
+      "tokens_used": 124215,
+      "tokens_remaining": 875785
+    },
+    "scope_token_allocations": {},
+    "transport_retries": 0,
+    "semantic_disputes": [],
+    "predecessor_lineage": []
+  },
+  "legacy_writers_invoked": [],
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "llm_generated",
+    "report": {
+      "instrument_id": "920003.BJ",
+      "report_id": "asset_4be790b0218414e3166dea111c8c52b6",
+      "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-20T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0026",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "一、 业务概要"
+          ],
+          "start_page": 12,
+          "end_page": 12,
+          "rationale": "section-0026业务概要完整覆盖公司业务结构、盈利模式、采购与营销方式；section-0032经营情况回顾提供经营计划、核心影响因素和本期变化线索；section-0061营业情况分析用于获取营业收入、成本及主要业务构成等货币化与规模信息；section-0970营业收入和营业成本为收入来源与主要业务权重提供报表附注层面的定向补充。所选均为公司层面实质经营或收入内容，且无祖先与子节重复。"
+        },
+        {
+          "section_id": "section-0032",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "二、 经营情况回顾"
+          ],
+          "start_page": 13,
+          "end_page": 15,
+          "rationale": "section-0026业务概要完整覆盖公司业务结构、盈利模式、采购与营销方式；section-0032经营情况回顾提供经营计划、核心影响因素和本期变化线索；section-0061营业情况分析用于获取营业收入、成本及主要业务构成等货币化与规模信息；section-0970营业收入和营业成本为收入来源与主要业务权重提供报表附注层面的定向补充。所选均为公司层面实质经营或收入内容，且无祖先与子节重复。"
+        },
+        {
+          "section_id": "section-0061",
+          "section_path": [
+            "第四节 管理层讨论与分析",
+            "境外资产占比较高的情况",
+            "2. 营业情况分析"
+          ],
+          "start_page": 21,
+          "end_page": 24,
+          "rationale": "section-0026业务概要完整覆盖公司业务结构、盈利模式、采购与营销方式；section-0032经营情况回顾提供经营计划、核心影响因素和本期变化线索；section-0061营业情况分析用于获取营业收入、成本及主要业务构成等货币化与规模信息；section-0970营业收入和营业成本为收入来源与主要业务权重提供报表附注层面的定向补充。所选均为公司层面实质经营或收入内容，且无祖先与子节重复。"
+        },
+        {
+          "section_id": "section-0970",
+          "section_path": [
+            "第十一节 财务会计报告",
+            "三、企业年金缴费 — — — —",
+            "30、营业收入和营业成本"
+          ],
+          "start_page": 150,
+          "end_page": 151,
+          "rationale": "section-0026业务概要完整覆盖公司业务结构、盈利模式、采购与营销方式；section-0032经营情况回顾提供经营计划、核心影响因素和本期变化线索；section-0061营业情况分析用于获取营业收入、成本及主要业务构成等货币化与规模信息；section-0970营业收入和营业成本为收入来源与主要业务权重提供报表附注层面的定向补充。所选均为公司层面实质经营或收入内容，且无祖先与子节重复。"
+        }
+      ],
+      "unread_or_deferred": [
+        "section-0042、section-0044行业背景仅作外部环境补充，非公司层面经营解释所必需",
+        "section-0144未来展望含计划性内容，当前以实际经营与收入说明为主，暂不展开",
+        "section-0098研发情况及section-0263行业信息中的资质、技术细节，属于次级或可选补充",
+        "section-0457财务会计报告整体不纳入，仅以section-0970定向补充收入构成"
+      ],
+      "selection_rationale": "section-0026业务概要完整覆盖公司业务结构、盈利模式、采购与营销方式；section-0032经营情况回顾提供经营计划、核心影响因素和本期变化线索；section-0061营业情况分析用于获取营业收入、成本及主要业务构成等货币化与规模信息；section-0970营业收入和营业成本为收入来源与主要业务权重提供报表附注层面的定向补充。所选均为公司层面实质经营或收入内容，且无祖先与子节重复。",
+      "stop_reason": "已选节覆盖业务模式、经营回顾、营业情况与收入构成，可解释主要业务、收入来源和本期经营因素；在保持公司层面阅读范围的前提下无需扩展到行业背景、未来规划、研发明细或完整财务报表。",
+      "transcription_version": "shared-pdf-pypdf-layout.structured-notes.v1"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "bs-1",
+            "text": "公司长期深耕于工程咨询服务业，所处行业为工程咨询服务业，属于技术密集型行业；业务以工程咨询专业技术服务及全过程一体化咨询服务为主。报告期内，公司的主营业务、主要产品及服务较为稳定，公司商业模式未发生重大变化。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "products_services": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "ps-1",
+            "text": "公司面向建筑工程项目客户提供工程造价、招标代理、工程监理及管理、BIM服务、工程设计等专业技术服务，并开展全过程一体化咨询；公司将工程数据与BIM、大数据等信息化技术融合。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+      },
+      "revenue_model": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "rm-1",
+            "text": "公司基于提供的工程咨询专业技术服务内容，按照合同约定金额或收费标准向客户收取费用，形成收入和利润。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "scale_and_mix": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "sm-1",
+            "text": "2025年公司实现营业收入369,492,413.83元，毛利率49.59%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005",
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入",
+                "raw_value": "369,492,413.83",
+                "value": "369492413.83",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "毛利率",
+                "raw_value": "49.59",
+                "value": "49.59",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-2",
+            "text": "2025年主营业务收入368,152,037.35元，其他业务收入1,340,376.48元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "主营业务收入",
+                "raw_value": "368,152,037.35",
+                "value": "368152037.35",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他业务收入",
+                "raw_value": "1,340,376.48",
+                "value": "1340376.48",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-3",
+            "text": "2025年公司实现净利润101,492,989.38元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005",
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "净利润",
+                "raw_value": "101,492,989.38",
+                "value": "101492989.38",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-4",
+            "text": "2025年工程造价业务营业收入182,416,579.30元，毛利率52.97%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "工程造价营业收入",
+                "raw_value": "182,416,579.30",
+                "value": "182416579.30",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "工程造价毛利率",
+                "raw_value": "52.97",
+                "value": "52.97",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-5",
+            "text": "2025年工程监理及管理业务营业收入64,253,334.03元，毛利率46.14%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "工程监理及管理营业收入",
+                "raw_value": "64,253,334.03",
+                "value": "64253334.03",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "工程监理及管理毛利率",
+                "raw_value": "46.14",
+                "value": "46.14",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-6",
+            "text": "2025年全过程咨询业务营业收入46,621,583.10元，毛利率47.80%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "全过程咨询营业收入",
+                "raw_value": "46,621,583.10",
+                "value": "46621583.10",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "全过程咨询毛利率",
+                "raw_value": "47.80",
+                "value": "47.80",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-7",
+            "text": "2025年招标代理业务营业收入29,148,462.54元，毛利率57.53%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "招标代理营业收入",
+                "raw_value": "29,148,462.54",
+                "value": "29148462.54",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "招标代理毛利率",
+                "raw_value": "57.53",
+                "value": "57.53",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-8",
+            "text": "2025年其他技术服务业务营业收入45,712,078.38元，毛利率36.56%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "其他技术服务营业收入",
+                "raw_value": "45,712,078.38",
+                "value": "45712078.38",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他技术服务毛利率",
+                "raw_value": "36.56",
+                "value": "36.56",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+      },
+      "operations_and_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "oi-1",
+            "text": "公司所处工程咨询服务业属技术密集型，日常经营主要成本包括职工薪酬、外协服务费、经营场地费、差旅及办公费等。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+      },
+      "customers_channels_markets": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "ccm-1",
+            "text": "公司营销模式包括招投标模式和客户直接委托模式；非必须招标项目由客户综合考虑资信、业绩、服务品质和历史合作后直接委托。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ccm-2",
+            "text": "2025年公司收入主要集中于江苏省内，江苏省内营业收入362,444,827.01元，占全年营业收入98.09%；江苏省外营业收入7,047,586.82元，占1.91%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "江苏省内营业收入",
+                "raw_value": "362,444,827.01",
+                "value": "362444827.01",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "江苏省内收入占比",
+                "raw_value": "98.09",
+                "value": "98.09",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "江苏省外营业收入",
+                "raw_value": "7,047,586.82",
+                "value": "7047586.82",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "江苏省外收入占比",
+                "raw_value": "1.91",
+                "value": "1.91",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ccm-3",
+            "text": "2025年前五大客户合计销售88,078,006.84元，占年度销售23.83%；第一大客户为苏州元脉科技产业发展合伙企业（有限合伙），销售42,317,012.71元，占11.45%，公司披露为关联关系。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "前五大客户销售合计",
+                "raw_value": "88,078,006.84",
+                "value": "88078006.84",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "前五大客户销售占比",
+                "raw_value": "23.83",
+                "value": "23.83",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "第一大客户销售",
+                "raw_value": "42,317,012.71",
+                "value": "42317012.71",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "第一大客户销售占比",
+                "raw_value": "11.45",
+                "value": "11.45",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+      },
+      "operating_drivers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "od-1",
+            "text": "公司主营工程咨询服务直接服务于固定资产投资建设活动，经营业绩受固定资产投资规模直接影响。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "od-3",
+            "text": "2025年公司研发投入合计17,285,507.34元，占当期营业收入4.68%，公司称坚持数字化转型并加大研发投入。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "研发投入",
+                "raw_value": "17,285,507.34",
+                "value": "17285507.34",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "研发投入占营业收入比重",
+                "raw_value": "4.68",
+                "value": "4.68",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+      },
+      "material_changes": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "mc-1",
+            "text": "2025年公司在北京证券交易所上市，发行新股1,400万股，募集资金1.73亿元（已扣除发行费用）。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [
+              {
+                "name": "发行新股",
+                "raw_value": "1,400",
+                "value": "1400",
+                "unit": "万股",
+                "source_unit": "万股",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "募集资金",
+                "raw_value": "1.73",
+                "value": "1.73",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "mc-2",
+            "text": "受国内固定资产投资规模减少影响，公司报告期内营业收入、净利润相较上年同期略有下滑。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "一、 业务概要"
+        ],
+        "physical_pages": [
+          12
+        ],
+        "source_spans": [
+          {
+            "page": 12,
+            "start": 50,
+            "end": 1001,
+            "quote": "一、      业务概要\n\n商业模式报告期内变化情况：\n    公司长期深耕于工程咨询服务业，致力于为客户提供工程造价、招标代理、工程监理及管理、BIM\n\n服务、工程设计等专业技术服务及全过程一体化咨询服务。公司依托优秀的技术团队及丰富的项目经验，\n\n建立了规范且运行良好的服务体系，满足客户多样化的需求。公司将建筑工程项目的各项相关数据与\n\nBIM、大数据等信息化技术相融合，同时积极开展全过程咨询服务，加快与国际建设管理服务方式接轨，\n\n促进自身转型升级。\n\n    （一）盈利模式\n\n    公司依托优秀的技术团队，充分利用自身丰富的项目经验和良好的客户资源，为客户提供工程咨询\n\n专业技术服务。公司基于自身提供的服务内容，按照合同约定金额或收费标准计算向客户收取费用，形\n\n成相应的收入和利润。\n\n    （二）采购模式\n\n    公司致力于为客户提供工程造价、招标代理、工程监理及管理、BIM                             服务、工程设计等专业技术服\n\n务及全过程一体化咨询服务。公司所处行业为工程咨询服务业，属于技术密集型行业。基于行业特性，\n\n公司日常经营过程中产生的主要成本包括职工薪酬、外协服务费、经营场地费、差旅及办公费等。\n\n    （三）营销模式\n\n    公司营销模式主要包括招投标模式、客户直接委托模式两种。\n\n    招投标模式是目前工程咨询服务业承接业务较为常见的模式。在招投标模式下，招标单位通常会根\n\n据项目预算、项目建设内容、类似项目的市场价格等因素事先确定招投标的价格区间。公司综合考虑客\n\n户性质、结算政策、项目规模、技术含量、项目工期、公司产品规划、预计投入成本以及市场竞争情况\n\n等因素，根据《招标投标法》等法律法规的规定履行招投标程序制作投标文件并参与投标。项目中标后，\n\n双方进行合同洽谈，并订立正式合同。\n\n    针对非必须招标的项目，公司通过客户直接委托的方式获取客户订单。在该模式下，客户综合考虑\n\n公司的资信水平、过往业绩、服务品质、历史合作情况等因素直接委托公司参与项目。\n\n    报告期内，公司的主营业务、主要产品及服务较为稳定，公司商业模式未发生重大变化。\n\n报告期内核心竞争力变化情况：\n□适用 √不适用\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "二、 经营情况回顾"
+        ],
+        "physical_pages": [
+          13
+        ],
+        "source_spans": [
+          {
+            "page": 13,
+            "start": 883,
+            "end": 1577,
+            "quote": "二、      经营情况回顾\n\n(一)     经营计划\n\n\n    2025 年，公司在北京证券交易所上市，发行新股1,400                         万股，募集资金         1.73  亿元（已扣除发行费\n\n用）。本报告期公司实现净利润                1.01 亿元，期末总资产、净资产余额较期初分别增长了                          41.18%、75.44%。\n\n同时受到国内固定资产投资规模减少的影响，公司报告期内营业收入、净利润相较上年同期略有下滑。\n\n    1、影响公司经营业绩核心主要因素是：固定资产投资规模。\n\n    公司主营的工程咨询服务业务直接服务于固定资产投资建设活动，因此固定资产投资规模                                                对公司的\n\n经营业绩会产生直接的影响。\n\n    根据国家统计局公布的数据，2025                年全国固定资产投资（不含农户）485,186                 亿元，比上年下降         3.80%。\n\n分地区看东部地区投资比上年下降                   8.4%、中部地区投资下降            2.70%、西部地区投资下降            1.30%、东北部\n\n地区投资下降       15.50%。\n\n\n\n\n\n\n\n\n\n\n\n\n                                                13\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "二、 经营情况回顾"
+        ],
+        "physical_pages": [
+          14
+        ],
+        "source_spans": [
+          {
+            "page": 14,
+            "start": 0,
+            "end": 1054,
+            "quote": "                                                                         数据来源：国家统计局官网\n    具体到公司经营业务主要集中地江苏省，根据江苏省统计局公布的数据：2025                                    年，受国内供强需弱\n\n矛盾突出、房地产市场持续下行影响，全省固定资产投资比上年下降                                  12.70%。（数据来源：江苏省统计\n\n局官网）\n\n    因此在国内整体固定资产投资下降的不利因素下，公司                            2025 年营业收入相较        2024 年降低    6.61%，\n\n归属于上市公司股东的净利润下降                 3.70%。\n\n    报告期内国内固定资产投资下滑较多的的情况下，公司采取了以下几方面的措施：\n\n    （1）坚持数字化转型\n\n    报告期内，公司坚持数字化转型的战略，加大研发投入，                            2025 年公司研发投入合计           17,285,507.34\n\n元，占当期营业收入           4.68%。公司数字化信息系统的投入，已经对公司业务带来了积极的影响，分业务\n\n板块数字化信息系统建设情况如下：\n\n    ①  造价业务数字化系统\n\n    A、搭建统一数据中枢的数据管理系统\n\n    数据管理系统是一个工程造价大数据管理平台，平台贴合造价人员的使用习惯，利用机器学习的模\n\n式，有效的将工程师们对指标数据的归集、数据的应用等操作的经验转化为计算机的自动归集管理以及\n\n应用，能够有效提升业务的效率和质量。\n\n    B、构筑造价质量防线的工程校核系统\n\n    校核系统是一个针对工程造价文件进行检验的智能工具，通过将过往工程师和专业主管丰富的造价\n\n文件编制经验、复核经验，以及造价指标数据归纳总结为系统                              数据。系统利用历史数据对造价成果文件\n\n的编制质量进行全方位、多角度、多层次                    的检查，智能找出造价文件的错误所在及造价数据的不合理之\n\n                                              14\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "二、 经营情况回顾"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 0,
+            "end": 888,
+            "quote": "处，并生成相应的检查报告，实现对造价成果文件的快速校核，从而达到提升造价成果文件质量的目的。\n\n    C、打造前置价值核心的成本预测系统\n\n    成本预测系统是利用数字化技术对历史项目数据的分析、挖掘和应用，构建基于机器学习的工程量\n\n智慧预测模型和推荐算法模型，实现对工程量及成本的快速准确预测。\n\n    成本预测系统分为两大功能模块，分别是工程估算和工程概算。\n\n    工程估算：项目人员在系统中输入项目工程的概况，通过工程量智慧测算模型，输出工程量指标，\n\n系统取定历史相似项目单价，实现快速估算造价。\n\n    工程概算：通过对大量历史项目单体拆解专业工程相似特征，基于特征，智能推荐类似单体、专业\n\n和分部的数据，逐级实现生成工程概算。\n\n    ②公司的数字化监理系统，可以实现以下几方面价值：\n\n    A、对业主而言，数字化监理系统可以实现透明化管控以及提高投资回报。业主可以通过“数字化\n\n监理平台-驾驶舱”可以掌握项目真实的施工进度人员到岗、质量隐患，实现透明化管理。有效保障投\n\n资安全与决策精准度。\n\n    B、对公司而言，数字化监理系统可以实现。a                    强化内部管控：数字化、标准化的业务流程降低了对\n\n个人经验或能力的依赖；通过数字化监理系统实时查看项目                           的现场情况也有效的规避了现场人员履职不\n\n到位、资料造假的风险。b            实质性的降本增效：通过数字化、标准化的业务流程，公司的业务资料自动\n\n生成，减少了项目现场人员重复录入工作，让现场人员有更多的精力投入到实质性的质量安全工作中；\n\n利用移动设备对现场的实时监测，让现场人员无需往返不同的地点，实现“一人盯多点、少人管全盘”。\n\nc借助远程连线辅助，打破了空间壁垒，让公司技术专家为一线提供实时、权威的技术支撑。\n\n    C、对现场人员而言，数字化监理平台可以减轻内业负担，让一线人员告别“文山会海”，专注现\n\n场管控，并以全过程数据留痕筑牢履职免责的证据链条。\n\n    "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "境外资产占比较高的情况",
+          "2. 营业情况分析"
+        ],
+        "physical_pages": [
+          21
+        ],
+        "source_spans": [
+          {
+            "page": 21,
+            "start": 1677,
+            "end": 1964,
+            "quote": "2.   营业情况分析\n(1) 利润构成\n                                                                                                      单位：元\n    项目                        2025 年                              2024  年                      变动比例%\n\n                                                      21\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "境外资产占比较高的情况",
+          "2. 营业情况分析"
+        ],
+        "physical_pages": [
+          22
+        ],
+        "source_spans": [
+          {
+            "page": 22,
+            "start": 0,
+            "end": 3128,
+            "quote": "                            金额               占营业收入                     金额               占营业收入\n                                               的比重%                                       的比重%\n营业收入                369,492,413.83                 -           395,627,731.72                  -                           -6.61%\n营业成本                186,258,593.24                  50.41%     212,093,490.67                  53.61%                     -12.18%\n毛利率                             49.59%             -                       46.39%              -                       -\n销售费用                   5,904,281.18                  1.60%        6,690,789.91                  1.69%                     -11.76%\n管理费用                  29,744,782.19                  8.05%       30,925,930.32                  7.82%                      -3.82%\n研发费用                  17,285,507.34                  4.68%       18,773,203.33                  4.75%                      -7.92%\n财务费用                      586,643.15                 0.16%           784,597.08                 0.20%                     -25.23%\n信用减值损失              -20,038,172.29                  -5.42%     -15,496,355.57                  -3.92%                     -29.31%\n资产减值损失\n其他收益                   2,246,311.78                  0.61%        6,206,249.57                  1.57%                     -63.81%\n投资收益                   1,289,738.43                  0.35%        2,330,862.40                  0.59%                     -44.67%\n公允价值变动                 5,135,238.64                  1.39%        3,279,390.47                  0.83%                      56.59%\n收益\n资产处置收益                         -198.02               0.00%           -15,704.19                 0.00%                      98.74%\n汇兑收益\n营业利润                115,955,126.32                  31.38%     120,112,210.77                  30.36%                      -3.46%\n营业外收入                     157,214.05                 0.04%             45,609.92                0.01%                     244.69%\n营业外支出                       23,790.13                0.01%             13,000.00                0.00%                      83.00%\n净利润                 101,492,989.38                  27.47%     105,388,488.12                  26.64%                      -3.70%\n\n项目重大变动原因：\n     （1）财务费用较上期减少                        25.23%，主要系租赁负债后续计量利息摊销金额减少，以及本期银行手\n\n续费减少所致；报告期内银行手续费支出约                                     12.50   万元，较上年同期降低                    55.65%是因为银行函证等支出\n\n降低所致；\n\n     （2）信用减值损失较上期，损失增加                                  29.31%，主要系部分账龄较长的应收账款，对应的报告期内\n\n计提坏账增加所致；\n\n     （3）其他收益较上期降低                        63.81%，主要系本期收到的政府补助较上期降低所致，报告期上期政府\n\n补助约      597.64    万元，本期政府补助约                    210.84    万元；\n\n     （4）投资收益较上期降低                        44.67%，主要系本期参股公司东印智慧亏损，公司按照持股比例确认损\n\n失所致；\n\n     （5）公允价值变动收益较上年同期增加                                   56.59%，主要系公司报告期期末尚未到期的理财产品期末\n\n净值增加所致；\n\n     （6）资产处置收益较上期收益增加                               98.74%，主要系本期处置的资产损失较小；\n\n     （7）营业外收入较上年同期增加                             244.69%，主要系本期在中国建筑学会举办的“第五期苏州古城复\n\n\n                                                                22\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "境外资产占比较高的情况",
+          "2. 营业情况分析"
+        ],
+        "physical_pages": [
+          23
+        ],
+        "source_spans": [
+          {
+            "page": 23,
+            "start": 0,
+            "end": 4327,
+            "quote": "兴建筑设计工作营”的活动中获得                               15  万元入围奖。\n\n      （8）营业外支出较上年同期增加                              83.00%，主要系本期对外捐赠增加所致。\n\n(2)   收入构成\n                                                                                                                            单位：元\n            项目                               2025   年                            2024  年                          变动比例%\n主营业务收入                                       368,152,037.35                     394,469,254.44                                 -6.67%\n其他业务收入                                          1,340,376.48                       1,158,477.28                                15.70%\n主营业务成本                                       186,120,012.68                     211,929,330.85                                -12.18%\n其他业务成本                                             138,580.56                         164,159.82                              -15.58%\n\n按产品分类分析：\n                                                                                                                            单位：元\n                                                                                   营业收入比              营业成本比              毛利率比上\n  分产品                 营业收入                     营业成本                 毛利率%             上年同期              上年同期              年同期增减\n                                                                                       增减%                增减%\n工程造价              182,416,579.30            85,798,604.34              52.97%           -13.17%            -18.48%      增加     3.07个\n                                                                                                                            百分点\n工程监理               64,253,334.03            34,604,685.93              46.14%            21.35%             18.45%      增加     1.31个\n及管理                                                                                                                         百分点\n全过程咨               46,621,583.10            24,338,588.55              47.80%              3.82%              0.64%     增加     1.65个\n询                                                                                                                           百分点\n招标代理               29,148,462.54            12,378,455.16              57.53%            -8.38%            -24.33%      增加     8.95个\n                                                                                                                            百分点\n其他技术               45,712,078.38            28,999,678.70              36.56%           -16.45%            -21.47%      增加     4.05个\n服务                                                                                                                          百分点\n其他业务                 1,340,376.48               138,580.56             89.66%            15.70%            -15.58%      增加     3.83个\n收入                                                                                                                          百分点\n    合计            369,492,413.83          186,258,593.24                 -                -                  -                  -\n\n按区域分类分析：\n                                                                                                                            单位：元\n                                                                                   营业收入比               营业成本\n  分地区                 营业收入                     营业成本                 毛利率%             上年同期              比上年同             毛利率比上\n                                                                                       增减%                 期            年同期增减\n                                                                                                         增减%\n江苏省内              362,444,827.01          182,575,954.54               49.63%            -5.51%          -10.99%                 3.11%\n江苏省外                 7,047,586.82            3,682,638.70              47.75%           -42.76%          -47.20%                 4.39%\n    合计            369,492,413.83          186,258,593.24                 -                -                 -                  -\n\n收入构成变动的原因：\n      报告期内，公司营业收入主要集中在江苏省省内，占全年营业收入                                                           98.09%；江苏省省外营业收入占\n                                                                  23\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+        "section_path": [
+          "第四节 管理层讨论与分析",
+          "境外资产占比较高的情况",
+          "2. 营业情况分析"
+        ],
+        "physical_pages": [
+          24
+        ],
+        "source_spans": [
+          {
+            "page": 24,
+            "start": 0,
+            "end": 3078,
+            "quote": "比较低，占全年营业收入比例为                        1.91%。\n\n     报告期内，公司江苏省省外的营业收入较上年同期下降                                        42.76%，主要原因是受到行业大环境的影响，\n\n由于    2024  年江苏省省外营业收入基数仅                      1,231.16    万元，因此变动比例较大。\n\n(3)  主要客户情况\n                                                                                                             单位：元\n序号                               客户                                   销售金额              年度销售占            是否存在关\n                                                                                             比%             联关系\n  1     苏州元脉科技产业发展合伙企业（有限合伙）                                        42,317,012.71            11.45%            是\n  2     苏州苏高新集团有限公司及其下属子公司                                          16,268,716.95              4.40%           是\n  3     苏州新建元控股集团有限公司及其下属子公司                                        11,532,441.72              3.12%           否\n  4     苏州市轨道交通集团有限公司及其下属子公司                                         9,481,436.16              2.57%           否\n  5     苏州工业园区兆润投资控股集团有限公司及其                                         8,478,399.30              2.29%           否\n        下属子公司\n                             合计                                    88,078,006.84             23.83%            -\n     注  1：（1   ）苏州苏高新集团有限公司为                     间接持有上市公司               5%以上股份的法人，2025               年公司向苏州苏\n高新集团有限公司销售                  1,698.11    元；（2）公司董事张俊在苏高新集团有限公司控制的部分公司担任                                                董\n事、高级管理人员，2025                年公司向上述公司销售                  3,204,714.85     元；两者合计          3,206,412.96     元；（3）向\n苏州苏高新集团有限公司                  控制的除上述（            1）（2   ）以外的公司销售              13 ,062 , 303.99   元，按照比照关联交\n易的形式披露。\n     注   2：  公司控股股东、实际控制人许学雷控制的企业诚来智作为有限合伙人持有                                                      苏州元创筑脉二期\n股权投资合伙企业（有限合伙）                       22%  出资份额      ，  苏州元创筑脉二期股权投资合伙企业（有限合伙）                                      持有\n苏州元脉科技产业发展合伙企业（有限合伙）                                 99% 的出资份额，公司              2025  年度向苏州元脉科技产业发展\n合伙企业（有限合伙）销售                    42,317,012.71      元，按照比照关联交易的形式披露。\n\n(4)  主要供应商情况\n                                                                                                             单位：元\n序号                        供应商                               采购金额              年度采购占比%             是否存在关联关系\n  1     苏州诚来智投资管理有限公司                                    10,835,828.85                 20.99%               是\n  2     昆山西子奥电梯工程有限公司                                      2,418,407.11                 4.69%               否\n  3     中国石化销售股份有限公司                                       2,244,117.17                 4.35%               否\n  4     苏州高新进口商贸有限公司                                       1,582,343.00                 3.07%               否\n  5     中国石油天然气股份有限公司                                      1,465,011.64                 2.84%               否\n                       合计                                18,545,707.77                 35.94%               -\n\n(5)  报告期内公司贸易业务收入占营业收入比例超过                                    10%情况\n□适用 √不适用\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+        "section_path": [
+          "第十一节 财务会计报告",
+          "三、企业年金缴费 — — — —",
+          "30、营业收入和营业成本"
+        ],
+        "physical_pages": [
+          150
+        ],
+        "source_spans": [
+          {
+            "page": 150,
+            "start": 1483,
+            "end": 3725,
+            "quote": "30、营业收入和营业成本\n\n        （1）营业收入和营业成本\n项目                                                                 本期发生额                                              上期发生额\n主营业务收入                                                                       368,152,037.35                                     394,469,254.44\n其他业务收入                                                                          1,340,376.48                                       1,158,477.28\n营业收入合计                                                                       369,492,413.83                                     395,627,731.72\n主营业务成本                                                                       186,120,012.68                                     211,929,330.85\n其他业务成本                                                                             138,580.56                                         164,159.82\n营业成本合计                                                                       186,258,593.24                                     212,093,490.67\n\n        （2）主营业务（分业务）\n项目                                                 本期发生额                                                        上期发生额\n                                  主营业务收入                         主营业务成本                        主营业务收入                        主营业务成本\n工程造价                               182,416,579.30                 85,798,604.34                210,081,347.24                105,246,217.02\n工程监理及管理                              64,253,334.03                34,604,685.93                 52,950,924.12                  29,214,931.11\n全过程咨询                                46,621,583.10                24,338,588.55                 44,908,229.01                  24,183,418.26\n招标代理                                 29,148,462.54                12,378,455.16                 31,814,349.40                  16,358,178.34\n其他技术服务                               45,712,078.38                28,999,678.70                 54,714,404.67                  36,926,586.12\n合计                                 368,152,037.35                186,120,012.68                394,469,254.44                 211,929,330.85\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                                               150\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "limitations": [
+      "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+    ],
+    "supply_chain": {
+      "position": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "sc-pos-1",
+            "text": "公司处于工程咨询服务业，作为服务提供方为建筑工程项目提供专业技术服务及全过程一体化咨询。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "upstream_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "sc-up-1",
+            "text": "公司日常经营过程中产生的主要成本包括职工薪酬、外协服务费、经营场地费、差旅及办公费等；2025年前五大供应商合计采购18,545,707.77元，占年度采购35.94%；第一大供应商苏州诚来智投资管理有限公司采购10,835,828.85元，占20.99%，披露为关联关系。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "前五大供应商采购合计",
+                "raw_value": "18,545,707.77",
+                "value": "18545707.77",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "前五大供应商采购占比",
+                "raw_value": "35.94",
+                "value": "35.94",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "第一大供应商采购",
+                "raw_value": "10,835,828.85",
+                "value": "10835828.85",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "第一大供应商采购占比",
+                "raw_value": "20.99",
+                "value": "20.99",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+      },
+      "downstream_customers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "sc-down-1",
+            "text": "公司服务面向建筑工程项目客户，客户为工程项目的招标单位或直接委托方；公司通过招投标或客户直接委托获取订单。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+      }
+    },
+    "generation": {
+      "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+      "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+      "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+      "selection": {
+        "purpose": "select_profile_sections",
+        "request_id": "bp-work-3365870b26619438dab9801d:workpaper:sections",
+        "request_hash": "7d9eeea80759680d86eb96230b05ca91d936aedec212abb77e93da70f2d1d5a7",
+        "response_hash": "6dff4b7d1508e84c2ea4e2fac938670b6edbe32ff76afb0ba8c123162f8e23aa",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 18359,
+          "output_tokens": 11303,
+          "total_tokens": 29662
+        },
+        "scope_kind": "report_heading_index",
+        "heading_count": 682,
+        "section_ids": [
+          "section-0001",
+          "section-0002",
+          "section-0003",
+          "section-0004",
+          "section-0005",
+          "section-0006",
+          "section-0007",
+          "section-0008",
+          "section-0009",
+          "section-0010",
+          "section-0011",
+          "section-0012",
+          "section-0013",
+          "section-0014",
+          "section-0015",
+          "section-0016",
+          "section-0017",
+          "section-0018",
+          "section-0019",
+          "section-0020",
+          "section-0021",
+          "section-0022",
+          "section-0023",
+          "section-0024",
+          "section-0025",
+          "section-0026",
+          "section-0027",
+          "section-0028",
+          "section-0029",
+          "section-0030",
+          "section-0031",
+          "section-0032",
+          "section-0033",
+          "section-0034",
+          "section-0036",
+          "section-0039",
+          "section-0042",
+          "section-0043",
+          "section-0044",
+          "section-0048",
+          "section-0049",
+          "section-0060",
+          "section-0061",
+          "section-0075",
+          "section-0079",
+          "section-0080",
+          "section-0081",
+          "section-0082",
+          "section-0083",
+          "section-0084",
+          "section-0085",
+          "section-0086",
+          "section-0087",
+          "section-0090",
+          "section-0092",
+          "section-0093",
+          "section-0094",
+          "section-0096",
+          "section-0097",
+          "section-0098",
+          "section-0099",
+          "section-0100",
+          "section-0101",
+          "section-0102",
+          "section-0110",
+          "section-0111",
+          "section-0112",
+          "section-0113",
+          "section-0114",
+          "section-0115",
+          "section-0116",
+          "section-0124",
+          "section-0125",
+          "section-0126",
+          "section-0132",
+          "section-0133",
+          "section-0134",
+          "section-0135",
+          "section-0136",
+          "section-0142",
+          "section-0143",
+          "section-0144",
+          "section-0145",
+          "section-0146",
+          "section-0147",
+          "section-0148",
+          "section-0149",
+          "section-0153",
+          "section-0154",
+          "section-0155",
+          "section-0156",
+          "section-0157",
+          "section-0158",
+          "section-0159",
+          "section-0160",
+          "section-0161",
+          "section-0162",
+          "section-0163",
+          "section-0164",
+          "section-0165",
+          "section-0166",
+          "section-0167",
+          "section-0168",
+          "section-0169",
+          "section-0170",
+          "section-0171",
+          "section-0172",
+          "section-0173",
+          "section-0174",
+          "section-0175",
+          "section-0176",
+          "section-0177",
+          "section-0178",
+          "section-0179",
+          "section-0180",
+          "section-0181",
+          "section-0182",
+          "section-0183",
+          "section-0184",
+          "section-0185",
+          "section-0186",
+          "section-0187",
+          "section-0188",
+          "section-0189",
+          "section-0190",
+          "section-0191",
+          "section-0192",
+          "section-0193",
+          "section-0194",
+          "section-0195",
+          "section-0196",
+          "section-0197",
+          "section-0198",
+          "section-0199",
+          "section-0200",
+          "section-0201",
+          "section-0202",
+          "section-0203",
+          "section-0204",
+          "section-0205",
+          "section-0206",
+          "section-0207",
+          "section-0208",
+          "section-0209",
+          "section-0210",
+          "section-0211",
+          "section-0212",
+          "section-0213",
+          "section-0214",
+          "section-0215",
+          "section-0216",
+          "section-0217",
+          "section-0218",
+          "section-0219",
+          "section-0220",
+          "section-0221",
+          "section-0222",
+          "section-0223",
+          "section-0224",
+          "section-0225",
+          "section-0226",
+          "section-0227",
+          "section-0228",
+          "section-0229",
+          "section-0232",
+          "section-0233",
+          "section-0234",
+          "section-0235",
+          "section-0236",
+          "section-0237",
+          "section-0238",
+          "section-0239",
+          "section-0240",
+          "section-0241",
+          "section-0242",
+          "section-0243",
+          "section-0244",
+          "section-0245",
+          "section-0246",
+          "section-0247",
+          "section-0248",
+          "section-0249",
+          "section-0250",
+          "section-0251",
+          "section-0252",
+          "section-0253",
+          "section-0254",
+          "section-0255",
+          "section-0256",
+          "section-0257",
+          "section-0258",
+          "section-0259",
+          "section-0260",
+          "section-0261",
+          "section-0262",
+          "section-0263",
+          "section-0264",
+          "section-0265",
+          "section-0266",
+          "section-0267",
+          "section-0268",
+          "section-0269",
+          "section-0270",
+          "section-0271",
+          "section-0272",
+          "section-0273",
+          "section-0274",
+          "section-0275",
+          "section-0276",
+          "section-0277",
+          "section-0278",
+          "section-0279",
+          "section-0280",
+          "section-0281",
+          "section-0282",
+          "section-0283",
+          "section-0284",
+          "section-0285",
+          "section-0286",
+          "section-0287",
+          "section-0288",
+          "section-0289",
+          "section-0290",
+          "section-0291",
+          "section-0292",
+          "section-0293",
+          "section-0294",
+          "section-0415",
+          "section-0416",
+          "section-0417",
+          "section-0418",
+          "section-0419",
+          "section-0441",
+          "section-0442",
+          "section-0443",
+          "section-0444",
+          "section-0445",
+          "section-0446",
+          "section-0447",
+          "section-0448",
+          "section-0449",
+          "section-0450",
+          "section-0451",
+          "section-0452",
+          "section-0453",
+          "section-0454",
+          "section-0455",
+          "section-0456",
+          "section-0457",
+          "section-0458",
+          "section-0459",
+          "section-0460",
+          "section-0461",
+          "section-0462",
+          "section-0463",
+          "section-0464",
+          "section-0472",
+          "section-0473",
+          "section-0474",
+          "section-0480",
+          "section-0481",
+          "section-0482",
+          "section-0489",
+          "section-0490",
+          "section-0491",
+          "section-0492",
+          "section-0493",
+          "section-0494",
+          "section-0495",
+          "section-0496",
+          "section-0497",
+          "section-0498",
+          "section-0499",
+          "section-0500",
+          "section-0501",
+          "section-0502",
+          "section-0503",
+          "section-0504",
+          "section-0505",
+          "section-0506",
+          "section-0512",
+          "section-0520",
+          "section-0521",
+          "section-0522",
+          "section-0523",
+          "section-0524",
+          "section-0525",
+          "section-0526",
+          "section-0527",
+          "section-0528",
+          "section-0529",
+          "section-0530",
+          "section-0531",
+          "section-0532",
+          "section-0533",
+          "section-0534",
+          "section-0535",
+          "section-0536",
+          "section-0537",
+          "section-0538",
+          "section-0539",
+          "section-0540",
+          "section-0541",
+          "section-0542",
+          "section-0543",
+          "section-0544",
+          "section-0545",
+          "section-0546",
+          "section-0547",
+          "section-0548",
+          "section-0549",
+          "section-0550",
+          "section-0551",
+          "section-0552",
+          "section-0553",
+          "section-0554",
+          "section-0555",
+          "section-0556",
+          "section-0557",
+          "section-0558",
+          "section-0559",
+          "section-0560",
+          "section-0561",
+          "section-0562",
+          "section-0563",
+          "section-0564",
+          "section-0565",
+          "section-0566",
+          "section-0567",
+          "section-0568",
+          "section-0569",
+          "section-0570",
+          "section-0571",
+          "section-0572",
+          "section-0573",
+          "section-0574",
+          "section-0575",
+          "section-0576",
+          "section-0577",
+          "section-0578",
+          "section-0579",
+          "section-0580",
+          "section-0581",
+          "section-0582",
+          "section-0583",
+          "section-0584",
+          "section-0585",
+          "section-0586",
+          "section-0587",
+          "section-0588",
+          "section-0589",
+          "section-0590",
+          "section-0591",
+          "section-0592",
+          "section-0593",
+          "section-0594",
+          "section-0595",
+          "section-0596",
+          "section-0597",
+          "section-0598",
+          "section-0599",
+          "section-0600",
+          "section-0601",
+          "section-0602",
+          "section-0603",
+          "section-0604",
+          "section-0605",
+          "section-0606",
+          "section-0607",
+          "section-0608",
+          "section-0609",
+          "section-0610",
+          "section-0611",
+          "section-0612",
+          "section-0613",
+          "section-0614",
+          "section-0615",
+          "section-0616",
+          "section-0617",
+          "section-0618",
+          "section-0619",
+          "section-0620",
+          "section-0621",
+          "section-0622",
+          "section-0623",
+          "section-0624",
+          "section-0625",
+          "section-0626",
+          "section-0627",
+          "section-0628",
+          "section-0629",
+          "section-0630",
+          "section-0631",
+          "section-0632",
+          "section-0633",
+          "section-0634",
+          "section-0635",
+          "section-0636",
+          "section-0637",
+          "section-0638",
+          "section-0639",
+          "section-0640",
+          "section-0641",
+          "section-0642",
+          "section-0643",
+          "section-0644",
+          "section-0645",
+          "section-0646",
+          "section-0647",
+          "section-0648",
+          "section-0649",
+          "section-0650",
+          "section-0651",
+          "section-0652",
+          "section-0653",
+          "section-0654",
+          "section-0655",
+          "section-0656",
+          "section-0657",
+          "section-0658",
+          "section-0659",
+          "section-0660",
+          "section-0661",
+          "section-0662",
+          "section-0663",
+          "section-0664",
+          "section-0665",
+          "section-0666",
+          "section-0667",
+          "section-0668",
+          "section-0669",
+          "section-0670",
+          "section-0671",
+          "section-0672",
+          "section-0673",
+          "section-0674",
+          "section-0675",
+          "section-0676",
+          "section-0677",
+          "section-0678",
+          "section-0679",
+          "section-0680",
+          "section-0681",
+          "section-0682",
+          "section-0683",
+          "section-0686",
+          "section-0689",
+          "section-0690",
+          "section-0691",
+          "section-0694",
+          "section-0695",
+          "section-0696",
+          "section-0697",
+          "section-0698",
+          "section-0699",
+          "section-0700",
+          "section-0701",
+          "section-0708",
+          "section-0709",
+          "section-0712",
+          "section-0717",
+          "section-0718",
+          "section-0721",
+          "section-0722",
+          "section-0726",
+          "section-0730",
+          "section-0731",
+          "section-0732",
+          "section-0733",
+          "section-0738",
+          "section-0741",
+          "section-0751",
+          "section-0752",
+          "section-0756",
+          "section-0757",
+          "section-0763",
+          "section-0764",
+          "section-0765",
+          "section-0766",
+          "section-0767",
+          "section-0768",
+          "section-0771",
+          "section-0772",
+          "section-0778",
+          "section-0784",
+          "section-0788",
+          "section-0794",
+          "section-0795",
+          "section-0797",
+          "section-0798",
+          "section-0800",
+          "section-0801",
+          "section-0803",
+          "section-0804",
+          "section-0805",
+          "section-0808",
+          "section-0811",
+          "section-0812",
+          "section-0813",
+          "section-0814",
+          "section-0817",
+          "section-0820",
+          "section-0821",
+          "section-0822",
+          "section-0823",
+          "section-0825",
+          "section-0828",
+          "section-0829",
+          "section-0830",
+          "section-0831",
+          "section-0835",
+          "section-0837",
+          "section-0838",
+          "section-0839",
+          "section-0841",
+          "section-0844",
+          "section-0845",
+          "section-0846",
+          "section-0847",
+          "section-0849",
+          "section-0852",
+          "section-0853",
+          "section-0854",
+          "section-0855",
+          "section-0856",
+          "section-0857",
+          "section-0858",
+          "section-0859",
+          "section-0860",
+          "section-0865",
+          "section-0867",
+          "section-0868",
+          "section-0869",
+          "section-0872",
+          "section-0876",
+          "section-0877",
+          "section-0878",
+          "section-0879",
+          "section-0881",
+          "section-0885",
+          "section-0886",
+          "section-0887",
+          "section-0888",
+          "section-0890",
+          "section-0892",
+          "section-0893",
+          "section-0894",
+          "section-0895",
+          "section-0897",
+          "section-0899",
+          "section-0900",
+          "section-0901",
+          "section-0905",
+          "section-0907",
+          "section-0908",
+          "section-0909",
+          "section-0910",
+          "section-0912",
+          "section-0914",
+          "section-0915",
+          "section-0916",
+          "section-0917",
+          "section-0919",
+          "section-0921",
+          "section-0922",
+          "section-0923",
+          "section-0924",
+          "section-0927",
+          "section-0928",
+          "section-0931",
+          "section-0932",
+          "section-0933",
+          "section-0937",
+          "section-0940",
+          "section-0942",
+          "section-0943",
+          "section-0944",
+          "section-0945",
+          "section-0947",
+          "section-0948",
+          "section-0949",
+          "section-0950",
+          "section-0951",
+          "section-0952",
+          "section-0953",
+          "section-0955",
+          "section-0956",
+          "section-0957",
+          "section-0958",
+          "section-0959",
+          "section-0962",
+          "section-0963",
+          "section-0964",
+          "section-0965",
+          "section-0967",
+          "section-0968",
+          "section-0969",
+          "section-0970",
+          "section-0973",
+          "section-0974",
+          "section-0975",
+          "section-0976",
+          "section-0977",
+          "section-0978",
+          "section-0981",
+          "section-0982",
+          "section-0983",
+          "section-0984",
+          "section-0985",
+          "section-0986",
+          "section-0987",
+          "section-0990",
+          "section-0999",
+          "section-1001",
+          "section-1002",
+          "section-1003",
+          "section-1005",
+          "section-1006",
+          "section-1007",
+          "section-1008",
+          "section-1009",
+          "section-1010",
+          "section-1011",
+          "section-1012",
+          "section-1013",
+          "section-1014",
+          "section-1017",
+          "section-1018",
+          "section-1019",
+          "section-1020",
+          "section-1021",
+          "section-1022",
+          "section-1024",
+          "section-1032",
+          "section-1033",
+          "section-1034",
+          "section-1035",
+          "section-1036",
+          "section-1037",
+          "section-1038",
+          "section-1039",
+          "section-1040",
+          "section-1043",
+          "section-1044",
+          "section-1045",
+          "section-1046",
+          "section-1047",
+          "section-1048",
+          "section-1049",
+          "section-1050",
+          "section-1051",
+          "section-1052",
+          "section-1053",
+          "section-1054",
+          "section-1055",
+          "section-1056",
+          "section-1063",
+          "section-1067",
+          "section-1068",
+          "section-1069",
+          "section-1070",
+          "section-1071",
+          "section-1072",
+          "section-1073",
+          "section-1074",
+          "section-1075",
+          "section-1076",
+          "section-1077",
+          "section-1084",
+          "section-1090",
+          "section-1092",
+          "section-1093",
+          "section-1094",
+          "section-1096",
+          "section-1099",
+          "section-1100",
+          "section-1101",
+          "section-1102",
+          "section-1103",
+          "section-1104",
+          "section-1105",
+          "section-1106"
+        ],
+        "physical_pages": []
+      },
+      "extraction": {
+        "purpose": "extract_profile_workpaper",
+        "request_id": "bp-work-3365870b26619438dab9801d:workpaper:extract",
+        "request_hash": "253a4bc71d8116ed15221c3008dfd953c0583b1d46a55bdc90adadba41bc3414",
+        "response_hash": "fc9b08b3a35c2af8e8bd9d4795f5b39445d902a851281f88a1855b86d79341d1",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 9691,
+          "output_tokens": 26951,
+          "total_tokens": 36642
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0026",
+          "section-0032",
+          "section-0061",
+          "section-0970"
+        ],
+        "physical_pages": [
+          12,
+          13,
+          14,
+          15,
+          21,
+          22,
+          23,
+          24,
+          150
+        ]
+      }
+    },
+    "quality_review": {
+      "status": "completed_with_open_findings",
+      "policy_version": "company_profile_workpaper_review.v13",
+      "original_draft_hash": "44200cb23836fc919692211e71e40af8a198c002ef10d98fbf53b8385e224f12",
+      "findings": [
+        {
+          "finding_id": "f-bs-1",
+          "element": "business_structure",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "affected_fact_id": "bs-1",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "原文明确公司所处行业为工程咨询服务业，并表述该行业“属于技术密集型行业”。草稿将“技术密集型”写成所属行业名称，行业主体归类不准确。工程咨询主业、商业模式未发生重大变化等表述有原文支持，应保留，仅将技术密集型改回行业属性。",
+          "resolution": "corrected_pending_trust",
+          "original_fact": {
+            "fact_id": "bs-1",
+            "text": "公司长期深耕工程咨询服务业，所属行业为技术密集型；业务以工程咨询专业技术服务及全过程一体化咨询为主。报告期内主营业务、主要产品及服务较为稳定，商业模式未发生重大变化。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "revised_fact": {
+            "fact_id": "bs-1",
+            "text": "公司长期深耕于工程咨询服务业，所处行业为工程咨询服务业，属于技术密集型行业；业务以工程咨询专业技术服务及全过程一体化咨询服务为主。报告期内，公司的主营业务、主要产品及服务较为稳定，公司商业模式未发生重大变化。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "finding_id": "f-ccm-2",
+          "element": "customers_channels_markets",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "affected_fact_id": "ccm-2",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0007",
+            "source-0008"
+          ],
+          "explanation": "叙述及所引证据与原文一致：江苏省内营业收入362,444,827.01元、占全年营业收入98.09%，江苏省外营业收入7,047,586.82元、占1.91%。但原metrics四项的subject_scope均为business_segment。该表是“按区域分类”的地区行，不是业务、产品或行业分部，地区收入不能按业务分部指标使用。事实级subject_scope同样不能读成产品分部。不替换原数值或原标签。",
+          "resolution": "metrics_limited",
+          "original_fact": {
+            "fact_id": "ccm-2",
+            "text": "2025年公司收入主要集中于江苏省内，江苏省内营业收入362,444,827.01元，占全年营业收入98.09%；江苏省外营业收入7,047,586.82元，占1.91%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "江苏省内营业收入",
+                "raw_value": "362,444,827.01",
+                "value": "362444827.01",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "江苏省内收入占比",
+                "raw_value": "98.09",
+                "value": "98.09",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "江苏省外营业收入",
+                "raw_value": "7,047,586.82",
+                "value": "7047586.82",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "江苏省外收入占比",
+                "raw_value": "1.91",
+                "value": "1.91",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "revised_fact": null,
+          "metric_limit": {
+            "fact_sha256": "b0e2197a0ec8f50e842c4166d649675a907d1640efd03b9b5c35f639fb0c20bf",
+            "narrative_supported": true,
+            "metric_indices": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        },
+        {
+          "finding_id": "f-sc-up-1",
+          "element": "upstream_inputs",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "affected_fact_id": "sc-up-1",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0001",
+            "source-0008"
+          ],
+          "explanation": "前五大供应商采购合计18,545,707.77元、占比35.94%，以及第一大供应商采购10,835,828.85元、占比20.99%和关联关系披露，可由source-0008支持。但职工薪酬、外协服务费、经营场地费、差旅及办公费等主要成本类别出自source-0001，本事实仅引用source-0008，该句缺乏对应证据。应补引source-0001或拆分事实，已支持的供应商金额与占比可保留。",
+          "resolution": "corrected_pending_trust",
+          "original_fact": {
+            "fact_id": "sc-up-1",
+            "text": "公司主要成本投入包括职工薪酬、外协服务费、经营场地费、差旅及办公费等；2025年前五大供应商合计采购18,545,707.77元，占年度采购35.94%，第一大供应商采购10,835,828.85元，占20.99%，披露为关联关系。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "前五大供应商采购合计",
+                "raw_value": "18,545,707.77",
+                "value": "18545707.77",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "前五大供应商采购占比",
+                "raw_value": "35.94",
+                "value": "35.94",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "第一大供应商采购",
+                "raw_value": "10,835,828.85",
+                "value": "10835828.85",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "第一大供应商采购占比",
+                "raw_value": "20.99",
+                "value": "20.99",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "revised_fact": {
+            "fact_id": "sc-up-1",
+            "text": "公司日常经营过程中产生的主要成本包括职工薪酬、外协服务费、经营场地费、差旅及办公费等；2025年前五大供应商合计采购18,545,707.77元，占年度采购35.94%；第一大供应商苏州诚来智投资管理有限公司采购10,835,828.85元，占20.99%，披露为关联关系。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "前五大供应商采购合计",
+                "raw_value": "18,545,707.77",
+                "value": "18545707.77",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "前五大供应商采购占比",
+                "raw_value": "35.94",
+                "value": "35.94",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "第一大供应商采购",
+                "raw_value": "10,835,828.85",
+                "value": "10835828.85",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "第一大供应商采购占比",
+                "raw_value": "20.99",
+                "value": "20.99",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "finding_id": "f-lim-1",
+          "element": "limitations",
+          "severity": "minor",
+          "issue_type": "contradicts_source",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "局限称全国固定资产投资同比数字在所引来源中缺失，与已提供原文相反。source-0002写明2025年全国固定资产投资（不含农户）485,186亿元、比上年下降3.80%。该数是外部行业统计，不是公司自身经营指标，不必改记为公司业绩；但不应表述为原文未披露。",
+          "resolution": "unresolved",
+          "original_fact": null,
+          "revised_fact": null
+        }
+      ],
+      "checked_fact_ids": [
+        "bs-1",
+        "ps-1",
+        "rm-1",
+        "sm-1",
+        "sm-2",
+        "sm-3",
+        "sm-4",
+        "sm-5",
+        "sm-6",
+        "sm-7",
+        "sm-8",
+        "oi-1",
+        "ccm-1",
+        "ccm-2",
+        "ccm-3",
+        "od-1",
+        "od-3",
+        "mc-1",
+        "mc-2",
+        "sc-pos-1",
+        "sc-up-1",
+        "sc-down-1",
+        "cf-1"
+      ],
+      "calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-0788cd766ed03e2101c554ec:workpaper:review",
+          "request_hash": "975cd312c2aad8db0d5fe14de0c18ea76b60e6327e2cf144c77c4e60161b75de",
+          "response_hash": "f987676bfefaeb0ccd31190586d7005d2854bb78d92759a7792ab9e3af0499b5",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 15617,
+            "output_tokens": 817,
+            "total_tokens": 36990
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0026",
+            "section-0032",
+            "section-0061",
+            "section-0970"
+          ],
+          "physical_pages": [
+            12,
+            13,
+            14,
+            15,
+            21,
+            22,
+            23,
+            24,
+            150
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-0788cd766ed03e2101c554ec:workpaper:repair",
+          "request_hash": "846bc2a227ee79aaef27c9619baef17deaa61800858363b918a41c4a4b6cdc67",
+          "response_hash": "5ca35ccd35eacec8382deead258b835819e91fa9c7cc4e4eec824c647dfcc185",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 7588,
+            "output_tokens": 1415,
+            "total_tokens": 9003
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0026",
+            "section-0032",
+            "section-0061",
+            "section-0970"
+          ],
+          "physical_pages": [
+            12,
+            13,
+            14,
+            15,
+            21,
+            22,
+            23,
+            24,
+            150
+          ]
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "request_id": "bp-work-0788cd766ed03e2101c554ec:workpaper:repair-verify",
+          "request_hash": "2a247cbced97d256618e1ae742d4551fdb367aacc5deb4fe83b9de55b11e136d",
+          "response_hash": "a325875e8ad3a42999bc4df8723c2b33356488d8716c0e9c6ed932475ad2649d",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 8943,
+            "output_tokens": 292,
+            "total_tokens": 11918
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0026",
+            "section-0032",
+            "section-0061",
+            "section-0970"
+          ],
+          "physical_pages": [
+            12,
+            13,
+            14,
+            15,
+            21,
+            22,
+            23,
+            24,
+            150
+          ]
+        }
+      ],
+      "retained_request_ids": [],
+      "locally_revalidated_request_ids": [],
+      "error": null,
+      "checked_fact_hashes": {
+        "bs-1": "353cea9a1b5df65f1144760117d276f1bcef4c807addbf73a446fc9a97079080",
+        "ps-1": "c2396de81288543366e47d4f0c0b291718050f4fa4d47e88b8a4a6bbeb2a7287",
+        "rm-1": "fe1fc2ecd6aa86528af2a3a30a222e11ec7a67825f08da1bf42fe2da01e4179b",
+        "sm-1": "fd93779aa0cdf4ef66a993dddb643447e053e26a039945ec054de477953caee9",
+        "sm-2": "11de2d2559efe3b356c9fda9f23c56b70f6fec8a20267da1a93ea17f596dc2ab",
+        "sm-3": "8b9e4535fb75ae0090eaaa130367ce9ce7233b8197f86e34c9411af36d5b5627",
+        "sm-4": "bfcdae44c4a4f36439b28235384fa7f8b17e33bf61d7aed0fb0cd55d2d18bf6c",
+        "sm-5": "413e36ac73d5692b18862293ea71c33220bdbc1155db5c891a7e20b4d70ec5e9",
+        "sm-6": "0e578b5bdba53be6d7e8dfcb01d61435e8b1d15d29e9ca7b8214147a8004234c",
+        "sm-7": "703e68d755b94fcc88b0474431cf3fda4f428786b19b98414cdd88e80d4ff90d",
+        "sm-8": "572261ff60002b00e30657f8c5782d2285a22a26f0d90ed63cad7340667d0870",
+        "oi-1": "ffab98c51825dec89b1cde56f9042e56b6785eb77f022eec85abd7e0301078ff",
+        "ccm-1": "266f674b020759c101ece2d879722433734b926372739120d16acc46e1ddcd81",
+        "ccm-2": "b0e2197a0ec8f50e842c4166d649675a907d1640efd03b9b5c35f639fb0c20bf",
+        "ccm-3": "d9874c2f3482496b66f00cc18088c4adb0d07c7d36fb29536a7ba5ae03c23e85",
+        "od-1": "6ef8ac3b35677d8f43ddbe393b62a0490a6f371665c5ba2adbd3c3bc148e335a",
+        "od-3": "d7d732ab8c5da3eb628e620fd13323aef90c79a548527024709e71c06249de40",
+        "mc-1": "b38e96e45ba05815283199aec38edb3c795eee44b80555a60562cf012a4ca3a1",
+        "mc-2": "2d2786a086a34bd8ac280aa6f44a73872538e27ea67c32821bee750d7e97d86a",
+        "sc-pos-1": "48f5e9dbb59b9bfb6dd3e0516c969d4ffe6c1c309978a51eec11411ed36c94a0",
+        "sc-up-1": "1ff8e1f5f5b51ee79eeadfff7b56306c93aa93c9444d736ed1b838606626322b",
+        "sc-down-1": "97e390e5716d225ea39d265a37d117fdc72c6571c82032cb355fc0e05d7b923e",
+        "cf-1": "10f85c46b5a5e8c2588e857f103a56aa0e6c97fa50222e4b81edb1f724e9306d"
+      },
+      "metric_limit_policy": "source_review_exact_metric_limits.v1"
+    },
+    "standardization_notes": [
+      "事实od-2已隔离，未作为结论采用：metric number is absent from cited source: 全国固定资产投资同比"
+    ],
+    "company_features": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "cf-1",
+          "text": "公司推进造价业务数字化和数字化监理：造价系统涵盖数据管理、工程校核、成本预测；监理系统用于业主透明化管控、公司内部标准化降本增效及现场人员减负。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003",
+            "source-0004"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ],
+      "limitations": [
+        "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+      ]
+    },
+    "use_review": {
+      "report": {
+        "instrument_id": "920003.BJ",
+        "report_id": "asset_4be790b0218414e3166dea111c8c52b6",
+        "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-20T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reviewer": "6.FN A independent source audit",
+      "reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/a-release-decisions.json",
+      "reference_sha256": "cbfa2669df61f8f5d8512a22db260b915a410ff3773a23c09751a528de12ec2a",
+      "decisions": [
+        {
+          "fact_id": "ccm-2",
+          "fact_sha256": "b0e2197a0ec8f50e842c4166d649675a907d1640efd03b9b5c35f639fb0c20bf",
+          "disposition": "source_only",
+          "evidence_ids": [
+            "source-0007",
+            "source-0008"
+          ],
+          "reason": "原PDF23页江苏省内/省外为地区维度，不是上表工程造价/监理等经营分部；事实层business_segment错误仍对外。仅源参考，不改原数。",
+          "limitation": null
+        }
+      ]
+    }
+  },
+  "workpaper_receipts": [
+    {
+      "request_id": "bp-work-3365870b26619438dab9801d:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "7d9eeea80759680d86eb96230b05ca91d936aedec212abb77e93da70f2d1d5a7",
+      "response_hash": "6dff4b7d1508e84c2ea4e2fac938670b6edbe32ff76afb0ba8c123162f8e23aa",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0026\",\"section-0032\",\"section-0061\",\"section-0970\"],\"rationale\":\"section-0026业务概要完整覆盖公司业务结构、盈利模式、采购与营销方式；section-0032经营情况回顾提供经营计划、核心影响因素和本期变化线索；section-0061营业情况分析用于获取营业收入、成本及主要业务构成等货币化与规模信息；section-0970营业收入和营业成本为收入来源与主要业务权重提供报表附注层面的定向补充。所选均为公司层面实质经营或收入内容，且无祖先与子节重复。\",\"deferred\":[\"section-0042、section-0044行业背景仅作外部环境补充，非公司层面经营解释所必需\",\"section-0144未来展望含计划性内容，当前以实际经营与收入说明为主，暂不展开\",\"section-0098研发情况及section-0263行业信息中的资质、技术细节，属于次级或可选补充\",\"section-0457财务会计报告整体不纳入，仅以section-0970定向补充收入构成\"],\"stop_reason\":\"已选节覆盖业务模式、经营回顾、营业情况与收入构成，可解释主要业务、收入来源和本期经营因素；在保持公司层面阅读范围的前提下无需扩展到行业背景、未来规划、研发明细或完整财务报表。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0026",
+          "section-0032",
+          "section-0061",
+          "section-0970"
+        ],
+        "rationale": "section-0026业务概要完整覆盖公司业务结构、盈利模式、采购与营销方式；section-0032经营情况回顾提供经营计划、核心影响因素和本期变化线索；section-0061营业情况分析用于获取营业收入、成本及主要业务构成等货币化与规模信息；section-0970营业收入和营业成本为收入来源与主要业务权重提供报表附注层面的定向补充。所选均为公司层面实质经营或收入内容，且无祖先与子节重复。",
+        "deferred": [
+          "section-0042、section-0044行业背景仅作外部环境补充，非公司层面经营解释所必需",
+          "section-0144未来展望含计划性内容，当前以实际经营与收入说明为主，暂不展开",
+          "section-0098研发情况及section-0263行业信息中的资质、技术细节，属于次级或可选补充",
+          "section-0457财务会计报告整体不纳入，仅以section-0970定向补充收入构成"
+        ],
+        "stop_reason": "已选节覆盖业务模式、经营回顾、营业情况与收入构成，可解释主要业务、收入来源和本期经营因素；在保持公司层面阅读范围的前提下无需扩展到行业背景、未来规划、研发明细或完整财务报表。"
+      },
+      "usage": {
+        "input_tokens": 18359,
+        "output_tokens": 11303,
+        "total_tokens": 29662
+      },
+      "receipt_origin": "retained_receipt"
+    },
+    {
+      "request_id": "bp-work-3365870b26619438dab9801d:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "253a4bc71d8116ed15221c3008dfd953c0583b1d46a55bdc90adadba41bc3414",
+      "response_hash": "fc9b08b3a35c2af8e8bd9d4795f5b39445d902a851281f88a1855b86d79341d1",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"bs-1\",\"text\":\"公司长期深耕工程咨询服务业，所属行业为技术密集型；业务以工程咨询专业技术服务及全过程一体化咨询为主。报告期内主营业务、主要产品及服务较为稳定，商业模式未发生重大变化。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"ps-1\",\"text\":\"公司面向建筑工程项目客户提供工程造价、招标代理、工程监理及管理、BIM服务、工程设计等专业技术服务，并开展全过程一体化咨询；公司将工程数据与BIM、大数据等信息化技术融合。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"未获取各服务类别对应的具体项目、客户或应用环节明细。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"rm-1\",\"text\":\"公司基于提供的工程咨询专业技术服务内容，按照合同约定金额或收费标准向客户收取费用，形成收入和利润。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sm-1\",\"text\":\"2025年公司实现营业收入369,492,413.83元，毛利率49.59%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0006\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"369,492,413.83\",\"value\":\"369492413.83\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"毛利率\",\"raw_value\":\"49.59\",\"value\":\"49.59\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-2\",\"text\":\"2025年主营业务收入368,152,037.35元，其他业务收入1,340,376.48元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"主营业务收入\",\"raw_value\":\"368,152,037.35\",\"value\":\"368152037.35\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"其他业务收入\",\"raw_value\":\"1,340,376.48\",\"value\":\"1340376.48\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-3\",\"text\":\"2025年公司实现净利润101,492,989.38元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0006\"],\"metrics\":[{\"name\":\"净利润\",\"raw_value\":\"101,492,989.38\",\"value\":\"101492989.38\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-4\",\"text\":\"2025年工程造价业务营业收入182,416,579.30元，毛利率52.97%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"工程造价营业收入\",\"raw_value\":\"182,416,579.30\",\"value\":\"182416579.30\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"工程造价毛利率\",\"raw_value\":\"52.97\",\"value\":\"52.97\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-5\",\"text\":\"2025年工程监理及管理业务营业收入64,253,334.03元，毛利率46.14%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"工程监理及管理营业收入\",\"raw_value\":\"64,253,334.03\",\"value\":\"64253334.03\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"工程监理及管理毛利率\",\"raw_value\":\"46.14\",\"value\":\"46.14\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-6\",\"text\":\"2025年全过程咨询业务营业收入46,621,583.10元，毛利率47.80%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"全过程咨询营业收入\",\"raw_value\":\"46,621,583.10\",\"value\":\"46621583.10\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"全过程咨询毛利率\",\"raw_value\":\"47.80\",\"value\":\"47.80\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-7\",\"text\":\"2025年招标代理业务营业收入29,148,462.54元，毛利率57.53%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"招标代理营业收入\",\"raw_value\":\"29,148,462.54\",\"value\":\"29148462.54\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"招标代理毛利率\",\"raw_value\":\"57.53\",\"value\":\"57.53\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-8\",\"text\":\"2025年其他技术服务业务营业收入45,712,078.38元，毛利率36.56%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"其他技术服务营业收入\",\"raw_value\":\"45,712,078.38\",\"value\":\"45712078.38\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"其他技术服务毛利率\",\"raw_value\":\"36.56\",\"value\":\"36.56\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"分产品收入占比未在所选章节直接披露，本工作稿未自行计算；分产品仅保留收入与毛利率，未展开营业成本明细。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"oi-1\",\"text\":\"公司所处工程咨询服务业属技术密集型，日常经营主要成本包括职工薪酬、外协服务费、经营场地费、差旅及办公费等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"主要成本类别未在所选章节列示金额；主要供应商的具体采购内容未披露。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"ccm-1\",\"text\":\"公司营销模式包括招投标模式和客户直接委托模式；非必须招标项目由客户综合考虑资信、业绩、服务品质和历史合作后直接委托。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"ccm-2\",\"text\":\"2025年公司收入主要集中于江苏省内，江苏省内营业收入362,444,827.01元，占全年营业收入98.09%；江苏省外营业收入7,047,586.82元，占1.91%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"metrics\":[{\"name\":\"江苏省内营业收入\",\"raw_value\":\"362,444,827.01\",\"value\":\"362444827.01\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"江苏省内收入占比\",\"raw_value\":\"98.09\",\"value\":\"98.09\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"江苏省外营业收入\",\"raw_value\":\"7,047,586.82\",\"value\":\"7047586.82\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"江苏省外收入占比\",\"raw_value\":\"1.91\",\"value\":\"1.91\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"ccm-3\",\"text\":\"2025年前五大客户合计销售88,078,006.84元，占年度销售23.83%；第一大客户为苏州元脉科技产业发展合伙企业（有限合伙），销售42,317,012.71元，占11.45%，公司披露为关联关系。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"前五大客户销售合计\",\"raw_value\":\"88,078,006.84\",\"value\":\"88078006.84\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"前五大客户销售占比\",\"raw_value\":\"23.83\",\"value\":\"23.83\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"第一大客户销售\",\"raw_value\":\"42,317,012.71\",\"value\":\"42317012.71\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"第一大客户销售占比\",\"raw_value\":\"11.45\",\"value\":\"11.45\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"未获取按客户类型或渠道划分的收入明细；区域收入仅按江苏省内/外披露。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"od-1\",\"text\":\"公司主营工程咨询服务直接服务于固定资产投资建设活动，经营业绩受固定资产投资规模直接影响。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"od-2\",\"text\":\"国家统计局数据显示，2025年全国固定资产投资（不含农户）485,186亿元，比上年下降3.80%；江苏省统计局数据显示，江苏省固定资产投资下降12.70%。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0003\"],\"uncertainty_reason\":\"包含国家及江苏省行业统计指标，非公司自身经营数据\",\"metrics\":[{\"name\":\"全国固定资产投资（不含农户）\",\"raw_value\":\"485,186\",\"value\":\"485186\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"unclear\",\"uncertainty_reason\":\"国家统计局行业统计指标，非公司自身经营数据\",\"qualifier\":\"exact\"},{\"name\":\"全国固定资产投资同比\",\"raw_value\":\"-3.80\",\"value\":\"-3.80\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"unclear\",\"uncertainty_reason\":\"国家统计局行业统计指标，非公司自身经营数据\",\"comparison_basis\":\"上年\",\"qualifier\":\"exact\"},{\"name\":\"江苏省固定资产投资同比\",\"raw_value\":\"-12.70\",\"value\":\"-12.70\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"unclear\",\"uncertainty_reason\":\"江苏省统计局行业统计指标，非公司自身经营数据\",\"comparison_basis\":\"上年\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"od-3\",\"text\":\"2025年公司研发投入合计17,285,507.34元，占当期营业收入4.68%，公司称坚持数字化转型并加大研发投入。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"研发投入\",\"raw_value\":\"17,285,507.34\",\"value\":\"17285507.34\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"研发投入占营业收入比重\",\"raw_value\":\"4.68\",\"value\":\"4.68\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"固定资产投资全国及江苏数据为外部行业统计，不是公司自身经营数据；数字化投入对经营成果的量化影响未披露。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"mc-1\",\"text\":\"2025年公司在北京证券交易所上市，发行新股1,400万股，募集资金1.73亿元（已扣除发行费用）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"发行新股\",\"raw_value\":\"1,400\",\"value\":\"1400\",\"unit\":\"万股\",\"source_unit\":\"万股\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"募集资金\",\"raw_value\":\"1.73\",\"value\":\"1.73\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"mc-2\",\"text\":\"受国内固定资产投资规模减少影响，公司报告期内营业收入、净利润相较上年同期略有下滑。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}],\"limitations\":[\"未获取核心竞争力变化的具体量化明细；报告仅披露该披露项不适用。\"]}},\"company_features\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"cf-1\",\"text\":\"公司推进造价业务数字化和数字化监理：造价系统涵盖数据管理、工程校核、成本预测；监理系统用于业主透明化管控、公司内部标准化降本增效及现场人员减负。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"]}],\"limitations\":[\"数字化系统的量化效益未披露。\"]},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sc-pos-1\",\"text\":\"公司处于工程咨询服务业，作为服务提供方为建筑工程项目提供专业技术服务及全过程一体化咨询。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sc-up-1\",\"text\":\"公司主要成本投入包括职工薪酬、外协服务费、经营场地费、差旅及办公费等；2025年前五大供应商合计采购18,545,707.77元，占年度采购35.94%，第一大供应商采购10,835,828.85元，占20.99%，披露为关联关系。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"前五大供应商采购合计\",\"raw_value\":\"18,545,707.77\",\"value\":\"18545707.77\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"前五大供应商采购占比\",\"raw_value\":\"35.94\",\"value\":\"35.94\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"第一大供应商采购\",\"raw_value\":\"10,835,828.85\",\"value\":\"10835828.85\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"第一大供应商采购占比\",\"raw_value\":\"20.99\",\"value\":\"20.99\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"主要供应商的具体采购内容未在所选章节披露。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sc-down-1\",\"text\":\"公司服务面向建筑工程项目客户，客户为工程项目的招标单位或直接委托方；公司通过招投标或客户直接委托获取订单。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"未在所选章节披露按客户类型划分的收入或客户结构。\"]}},\"limitations\":[\"仅依据指定章节形成，未覆盖行业背景、未来展望、研发明细及完整财务报表；未对未披露数据作推算。\"]}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "bs-1",
+                "text": "公司长期深耕工程咨询服务业，所属行业为技术密集型；业务以工程咨询专业技术服务及全过程一体化咨询为主。报告期内主营业务、主要产品及服务较为稳定，商业模式未发生重大变化。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "ps-1",
+                "text": "公司面向建筑工程项目客户提供工程造价、招标代理、工程监理及管理、BIM服务、工程设计等专业技术服务，并开展全过程一体化咨询；公司将工程数据与BIM、大数据等信息化技术融合。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取各服务类别对应的具体项目、客户或应用环节明细。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "rm-1",
+                "text": "公司基于提供的工程咨询专业技术服务内容，按照合同约定金额或收费标准向客户收取费用，形成收入和利润。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "sm-1",
+                "text": "2025年公司实现营业收入369,492,413.83元，毛利率49.59%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005",
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "369,492,413.83",
+                    "value": "369492413.83",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "毛利率",
+                    "raw_value": "49.59",
+                    "value": "49.59",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-2",
+                "text": "2025年主营业务收入368,152,037.35元，其他业务收入1,340,376.48元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "主营业务收入",
+                    "raw_value": "368,152,037.35",
+                    "value": "368152037.35",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "其他业务收入",
+                    "raw_value": "1,340,376.48",
+                    "value": "1340376.48",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-3",
+                "text": "2025年公司实现净利润101,492,989.38元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005",
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "净利润",
+                    "raw_value": "101,492,989.38",
+                    "value": "101492989.38",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-4",
+                "text": "2025年工程造价业务营业收入182,416,579.30元，毛利率52.97%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "工程造价营业收入",
+                    "raw_value": "182,416,579.30",
+                    "value": "182416579.30",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "工程造价毛利率",
+                    "raw_value": "52.97",
+                    "value": "52.97",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-5",
+                "text": "2025年工程监理及管理业务营业收入64,253,334.03元，毛利率46.14%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "工程监理及管理营业收入",
+                    "raw_value": "64,253,334.03",
+                    "value": "64253334.03",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "工程监理及管理毛利率",
+                    "raw_value": "46.14",
+                    "value": "46.14",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-6",
+                "text": "2025年全过程咨询业务营业收入46,621,583.10元，毛利率47.80%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "全过程咨询营业收入",
+                    "raw_value": "46,621,583.10",
+                    "value": "46621583.10",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "全过程咨询毛利率",
+                    "raw_value": "47.80",
+                    "value": "47.80",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-7",
+                "text": "2025年招标代理业务营业收入29,148,462.54元，毛利率57.53%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "招标代理营业收入",
+                    "raw_value": "29,148,462.54",
+                    "value": "29148462.54",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "招标代理毛利率",
+                    "raw_value": "57.53",
+                    "value": "57.53",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-8",
+                "text": "2025年其他技术服务业务营业收入45,712,078.38元，毛利率36.56%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "其他技术服务营业收入",
+                    "raw_value": "45,712,078.38",
+                    "value": "45712078.38",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "其他技术服务毛利率",
+                    "raw_value": "36.56",
+                    "value": "36.56",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "分产品收入占比未在所选章节直接披露，本工作稿未自行计算；分产品仅保留收入与毛利率，未展开营业成本明细。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "oi-1",
+                "text": "公司所处工程咨询服务业属技术密集型，日常经营主要成本包括职工薪酬、外协服务费、经营场地费、差旅及办公费等。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "主要成本类别未在所选章节列示金额；主要供应商的具体采购内容未披露。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "ccm-1",
+                "text": "公司营销模式包括招投标模式和客户直接委托模式；非必须招标项目由客户综合考虑资信、业绩、服务品质和历史合作后直接委托。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "ccm-2",
+                "text": "2025年公司收入主要集中于江苏省内，江苏省内营业收入362,444,827.01元，占全年营业收入98.09%；江苏省外营业收入7,047,586.82元，占1.91%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007",
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "江苏省内营业收入",
+                    "raw_value": "362,444,827.01",
+                    "value": "362444827.01",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "江苏省内收入占比",
+                    "raw_value": "98.09",
+                    "value": "98.09",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "江苏省外营业收入",
+                    "raw_value": "7,047,586.82",
+                    "value": "7047586.82",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "江苏省外收入占比",
+                    "raw_value": "1.91",
+                    "value": "1.91",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "ccm-3",
+                "text": "2025年前五大客户合计销售88,078,006.84元，占年度销售23.83%；第一大客户为苏州元脉科技产业发展合伙企业（有限合伙），销售42,317,012.71元，占11.45%，公司披露为关联关系。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五大客户销售合计",
+                    "raw_value": "88,078,006.84",
+                    "value": "88078006.84",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "前五大客户销售占比",
+                    "raw_value": "23.83",
+                    "value": "23.83",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "第一大客户销售",
+                    "raw_value": "42,317,012.71",
+                    "value": "42317012.71",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "第一大客户销售占比",
+                    "raw_value": "11.45",
+                    "value": "11.45",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取按客户类型或渠道划分的收入明细；区域收入仅按江苏省内/外披露。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "od-1",
+                "text": "公司主营工程咨询服务直接服务于固定资产投资建设活动，经营业绩受固定资产投资规模直接影响。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "od-2",
+                "text": "国家统计局数据显示，2025年全国固定资产投资（不含农户）485,186亿元，比上年下降3.80%；江苏省统计局数据显示，江苏省固定资产投资下降12.70%。",
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002",
+                  "source-0003"
+                ],
+                "uncertainty_reason": "包含国家及江苏省行业统计指标，非公司自身经营数据",
+                "metrics": [
+                  {
+                    "name": "全国固定资产投资（不含农户）",
+                    "raw_value": "485,186",
+                    "value": "485186",
+                    "unit": "亿元",
+                    "source_unit": "亿元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "unclear",
+                    "uncertainty_reason": "国家统计局行业统计指标，非公司自身经营数据",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "全国固定资产投资同比",
+                    "raw_value": "-3.80",
+                    "value": "-3.80",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "unclear",
+                    "uncertainty_reason": "国家统计局行业统计指标，非公司自身经营数据",
+                    "comparison_basis": "上年",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "江苏省固定资产投资同比",
+                    "raw_value": "-12.70",
+                    "value": "-12.70",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "unclear",
+                    "uncertainty_reason": "江苏省统计局行业统计指标，非公司自身经营数据",
+                    "comparison_basis": "上年",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "od-3",
+                "text": "2025年公司研发投入合计17,285,507.34元，占当期营业收入4.68%，公司称坚持数字化转型并加大研发投入。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": [
+                  {
+                    "name": "研发投入",
+                    "raw_value": "17,285,507.34",
+                    "value": "17285507.34",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "研发投入占营业收入比重",
+                    "raw_value": "4.68",
+                    "value": "4.68",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "固定资产投资全国及江苏数据为外部行业统计，不是公司自身经营数据；数字化投入对经营成果的量化影响未披露。"
+            ]
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "mc-1",
+                "text": "2025年公司在北京证券交易所上市，发行新股1,400万股，募集资金1.73亿元（已扣除发行费用）。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ],
+                "metrics": [
+                  {
+                    "name": "发行新股",
+                    "raw_value": "1,400",
+                    "value": "1400",
+                    "unit": "万股",
+                    "source_unit": "万股",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "募集资金",
+                    "raw_value": "1.73",
+                    "value": "1.73",
+                    "unit": "亿元",
+                    "source_unit": "亿元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "mc-2",
+                "text": "受国内固定资产投资规模减少影响，公司报告期内营业收入、净利润相较上年同期略有下滑。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              }
+            ],
+            "limitations": [
+              "未获取核心竞争力变化的具体量化明细；报告仅披露该披露项不适用。"
+            ]
+          }
+        },
+        "company_features": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "cf-1",
+              "text": "公司推进造价业务数字化和数字化监理：造价系统涵盖数据管理、工程校核、成本预测；监理系统用于业主透明化管控、公司内部标准化降本增效及现场人员减负。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ]
+            }
+          ],
+          "limitations": [
+            "数字化系统的量化效益未披露。"
+          ]
+        },
+        "supply_chain": {
+          "position": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "sc-pos-1",
+                "text": "公司处于工程咨询服务业，作为服务提供方为建筑工程项目提供专业技术服务及全过程一体化咨询。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "upstream_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "sc-up-1",
+                "text": "公司主要成本投入包括职工薪酬、外协服务费、经营场地费、差旅及办公费等；2025年前五大供应商合计采购18,545,707.77元，占年度采购35.94%，第一大供应商采购10,835,828.85元，占20.99%，披露为关联关系。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五大供应商采购合计",
+                    "raw_value": "18,545,707.77",
+                    "value": "18545707.77",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "前五大供应商采购占比",
+                    "raw_value": "35.94",
+                    "value": "35.94",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "第一大供应商采购",
+                    "raw_value": "10,835,828.85",
+                    "value": "10835828.85",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "第一大供应商采购占比",
+                    "raw_value": "20.99",
+                    "value": "20.99",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "qualifier": "exact"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "主要供应商的具体采购内容未在所选章节披露。"
+            ]
+          },
+          "downstream_customers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "sc-down-1",
+                "text": "公司服务面向建筑工程项目客户，客户为工程项目的招标单位或直接委托方；公司通过招投标或客户直接委托获取订单。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "未在所选章节披露按客户类型划分的收入或客户结构。"
+            ]
+          }
+        },
+        "limitations": [
+          "仅依据指定章节形成，未覆盖行业背景、未来展望、研发明细及完整财务报表；未对未披露数据作推算。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 9691,
+        "output_tokens": 26951,
+        "total_tokens": 36642
+      },
+      "receipt_origin": "retained_receipt"
+    },
+    {
+      "request_id": "bp-work-0788cd766ed03e2101c554ec:workpaper:review",
+      "purpose": "review_profile_workpaper",
+      "request_hash": "975cd312c2aad8db0d5fe14de0c18ea76b60e6327e2cf144c77c4e60161b75de",
+      "response_hash": "f987676bfefaeb0ccd31190586d7005d2854bb78d92759a7792ab9e3af0499b5",
+      "finish_reason": "stop",
+      "source_label": "scorpio:grok-4.7",
+      "model": "grok-4.7",
+      "selected_profile": "semantic_extraction__scorpio_grok",
+      "logical_profile": "semantic_extraction__scorpio_grok",
+      "reasoning_effort": "high",
+      "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+      "contract_status": "accepted",
+      "raw_content": "{\"findings\":[{\"finding_id\":\"f-bs-1\",\"element\":\"business_structure\",\"affected_fact_id\":\"bs-1\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"evidence_ids\":[\"source-0001\"],\"explanation\":\"原文明确公司所处行业为工程咨询服务业，并表述该行业“属于技术密集型行业”。草稿将“技术密集型”写成所属行业名称，行业主体归类不准确。工程咨询主业、商业模式未发生重大变化等表述有原文支持，应保留，仅将技术密集型改回行业属性。\"},{\"finding_id\":\"f-ccm-2\",\"element\":\"customers_channels_markets\",\"affected_fact_id\":\"ccm-2\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"limit_metrics\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"explanation\":\"叙述及所引证据与原文一致：江苏省内营业收入362,444,827.01元、占全年营业收入98.09%，江苏省外营业收入7,047,586.82元、占1.91%。但原metrics四项的subject_scope均为business_segment。该表是“按区域分类”的地区行，不是业务、产品或行业分部，地区收入不能按业务分部指标使用。事实级subject_scope同样不能读成产品分部。不替换原数值或原标签。\",\"metric_limit\":{\"fact_sha256\":\"b0e2197a0ec8f50e842c4166d649675a907d1640efd03b9b5c35f639fb0c20bf\",\"narrative_supported\":true,\"metric_indices\":[0,1,2,3]}},{\"finding_id\":\"f-sc-up-1\",\"element\":\"upstream_inputs\",\"affected_fact_id\":\"sc-up-1\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"evidence_ids\":[\"source-0001\",\"source-0008\"],\"explanation\":\"前五大供应商采购合计18,545,707.77元、占比35.94%，以及第一大供应商采购10,835,828.85元、占比20.99%和关联关系披露，可由source-0008支持。但职工薪酬、外协服务费、经营场地费、差旅及办公费等主要成本类别出自source-0001，本事实仅引用source-0008，该句缺乏对应证据。应补引source-0001或拆分事实，已支持的供应商金额与占比可保留。\"},{\"finding_id\":\"f-lim-1\",\"element\":\"limitations\",\"affected_fact_id\":null,\"severity\":\"minor\",\"issue_type\":\"contradicts_source\",\"action\":\"correct\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"局限称全国固定资产投资同比数字在所引来源中缺失，与已提供原文相反。source-0002写明2025年全国固定资产投资（不含农户）485,186亿元、比上年下降3.80%。该数是外部行业统计，不是公司自身经营指标，不必改记为公司业绩；但不应表述为原文未披露。\"}],\"reviewed_fact_ids\":[\"bs-1\",\"ps-1\",\"rm-1\",\"sm-1\",\"sm-2\",\"sm-3\",\"sm-4\",\"sm-5\",\"sm-6\",\"sm-7\",\"sm-8\",\"oi-1\",\"ccm-1\",\"ccm-2\",\"ccm-3\",\"od-1\",\"od-3\",\"mc-1\",\"mc-2\",\"sc-pos-1\",\"sc-up-1\",\"sc-down-1\",\"cf-1\"]}",
+      "response_payload": {
+        "findings": [
+          {
+            "finding_id": "f-bs-1",
+            "element": "business_structure",
+            "affected_fact_id": "bs-1",
+            "severity": "minor",
+            "issue_type": "wrong_subject",
+            "action": "correct",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "explanation": "原文明确公司所处行业为工程咨询服务业，并表述该行业“属于技术密集型行业”。草稿将“技术密集型”写成所属行业名称，行业主体归类不准确。工程咨询主业、商业模式未发生重大变化等表述有原文支持，应保留，仅将技术密集型改回行业属性。"
+          },
+          {
+            "finding_id": "f-ccm-2",
+            "element": "customers_channels_markets",
+            "affected_fact_id": "ccm-2",
+            "severity": "minor",
+            "issue_type": "wrong_subject",
+            "action": "limit_metrics",
+            "evidence_ids": [
+              "source-0007",
+              "source-0008"
+            ],
+            "explanation": "叙述及所引证据与原文一致：江苏省内营业收入362,444,827.01元、占全年营业收入98.09%，江苏省外营业收入7,047,586.82元、占1.91%。但原metrics四项的subject_scope均为business_segment。该表是“按区域分类”的地区行，不是业务、产品或行业分部，地区收入不能按业务分部指标使用。事实级subject_scope同样不能读成产品分部。不替换原数值或原标签。",
+            "metric_limit": {
+              "fact_sha256": "b0e2197a0ec8f50e842c4166d649675a907d1640efd03b9b5c35f639fb0c20bf",
+              "narrative_supported": true,
+              "metric_indices": [
+                0,
+                1,
+                2,
+                3
+              ]
+            }
+          },
+          {
+            "finding_id": "f-sc-up-1",
+            "element": "upstream_inputs",
+            "affected_fact_id": "sc-up-1",
+            "severity": "minor",
+            "issue_type": "unsupported_claim",
+            "action": "correct",
+            "evidence_ids": [
+              "source-0001",
+              "source-0008"
+            ],
+            "explanation": "前五大供应商采购合计18,545,707.77元、占比35.94%，以及第一大供应商采购10,835,828.85元、占比20.99%和关联关系披露，可由source-0008支持。但职工薪酬、外协服务费、经营场地费、差旅及办公费等主要成本类别出自source-0001，本事实仅引用source-0008，该句缺乏对应证据。应补引source-0001或拆分事实，已支持的供应商金额与占比可保留。"
+          },
+          {
+            "finding_id": "f-lim-1",
+            "element": "limitations",
+            "affected_fact_id": null,
+            "severity": "minor",
+            "issue_type": "contradicts_source",
+            "action": "correct",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "explanation": "局限称全国固定资产投资同比数字在所引来源中缺失，与已提供原文相反。source-0002写明2025年全国固定资产投资（不含农户）485,186亿元、比上年下降3.80%。该数是外部行业统计，不是公司自身经营指标，不必改记为公司业绩；但不应表述为原文未披露。"
+          }
+        ],
+        "reviewed_fact_ids": [
+          "bs-1",
+          "ps-1",
+          "rm-1",
+          "sm-1",
+          "sm-2",
+          "sm-3",
+          "sm-4",
+          "sm-5",
+          "sm-6",
+          "sm-7",
+          "sm-8",
+          "oi-1",
+          "ccm-1",
+          "ccm-2",
+          "ccm-3",
+          "od-1",
+          "od-3",
+          "mc-1",
+          "mc-2",
+          "sc-pos-1",
+          "sc-up-1",
+          "sc-down-1",
+          "cf-1"
+        ]
+      },
+      "usage": {
+        "input_tokens": 15617,
+        "output_tokens": 817,
+        "total_tokens": 36990
+      }
+    },
+    {
+      "request_id": "bp-work-0788cd766ed03e2101c554ec:workpaper:repair",
+      "purpose": "repair_profile_workpaper",
+      "request_hash": "846bc2a227ee79aaef27c9619baef17deaa61800858363b918a41c4a4b6cdc67",
+      "response_hash": "5ca35ccd35eacec8382deead258b835819e91fa9c7cc4e4eec824c647dfcc185",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"bs-1\",\"text\":\"公司长期深耕于工程咨询服务业，所处行业为工程咨询服务业，属于技术密集型行业；业务以工程咨询专业技术服务及全过程一体化咨询服务为主。报告期内，公司的主营业务、主要产品及服务较为稳定，公司商业模式未发生重大变化。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"sc-up-1\",\"text\":\"公司日常经营过程中产生的主要成本包括职工薪酬、外协服务费、经营场地费、差旅及办公费等；2025年前五大供应商合计采购18,545,707.77元，占年度采购35.94%；第一大供应商苏州诚来智投资管理有限公司采购10,835,828.85元，占20.99%，披露为关联关系。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0008\"],\"metrics\":[{\"name\":\"前五大供应商采购合计\",\"raw_value\":\"18,545,707.77\",\"value\":\"18545707.77\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"前五大供应商采购占比\",\"raw_value\":\"35.94\",\"value\":\"35.94\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"第一大供应商采购\",\"raw_value\":\"10,835,828.85\",\"value\":\"10835828.85\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"第一大供应商采购占比\",\"raw_value\":\"20.99\",\"value\":\"20.99\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+      "response_payload": {
+        "repaired_facts": [
+          {
+            "fact_id": "bs-1",
+            "text": "公司长期深耕于工程咨询服务业，所处行业为工程咨询服务业，属于技术密集型行业；业务以工程咨询专业技术服务及全过程一体化咨询服务为主。报告期内，公司的主营业务、主要产品及服务较为稳定，公司商业模式未发生重大变化。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sc-up-1",
+            "text": "公司日常经营过程中产生的主要成本包括职工薪酬、外协服务费、经营场地费、差旅及办公费等；2025年前五大供应商合计采购18,545,707.77元，占年度采购35.94%；第一大供应商苏州诚来智投资管理有限公司采购10,835,828.85元，占20.99%，披露为关联关系。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "前五大供应商采购合计",
+                "raw_value": "18,545,707.77",
+                "value": "18545707.77",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "前五大供应商采购占比",
+                "raw_value": "35.94",
+                "value": "35.94",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "第一大供应商采购",
+                "raw_value": "10,835,828.85",
+                "value": "10835828.85",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "第一大供应商采购占比",
+                "raw_value": "20.99",
+                "value": "20.99",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 7588,
+        "output_tokens": 1415,
+        "total_tokens": 9003
+      }
+    },
+    {
+      "request_id": "bp-work-0788cd766ed03e2101c554ec:workpaper:repair-verify",
+      "purpose": "verify_profile_workpaper_repair",
+      "request_hash": "2a247cbced97d256618e1ae742d4551fdb367aacc5deb4fe83b9de55b11e136d",
+      "response_hash": "a325875e8ad3a42999bc4df8723c2b33356488d8716c0e9c6ed932475ad2649d",
+      "finish_reason": "stop",
+      "source_label": "scorpio:grok-4.7",
+      "model": "grok-4.7",
+      "selected_profile": "semantic_extraction__scorpio_grok",
+      "logical_profile": "semantic_extraction__scorpio_grok",
+      "reasoning_effort": "high",
+      "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+      "contract_status": "accepted",
+      "raw_content": "{\"checked_fact_ids\":[\"bs-1\",\"sc-up-1\"],\"checks\":[{\"fact_id\":\"bs-1\",\"accepted\":true,\"evidence_ids\":[\"source-0001\"],\"explanation\":\"source-0001明确公司所处行业为工程咨询服务业，并称该行业属于技术密集型行业；同时支持工程咨询专业技术服务及全过程一体化咨询服务、报告期内主营业务和主要产品及服务较为稳定、商业模式未发生重大变化。修复后将技术密集型恢复为行业属性而非行业名称，主体按报告口径公司归为合并集团、期间为2025年度，已实质纠正主体归类错误。\"},{\"fact_id\":\"sc-up-1\",\"accepted\":true,\"evidence_ids\":[\"source-0001\",\"source-0008\"],\"explanation\":\"主要成本类别职工薪酬、外协服务费、经营场地费、差旅及办公费等出自source-0001，现已补引。source-0008供应商表列明前五名合计采购18,545,707.77元、年度采购占比35.94%，序号1苏州诚来智投资管理有限公司采购10,835,828.85元、占比20.99%且关联关系为是；金额、占比分母、单位及关联披露均与原文一致，主体和2025年度期间正确。\"}]}",
+      "response_payload": {
+        "checked_fact_ids": [
+          "bs-1",
+          "sc-up-1"
+        ],
+        "checks": [
+          {
+            "fact_id": "bs-1",
+            "accepted": true,
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "explanation": "source-0001明确公司所处行业为工程咨询服务业，并称该行业属于技术密集型行业；同时支持工程咨询专业技术服务及全过程一体化咨询服务、报告期内主营业务和主要产品及服务较为稳定、商业模式未发生重大变化。修复后将技术密集型恢复为行业属性而非行业名称，主体按报告口径公司归为合并集团、期间为2025年度，已实质纠正主体归类错误。"
+          },
+          {
+            "fact_id": "sc-up-1",
+            "accepted": true,
+            "evidence_ids": [
+              "source-0001",
+              "source-0008"
+            ],
+            "explanation": "主要成本类别职工薪酬、外协服务费、经营场地费、差旅及办公费等出自source-0001，现已补引。source-0008供应商表列明前五名合计采购18,545,707.77元、年度采购占比35.94%，序号1苏州诚来智投资管理有限公司采购10,835,828.85元、占比20.99%且关联关系为是；金额、占比分母、单位及关联披露均与原文一致，主体和2025年度期间正确。"
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 8943,
+        "output_tokens": 292,
+        "total_tokens": 11918
+      }
+    }
+  ]
+}

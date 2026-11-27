@@ -1,0 +1,57 @@
+{
+  "task": "6.FU",
+  "state": "engineering_handoff_complete_real_observation_pending_specific_human_approval",
+  "review": {
+    "new_application_P1_P2": 0,
+    "application_changes": [],
+    "B_ready_and_source_hashes_verified": 91,
+    "actual_gateway_contract_stages": 3,
+    "controlled_original_owner_cases": 3,
+    "related_tests_passed": 79,
+    "OpenSpec_strict": "passed",
+    "new_local_links_checked": 12,
+    "new_model_effect_assessed": false
+  },
+  "existing_dirty_paths": 20,
+  "own_staged_dirty_document_blocks_only": {
+    "docs/development/company_profile_acceptance_program.md": "1347278bdd5bcfe5aaec98b35f56a709b9b36cecdcf010d2255205e6b18c4ff4",
+    "docs/development/company_profile_delivery_plan.md": "4d1cfdcce26b7b54b51a2847d2b5c36405d0915244d83bd468cab20f0d90cccf",
+    "openspec/changes/restore-company-profile-llm-led-generalization/proposal.md": "5b676b1472082c6cd53630c8cfefe0cbce3f777e0529bb3d31caab0496b16b35",
+    "openspec/changes/restore-company-profile-llm-led-generalization/design.md": "ce431783775b6fb61f7f793cbfd1b0344b6f77059f2de1de8646a56db2bf4dbf",
+    "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md": "5b62434f9359f62cc06a6fb480c8fa12a3c46db2491427452ed56741a8ee2146",
+    "openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md": "813ca82fc16711c93a9bc94362fe0e149775b03422c69020d37398d74557e476"
+  },
+  "original_research_root_and_private_config_unchanged": 397,
+  "original_planned_3_authority_states_preserved": true,
+  "six_parent_records_retained_for_actual_execution": true,
+  "new_real_clients": 0,
+  "new_model_sends": 0,
+  "new_live_HTTP_window": false,
+  "production_authorization": "not_authorized",
+  "A_cleanup": {
+    "root": "/home/python/Quote/data/QuoteBak/company-profile-6fu-a-zYLtFDor",
+    "files_removed": 24,
+    "logical_bytes_removed": 4578442,
+    "root_absent": true
+  },
+  "B_cleanup": {
+    "state": "completed",
+    "root": "/home/python/Quote/data/QuoteBak/company-profile-6fu-b-BiUg3JVN",
+    "files_deleted": 115,
+    "logical_bytes_deleted": 17454282,
+    "retained": [
+      "review_operator.py",
+      "three original planned task files",
+      "six original parent records",
+      "b-* compact proof and reproduction scripts"
+    ],
+    "A_parallel_temp_untouched": true,
+    "main_research_and_sources_untouched": true,
+    "new_real_client_constructions": 0,
+    "new_real_sends": 0
+  },
+  "total_files_removed": 139,
+  "total_logical_bytes_removed": 22032724,
+  "retained_use_and_cleanup_condition": "Three planned files and six exact parent records are needed to execute the concrete review package after approval; source PDFs/native cache stay in original owners. Do not redo unchanged preparation. Remove derived inputs only once no saved task/lineage needs them.",
+  "next_gate": "Specific three-company public-source transfer and cumulative budget question is pending. No real run may borrow closed old allowances."
+}

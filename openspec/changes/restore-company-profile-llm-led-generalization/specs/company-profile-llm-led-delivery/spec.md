@@ -220,6 +220,11 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 - **AND** supported ambiguous wording MAY retain unclear scope and a specific reason, while unsupported definite scope, false prose or a future conditional result presented as already realized MUST NOT be rescued by removing metrics or adding an uncertainty label
 - **AND** metric-only limitation requires support for the fact's own scope, period, qualifications, prose and evidence; program code MUST NOT infer that semantic support from reason-text patterns or matching field names, and frozen historical identities/results remain unchanged
 
+#### Scenario: One source distinguishes business lines, regions and customer categories
+- **WHEN** a source packet contains governing product/business, geographic or customer/sales-mode classifications, or a narrower operating/revenue row within a group report
+- **THEN** source review, repair and final verification MUST judge the asserted fact and each metric against its own local classification and object; a region or customer category alone MUST NOT establish an operating business segment, and the group heading MUST NOT turn a local operating fact or revenue row into the entire group total
+- **AND** supported source-native descriptions MAY remain with specific uncertainty when existing labels cannot represent their scope faithfully, without company-specific rules, invented normalized replacements or new mandatory fields; accepted corrections still require their own matching source-final response and existing independent restrictions remain separate
+
 #### Scenario: A changed fact has its own final after an older model metric limit
 - **WHEN** a current-draft recheck has its own accepted complete initial, repair and final source calls for the same report/sections/pages, and a non-inherited accepted revision binds the exact original and current fact-content hashes
 - **THEN** a prior model metric-only limitation bound to that exact old original hash MUST NOT be retargeted as a whole-fact defect on the newly source-verified changed content

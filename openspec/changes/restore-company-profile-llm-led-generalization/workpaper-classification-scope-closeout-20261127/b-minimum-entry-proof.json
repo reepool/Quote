@@ -1,0 +1,46 @@
+{
+  "state": "passed",
+  "aliases": [
+    {
+      "instrument_id": "601788.SH",
+      "old_asset_id": "asset_9ef66d1c8169474f0d374e4f2bb8dc47",
+      "resolved_asset_id": "asset_511fa14eb9498a0b9fea0f250cb66bba",
+      "document_version": "aa1f35cc252a1532cd7bf0d0a2f4938c28099b09dc02b4ad64b35e5fe37b3f2d",
+      "normal_owner": "register_business_profile_shared_annual_report_asset",
+      "state": "registered_metadata_only",
+      "rejected_identity_changes": [
+        "content_hash",
+        "source_announcement_id",
+        "published_at",
+        "report_period"
+      ],
+      "semantic_requests": 0
+    },
+    {
+      "instrument_id": "002736.SZ",
+      "old_asset_id": "asset_ccea71fb3a03e7cb62dd95338db20c29",
+      "resolved_asset_id": "asset_8cfbc5e555a50a1567377eb1e2c70252",
+      "document_version": "69e640cb99857943fd54921ea0b5f0ac0df00aae288aea93dce39041aa09beb5",
+      "normal_owner": "register_business_profile_shared_annual_report_asset",
+      "state": "registered_metadata_only",
+      "rejected_identity_changes": [
+        "content_hash",
+        "source_announcement_id",
+        "published_at",
+        "report_period"
+      ],
+      "semantic_requests": 0
+    }
+  ],
+  "raw_null": {
+    "normal_entry": "run_workpaper -> actual gateway -> normalize -> source bind",
+    "scripted_requests": 2,
+    "fact_retained": true,
+    "value": null,
+    "unchanged_raw_response": true,
+    "semantic_approval": false
+  },
+  "real_clients": 0,
+  "real_requests": 0,
+  "shared_config_changes": 0
+}

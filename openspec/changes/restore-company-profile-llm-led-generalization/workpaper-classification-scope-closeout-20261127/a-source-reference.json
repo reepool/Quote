@@ -1,0 +1,228 @@
+{
+  "task": "6.FU",
+  "state": "A_independent_source_first_reference_frozen_before_new_calls",
+  "risk_count": 4,
+  "positive_control_count": 6,
+  "cases": [
+    {
+      "instrument_id": "920003.BJ",
+      "work_id": "bp-work-0788cd766ed03e2101c554ec",
+      "report": {
+        "instrument_id": "920003.BJ",
+        "report_id": "asset_4be790b0218414e3166dea111c8c52b6",
+        "document_version": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-20T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "record_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-0788cd766ed03e2101c554ec.json",
+      "record_sha256": "863fcd266bc830c1284eb570044d64edf646eb445a71631c0f90b67886d47a72",
+      "old_review_policy": "company_profile_workpaper_review.v13",
+      "official_PDF": "data/filings/announcements/blobs/e5/e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101.pdf",
+      "original_PDF_sha256": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+      "A_original_PDF_reading_completed": true,
+      "risks": [
+        {
+          "fact_id": "ccm-2",
+          "current_raw_fact_sha256": "b0e2197a0ec8f50e842c4166d649675a907d1640efd03b9b5c35f639fb0c20bf",
+          "source_evidence_ids": [
+            "source-0007",
+            "source-0008"
+          ],
+          "source_section_paths": [
+            [
+              "第四节 管理层讨论与分析",
+              "境外资产占比较高的情况",
+              "2. 营业情况分析"
+            ],
+            [
+              "第四节 管理层讨论与分析",
+              "境外资产占比较高的情况",
+              "2. 营业情况分析"
+            ]
+          ],
+          "physical_pages": [
+            23,
+            24
+          ],
+          "source_semantics": "按产品表为工程造价/监理等，按区域表为江苏省内362444827.01元/98.09%、省外7047586.82元/1.91%；区域不是经营分部。",
+          "required_resolution": "保区域/公司期间的有源数及占比，撤错误经营分部确定标签；允许具体unclear，不强制同一替代枚举或补更多地区。"
+        }
+      ],
+      "positive_controls": [
+        {
+          "fact_id": "bs-1",
+          "current_raw_fact_sha256": "dfb7089402b27a36e0fafe4ba9c0875ca5118d8a7d41372e66685e0f9f9a2ddb",
+          "prior_independent_decision": {
+            "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-quality-closure-20261127/a-source-decisions.json",
+            "sha256": "94290ed7a788688033f0d89f7651c2d6bbb22e2d5d07fa792b78f91a75717339",
+            "sample_id": "S156"
+          },
+          "expected": "保实质主营/规模或收费机制及全部原正确限定，非所有复核意见绿灯才可交付。"
+        },
+        {
+          "fact_id": "rm-1",
+          "current_raw_fact_sha256": "fe1fc2ecd6aa86528af2a3a30a222e11ec7a67825f08da1bf42fe2da01e4179b",
+          "prior_independent_decision": {
+            "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-quality-closure-20261127/a-source-decisions.json",
+            "sha256": "94290ed7a788688033f0d89f7651c2d6bbb22e2d5d07fa792b78f91a75717339",
+            "sample_id": "S158"
+          },
+          "expected": "保实质主营/规模或收费机制及全部原正确限定，非所有复核意见绿灯才可交付。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600350.SH",
+      "work_id": "bp-work-48e5b38db9e2d9737d7a6c78",
+      "report": {
+        "instrument_id": "600350.SH",
+        "report_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-03T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "record_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-48e5b38db9e2d9737d7a6c78.json",
+      "record_sha256": "0e1ac61d276a45ee049c19458fb2c1ec3ac41aecc1c9b61fc19a9be6440eb2eb",
+      "old_review_policy": "company_profile_workpaper_review.v13",
+      "official_PDF": "data/filings/announcements/blobs/2c/2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059.pdf",
+      "original_PDF_sha256": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+      "A_original_PDF_reading_completed": true,
+      "risks": [
+        {
+          "fact_id": "op-01",
+          "current_raw_fact_sha256": "fe1bbbc0814e636484dc5bef523b579a11c948187c6697aa21ef45cc2c53a29d",
+          "source_evidence_ids": [
+            "source-0005"
+          ],
+          "source_section_paths": [
+            [
+              "第三节 管理层讨论与分析",
+              "三、经营情况讨论与分析"
+            ]
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_semantics": "路桥运营板块段落中的救援/通行率99.54%及收费站托管服务，不是所有集团业务的统一运营指标。",
+          "required_resolution": "独立核事实层主体，即使原metric已经隔离也不能默认为事实正确；修至路桥范围或具体unclear，不能只再次隐藏metric后保错误确定集团范围。"
+        },
+        {
+          "fact_id": "sm-12",
+          "current_raw_fact_sha256": "2a896714deae169fc01c1aa2ff0ae5b53948867904561c6d356e500c0d577e08",
+          "source_evidence_ids": [
+            "source-0016"
+          ],
+          "source_section_paths": [
+            [
+              "第八节 财务报告",
+              "主营业务"
+            ]
+          ],
+          "physical_pages": [
+            273
+          ],
+          "source_semantics": "2025其他业务收入合计891806452.78元，其中租赁185065717.54元，其他706740735.24元；租赁为明确较窄行，非全部集团营收。",
+          "required_resolution": "有源描述/原指标0保留，原指标1独立核较窄业务口径，纠正或局部限制；不能借集团表头把全部指标主体复制为集团整体，不能整条丢正确描述来算通过。"
+        }
+      ],
+      "positive_controls": [
+        {
+          "fact_id": "bs-01",
+          "current_raw_fact_sha256": "bbe923d126b01f3a5c5dd9a6fbbbe591e587976a94cb72e52772957c7918cf21",
+          "prior_independent_decision": {
+            "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-quality-closure-20261127/a-source-decisions.json",
+            "sha256": "94290ed7a788688033f0d89f7651c2d6bbb22e2d5d07fa792b78f91a75717339",
+            "sample_id": "S079"
+          },
+          "expected": "保实质主营/规模或收费机制及全部原正确限定，非所有复核意见绿灯才可交付。"
+        },
+        {
+          "fact_id": "sm-01",
+          "current_raw_fact_sha256": "995b56fced041c01e6fc08ab6c7f7dcd99f22ec1119a73349e4683aa0df4c808",
+          "prior_independent_decision": {
+            "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-quality-closure-20261127/a-source-decisions.json",
+            "sha256": "94290ed7a788688033f0d89f7651c2d6bbb22e2d5d07fa792b78f91a75717339",
+            "sample_id": "S082"
+          },
+          "expected": "保实质主营/规模或收费机制及全部原正确限定，非所有复核意见绿灯才可交付。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600704.SH",
+      "work_id": "bp-work-e53470a4bfe65c83d9a82b89",
+      "report": {
+        "instrument_id": "600704.SH",
+        "report_id": "asset_195752e3df7d07f8addfe080f48b9b64",
+        "document_version": "be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "record_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-e53470a4bfe65c83d9a82b89.json",
+      "record_sha256": "ad57cc52815437c2b6a679f89194c56b18af9e81204501b1d724db9c05cacc27",
+      "old_review_policy": "company_profile_workpaper_review.v13",
+      "official_PDF": "data/filings/announcements/blobs/be/be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd.pdf",
+      "original_PDF_sha256": "be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd",
+      "A_original_PDF_reading_completed": true,
+      "risks": [
+        {
+          "fact_id": "F-CC-01",
+          "current_raw_fact_sha256": "3f2c82b29f99a5634d0d49b69be9d82edf783de255842f785251a8da003bdcf2",
+          "source_evidence_ids": [
+            "source-0011",
+            "source-0014"
+          ],
+          "source_section_paths": [
+            [
+              "第三节 管理层讨论与分析",
+              "五、报告期内主要经营情况",
+              "(一) 主营业务分析"
+            ],
+            [
+              "第三节 管理层讨论与分析",
+              "主营业务分销售模式情况"
+            ]
+          ],
+          "physical_pages": [
+            21,
+            22
+          ],
+          "source_semantics": "主营业务分销售模式按企业/个人客户分类；不是经营分部。5423.67/540.96亿元数字及客户类别有源。",
+          "required_resolution": "独立核fact及metric分类轴，不能继续确定标为business_segment；保客户分类原文/数值和限定，或有具体原因的unclear/局部限用。不强制同一个替代枚举。"
+        }
+      ],
+      "positive_controls": [
+        {
+          "fact_id": "F-BS-01",
+          "current_raw_fact_sha256": "5c03645cc3aa1068d744c80b964fe4ff2cd2c52f7cc78c3f40f991db39b98c2c",
+          "prior_independent_decision": {
+            "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-quality-closure-20261127/a-source-decisions.json",
+            "sha256": "94290ed7a788688033f0d89f7651c2d6bbb22e2d5d07fa792b78f91a75717339",
+            "sample_id": "S091"
+          },
+          "expected": "保实质主营/规模或收费机制及全部原正确限定，非所有复核意见绿灯才可交付。"
+        },
+        {
+          "fact_id": "F-SM-01",
+          "current_raw_fact_sha256": "d6e2707687ee6d4e3c05b01c9100d25b6b3cb4bf631f659d85f4fcae6ea63017",
+          "prior_independent_decision": {
+            "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-quality-closure-20261127/a-source-decisions.json",
+            "sha256": "94290ed7a788688033f0d89f7651c2d6bbb22e2d5d07fa792b78f91a75717339",
+            "sample_id": "S094"
+          },
+          "expected": "保实质主营/规模或收费机制及全部原正确限定，非所有复核意见绿灯才可交付。"
+        }
+      ]
+    }
+  ],
+  "not_model_input": true,
+  "supplier_requests_at_freeze": 0,
+  "limits": [
+    "已见问题开发观察，不是独立未见准确率或正式S2成绩。",
+    "不以必须同一scope标签或补满可选字段判通过；按原文语义/主体现象和保真不确定独立判断。",
+    "新模型意见与继承A/旧模型保护分列，继承限制不能算本次检错收益。"
+  ]
+}

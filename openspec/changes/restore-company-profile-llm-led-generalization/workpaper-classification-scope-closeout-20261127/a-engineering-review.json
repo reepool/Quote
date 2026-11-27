@@ -1,0 +1,33 @@
+{
+  "task": "6.FU",
+  "state": "A_engineering_review_passed_pending_specific_real_run_approval",
+  "new_application_blockers": 0,
+  "application_source_changed": false,
+  "review_policy": "v14",
+  "previous_actual_policy": "v13",
+  "B_ready_sha256": "3ee68f9682e181ba1a1b99f956cbd931b88ed50404e8a1803cf6d4ecdc6251e9",
+  "B_exact_frozen_inputs_checked": 91,
+  "original_root_and_private_configuration_files_unchanged": 397,
+  "actual_schema_and_system_message_stages_checked": [
+    "review_profile_workpaper",
+    "repair_profile_workpaper",
+    "verify_profile_workpaper_repair"
+  ],
+  "controlled_full_original_TaskService_cases": 3,
+  "related_tests_passed": 79,
+  "new_real_clients": 0,
+  "new_supplier_calls": 0,
+  "independent_source_reference_sha256": "c8714523377754dabd84ab2401f4d086fbb49681303230ccbeffa01c51238533",
+  "why_another_real_observation_is_meaningful": "Four preserved mistakes were produced under v13; v14 already changed fact/metric scope and classification-axis review. Test this actual implemented delta once, rather than changing the same prompt again.",
+  "real_effect_target_count": 4,
+  "real_effect_measured": false,
+  "limits": [
+    "Scripted verdicts prove wiring/consumption, not new model comprehension.",
+    "No independent A safety restriction has been lifted and current39 API remains unchanged.",
+    "No new formal20 cohort, S3 or production authority."
+  ],
+  "review_nonblocking": [
+    "Population-wide accuracy is outside this known-case observation.",
+    "No extra classification fields or company-specific rules are required."
+  ]
+}

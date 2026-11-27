@@ -1,0 +1,625 @@
+{
+  "task": "6.FU",
+  "state": "planned_pending_A_freeze_and_specific_call_approval",
+  "entry": "execute_configured_task -> original CompanyProfileTaskService.review_batch -> original writer",
+  "application_delta": "none",
+  "expected_review_policy": "company_profile_workpaper_review.v14",
+  "baseline": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/a-baseline.json",
+  "baseline_sha256": "995888d1537e1d96222df47e38971c41e895523e65f13d03b257edf82e934427",
+  "output_root": "/home/python/Quote/data/research/company_profile_classification_scope_20261127",
+  "checkpoint_root": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127",
+  "cases": [
+    {
+      "instrument_id": "920003.BJ",
+      "current_work_id": "bp-work-0788cd766ed03e2101c554ec",
+      "parents": [
+        "bp-work-0788cd766ed03e2101c554ec",
+        "bp-work-3365870b26619438dab9801d"
+      ],
+      "current_record_sha256": "863fcd266bc830c1284eb570044d64edf646eb445a71631c0f90b67886d47a72",
+      "old_review_policy": "company_profile_workpaper_review.v13",
+      "original_author": {
+        "request_id": "bp-work-3365870b26619438dab9801d:workpaper:extract",
+        "request_hash": "253a4bc71d8116ed15221c3008dfd953c0583b1d46a55bdc90adadba41bc3414",
+        "response_hash": "fc9b08b3a35c2af8e8bd9d4795f5b39445d902a851281f88a1855b86d79341d1",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek"
+      },
+      "source": {
+        "pdf": "/home/python/Quote/data/filings/announcements/blobs/e5/e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101.pdf",
+        "pdf_sha256": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+        "cache": "/home/python/Quote/data/filings/announcements/blobs/e5/derived/business_profile_pdfium_recovery.v4/e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101_57e1dd4f16ef40ff.json.gz",
+        "cache_sha256": "10e6172cc5568ec64b9c6866ecc9df1cd91d9e708745989614277a0fc48c90c9",
+        "native_pages": 174
+      },
+      "resolved_asset_id": "asset_4be790b0218414e3166dea111c8c52b6",
+      "original_asset_id": "asset_4be790b0218414e3166dea111c8c52b6",
+      "same_document_alias": false,
+      "current_fact_count": 23,
+      "facts": [
+        {
+          "fact_id": "bs-1",
+          "element": "business_structure",
+          "fact_sha256": "dfb7089402b27a36e0fafe4ba9c0875ca5118d8a7d41372e66685e0f9f9a2ddb"
+        },
+        {
+          "fact_id": "ps-1",
+          "element": "products_services",
+          "fact_sha256": "c2396de81288543366e47d4f0c0b291718050f4fa4d47e88b8a4a6bbeb2a7287"
+        },
+        {
+          "fact_id": "rm-1",
+          "element": "revenue_model",
+          "fact_sha256": "fe1fc2ecd6aa86528af2a3a30a222e11ec7a67825f08da1bf42fe2da01e4179b"
+        },
+        {
+          "fact_id": "sm-1",
+          "element": "scale_and_mix",
+          "fact_sha256": "fd93779aa0cdf4ef66a993dddb643447e053e26a039945ec054de477953caee9"
+        },
+        {
+          "fact_id": "sm-2",
+          "element": "scale_and_mix",
+          "fact_sha256": "11de2d2559efe3b356c9fda9f23c56b70f6fec8a20267da1a93ea17f596dc2ab"
+        },
+        {
+          "fact_id": "sm-3",
+          "element": "scale_and_mix",
+          "fact_sha256": "8b9e4535fb75ae0090eaaa130367ce9ce7233b8197f86e34c9411af36d5b5627"
+        },
+        {
+          "fact_id": "sm-4",
+          "element": "scale_and_mix",
+          "fact_sha256": "bfcdae44c4a4f36439b28235384fa7f8b17e33bf61d7aed0fb0cd55d2d18bf6c"
+        },
+        {
+          "fact_id": "sm-5",
+          "element": "scale_and_mix",
+          "fact_sha256": "413e36ac73d5692b18862293ea71c33220bdbc1155db5c891a7e20b4d70ec5e9"
+        },
+        {
+          "fact_id": "sm-6",
+          "element": "scale_and_mix",
+          "fact_sha256": "0e578b5bdba53be6d7e8dfcb01d61435e8b1d15d29e9ca7b8214147a8004234c"
+        },
+        {
+          "fact_id": "sm-7",
+          "element": "scale_and_mix",
+          "fact_sha256": "703e68d755b94fcc88b0474431cf3fda4f428786b19b98414cdd88e80d4ff90d"
+        },
+        {
+          "fact_id": "sm-8",
+          "element": "scale_and_mix",
+          "fact_sha256": "572261ff60002b00e30657f8c5782d2285a22a26f0d90ed63cad7340667d0870"
+        },
+        {
+          "fact_id": "oi-1",
+          "element": "operations_and_inputs",
+          "fact_sha256": "ffab98c51825dec89b1cde56f9042e56b6785eb77f022eec85abd7e0301078ff"
+        },
+        {
+          "fact_id": "ccm-1",
+          "element": "customers_channels_markets",
+          "fact_sha256": "266f674b020759c101ece2d879722433734b926372739120d16acc46e1ddcd81"
+        },
+        {
+          "fact_id": "ccm-2",
+          "element": "customers_channels_markets",
+          "fact_sha256": "b0e2197a0ec8f50e842c4166d649675a907d1640efd03b9b5c35f639fb0c20bf"
+        },
+        {
+          "fact_id": "ccm-3",
+          "element": "customers_channels_markets",
+          "fact_sha256": "d9874c2f3482496b66f00cc18088c4adb0d07c7d36fb29536a7ba5ae03c23e85"
+        },
+        {
+          "fact_id": "od-1",
+          "element": "operating_drivers",
+          "fact_sha256": "6ef8ac3b35677d8f43ddbe393b62a0490a6f371665c5ba2adbd3c3bc148e335a"
+        },
+        {
+          "fact_id": "od-3",
+          "element": "operating_drivers",
+          "fact_sha256": "d7d732ab8c5da3eb628e620fd13323aef90c79a548527024709e71c06249de40"
+        },
+        {
+          "fact_id": "mc-1",
+          "element": "material_changes",
+          "fact_sha256": "b38e96e45ba05815283199aec38edb3c795eee44b80555a60562cf012a4ca3a1"
+        },
+        {
+          "fact_id": "mc-2",
+          "element": "material_changes",
+          "fact_sha256": "2d2786a086a34bd8ac280aa6f44a73872538e27ea67c32821bee750d7e97d86a"
+        },
+        {
+          "fact_id": "sc-pos-1",
+          "element": "position",
+          "fact_sha256": "48f5e9dbb59b9bfb6dd3e0516c969d4ffe6c1c309978a51eec11411ed36c94a0"
+        },
+        {
+          "fact_id": "sc-up-1",
+          "element": "upstream_inputs",
+          "fact_sha256": "ef046ef3931587684bfbffceef9dd223e324531213ff19b94c4c7066db518a2e"
+        },
+        {
+          "fact_id": "sc-down-1",
+          "element": "downstream_customers",
+          "fact_sha256": "97e390e5716d225ea39d265a37d117fdc72c6571c82032cb355fc0e05d7b923e"
+        },
+        {
+          "fact_id": "cf-1",
+          "element": "company_features",
+          "fact_sha256": "10f85c46b5a5e8c2588e857f103a56aa0e6c97fa50222e4b81edb1f724e9306d"
+        }
+      ],
+      "authored_input_sha256": "88282c49db4822dff936225a620997f213455fbd6c96effe2168c410361f28e0",
+      "source_text_sha256": "2134a5986d82285e1252194cf49d73b92e5c3f08da7b8ce0f347d4b8605487e2",
+      "source_bytes": 26866,
+      "input_binding": {
+        "current_draft_sha256": "15ac7974112f116d8bf847b44b2a2ed9ca360cdde07b4526ce084dd37d9560b9",
+        "request_draft_sha256": "88282c49db4822dff936225a620997f213455fbd6c96effe2168c410361f28e0",
+        "source_packet_sha256": "f43182510343328d79fb4e7754ba5a76722a58567541892a37af3bccfcb82a2b"
+      },
+      "retained_receipts": [
+        "select_profile_sections",
+        "extract_profile_workpaper"
+      ],
+      "plan": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/920003.BJ/execution-plan.json",
+      "plan_sha256": "55f88a7714fb5ffa3df7fb74af9a97c901cd6641039f4ebe6a5dc4dadc6b4b0e"
+    },
+    {
+      "instrument_id": "600350.SH",
+      "current_work_id": "bp-work-48e5b38db9e2d9737d7a6c78",
+      "parents": [
+        "bp-work-48e5b38db9e2d9737d7a6c78",
+        "bp-work-f7e0f0a8da3af9c1e51ec585"
+      ],
+      "current_record_sha256": "0e1ac61d276a45ee049c19458fb2c1ec3ac41aecc1c9b61fc19a9be6440eb2eb",
+      "old_review_policy": "company_profile_workpaper_review.v13",
+      "original_author": {
+        "request_id": "bp-work-f7e0f0a8da3af9c1e51ec585:workpaper:extract",
+        "request_hash": "8c7d316df68285f5b3f30fb937158b0282cf4fa338ab0fd2a5c239df7bf15e63",
+        "response_hash": "ead621134fa09080e1e0b1319fa8b1b772abe841ad7d30d65f212d610fa53f21",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek"
+      },
+      "source": {
+        "pdf": "/home/python/Quote/data/filings/announcements/blobs/2c/2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059.pdf",
+        "pdf_sha256": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "cache": "/home/python/Quote/data/filings/announcements/blobs/2c/derived/business_profile_pdfium_recovery.v4/2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059_57e1dd4f16ef40ff.json.gz",
+        "cache_sha256": "d67d81201ae25dccbaee7480308d5bc7ebd7d383f6a4e418a14f0985f5ae5805",
+        "native_pages": 417
+      },
+      "resolved_asset_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+      "original_asset_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+      "same_document_alias": false,
+      "current_fact_count": 25,
+      "facts": [
+        {
+          "fact_id": "bs-01",
+          "element": "business_structure",
+          "fact_sha256": "bbe923d126b01f3a5c5dd9a6fbbbe591e587976a94cb72e52772957c7918cf21"
+        },
+        {
+          "fact_id": "bs-02",
+          "element": "business_structure",
+          "fact_sha256": "93c7d09ec8b14fa2cea4f9eb1958d2d862092f0e96f17022236734fa537c2229"
+        },
+        {
+          "fact_id": "bs-03",
+          "element": "business_structure",
+          "fact_sha256": "e1fe1d72196db39805c0fbc20a71e70079cd6227441bf3208cedf264e23d8455"
+        },
+        {
+          "fact_id": "ps-01",
+          "element": "products_services",
+          "fact_sha256": "6255cb3d5ee39e2e8b17beed414dddfdbfe09c37534585df2193804a19d6eff3"
+        },
+        {
+          "fact_id": "ps-02",
+          "element": "products_services",
+          "fact_sha256": "73d0feffb0973d454b0ed5e59598e36c7b33e7dd8f181889ee9007fd7d2bf79a"
+        },
+        {
+          "fact_id": "ps-03",
+          "element": "products_services",
+          "fact_sha256": "71ea3d4b406d94545212f57de36d148e7e4caffdbb59aa195a9d6ae4d6cf536f"
+        },
+        {
+          "fact_id": "rm-01",
+          "element": "revenue_model",
+          "fact_sha256": "929fb08024a4714c6974583d962cc5fbdd4886637c2b228494b857daefae7877"
+        },
+        {
+          "fact_id": "sm-01",
+          "element": "scale_and_mix",
+          "fact_sha256": "995b56fced041c01e6fc08ab6c7f7dcd99f22ec1119a73349e4683aa0df4c808"
+        },
+        {
+          "fact_id": "sm-02",
+          "element": "scale_and_mix",
+          "fact_sha256": "d99c8fc181f6de587e3b51d9e57baf8be807eb3dc5921d3cee39a122437091c0"
+        },
+        {
+          "fact_id": "sm-03",
+          "element": "scale_and_mix",
+          "fact_sha256": "7f50004a5001c853b71fccbecdd18db609fdc1dbf1d4cf199b4d4b4f202dbab6"
+        },
+        {
+          "fact_id": "sm-04",
+          "element": "scale_and_mix",
+          "fact_sha256": "f58f525d11176b6fc592ce8ef3171fc72b8140a76e2aefe3de55b837daa42e21"
+        },
+        {
+          "fact_id": "sm-05",
+          "element": "scale_and_mix",
+          "fact_sha256": "b71685e79e6fa2682a6bc19430f35aa5060135b4f3f7a6820d369869d3d09a96"
+        },
+        {
+          "fact_id": "sm-06",
+          "element": "scale_and_mix",
+          "fact_sha256": "a1fe25d0f0e3aa70649efa1c34c138745e0e255088ec795cc038c417ba7c087d"
+        },
+        {
+          "fact_id": "sm-07",
+          "element": "scale_and_mix",
+          "fact_sha256": "65cb4acf0ab3741cc0013dc33a1fd07d8f5b7d899f91e2f568ea9a9cad054e02"
+        },
+        {
+          "fact_id": "sm-08",
+          "element": "scale_and_mix",
+          "fact_sha256": "c682fb32c8fd9efc0c7e14b00f2ddbea7e88e5bf64964576c6222c07009c13ce"
+        },
+        {
+          "fact_id": "sm-09",
+          "element": "scale_and_mix",
+          "fact_sha256": "e2607b1d190842f1b9a8feb3dbdca2214ecd0f9ffe8ab7a4930c8ed4d74e7015"
+        },
+        {
+          "fact_id": "sm-10",
+          "element": "scale_and_mix",
+          "fact_sha256": "f2c964c81194b28043152eec0f60ec3364ef463d7a2c7abd68f800828da1e3c5"
+        },
+        {
+          "fact_id": "sm-11",
+          "element": "scale_and_mix",
+          "fact_sha256": "1e8c2a162b1fa0e72ca605850035616da36ff62f3019e7f78697bb7ca4ef60ee"
+        },
+        {
+          "fact_id": "sm-12",
+          "element": "scale_and_mix",
+          "fact_sha256": "2a896714deae169fc01c1aa2ff0ae5b53948867904561c6d356e500c0d577e08"
+        },
+        {
+          "fact_id": "op-01",
+          "element": "operations_and_inputs",
+          "fact_sha256": "fe1bbbc0814e636484dc5bef523b579a11c948187c6697aa21ef45cc2c53a29d"
+        },
+        {
+          "fact_id": "cm-01",
+          "element": "customers_channels_markets",
+          "fact_sha256": "260ef13ce3474282fd140824e77e126c1abbbc769e8856e30506674459b76cb2"
+        },
+        {
+          "fact_id": "od-01",
+          "element": "operating_drivers",
+          "fact_sha256": "373ab8d40534027dae2c97986b3f55227444978047621a1fb876080342aed521"
+        },
+        {
+          "fact_id": "mc-01",
+          "element": "material_changes",
+          "fact_sha256": "cb05314d7e9cc8f830f650b950d69b8ca8cabfd7fb461b3a9dc90e530c2e72c2"
+        },
+        {
+          "fact_id": "sc-pos-01",
+          "element": "position",
+          "fact_sha256": "a4b1a639f4b6f66efb2cee7d55ab3243a33f5022d29e77774ffb126df4a29e52"
+        },
+        {
+          "fact_id": "sc-down-01",
+          "element": "downstream_customers",
+          "fact_sha256": "e1df85aaf7fdc18bb9a904fb7d3864a575b0b56d41a27e8eb1775983fd6458d1"
+        }
+      ],
+      "authored_input_sha256": "555028039843ce24c72c8066ae34e08d5b4a47b0002b379712473eea9eaa942a",
+      "source_text_sha256": "e502dc9e7a46025144395b6195e2d49f108c3f5d3c6c78b22c576df278fc26fb",
+      "source_bytes": 56722,
+      "input_binding": {
+        "current_draft_sha256": "67282d7d91d47fdf21497d671c9e65b7ca05cf793eb77883df2d5c516328dabc",
+        "request_draft_sha256": "555028039843ce24c72c8066ae34e08d5b4a47b0002b379712473eea9eaa942a",
+        "source_packet_sha256": "9e530899c73fb0f0f509786c7731648556a43e9069adfe80decb4f17e6bc9fb2"
+      },
+      "retained_receipts": [
+        "select_profile_sections",
+        "extract_profile_workpaper"
+      ],
+      "plan": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/600350.SH/execution-plan.json",
+      "plan_sha256": "0d8b50f0bd845795616ca144057831d41a9338ea310e89c26c90d07f0dbc43ee"
+    },
+    {
+      "instrument_id": "600704.SH",
+      "current_work_id": "bp-work-e53470a4bfe65c83d9a82b89",
+      "parents": [
+        "bp-work-e53470a4bfe65c83d9a82b89",
+        "bp-work-b37054c9acc8953c37d6a3fa"
+      ],
+      "current_record_sha256": "ad57cc52815437c2b6a679f89194c56b18af9e81204501b1d724db9c05cacc27",
+      "old_review_policy": "company_profile_workpaper_review.v13",
+      "original_author": {
+        "request_id": "bp-work-b37054c9acc8953c37d6a3fa:workpaper:extract",
+        "request_hash": "959752617125fbfd077817e387465017cf951da7fe76ce0894607770bf1bbd6d",
+        "response_hash": "c4b215345e381c006ddbd7b35311c30e6b7ac839c845157eae8df2d59049e6b5",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek"
+      },
+      "source": {
+        "pdf": "/home/python/Quote/data/filings/announcements/blobs/be/be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd.pdf",
+        "pdf_sha256": "be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd",
+        "cache": "/home/python/Quote/data/filings/announcements/blobs/be/derived/business_profile_pdfium_recovery.v4/be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd_57e1dd4f16ef40ff.json.gz",
+        "cache_sha256": "ab29424351eb0de46bb038ec578e397c126d9c84053026682e9926c3c37b27a2",
+        "native_pages": 315
+      },
+      "resolved_asset_id": "asset_195752e3df7d07f8addfe080f48b9b64",
+      "original_asset_id": "asset_195752e3df7d07f8addfe080f48b9b64",
+      "same_document_alias": false,
+      "current_fact_count": 27,
+      "facts": [
+        {
+          "fact_id": "F-BS-01",
+          "element": "business_structure",
+          "fact_sha256": "5c03645cc3aa1068d744c80b964fe4ff2cd2c52f7cc78c3f40f991db39b98c2c"
+        },
+        {
+          "fact_id": "F-PS-01",
+          "element": "products_services",
+          "fact_sha256": "2a4c06cc8b7f10ce8a4eeb5728160da00a29f81bcc8b28fa8681840de58104ef"
+        },
+        {
+          "fact_id": "F-PS-02",
+          "element": "products_services",
+          "fact_sha256": "679218bc24d9e61d8e91dde3f15e36118d9d08bbf5fc826f9b29385aa3f0f70f"
+        },
+        {
+          "fact_id": "F-PS-03",
+          "element": "products_services",
+          "fact_sha256": "800b5d8653ca238eb5464223c8e6ec1c165927a5c0031e0bc3d867fe052de701"
+        },
+        {
+          "fact_id": "F-PS-04",
+          "element": "products_services",
+          "fact_sha256": "205adffb00ad07dd0eb27a4bc43b0b3dc54fc87e9647f35ba1a480246552bbed"
+        },
+        {
+          "fact_id": "F-PS-05",
+          "element": "products_services",
+          "fact_sha256": "481d8a165c15647fc5cc6fcc089f332d9fd155e6646ec602a0858098b32958b3"
+        },
+        {
+          "fact_id": "F-PS-06",
+          "element": "products_services",
+          "fact_sha256": "af3f21273d2ec7d93f371b0dc0a2d5e04cff5e0a49a22fcf98d0d3219608d559"
+        },
+        {
+          "fact_id": "F-RM-01",
+          "element": "revenue_model",
+          "fact_sha256": "7c49b4d93d93fb0c508ff04154011eda19b992138a94bd1912705069e7c2150c"
+        },
+        {
+          "fact_id": "F-SM-01",
+          "element": "scale_and_mix",
+          "fact_sha256": "d6e2707687ee6d4e3c05b01c9100d25b6b3cb4bf631f659d85f4fcae6ea63017"
+        },
+        {
+          "fact_id": "F-SM-02",
+          "element": "scale_and_mix",
+          "fact_sha256": "18c194cb41cd80c329dadff11888a28664b4c6dc460c3a6f44036393c6d73056"
+        },
+        {
+          "fact_id": "F-SM-03",
+          "element": "scale_and_mix",
+          "fact_sha256": "77d13edce61b823ea3d6b3e6ef0cc4602af7985fbce2e7dc291431e2f53e042a"
+        },
+        {
+          "fact_id": "F-SM-04",
+          "element": "scale_and_mix",
+          "fact_sha256": "69a967da18c6f47c97b75e710b70db3779321510a1067f6122b76cb9f3ac27fd"
+        },
+        {
+          "fact_id": "review-add:FR-002",
+          "element": "scale_and_mix",
+          "fact_sha256": "a1f6772aebdf025ca181e46cac16cca368469f526d733323204937e9c109dc87"
+        },
+        {
+          "fact_id": "review-add:FR-003",
+          "element": "scale_and_mix",
+          "fact_sha256": "93aedcee75c36a254939593b3b5ea72620092c8d5060c6622dcb48245171bb5d"
+        },
+        {
+          "fact_id": "review-add:FR-004",
+          "element": "scale_and_mix",
+          "fact_sha256": "63532507046c334b9f2edcdceb37314779d60f4313caddcb70af28e6faff695d"
+        },
+        {
+          "fact_id": "F-OI-01",
+          "element": "operations_and_inputs",
+          "fact_sha256": "c3c747ac899efd9daf780c74ba633e57ea59fb80c8d10ffbe50f2f0a5be2275d"
+        },
+        {
+          "fact_id": "F-OI-02",
+          "element": "operations_and_inputs",
+          "fact_sha256": "c1c80c4d5ec8bc329928cd8a149afa69e86922606c38515deb4b4897205a8313"
+        },
+        {
+          "fact_id": "F-CC-01",
+          "element": "customers_channels_markets",
+          "fact_sha256": "3f2c82b29f99a5634d0d49b69be9d82edf783de255842f785251a8da003bdcf2"
+        },
+        {
+          "fact_id": "F-CC-02",
+          "element": "customers_channels_markets",
+          "fact_sha256": "afb530300399a5f4c9e7c89a0898aa6ab9566d7358c33cfa12d114ce28914a08"
+        },
+        {
+          "fact_id": "F-OD-01",
+          "element": "operating_drivers",
+          "fact_sha256": "107f161860eb482ad9c7ff453ae9d3313c7f3f371f97880b4560dfe6c37a9eee"
+        },
+        {
+          "fact_id": "F-OD-02",
+          "element": "operating_drivers",
+          "fact_sha256": "29a4654d2b705018decc8fb25a92d69a7efe9cca0108b4387397648dae4a9602"
+        },
+        {
+          "fact_id": "F-OD-03",
+          "element": "operating_drivers",
+          "fact_sha256": "8b2846c7826a7d42e8a4272e40b18e99df69f0b02854362ae3a30e59111d12d2"
+        },
+        {
+          "fact_id": "F-MC-01",
+          "element": "material_changes",
+          "fact_sha256": "ac8ec8aafedab38e17a892a8a5c1979958fdfc7c173f7650de6fd650a69355dc"
+        },
+        {
+          "fact_id": "F-MC-02",
+          "element": "material_changes",
+          "fact_sha256": "59c61398be0b4f7ec8b3376f9f545d8e760e4dd4686b6790cef59f04ab3840e5"
+        },
+        {
+          "fact_id": "F-SC-01",
+          "element": "position",
+          "fact_sha256": "9dd1035dcd3a3b1d7012ce119e371de331cdc8c6195c628ae48dc732d9802df1"
+        },
+        {
+          "fact_id": "F-SC-02",
+          "element": "upstream_inputs",
+          "fact_sha256": "a7557357745e525feb2b2f45d27529664b96ab0b82e913a6ca49020337654a98"
+        },
+        {
+          "fact_id": "F-SC-03",
+          "element": "downstream_customers",
+          "fact_sha256": "c9c4a150eb58a62b398fa4eb9e110938f09c2c2ee166f32f187bd25d235d74c6"
+        }
+      ],
+      "authored_input_sha256": "f801557cad5ddd022d4dc2acb70165ba569406e2a5f45f25fe38219b2f85f60f",
+      "source_text_sha256": "ee7c217a3574b633496256ca80d3bd9fd80423e5697bd50c0e8d3be8d5724ea5",
+      "source_bytes": 57186,
+      "input_binding": {
+        "current_draft_sha256": "5600ee7e25f8283aeea359da2bece180fb406dab48ea0714d371adfc930e992d",
+        "request_draft_sha256": "f801557cad5ddd022d4dc2acb70165ba569406e2a5f45f25fe38219b2f85f60f",
+        "source_packet_sha256": "96aa36d9d707f0d7be48846580915b814cbde04741294ed3fe43efdeaf9c153c"
+      },
+      "retained_receipts": [
+        "select_profile_sections",
+        "extract_profile_workpaper"
+      ],
+      "plan": "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/600704.SH/execution-plan.json",
+      "plan_sha256": "07ef5ad89dacf0e6f0676c5d6c9ec4b5b04feeee68c26421804993dc22a9bea3"
+    }
+  ],
+  "frozen_files": {
+    "/home/python/Quote/data/research/company_profile_classification_scope_20261127/company_profile_common_core.v1/bp-work-0788cd766ed03e2101c554ec.json": "863fcd266bc830c1284eb570044d64edf646eb445a71631c0f90b67886d47a72",
+    "/home/python/Quote/data/research/company_profile_classification_scope_20261127/company_profile_common_core.v1/bp-work-3365870b26619438dab9801d.json": "c4a58f719542037021c3e2c411670d89410f6519d9c48181fdb1f8b61b923139",
+    "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/920003.BJ/execution-plan.json": "55f88a7714fb5ffa3df7fb74af9a97c901cd6641039f4ebe6a5dc4dadc6b4b0e",
+    "/home/python/Quote/data/filings/announcements/blobs/e5/e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101.pdf": "e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101",
+    "/home/python/Quote/data/filings/announcements/blobs/e5/derived/business_profile_pdfium_recovery.v4/e5e982fe2f8f0df7d890deab20fb40236e367e107e023d4c5e0c09dbb9fb3101_57e1dd4f16ef40ff.json.gz": "10e6172cc5568ec64b9c6866ecc9df1cd91d9e708745989614277a0fc48c90c9",
+    "/home/python/Quote/data/research/company_profile_classification_scope_20261127/company_profile_common_core.v1/bp-work-48e5b38db9e2d9737d7a6c78.json": "0e1ac61d276a45ee049c19458fb2c1ec3ac41aecc1c9b61fc19a9be6440eb2eb",
+    "/home/python/Quote/data/research/company_profile_classification_scope_20261127/company_profile_common_core.v1/bp-work-f7e0f0a8da3af9c1e51ec585.json": "f6e526cfc4e6d663eaccd05b8348dd07f023e1a5b9279a43ed46fe701f1f2865",
+    "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/600350.SH/execution-plan.json": "0d8b50f0bd845795616ca144057831d41a9338ea310e89c26c90d07f0dbc43ee",
+    "/home/python/Quote/data/filings/announcements/blobs/2c/2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059.pdf": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+    "/home/python/Quote/data/filings/announcements/blobs/2c/derived/business_profile_pdfium_recovery.v4/2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059_57e1dd4f16ef40ff.json.gz": "d67d81201ae25dccbaee7480308d5bc7ebd7d383f6a4e418a14f0985f5ae5805",
+    "/home/python/Quote/data/research/company_profile_classification_scope_20261127/company_profile_common_core.v1/bp-work-e53470a4bfe65c83d9a82b89.json": "ad57cc52815437c2b6a679f89194c56b18af9e81204501b1d724db9c05cacc27",
+    "/home/python/Quote/data/research/company_profile_classification_scope_20261127/company_profile_common_core.v1/bp-work-b37054c9acc8953c37d6a3fa.json": "b67e4edfa4e449d52b2a23d491664672d384a0b520baf57b42c09ff5b04e1b7b",
+    "/home/python/Quote/data/checkpoints/company_profile_classification_scope_20261127/600704.SH/execution-plan.json": "07ef5ad89dacf0e6f0676c5d6c9ec4b5b04feeee68c26421804993dc22a9bea3",
+    "/home/python/Quote/data/filings/announcements/blobs/be/be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd.pdf": "be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd",
+    "/home/python/Quote/data/filings/announcements/blobs/be/derived/business_profile_pdfium_recovery.v4/be60087b5142bb9ce95fac4987c0833cb44d6f6133a8a6dcc89391c6f72f3ccd_57e1dd4f16ef40ff.json.gz": "ab29424351eb0de46bb038ec578e397c126d9c84053026682e9926c3c37b27a2",
+    "/home/python/Quote/research/company_profile/source_review.py": "4da6bcb7b1aa1be459cb1b232df59a65acef535afc8b8593d8852f26ebe02bf9",
+    "/home/python/Quote/research/company_profile/segment_financial_research.py": "1c0e27469a670e68fb289b4ad3dd86e643189c3874186f724c34f763e04a8d1f",
+    "/home/python/Quote/research/company_profile/models.py": "e85e4bd785ad698b814b84ecb69cba750f118a37140775d596fe01c3e12e2a2b",
+    "/home/python/Quote/research/company_profile/material_input_research.py": "1e903edfe38d1b0d569299436e59a150ca909570de5ac14c496630831d4d37ab",
+    "/home/python/Quote/research/company_profile/shadow_evidence.py": "dc580e45feb9eb55b63e0bea608fe63c4f50bef0e8553eb0ba879da88602970b",
+    "/home/python/Quote/research/company_profile/workpaper_delivery.py": "7b6f828fff5a2cba3d993d6bc9422e263fdb4b5c1ee8a33df03eb1df04ab7803",
+    "/home/python/Quote/research/company_profile/counterparty_research.py": "83a3779d2e6c044acfe3f4e560b59b4a8d631bdcc03af8e8a4b686962b17fd83",
+    "/home/python/Quote/research/company_profile/candidate_registry.py": "c782e7fb85379e07b464a1d90fdbf1b0ab527df287376a9091d2d7b00e0473c4",
+    "/home/python/Quote/research/company_profile/projection.py": "504f8446256d157219e1d21ce35474b323f3c625a799d5f0a22809d3e656536c",
+    "/home/python/Quote/research/company_profile/stage5_benchmark.py": "c7cc313671af27e7c66687faf8ff8e774a993c47dd7fd97b2dbf83833d27290c",
+    "/home/python/Quote/research/company_profile/stage5_service.py": "e53776bfe200ab3341f88d22207a41508020b6867ef03c3312ec9ec250957b11",
+    "/home/python/Quote/research/company_profile/workpaper_metric_format.py": "99722cd5938818f73ba3bb093e76965c15d1662f27d5f12a4df89152a1896bec",
+    "/home/python/Quote/research/company_profile/http_tasks.py": "784461fb4e1fd142faf55f47e38d320e20b453878e42c1bb0a289d94bb5bc440",
+    "/home/python/Quote/research/company_profile/operator_closure.py": "529dd42b014449c0ac20c0e5be3180c8c21b4f9df3cb509d5334fe65bb0232dd",
+    "/home/python/Quote/research/company_profile/live_plan.py": "12b442cd3334e65d4de050daa70043e02b2cb9271b0b90708be36fdd8e0dd856",
+    "/home/python/Quote/research/company_profile/publication.py": "d2c43d7a6199f0fbab64915beec8768a65c11df7d67d6615b25bff76300c6f36",
+    "/home/python/Quote/research/company_profile/workpaper.py": "fa1699a5266a90c4225f793ca3ceb4ce01d4232d4bbf358ef62b07f372203d2f",
+    "/home/python/Quote/research/company_profile/resource_probe.py": "760686a09cde4d618f2626a03113e2742306e885284c61fda11fb7c16c561216",
+    "/home/python/Quote/research/company_profile/m4_next_batch.py": "a23249872610f38d1294a9945478cacf609455bfd453790044268c3bd9dc565a",
+    "/home/python/Quote/research/company_profile/contracts.py": "bd6d1d8d01e7698affc3801f231a66dd72be849e6c7d59fbf49a4ca5768e789f",
+    "/home/python/Quote/research/company_profile/core_assessment_projection.py": "562a2c95c59b05aaa842d32b1eace6e39b89beaab2a2be00f73b2296eb008737",
+    "/home/python/Quote/research/company_profile/workpaper_enrichment.py": "4a8249bafe59b0986f50fa8ef2c27dbf371f539073eff1c002bb70266b6c70aa",
+    "/home/python/Quote/research/company_profile/workpaper_sections.py": "6e00325bb6c5bde12944150206aed3c1c7519ef8e2bd23ea199320a8f0af2c5f",
+    "/home/python/Quote/research/company_profile/reading_budget.py": "6713ca5d88c782709ed931c186d52a570689fa6884dc0fb7c98591c6456a1fe0",
+    "/home/python/Quote/research/company_profile/stage4_restricted_read.py": "f29e14ad0754dd42a0bd950171fb077ebaf7f7175aef12bd55771a82619ccbaf",
+    "/home/python/Quote/research/company_profile/shadow_batch.py": "155e54e72c43a841683833e0ec46135ebde8e2572a195284b87b6a23340e4792",
+    "/home/python/Quote/research/company_profile/stage5_adjudication.py": "0897c27651a83f86da877d3940c7b21af5ddcc06e92b0ca32ffad94752037773",
+    "/home/python/Quote/research/company_profile/task_entry.py": "211a4fa34baa45f8270735a0bf4b460a83cdbe2c2337febaf99d12b364791132",
+    "/home/python/Quote/research/company_profile/direct_reading.py": "abe8f222bb15eda8521fe7a8447aeb7d54cc0aa6848579764727a030aa0cc167",
+    "/home/python/Quote/research/company_profile/shadow_batch_audit.py": "04f12d98d3819bfc02c683b3620e83c753be66c6377610ae8076c5153157a2ad",
+    "/home/python/Quote/research/company_profile/saved_draft_input.py": "37f1e64aa048b17119acd843af7ca72d826179565aa7521ef71fb16cd761cbc9",
+    "/home/python/Quote/research/company_profile/stage5.py": "47de653324c80e1eb1d615e179c2818eafdf568abd328698e92459122244da0c",
+    "/home/python/Quote/research/company_profile/core_skeleton.py": "288c1e58ee1f4d94096a19bc5e27df516c49bc7a2caa6b3329414dd1756027bc",
+    "/home/python/Quote/research/company_profile/bounded_entry.py": "03b79a7a11ac325b60e870cda4ed226e870f617d0a2b64f0753d85e72e98f428",
+    "/home/python/Quote/research/company_profile/stage5_bundle.py": "008b8c7d4de24ce03a75b95fbf97c47b24663d5950f53600761206e6397921c8",
+    "/home/python/Quote/research/company_profile/execution.py": "8649d1c31e081e168994a7fe433fa0b1d41616ea2039b78449b99e96065e2267",
+    "/home/python/Quote/research/company_profile/legacy_retirement.py": "3e01e1a88369f866790e65a7c4b04a3e9e5e4480fc099eef55303a5e34386b0c",
+    "/home/python/Quote/research/company_profile/operating_quantity_research.py": "d2dfadb2a88a5c2267daea7fda53b2147c47af2c1fe43a8eaa96c147452a029d",
+    "/home/python/Quote/research/company_profile/reads.py": "609cd005a7e088ad2796bd430f93023ed9b127ea5718319aa695ec21f5d1021d",
+    "/home/python/Quote/research/company_profile/commodity_exposure.py": "15d4cbf467013c23bb65db1fe0d8b9a69f68f323abefe2b0ccd1786c3652b063",
+    "/home/python/Quote/research/company_profile/operations.py": "987ecefaab6546ea153b7723dd9ad93df6a3618f59ec88fa2d1d5dbf1902b164",
+    "/home/python/Quote/research/company_profile/annual_render.py": "3201db90e7c7c0a8860cd17278fac6192d6c779545007f2be69405d73f9cdada",
+    "/home/python/Quote/research/company_profile/workpaper_review.py": "e341cb30da0c6e6a4afa80363f8c771b9ebcda222f2d9f4dbaad0a97fb2d7e03",
+    "/home/python/Quote/research/company_profile/acceptance_policy.py": "d7b96d51401b7c4baac7c56db36d99ae3e5ffb8742c6cac4edc07a7d99776d5c",
+    "/home/python/Quote/research/company_profile/__init__.py": "41e5f0c5c3562e789053ce756fe342d1cb8b2c34f4049920eb246855bdbf1364",
+    "/home/python/Quote/research/company_profile/core_evidence_selection.py": "ec85df0ec7f0c89e13f6dd1bbeecd4b4838f3af587819a8c4014c95fe60f5f1d",
+    "/home/python/Quote/research/company_profile/report_interpretation.py": "775f138cb8e964aa554cbc6a1efb1d406beadd535c6f8a1a2b26f03e6e40a937",
+    "/home/python/Quote/research/company_profile/shadow_batch_service.py": "bc3be4bd327b49f4abbec98d83cbbd6108993f9ac1253ecf2b42620c0a5dec74",
+    "/home/python/Quote/research/company_profile/workpaper_llm.py": "4bfe9b8fe4a144fd61ee1b3681ee679210146537ae8fb38ca8d63e1a5e476104",
+    "/home/python/Quote/research/company_profile/live_run.py": "ee7208f40879a12f2e87270743475a91aaf178a7bc2ec979cb36e059b4fb1933",
+    "/home/python/Quote/research/company_profile/first_expansion.py": "a37fef38017082f82e71036d470462f08a92ed05324a4685b21572fef91bf661",
+    "/home/python/Quote/research/company_profile/report_wire.py": "aa1a48b0bc71e2633393a3b49731b4c9d914908ab32f7a98e1334ec9d88a74af",
+    "/home/python/Quote/research/company_profile/runtime.py": "0ef9958ce9775b8c94fd77db6045319edc87431450233ddcf1ca8fb6aba70e42",
+    "/home/python/Quote/research/company_profile/stage5_provider.py": "030824cbf89df8b27418560e1e9e91771a66dca55f12d4a642bca1bb03f0b460",
+    "/home/python/Quote/research/company_profile/workflow.py": "ea0a0318d2affc207ff43d588d3ed1b03a422b9cfcac0017053499e10046678f",
+    "/home/python/Quote/utils/llm/models.py": "3337c2936410cb4ac8ee9963ac1ce02caca2b0d2d318c9d17e9a7dee8d4eee84",
+    "/home/python/Quote/utils/llm/client.py": "fc44754a0a08a0df8a841f379a06d881ac229e5709136ee06a4029bc968daa85",
+    "/home/python/Quote/utils/llm/rate_limit.py": "edaecaee1df375dfab8e5f3289a364de318fa00c32c233e74788863f730d6cd3",
+    "/home/python/Quote/utils/llm/errors.py": "3625a8325fa761194086e47b161672bb12d1f45b20ab1331b234caa37e7415a6",
+    "/home/python/Quote/utils/llm/schema.py": "ec679ed8fec132b3e5e0f8598cca71b772628c73f341658f8c32f690268d6b35",
+    "/home/python/Quote/utils/llm/testing.py": "cca9b7c3ec6c09d20690f4b70b4cfbecc974992f09a8d1f82a9a28ae4e82971a",
+    "/home/python/Quote/utils/llm/__init__.py": "25a037dbccd41a9c9f2982061e658f7381d8bf79fdcdbc8abd6d5e1e1fe2ae70",
+    "/home/python/Quote/utils/llm/transport.py": "a28c0c0e8aa3dffd04347f707f19e2ec5eacba32f21cb4b8f5d782e4f14b974d",
+    "/home/python/Quote/utils/llm/budget.py": "791cbc2f7ee3d580042e286603c758aa488d094044186c7bdf7f5dc5ac0ea66c",
+    "/home/python/Quote/utils/llm/config.py": "5327f3d23be58c40eae147bae41ca31761e49ae48a34844dacdab9411944289a",
+    "/home/python/Quote/.env": "cdaff5c614ae2269e98f35527d70bc6c141b5f78418f21f020623135c00d907a",
+    "/home/python/Quote/config/10_research.json": "5276473312249bac77ec2f4aac74a181e9b3d5f4bed7a9c7e183e943093abb01",
+    "/home/python/Quote/config/13_llm.json": "7650f2960b036815a6c05649ca9caba7d518b73380e561e334db49d062d82233",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/review_operator.py": "8fcadcb249333e4b52b4ef5ee79ff44104a00fb209023f36e1ffecb0c26b431d"
+  },
+  "new_supplier_requests": 0,
+  "real_client_constructions": 0,
+  "network_preflight": "not performed; A must use authorized network environment after approval",
+  "group": {
+    "seconds": 12600,
+    "tokens": 3000000,
+    "physical_requests": 18,
+    "concurrency": 3,
+    "cost": "unknown",
+    "priced_cny_per_stock": "10",
+    "max_logical_per_stock": 3
+  },
+  "A_run_requirements": [
+    "explicit specific approval",
+    "independent PDF reference kept out of input",
+    "freeze exact authorized plans/code/source/credentials hash",
+    "group cumulative guard + stop policy before each real send"
+  ],
+  "old_8_errors_reused_evidence": "workpaper-three-source-review-observation-20261126/result.md"
+}

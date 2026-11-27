@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+当前[6.FU分类维度/主体口径合并卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-classification-scope-closeout-card.md)工程已就绪：三股4旧错来自v13，v14已有针对性改动；B三非空原TaskService闭环/79相关测试及已修正常入口核查通过，A独核实际系统消息/Schema、4风险6正控、91输入及397原件。没有新增应用P1/P2，不为代码量重复改提示或版本；三份planned真实计划及6必要父链保留，具体累计预算确认已询问，当前0新真实调用，4目标新检错效果未评。A实际运行/独核和安全发布仍待授权及结果，不自动新20/S3/生产，当前39/旧分/人工保护不变；B本人临时物115文件清，A必要证据一套后清/Git先收工程段，详[result](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/result.md)。
+
 每轮必读的优化方针（2026-11-27用户确认）：发卡和审核先执行[验收计划§4.3](company_profile_acceptance_program.md#43-评估完成与达标及失败驱动的优化方针2026-11-27起生效)及[A/B流程§3.1](ab_role_development_workflow.md#31-未达标后的有据优化与复验强制)。未达标接续卡必须绑定上轮具体差距、原因证据、代码/策略变化、预期改善和验证结果；有界复验前冻结版本，未改善则解释/纠偏或止损。达到固定标准后结束该阶段；没有有效变化不自动续派同类试跑，不把文档或重复测试数量当业务进展。前后清本人垃圾、原结果/旧分及付费/生产边界保持。
 
 2026-11-27[6.FS当前39股质量与交付收口完成](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-quality-closure-20261127/result.md)：A冻原103record/39股及178对象181指标抽样，162精确旧独判复用+16新读源后当前样本均有据；原作者169支持1错6未评2缺，模型审后对应178有据。全部25人工安全限制另核，涵11股14整条/11局部20指标均不外放，不能以样本支持推全稿100%或免人工。原reader/export/fresh及actual8000完整39相等、批量2.584秒；当前1094/1677、320活动缺项/61建议/44指标缺口保留，0新模型/应用修复或重启。结论为当前研究交付继续使用，后续由具体研究问题驱动补读，不追本卡尾项或开新正式组；旧质量/生产边界和清理/Git沿[卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-current-quality-closure-card.md)收口。

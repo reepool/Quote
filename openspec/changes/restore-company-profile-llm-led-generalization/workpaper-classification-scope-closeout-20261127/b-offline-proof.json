@@ -1,0 +1,82 @@
+{
+  "task": "6.FU",
+  "state": "engineering_ready_no_new_application_P1_P2",
+  "application_delta": "none",
+  "head": "2815b456abfed8b395419160b6f907dd3a5ce90a",
+  "current_review_policy": "company_profile_workpaper_review.v14",
+  "current_drafts_previous_policy": "v13",
+  "current_drafts_actual_facts": 75,
+  "three_nonempty_original_TaskService_results": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/b-direct-validation.json",
+  "payload_contracts": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/b-payload-contracts.json",
+  "actual_wire_source_and_draft_hashes_match_planned": true,
+  "actual_wire_schema_location": "first system message Schema JSON; v14 semantic instructions in second system message; response_format=json_object",
+  "direct_tests": {
+    "command": "source /home/python/Quote/scripts/quote_dev_env.sh\n/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_workpaper_fact_scope_review.py tests/unit/test_research/test_company_profile_review_metric_limits.py tests/unit/test_research/test_company_profile_current_recheck.py tests/unit/test_research/test_company_profile_raw_null_consumption.py --basetemp=/home/python/Quote/data/QuoteBak/company-profile-6fu-b-BiUg3JVN/pytest-direct",
+    "passed": 79,
+    "failed": 0,
+    "skipped": 0,
+    "warnings": 6,
+    "seconds": 165.28
+  },
+  "repaired_entry_dependency_proof": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/b-minimum-entry-proof.json",
+  "planned_task_authority_rejection": {
+    "cases": 3,
+    "client_constructions": 0
+  },
+  "prior_8_error_disposition": {
+    "already_repaired_4": [
+      {
+        "stock": "920006.BJ",
+        "fact_id": "F009",
+        "fact_sha256": "5b9f70b2756fa12f1b4019818d07bcd781b2418d8c23194a1ec17521ce38f436",
+        "own_true_final": true
+      },
+      {
+        "stock": "920006.BJ",
+        "fact_id": "F021",
+        "fact_sha256": "f6c890b38473297adf5330d66b813bc3a7431b0f7ec9bdfb0deeff1ba8bc6951",
+        "own_true_final": true
+      },
+      {
+        "stock": "600177.SH",
+        "fact_id": "F005",
+        "fact_sha256": "91528907fbe0a96b258658bd5eba966455201dcd301d354486ebbed6cc650811",
+        "own_true_final": true
+      },
+      {
+        "stock": "000039.SZ",
+        "fact_id": "f-023",
+        "fact_sha256": "63fb1da36523a4527b25872adc05ec87ecb7cbd7c921d8d01667e307efaa2256",
+        "own_true_final": true
+      }
+    ],
+    "evidence": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-three-source-review-observation-20261126/a-source-adjudication.json",
+    "sha256": "3b75ef44e18e15b0cf74577da6dd125fe8b3164c060425038e99efd36c1f6904",
+    "remaining_4": "current three v13 drafts; v14 delta already implemented; true effect pending authorized observation"
+  },
+  "first_local_evidence_failure": {
+    "kind": "B-only helper interface assumptions",
+    "details": [
+      "read service has no latest_records; inspect original writer records instead",
+      "ResearchStorageManager closes per connection context; no manager.close",
+      "actual shared profiles use json_object plus schema system message, not response_format.json_schema"
+    ],
+    "application_failure": false,
+    "real_client_constructions": 0,
+    "real_sends": 0,
+    "completed_controlled_920003_run_reused_without_new_transport": true
+  },
+  "protection": {
+    "original_files_checked": 397,
+    "drift": [],
+    "private_config_unchanged": true,
+    "application_files_unchanged": 65,
+    "no_service_changes": true,
+    "existing_dirty_files_not_written_by_B": 20
+  },
+  "authorization": "pending specific human approval; engineering ready is not send authority",
+  "new_real_clients": 0,
+  "new_real_sends": 0,
+  "source_probes": 0,
+  "model_effect": "not evaluated in this offline proof"
+}
