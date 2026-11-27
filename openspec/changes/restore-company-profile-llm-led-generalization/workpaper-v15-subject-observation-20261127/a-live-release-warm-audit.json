@@ -1,0 +1,8 @@
+{
+  "task": "6.FV",
+  "purpose": "One immediate repeated read to distinguish first-observed validation latency from steady repeated-read behavior; no original receipt overwritten.",
+  "http_status": 200,
+  "seconds": 2.8000842699984787,
+  "complete_profiles_equal_expected": 39,
+  "new_task_or_model_submissions": 0
+}

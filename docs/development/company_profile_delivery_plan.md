@@ -1,6 +1,6 @@
 # 公司画像交付路径与开发任务卡
 
-当前[6.FV v15主体索引单股验证](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-v15-subject-observation-card.md)已工程就绪：仅山东现稿25事实/24指标、3必要父链和原公开章节，检验已实现索引对op-01/sm-12两目标及3正控的效果；A核原位置/输入/版本和402原件，复用101+9有效工程证据，不重抽三家/39/新20或重跑旧测试。新具体预算已一次询问、当前0客户端/探针/发送，确认后直接原owner一次闭环；旧6.FU不续额，失败给策略结论，不自动v16或再堆同义提示。主39/旧分与生产边界不改，工程/实际分列，必要证据一套后清和隔离Git先收工程段，详细交接见workpaper-v15-subject-observation-20261127/result.md。
+当前[6.FV v15单股策略观察已收口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-v15-subject-observation-20261127/result.md)：用户确认后一次原初/修/终3物理/107381/0恢复/723.105秒unknown费用，索引/原25facts/3正控保持但两目标仍漏，0/2未达标；结束该同股索引/优先级策略，不自动v16/再加同义提示或续额。模型自主补的收入下降原因/建造服务同期比较有源，经A原PDF与自己的真实final后交研究；另1里程metadata保守限用不当错数收益，原两限制保持。主39=1097/1687、其余38完整不变，当前数据仍研究使用；真实失败、旧分/原件保持，有限Review/必要一套后清/Git同卡，不自动新正式组或生产。
 
 当前[6.FU分类维度/主体口径卡已收口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/result.md)：用户确认后真实三股10物理/272622/1恢复/767.607秒unknown费用，v14实际修正中诚/物产2个目标、山东2目标仍漏，额外cm-01修订有源。A独核3final/6正控，安全3后继主root39现1096/1683、其他36不变、actual39及三详情200相等；两未解安全限制继续。按验收§4.3原run封存后零调用实现v15主体审查索引/优先级，工程101有效并集+A9直接通过，不算2→4模型提升。当前不因一组已见观察宣称前瞻正式验收就绪；下一真实验证需针对这次新增策略及未解问题另有明确版本/预算，不追加旧窗/重抽三家/自动新20或生产。必要证据一套后清本人产物、保护旧分并隔离Git同卡。
 

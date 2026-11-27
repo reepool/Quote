@@ -1,0 +1,36 @@
+{
+  "task": "6.FV",
+  "state": "useful_source_supported_revenue_explanation_released_without_lifting_unresolved_target_limits",
+  "source_work_id": "bp-work-0e01b8dbe366f6c7d181fd7d",
+  "safe_work_id": "bp-work-5dd34b44ee0f10180cf07a8c",
+  "published_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-5dd34b44ee0f10180cf07a8c.json",
+  "published_sha256": "a7067b5ef39f3be37727742c09122ec8e756ac47f43ec480d3eb2580c38b0637",
+  "original_record_and_receipts_unchanged": true,
+  "before": {
+    "visible_objects": 24,
+    "visible_metrics": 22
+  },
+  "after": {
+    "visible_objects": 25,
+    "visible_metrics": 26
+  },
+  "current_companies": 39,
+  "current_visible_objects": 1097,
+  "current_visible_metrics": 1687,
+  "other38_complete_profiles_unchanged": true,
+  "independently_supported_new_fact": "review-add:f-revenue-decline-driver",
+  "new_visible_metrics_from_addition": 5,
+  "original_metric_newly_model_limited": [
+    "bs-02:metric2"
+  ],
+  "new_model_limit_is_not_confirmed_wrong_number": true,
+  "known_target_limits_lifted": 0,
+  "retained_original_limits": [
+    "op-01:source_only",
+    "sm-12:metric1"
+  ],
+  "new_negative_independent_safety_restrictions": 0,
+  "new_supplier_calls": 0,
+  "current_json": "data/research/company_profile_research_v1_20261123/600350-current-6fv-20261127.json",
+  "current_markdown": "data/research/company_profile_research_v1_20261123/600350-current-6fv-20261127.md"
+}

@@ -1,6 +1,6 @@
 # 公司画像分阶段验收计划
 
-2026-11-27当前[6.FV单股v15验证](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-v15-subject-observation-card.md)已离线就绪：只山东现稿25事实/24指标及原所选章节，2风险/3正确对照先冻；索引逐位置可核，复用101有效相关工程并集和A9回执，不改源码或重复测试。单份6000秒/100万账本/6物理含3恢复为新具体提案，确认已询问，当前0客户端/真实发送，不借6.FU余额。实际两目标改善尚未评，不改变旧分/现39/1096/1683或开放新正式组；执行和止损唯一见本卡，准备不当语义进展。
+2026-11-27[6.FV单股v15验证已结束](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-v15-subject-observation-20261127/result.md)：用户确认后3物理/107381供应商total账本/0恢复/723.105秒unknown费用，全200/stop无超时；完整25facts/24metric及索引真正使用，3正控未变，但op-01/sm-12仍无新finding，目标0/2未达标。本次不支持索引/优先级解决两项的假设，按卡结束该同股策略，不自动v16/再发或扩20。新增有源营收变动解释经真final和A独核交研究，另1原metric保守限用不当错数；原两安全限制继续，主39=1097/1687、其他38完整不变。旧6.FN/S2失败及95%/99%、S3未启/生产边界保持，新增解释不替代失败结论。
 
 2026-11-27[6.FU真实观察结束](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/result.md)：用户确认后三股各一次原current-draft闭环，v14新核实际解决4旧目标中2项（中诚地区/物产客户分类），山东op-01/sm-12仍漏，另cm-01范围/引用有据修订；10物理272622供应商total/账本、1恢复、767.607组秒、费用unknown，全部stop无网络超时。A独核3真final/6正控，原writer3安全后继入main39股1096/1683，其他36完整不变；山东两旧限制保留，不用A解除限制改写自动分。原v14run封存后，针对“已核ID齐但主体仍漏”做一次v15主体索引与核查优先级零调用优化，101有效相关用例并集及A9直接通过，新语义效果未评。本卡明确2/4改善、未全部达标，旧6.FN/S2失败及95%/99%/S3未启与生产边界保持，不追加同窗或自动新正式组。
 

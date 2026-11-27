@@ -1,0 +1,13 @@
+{
+  "task": "6.FV",
+  "authorized": true,
+  "human_reply": "确认",
+  "approval_reference": "human-20261127-6FV-Shandong-single-v15-source-review-approved",
+  "stocks": ["600350.SH"],
+  "scope": "One v15 current-draft source review closure for the saved public2025 Shandong annual report; original selected sections and all25 current authored facts, no reselection or extraction. Existing Scorpio/Grok grok-4.7 high initial/final; official DeepSeek at most one necessary combined repair.",
+  "budget": {"seconds": 6000, "conservative_tokens": 1000000, "physical_requests": 6, "recoveries": 3, "recoveries_per_logical": 1},
+  "timeouts": {"high_tier_physical_seconds": 1200, "high_tier_logical_seconds": 2450, "flash_physical_seconds": 600},
+  "priced_cost_cny_limit": "10",
+  "unpriced_cost": "unknown",
+  "limits": "Approved network environment only. Public selected chapters and derived drafts only; no additional company/window, recharge, shared configuration changes or production. Preserve earlier failures/scores and all unresolved independent restrictions."
+}

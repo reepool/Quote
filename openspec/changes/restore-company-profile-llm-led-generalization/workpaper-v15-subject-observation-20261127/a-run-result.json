@@ -1,0 +1,32 @@
+{
+  "task": "6.FV",
+  "result": {
+    "action": "review_batch",
+    "state": "completed",
+    "items": [
+      {
+        "instrument_id": "600350.SH",
+        "request_id": "6fv-600350-SH-20261127",
+        "state": "completed",
+        "work_id": "bp-work-0e01b8dbe366f6c7d181fd7d",
+        "review_status": "completed_with_open_findings"
+      }
+    ],
+    "stop_reason": null,
+    "remaining_request_ids": [],
+    "research_only": true,
+    "production_authorization": "not_authorized",
+    "execution_plan": {
+      "run_id": "6fv-600350-SH-20261127",
+      "plan_sha256": "56d0c4f0b2ec0aa67588397b183758c93cbdb09bae75645e70ed9d0c97b05bee",
+      "budget_path": "/home/python/Quote/data/checkpoints/company_profile_v15_subject_20261127/600350.SH/executions/6fv-600350-SH-20261127/budget.json",
+      "production_authorization": "not_authorized"
+    }
+  },
+  "elapsed_seconds": 723.1054743459972,
+  "physical_send_attempts": 3,
+  "frozen_inputs_unchanged": true,
+  "publication": "isolated_pending_A_source_review",
+  "cost": "unknown",
+  "automatic_new_window": false
+}

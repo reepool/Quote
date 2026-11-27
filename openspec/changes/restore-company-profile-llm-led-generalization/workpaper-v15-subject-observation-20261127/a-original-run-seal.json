@@ -1,0 +1,30 @@
+{
+  "task": "6.FV",
+  "state": "original_v15_execution_complete_and_sealed_before_publication",
+  "frozen_inputs_unchanged": 483,
+  "sealed_original_files": {
+    "data/checkpoints/company_profile_v15_subject_20261127/600350.SH/control/task_control.json": "bd6cffca7d532be3eaeaa021f60c7acd35d1713177451fc235bfce6022da804b",
+    "data/checkpoints/company_profile_v15_subject_20261127/600350.SH/execution-plan-authorized.json": "47fedb17b279a94584834b1e8e4bdbd38c05103915d61b7e11dfc1473b8d2b10",
+    "data/checkpoints/company_profile_v15_subject_20261127/600350.SH/execution-plan.json": "0b9ff1ac10ced9e4395027ecb5b5fa568ff2ed86fecef53f1dd3e68e41499388",
+    "data/checkpoints/company_profile_v15_subject_20261127/600350.SH/executions/6fv-600350-SH-20261127/budget.json": "d9722604e8f4005fd11b9ac85c0a02adf481771199180325f9c5dc377378cdd7",
+    "data/checkpoints/company_profile_v15_subject_20261127/600350.SH/executions/6fv-600350-SH-20261127/receipts/001.json": "ed4e66080b2604d243c7627db71d745827f1163fb1a0d52ebe8b4e50fd6686ba",
+    "data/checkpoints/company_profile_v15_subject_20261127/600350.SH/executions/6fv-600350-SH-20261127/receipts/002.json": "035c1b051c9779434d631e501c9042bdd0308f9121df5721a8d2506b6b6a6a3d",
+    "data/checkpoints/company_profile_v15_subject_20261127/600350.SH/executions/6fv-600350-SH-20261127/receipts/003.json": "bb63e6f0da7b8ebc5493b5bf442a439fb792a7a72186bb4f61a963f685d9322e",
+    "data/checkpoints/company_profile_v15_subject_20261127/600350.SH/executions/6fv-600350-SH-20261127/result.json": "f5b2fa811ee77bd6365bcfa61bbcf812899acfb68f3f984b02a0f5a5ebaf1d81",
+    "data/checkpoints/company_profile_v15_subject_20261127/600350.SH/executions/6fv-600350-SH-20261127/started.json": "cd178f4c30a9fcf2071016f47863bd83f2e9db3c05357d9b65ad73340371ee7a",
+    "data/checkpoints/company_profile_v15_subject_20261127/600350.SH/reports/company_profile_research_publication.v1.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "data/research/company_profile_v15_subject_20261127/company_profile_common_core.v1/bp-work-0e01b8dbe366f6c7d181fd7d.json": "ef891fadc0cc7d00c97147096f92ba460811b06c8c7b6ba6ffd794efcb6d50a8",
+    "data/research/company_profile_v15_subject_20261127/company_profile_common_core.v1/bp-work-1deffa57365ab12095599a8f.json": "9190ae2b833acf4118a90ece1d2f2ea2f0f5b2d33d89d43c0403625524fc6eb3",
+    "data/research/company_profile_v15_subject_20261127/company_profile_common_core.v1/bp-work-48e5b38db9e2d9737d7a6c78.json": "0e1ac61d276a45ee049c19458fb2c1ec3ac41aecc1c9b61fc19a9be6440eb2eb",
+    "data/research/company_profile_v15_subject_20261127/company_profile_common_core.v1/bp-work-f7e0f0a8da3af9c1e51ec585.json": "f6e526cfc4e6d663eaccd05b8348dd07f023e1a5b9279a43ed46fe701f1f2865",
+    "data/research/company_profile_v15_subject_20261127/company_profile_common_core.v1/checkpoints/bp-work-0e01b8dbe366f6c7d181fd7d.json": "35c2be7ddc1d26040301e210f77d9c0e581fffb745fb12f53da91338140553eb"
+  },
+  "physical_requests": 3,
+  "logical_requests": 3,
+  "charged_tokens": 107381,
+  "supplier_total_tokens": 107381,
+  "recoveries": 0,
+  "elapsed_seconds": 723.1054743459972,
+  "cost": "unknown",
+  "own_final_response_hash": "d0e006e3d41124114e9b47bbac03fadaf9bbc05fa8165a3600e0779a58d6936a"
+}

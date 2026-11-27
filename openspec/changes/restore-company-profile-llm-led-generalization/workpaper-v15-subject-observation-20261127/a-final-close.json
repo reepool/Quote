@@ -1,0 +1,80 @@
+{
+  "task": "6.FV",
+  "state": "assessment_complete_not_passed_strategy_observation_ended",
+  "result": {
+    "known_targets": 2,
+    "newly_resolved": 0,
+    "prior_target_restrictions_retained": 2,
+    "original25_author_facts_unchanged": true,
+    "positive_controls_unchanged": 3,
+    "useful_source_supported_explanation_added": 1,
+    "new_addition_metrics": 5,
+    "new_original_model_metric_limit": 1,
+    "new_limit_not_confirmed_wrong_number": true,
+    "current_companies": 39,
+    "visible_objects": 1097,
+    "visible_metrics": 1687,
+    "other38_complete_unchanged": true
+  },
+  "real_run": {
+    "physical_requests": 3,
+    "logical_requests": 3,
+    "supplier_total_tokens": 107381,
+    "recoveries": 0,
+    "elapsed_seconds": 723.1054743459972,
+    "cost": "unknown",
+    "closed_no_more_sends": true
+  },
+  "finite_review": {
+    "new_application_or_prompt_changes": false,
+    "new_code_P1_P2": 0,
+    "known_semantic_misses": [
+      "op-01",
+      "sm-12:metric1"
+    ],
+    "regression_reused": "Previous same-code101 effective cases and A9; no new tests/fullmock replay.",
+    "OpenSpec_strict": "passed",
+    "staged_diff_check": "passed",
+    "local_links_checked": 28,
+    "actual39_HTTP": 200,
+    "actual_Shandong_HTTP": 200,
+    "first39_seconds": 29.242386607002118,
+    "repeat39_seconds": 2.8000842699984787,
+    "nonblocking": "Individual mileage metadata remains conservatively model-limited, with original sourced wording available."
+  },
+  "original_run_files_unchanged": 15,
+  "original_research_private_config_except_navigation_unchanged": 401,
+  "preexisting_tracked_changes_preserved": 20,
+  "only_own_dirty_doc_blocks_staged_sha256": {
+    "docs/development/company_profile_acceptance_program.md": "ab8fd305ea35f9a5213ea0929d5ddb6695daa5b3983946e118fb47f5b6d7772b",
+    "docs/development/company_profile_delivery_plan.md": "8cc8a8aff0684cfea24a4d2b93a496176d2efd2d24a36a2681cedc2d151688f6",
+    "openspec/changes/restore-company-profile-llm-led-generalization/proposal.md": "f2913213cb8cc7e38071a7c3ee1366cdf763167ca0faf4077c38f6464d45d1e3",
+    "openspec/changes/restore-company-profile-llm-led-generalization/design.md": "585961289352298f14e55056ffbec8fcff5722ef631328c0c9d7209ccb8556a0",
+    "openspec/changes/restore-company-profile-llm-led-generalization/tasks.md": "7939b66464158935f3f8607a8af42b9c8ce403f13706fb95deaa941e79615101",
+    "openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md": "a1b2f0275dfde32ca0ebb9bb4c157ab544eeaa0f66c2f032b734069210891d33"
+  },
+  "service_restart": false,
+  "production_authorization": "not_authorized",
+  "A_cleanup": [
+    {
+      "owned_root": "/home/python/Quote/data/QuoteBak/company-profile-6fv-run-kTL8Wc41",
+      "files_removed": 1,
+      "logical_bytes_removed": 1384448,
+      "root_absent": true,
+      "scope": "Only own transient research working database, approved isolated copies, before/expected39, local helpers/direct-source reads and dirty-baseline copies."
+    },
+    {
+      "owned_root": "/home/python/Quote/data/QuoteBak/company-profile-6fv-close-sVoRNTqE",
+      "files_removed": 32,
+      "logical_bytes_removed": 26763091,
+      "root_absent": true,
+      "scope": "Only own transient research working database, approved isolated copies, before/expected39, local helpers/direct-source reads and dirty-baseline copies."
+    }
+  ],
+  "B_cleanup": "No temporary root/files or client created by B input/result audit.",
+  "followup_files_removed": 33,
+  "followup_logical_bytes_removed": 28147539,
+  "preparation_cleanup": "a-close.json:23 files4585086 bytes; excluded from followup totals, not counted twice.",
+  "retained": "One original provider wire/budget/authority/started/result set and runtime lineage; source PDF/cache remain unchanged. Safe successor/current single-stock human+JSON and exact A/B audits kept once.",
+  "terminal_decision": "Do not automatically create v16, repeat same-stock equivalent prompt/queue trials, extend allowance, add a company or start formal20/S3/production. Further route decisions require actual new cause/contract, not a new round name."
+}

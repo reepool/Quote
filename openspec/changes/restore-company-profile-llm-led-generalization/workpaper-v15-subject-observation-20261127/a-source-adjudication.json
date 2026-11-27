@@ -1,0 +1,61 @@
+{
+  "task": "6.FV",
+  "authority": "A independent original-PDF adjudication with exact compatible prior-source reuse",
+  "source_work_id": "bp-work-0e01b8dbe366f6c7d181fd7d",
+  "source_record": "data/research/company_profile_v15_subject_20261127/company_profile_common_core.v1/bp-work-0e01b8dbe366f6c7d181fd7d.json",
+  "source_record_sha256": "ef891fadc0cc7d00c97147096f92ba460811b06c8c7b6ba6ffd794efcb6d50a8",
+  "known_target_count": 2,
+  "newly_detected_targets": 0,
+  "substantively_resolved_targets": 0,
+  "result": "not_passed",
+  "unresolved": [
+    {
+      "fact_id": "op-01",
+      "source_page": 17,
+      "reason": "已核列表包括该ID，但新初核无事实主体finding，原group事实范围未改；仅继承旧模型metric限制及原A source_only。"
+    },
+    {
+      "fact_id": "sm-12",
+      "metric_index": 1,
+      "source_page": 273,
+      "reason": "本次无对应新finding或修订，租赁原指标1仍为原group范围；原A局部限制保留。"
+    }
+  ],
+  "supported_addition": {
+    "fact_id": "review-add:f-revenue-decline-driver",
+    "current_fact_sha256": "11592ee89dd8c1ec4ea64f42422f518065d703c4f077b03ce414900885e280ca",
+    "source_pages": [
+      20,
+      21,
+      273
+    ],
+    "own_final_response_hash": "d0e006e3d41124114e9b47bbac03fadaf9bbc05fa8165a3600e0779a58d6936a",
+    "reason": "A直接读原PDF20/21并复用同源273行：营业收入同比-16.03%及主要因改扩建通车后建造服务收入下降均有明示；本期3100006510.91元/上期7485491706.94元、分行业建造服务同比-58.59%、通行费同比+3.70%对应。原mc-01已有建造服务下降定性，本条补显式公司收入主因/同期比较与通行费对照；部分数值重复，不算目标纠错或五项全新独立知识。"
+  },
+  "new_model_metric_limit": {
+    "fact_id": "bs-02",
+    "fact_sha256": "93c7d09ec8b14fa2cea4f9eb1958d2d862092f0e96f17022236734fa537c2229",
+    "metric_index": 2,
+    "source_page": 14,
+    "A_assessment": "保守主体限用，不认定原1316公里数字错误，也不计新纠错收益。",
+    "reason": "原文明确公司运营管理约2917、自有约1601、受托管理山东高速集团所属约1316公里；原正文和指标名已保自有/受托关系。运营管理主体与资产所属对象是不同口径，模型对位置2限用可保守保留；原文/约数仍可引用。不为恢复单个标准化指标另造override或修改模型原意见。"
+  },
+  "original_25_author_facts_unchanged": true,
+  "three_positive_controls_unchanged": true,
+  "independent_release_decision": {
+    "publish_useful_source_supported_addition": true,
+    "known_target_limits_lifted": 0,
+    "retain": [
+      "op-01:source_only",
+      "sm-12:metric1"
+    ],
+    "new_negative_A_safety_restrictions": 0,
+    "retain_model_conservative_metric_limit": [
+      "bs-02:metric2"
+    ],
+    "ordinary_profile_remains_research_only": true
+  },
+  "strategy_conclusion": "本次不支持v15索引/优先级能解决这两项的假设。结束该同股策略观察，不自动v16或追加模型/公司/正式组；新增有源解释不替代失败结论。",
+  "unchanged_formal_scores": true,
+  "new_supplier_calls": 0
+}
