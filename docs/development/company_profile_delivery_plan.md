@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+当前[6.FX合并卡已按停止条件收口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/result.md)。模型新主体限用真实生效，四类原入口/必要别名与计划开关修复及零调用直接验证通过；四类一次10物理411019账本/0恢复/882.212组秒，A原PDF核11项新增修订有据。仍漏sm-12指标范围、依赖原A保护，故自动gate未过，新20仅候选/部分参考未启动；不为单股标签继续付费试跑或换20碰运气。已审有用后继原writer交39股1102/1699，其余35完整保持、actual39/四详情及导出新实例一致。旧正式失败/95%/99%/S3/生产不改；先清后做、必要一套后清/隔离本人Git，当前继续研究使用及具体问题有界补读，下一自动方案须有针对剩余根因的实质变化和明确范围裁决。
+
 当前[6.FW主体口径分级消费已交付](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-subject-consumption-20261128/result.md)：A原PDF独核、B原typed决定/投影/reader实现事实主体unclear限用，元数据不确定时保有据正文；原指标及整事实缺陷隔离不松，改稿接续不自动解除限制。新31直测纳入69项定向回归全过，合并回归113过/1既有冲突已基线复现；新代码读旧39完整保持。0新模型，原writer一安全后继恢复山东1描述/0指标，当前39=1098/1687、其他38完整不变；原402文件保护，实际API/导出/新实例同源核对。旧分/S3/生产边界不变，必要证据一套后清本人产物，普通Git只本人可隔离块；不续同股提示或新的付费卡。
 
 当前[6.FV v15单股策略观察已收口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-v15-subject-observation-20261127/result.md)：用户确认后一次原初/修/终3物理/107381/0恢复/723.105秒unknown费用，索引/原25facts/3正控保持但两目标仍漏，0/2未达标；结束该同股索引/优先级策略，不自动v16/再加同义提示或续额。模型自主补的收入下降原因/建造服务同期比较有源，经A原PDF与自己的真实final后交研究；另1里程metadata保守限用不当错数收益，原两限制保持。主39=1097/1687、其余38完整不变，当前数据仍研究使用；真实失败、旧分/原件保持，有限Review/必要一套后清/Git同卡，不自动新正式组或生产。

@@ -1,0 +1,23 @@
+{
+  "action": "review_batch",
+  "state": "completed",
+  "items": [
+    {
+      "instrument_id": "920006.BJ",
+      "request_id": "6fx-920006-BJ-20261128",
+      "state": "completed",
+      "work_id": "bp-work-923127a5eb05a33c2b988507",
+      "review_status": "completed_with_open_findings"
+    }
+  ],
+  "stop_reason": null,
+  "remaining_request_ids": [],
+  "research_only": true,
+  "production_authorization": "not_authorized",
+  "execution_plan": {
+    "run_id": "6fx-920006-BJ-20261128",
+    "plan_sha256": "5da1e84597dd2b6797727a860c0fd227ecb57d08524af264eacc0cfa83dd6699",
+    "budget_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/920006.BJ/executions/6fx-920006-BJ-20261128/budget.json",
+    "production_authorization": "not_authorized"
+  }
+}

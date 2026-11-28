@@ -1,0 +1,55 @@
+{
+  "task": "6.FX",
+  "mode": "published",
+  "releases": [
+    {
+      "instrument_id": "920006.BJ",
+      "source_work_id": "bp-work-923127a5eb05a33c2b988507",
+      "safe_work_id": "bp-work-06661e474b0b0c7b1d262123",
+      "published_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-06661e474b0b0c7b1d262123.json",
+      "sha256": "946987f2781ca16f87a10cc117283d9a1c03e80a2a0cf52022acc9732939dffd",
+      "raw_facts_evidence_generation_model_review_unchanged": true,
+      "visible_facts": 24,
+      "visible_metrics": 38
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "source_work_id": "bp-work-c9d017b96a4eaeda3021a128",
+      "safe_work_id": "bp-work-7036843d789300f6e5c02205",
+      "published_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-7036843d789300f6e5c02205.json",
+      "sha256": "5faebc61ebced08616f9d3e9288b0a71f2c07cda02fa3cfb0873c5c53dd548fb",
+      "raw_facts_evidence_generation_model_review_unchanged": true,
+      "visible_facts": 21,
+      "visible_metrics": 34
+    },
+    {
+      "instrument_id": "600350.SH",
+      "source_work_id": "bp-work-0265278312fe929f77b71ae4",
+      "safe_work_id": "bp-work-c0b14cdf9835a3c65a205963",
+      "published_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-c0b14cdf9835a3c65a205963.json",
+      "sha256": "6d03441b1237d094acd150b03ebd6b177aab1454129d109d21eee7156d8dff3b",
+      "raw_facts_evidence_generation_model_review_unchanged": true,
+      "visible_facts": 27,
+      "visible_metrics": 31
+    },
+    {
+      "instrument_id": "601328.SH",
+      "source_work_id": "bp-work-6bee35aa007675221a3f0124",
+      "safe_work_id": "bp-work-3827c9661a3a26d8ddade04e",
+      "published_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-3827c9661a3a26d8ddade04e.json",
+      "sha256": "f80d7d147ddc4df959ad06c7c12a62821c8c356296cb51b9afb0ad51b5806b4b",
+      "raw_facts_evidence_generation_model_review_unchanged": true,
+      "visible_facts": 24,
+      "visible_metrics": 33
+    }
+  ],
+  "automatic_gate": "not_passed",
+  "new20_started": false,
+  "release_model_calls": 0,
+  "current_companies": 39,
+  "other35_complete_profiles_unchanged": true,
+  "current_visible_facts": 1102,
+  "current_visible_metrics": 1699,
+  "same_writer_reader_export_fresh_equal": true,
+  "original405_unchanged_before_navigation": true
+}

@@ -1,5 +1,9 @@
 ## Context
 
+### 6.FX model-owned source limits before a prospective automatic cohort
+
+Extend the original quality-review contract under an explicit new policy, preserving old wire schemas and content hashes when absent. A model may establish that the narrative, event period and citations are supported while a single subject enumeration cannot safely describe the operating actor, statistical population or asset ownership. Persist the exact fact/evidence-bound limitation as model review, never as an independent UseReview. The existing delivery projection emits unclear scope, source-model attribution, gap and aggregation restriction, unions metric restrictions, and gives whole-fact/independent defects precedence. Retained-review and changed-content guards preserve those limitations. First prove actual TaskService wiring and four known source cases; only a supported automatic path justifies independently frozen new20 prospective evaluation. Original failures, current39, thresholds and production restrictions remain separate. No parallel source truth store or field governance framework.
+
 ### 6.FV one bounded semantic check of the implemented v15 queue
 
 Use the current safe Shandong draft and its unchanged original selected public sections to test the already implemented v15 scope-index/priority delta once. All25 facts enter the same original review owner; the two independent risk references and three correct controls remain outside model input. Reuse unchanged engineering receipts and exact compatible source decisions instead of a new mock/broad regression round. A separately authorized finite plan precedes any new client/send. Keep the ended6.FU result intact, retain unresolved safeguards, publish only independently source-supported useful successors and end with a clear hypothesis conclusion, without automatic v16 or a new formal cohort.

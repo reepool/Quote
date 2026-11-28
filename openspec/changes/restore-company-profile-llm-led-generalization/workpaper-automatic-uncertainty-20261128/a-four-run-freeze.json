@@ -1,0 +1,21 @@
+{
+  "task": "6.FX-four",
+  "authorized": true,
+  "explicit_four_execution_instruction": true,
+  "approval_reference": "User 2026-11-28 explicitly approved the three-part OpenSpec implementation and causal prospective validation; A executes the independently bounded four-known-case prerequisite under company-profile-automatic-uncertainty-card.md",
+  "runtime_contract_sha256": "6ecaacf3bb02fe0dfd8617ab80ebb1a97cdfc9056b26523d7fb95c4eebf64409",
+  "four_reference_sha256": "9ee9c91f2941ff6c41462476d74631b8229ab39b690a7b76fa7d16e8883149e7",
+  "approved_network_context": true,
+  "A_review": "Original PDF reference and code diff reviewed; prompt conflict, original source alias and plan opt-in fixed; new/old wire, exact bindings, guard inheritance and 39 complete profiles verified",
+  "scope": [
+    "920006.BJ",
+    "600350.SH",
+    "601328.SH",
+    "000039.SZ"
+  ],
+  "data_transfer": "Only these existing public 2025 report sections and public-derived current drafts to existing official DeepSeek and Scorpio/Grok endpoints; no independent A reference/opinion or private data",
+  "new20_authorized_to_start": false,
+  "new20_gate": "Requires actual four results meeting pre-frozen A reference, plus separately frozen full20 samples and independent source references; no automatic dispatch",
+  "stop": "One invocation per company; no hotfix, extra window or other stocks; retain ordinary in-flight cases under original per-company limits; code/config/freeze break, authentication/safety issue or hard deadline blocks further sends",
+  "new_supplier_calls_before_this_freeze": 0
+}

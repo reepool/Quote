@@ -1,0 +1,11 @@
+{
+  "task": "6.FX",
+  "phase": "before_any_new_model_sends",
+  "actual_old_loaded_service_equals_current_new_code": true,
+  "companies": 39,
+  "http_status": 200,
+  "http_seconds": 2.279776,
+  "canonical_profile_sha256": "a32a759334c89b414168cf56f75e46c0beeb9c672f25333f34a0223a1f22d8bc",
+  "new_supplier_calls": 0,
+  "shared_service_or_data_writes": 0
+}

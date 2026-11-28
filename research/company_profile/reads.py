@@ -520,7 +520,9 @@ class CompanyProfileReadService:
                 if (isinstance(candidate, CompanyProfileRuntimeRecordV3) and (
                     candidate.workpaper.use_review and any(d.metric_restrictions or d.subject_scope_restriction
                                                            for d in candidate.workpaper.use_review.decisions)
-                    or candidate.workpaper.quality_review and candidate.workpaper.quality_review.metric_limit_policy is not None
+                    or candidate.workpaper.quality_review and (
+                        candidate.workpaper.quality_review.metric_limit_policy is not None
+                        or candidate.workpaper.quality_review.subject_scope_limit_policy is not None)
                 )):
                     component_records[candidate.work_id] = candidate
             if component_records:

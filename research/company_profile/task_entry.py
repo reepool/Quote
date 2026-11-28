@@ -12,7 +12,7 @@ import time
 from typing import Any, Literal
 from urllib.parse import urlsplit
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_serializer, model_validator
 
 from .models import PRODUCTION_AUTHORIZATION
 from .operations import execute_published_task
@@ -67,6 +67,14 @@ class CompanyProfileTaskPlan(_PlanModel):
     budget: _Budget
     review_plans: tuple[dict[str, Any], ...] = ()
     enrichment_plan: WorkpaperEnrichmentPlan | None = None
+    subject_scope_limits: bool = False
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_shape(self, handler):
+        payload = handler(self)
+        if not self.subject_scope_limits:
+            payload.pop("subject_scope_limits", None)
+        return payload
 
     @model_validator(mode="after")
     def bound_scope(self):
@@ -298,7 +306,8 @@ async def execute_configured_task(
             timeout_seconds=plan.budget.logical_seconds,
             execution_authorization={"status": "authorized", "approval_reference": plan.approval_reference})
         provider.document_versions = plan.document_versions
-        identity = workpaper_processing_identity(real=True, review=True, review_profile=plan.review.name)
+        identity = workpaper_processing_identity(real=True, review=True, review_profile=plan.review.name,
+            subject_scope_limits=plan.subject_scope_limits)
         identity.update(logical_request_timeout_seconds=plan.budget.logical_seconds,
             review_max_output_tokens=16384, repair_profile=plan.extract.name)
         result = await execute_published_task(action=normalized, provider=provider,

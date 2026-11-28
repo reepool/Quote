@@ -1,0 +1,287 @@
+{
+  "task": "6.FX",
+  "authority": "A independent original PDF source reading before new model sends",
+  "selection": "four known source cases, not unseen acceptance",
+  "source_reading": "native PDF pages explicitly listed; all three non-Shandong PDFs directly reread; Shandong direct 6.FW source judgment reused by exact document/fact hashes",
+  "companies": [
+    {
+      "instrument_id": "920006.BJ",
+      "report": {
+        "instrument_id": "920006.BJ",
+        "report_id": "asset_5970980588f77117bc176f4988e30fec",
+        "document_version": "74903f868606e3b524205c525970e6660879ca416bab162e9c9b9d7e52a4288b",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-23T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "work_id": "bp-work-6cb5e399db702402f828e710",
+      "source_record": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-6cb5e399db702402f828e710.json",
+      "source_record_sha256": "0b528fb3dc45a6ab52189ee27e826f3ad14e732bc294850307822dfa6a851eb5",
+      "source_sections": {
+        "第四节/一、业务概要": [
+          12,
+          13
+        ],
+        "第四节/二、经营情况回顾": [
+          14,
+          15,
+          19,
+          20,
+          21
+        ],
+        "第十一节/34、营业收入和营业成本": [
+          142
+        ]
+      },
+      "core_answers": [
+        "面向国防装备供应单位的研发采购生产销售体系",
+        "航空机械、综合电源和代加工劳务，其他按原表保留",
+        "项目直销、军品定型/审定价或议价取得收入"
+      ],
+      "source_amounts": {
+        "company_revenue_CNY": "112437270.64",
+        "main_business_revenue_CNY": "110497142.43",
+        "other_business_revenue_CNY": "1940128.21",
+        "military_new_customers": "20"
+      },
+      "targets": {
+        "F009": "主营合计为公司主营统计，不因主营二字强作单一经营分部；原本已修，保持有据范围",
+        "F021": "20新增客户/49投标/15中标属于军用领域；原unclear及军用限定可保真，无需强制统一标签",
+        "F022": "PDF15为公司自述竞争力与成本控制，PDF20另明示上期差价核减6762.86万元/本期较小；不得把收入同比全部解释为销量增长"
+      },
+      "positive_controls": [
+        "F001",
+        "F005",
+        "F007",
+        "F011",
+        "F012",
+        "F013"
+      ],
+      "frozen_fact_hashes": {
+        "F001": "f4145299a315a6bbb31f60bcb882c646b832af487207752c7e5b0a66eba69a88",
+        "F005": "e6e4531211de808298f4866d4bcb16b76d6d93d2733f757b0db8643d2a8a792a",
+        "F012": "f1e21e1c62238a043edf37fc0b5df710c9d13b242ef1d3d4acdb7034a1151ea7",
+        "F013": "d4a03bedacbae6cb78b50b781597ba8d4ca8f7c3419ff95512d8f8e239359405",
+        "F021": "f6c890b38473297adf5330d66b813bc3a7431b0f7ec9bdfb0deeff1ba8bc6951",
+        "F011": "f383e74c28a38cb746d2646b7b501774080fb8f256d5cde09b1bb618c16071cc",
+        "F022": "9b1fd43f7b5ed2336de57ae5ce74b15aef1c9ee13709e0515f602a40779b0522",
+        "F007": "3a8178f013a07afce73f970b9af495e071379ead04f26314f795c25265eaa3dd",
+        "F009": "5b9f70b2756fa12f1b4019818d07bcd781b2418d8c23194a1ec17521ce38f436"
+      }
+    },
+    {
+      "instrument_id": "600350.SH",
+      "report": {
+        "instrument_id": "600350.SH",
+        "report_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-03T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "work_id": "bp-work-90d584ecf4f680518ae247e7",
+      "source_record": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-90d584ecf4f680518ae247e7.json",
+      "source_record_sha256": "2399026406cb330a55e8b9f249e5f94456aa9736888492bf6bce4bb4153e0279",
+      "source_sections": {
+        "第三节/一、公司业务/智慧运营": [
+          14
+        ],
+        "第三节/三、经营讨论/路桥运营": [
+          17
+        ],
+        "财务报告/营业收入成本分解": [
+          273
+        ]
+      },
+      "core_answers": [
+        "交通基础设施投资运营及产业链股权投资，智慧运营/产业投资/工程建设/绿色低碳",
+        "路桥通行与受托运营，以及轨交/信息/工程等业务",
+        "政府收费标准收通行费，另有托管、铁路运输、工程和销售商品等收入"
+      ],
+      "source_amounts": {
+        "company_revenue_CNY": "23925458141.04",
+        "other_business_revenue_CNY": "891806452.78",
+        "rental_revenue_CNY": "185065717.54",
+        "operated_km_raw": "约2917",
+        "owned_km_raw": "约1601",
+        "entrusted_parent_owned_km_raw": "约1316",
+        "all_weather_passability_raw": "99.54%"
+      },
+      "targets": {
+        "op-01": "原文救援/到岗/通行率/中标均有据，但路桥运营下的事实枚举不能冒充全公司统一统计；可模型明确限用或有源修订，原指标旧限制须分列",
+        "sm-12": "其他业务合计与其中租赁行不同层次；正文可读，租赁metric不能作为公司总额；允许unclear/保真或有据局部限制",
+        "bs-02": "公司运营管理与母集团拥有1316公里资产是不同关系；原约数/自有/受托原句正确，不把该关系误判为错里程或已自有"
+      },
+      "positive_controls": [
+        "bs-01",
+        "ps-01",
+        "sm-01",
+        "cm-01",
+        "review-add:f-revenue-decline-driver"
+      ],
+      "frozen_fact_hashes": {
+        "cm-01": "2567cad8afc854140876eaa1b047966d5c064ca0a484ab49220e99c20dc0400d",
+        "bs-02": "93c7d09ec8b14fa2cea4f9eb1958d2d862092f0e96f17022236734fa537c2229",
+        "bs-01": "bbe923d126b01f3a5c5dd9a6fbbbe591e587976a94cb72e52772957c7918cf21",
+        "review-add:f-revenue-decline-driver": "11592ee89dd8c1ec4ea64f42422f518065d703c4f077b03ce414900885e280ca",
+        "sm-01": "995b56fced041c01e6fc08ab6c7f7dcd99f22ec1119a73349e4683aa0df4c808",
+        "op-01": "fe1bbbc0814e636484dc5bef523b579a11c948187c6697aa21ef45cc2c53a29d",
+        "sm-12": "2a896714deae169fc01c1aa2ff0ae5b53948867904561c6d356e500c0d577e08",
+        "ps-01": "6255cb3d5ee39e2e8b17beed414dddfdbfe09c37534585df2193804a19d6eff3"
+      }
+    },
+    {
+      "instrument_id": "601328.SH",
+      "report": {
+        "instrument_id": "601328.SH",
+        "report_id": "asset_0644e80b9e8838a883359459eef02550",
+        "document_version": "df52361e0a40791e9a37634437700b168eb2f76a2db41fe70b6d17099a549963",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "work_id": "bp-work-f1cba483b4bf6e44862a2468",
+      "source_record": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-f1cba483b4bf6e44862a2468.json",
+      "source_record_sha256": "9b9a5655e72a375b3e0ea19f0f596aa4a16f1d70457086a42d3b9d76cc076bf4",
+      "source_sections": {
+        "二、公司简介及主要业务": [
+          8
+        ],
+        "管理层讨论/二、业务回顾": [
+          19,
+          20
+        ],
+        "管理层讨论/财务报表分析/利润表": [
+          38,
+          39
+        ],
+        "分部情况/按业务板块业绩": [
+          51
+        ]
+      },
+      "core_answers": [
+        "银行集团，经营公司金融/个人金融/资金/其他业务，子公司扩展租赁基金等",
+        "存贷款、融资结算、财富信用卡、同业金融市场等服务",
+        "客户存款等形成资金来源，贷款/证券等资产产生利息，另有手续费佣金和投资等收入"
+      ],
+      "source_amounts": {
+        "company_revenue_CNY_million": "265071",
+        "net_interest_income_CNY_million": "173075",
+        "corporate_CNY_million": "132749",
+        "retail_CNY_million": "96724",
+        "treasury_CNY_million": "34377",
+        "other_CNY_million": "1221",
+        "green_loans_CNY_100million_domestic_bank": "9508.25",
+        "pension_loans_CNY_100million_entire_bank": "67.62"
+      },
+      "targets": {
+        "F20": "绿色境内行/养老全行/其他贷款分类不能强归同一集团总数；原unclear及文字限定可保，不能为了抽取统一标签删数字或改范围",
+        "F12": "业务板块收入与净利息/手续费两种分类轴不同，不能重复加总；保持主要公司/个人/资金三项和原其他类别"
+      },
+      "positive_controls": [
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F13",
+        "F19",
+        "F21"
+      ],
+      "frozen_fact_hashes": {
+        "F02": "9f131fbee526a14b5cc55e2ca54a7a6bce2ccb1132f56d3f86dd515792be8de4",
+        "F07": "4c42128fa1b74d1417a8599006eacb90c48cb0b4f64e73603ba5f7e72a379175",
+        "F04": "76257b069d165f35fdcad0846203ab2b11d7d234e253c8afc40a349847161489",
+        "F03": "7d698702098cb6279c73ed2459d63a75a17118aeddfd091e26adaad949b77b0a",
+        "F12": "bbc4867f28e0010c2c1707a3d44efec8e01440d4c97152e79e98f7d575155d7e",
+        "F05": "bdb9fb650d9af835246915a5227124bf5762aaaa44f06b9b0c1e648e9b148779",
+        "F13": "abf85ab5e857c1e703c822bba8b74dac61306ba3ba97ff09c48340ba0ba133f7",
+        "F06": "b2f0c1044b3843892ccc5d7f00249d853293a35abd17fc8c209a1baa8f4e7bca",
+        "F20": "5fe9d8cea749d2fceec312dd6772529356f5023bb29f96d49b9272a75442d275",
+        "F21": "3cd36cf47bc849dbdacab6e244a13978be2967db9badeaaf41d39095f7755ac4",
+        "F19": "75afb06be546e910d9c875a2c83036555df68dcf13701b56c3c00db23377ee97"
+      }
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "report": {
+        "instrument_id": "000039.SZ",
+        "report_id": "asset_1b1aa5ef27d445128b678487e2feec9f",
+        "document_version": "438e2d1c304b24311de907f012108270b38163769ece55d710ddae4b6fc3cf24",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "work_id": "bp-work-ddc3409c996dd2bdcfb355eb",
+      "source_record": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-ddc3409c996dd2bdcfb355eb.json",
+      "source_record_sha256": "a6458949b4b0a15c7b3e63e1dd6c55efc0af41b8c72feda0f73c64b860835553",
+      "source_sections": {
+        "第四章/一、公司业务概要及二、主营回顾": [
+          16
+        ],
+        "第四章/能源及海工经营": [
+          20
+        ],
+        "第四章/资本运作": [
+          22
+        ],
+        "第四章/五、财务数据/按行业业务地区指标": [
+          28
+        ]
+      },
+      "core_answers": [
+        "物流及能源装备/解决方案集团，兼有服务和循环载具/内部金融",
+        "集装箱、道路车辆、能源化工液态食品装备、海工、空港消防及物流等",
+        "装备销售与工程总包、物流/循环载具服务及金融资产管理，主要板块按原表分列"
+      ],
+      "source_amounts": {
+        "company_revenue_CNY_thousand": "156611446",
+        "container_revenue_CNY_thousand": "43008947",
+        "vehicles_revenue_CNY_thousand": "20177636",
+        "energy_equipment_revenue_CNY_thousand": "27192470",
+        "marine_revenue_CNY_thousand": "17938402",
+        "logistics_revenue_CNY_thousand": "26793404",
+        "clean_energy_new_orders_CNY_100million": "222.29",
+        "water_clean_energy_backlog_raw": "超190亿元",
+        "post_transaction_share_raw": "将由62.70%下降至45.04%"
+      },
+      "targets": {
+        "f-019": "222.29亿元是清洁能源分部新签订单，水上清洁能源在手超190亿元为子集/存量，不能交换范围和流存量",
+        "f-023": "2025年12月签署协议；交易完成后将变更持股，不得提前确认为2025已完成45.04%",
+        "f-014": "其他是报表未细分收入类别，保unclear及具体限制，不编造完整业务构成"
+      },
+      "positive_controls": [
+        "f-001",
+        "f-005",
+        "f-008",
+        "f-009",
+        "f-010",
+        "f-011",
+        "f-012"
+      ],
+      "frozen_fact_hashes": {
+        "f-005": "83977732ef4808fe70eafbc09b7e24f8d20047af9313e752985825796e3fc797",
+        "f-009": "ce5ab5eed513590130fc70ff9c524bc204c22dbd7a64da44e4ff5fb1c49bb0b4",
+        "f-008": "e4a83c33bb19b1630116688647ca34bace09e261eb408464ac7da1dc95341fc9",
+        "f-014": "33c59173e058089be5a5ff89cc29465dd58ee3efaf7074a72de3e2c21b1395ce",
+        "f-023": "63fb1da36523a4527b25872adc05ec87ecb7cbd7c921d8d01667e307efaa2256",
+        "f-010": "b75639c22da493b218de067d383969305762a75c4fa434b4012269d68d639fa3",
+        "f-012": "44140e257a7a29f197ed88b38d84d0efa50384c6b06db0bdd73f0330e323669c",
+        "f-019": "f54f19fe01917c48c2292d58e1a8b27135836dd24d409652505c653972334760",
+        "f-011": "8a2ce563dc640461f6c06131a886e2bc4124a1e4949a3f8ccd4e5021c603099a",
+        "f-001": "80f230d2ef0f410df3bded515970550a78fff3fd729443a9592d3689aa025f54"
+      }
+    }
+  ],
+  "formal_scores_unchanged": true,
+  "new_supplier_calls": 0,
+  "comparison": "automatic source-review effects judged separately from inherited independent guards; a stripped observation is never a published safe profile",
+  "automatic_ready_gate": [
+    "four original TaskService executions finish within frozen budgets or explicit faithful limited states",
+    "all 12 business core questions retain supported answers; new facts and changed high-risk facts source-checked",
+    "new subject-limitation behavior or a source-supported correction actually resolves scope-only failure without A-authored per-fact decisions in the automatic observation",
+    "no unisolated known false narrative/number/period/citation, no A restriction implicitly lifted, no repeated basic failure"
+  ],
+  "stop": "If actual automatic case remains unsafe or the new action cannot be consumed, stop subsequent20; keep current39 and give explicit failed hypothesis, do not claim the old gap has closed"
+}

@@ -7,6 +7,8 @@
 
 ## 0. 文档权威关系
 
+2026-11-28模型自主限用接续：显式新版本源核可对“原文叙述、期间、引文有据，只有事实主体枚举无法确定”的对象给出精确绑定的局部主体限制，由原读取投影自动标unclear、说明原因/缺项/计算限制；它是模型判断，不伪造独立人工UseReview。抽取、初核、修订、终核一致区分经营管理、统计切片和资产产权，各指标仍独立核查，已知错正文/数值不借不确定性放行，旧人工保护不由模型解除。四类真实观察已证新动作可实际消费及部分修订有据，但仍有未检出的原指标范围问题，不能据此称自动无人工达标或重算旧分；详[6.FX结果](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/result.md)。
+
 2026-11-28主体口径消费澄清：经营管理主体、指标统计切片与资产产权是不同关系，保留原文明示，不因“受托管理”推为自有，也不因地区/销售模式强套分部。经独立原文核对，只有事实主体枚举无法确认时，可在精确绑定当前事实/证据的研究投影中标unclear及原因，保留有据正文/期间/引用；各指标按自身依据限用，不能继承事实标签或将unclear当合并口径计算。错实体正文、错数/期间和无据引用仍隔离；旧原始记录、模型结果及评分不追改。实施与停止见[6.FW卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-subject-consumption-card.md)。
 
 本文件确定“交付什么”；[验收计划v2](company_profile_acceptance_program.md)唯一确定数量、阈值、补救上限与实际进度；[交付路径与任务卡v3](company_profile_delivery_plan.md)确定先后顺序、owner及清理；[A/B流程v3](ab_role_development_workflow.md)确定职责和审核顺序。下一开发唯一change为 `restore-company-profile-llm-led-generalization`。

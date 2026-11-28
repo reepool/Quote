@@ -1,0 +1,202 @@
+{
+  "task": "6.FX",
+  "status": "bounded_card_complete; automatic_gate_not_passed; no_new20",
+  "baseline_head": "3f7e724d9cbccc4197bd393cce5926ccb5c9c985",
+  "role_separation": "B1 implements, B2 original entry/real run, A original-PDF semantics and release",
+  "business": {
+    "model_subject_limit_and_joint_metric_limit_real": true,
+    "A_supported_new_or_repaired_facts": 11,
+    "current_research_companies": 39,
+    "visible_facts": 1102,
+    "visible_metrics": 1699,
+    "other35_complete_profiles_unchanged": true,
+    "new20_started": false,
+    "remaining_known_gap": "sm-12 metric1 scope was not newly identified; original independent metric restriction retained",
+    "historical_scores_recomputed": false,
+    "new_automatic_accuracy_claim": false
+  },
+  "verification": {
+    "model_wire_final_78": "passed including 48 new cases before original-entry followup",
+    "original_entry_followup_67": "passed including all 64 current new-contract/entry cases and existing configured/source-recheck compatibility",
+    "B2_nonempty_original_TaskService": "2/2 passed; controlled HTTP transmission only",
+    "old39_new_code_vs_actual_service": true,
+    "current39_and_four_details_HTTP": true,
+    "reader_export_fresh_equal": true,
+    "openspec_strict": "passed",
+    "source_diff_check": "passed",
+    "generated_Markdown": "original renderer/source whitespace retained, a nonblocking style observation"
+  },
+  "review": {
+    "fixed_blocking": [
+      "conflicting old metric instructions for new subject+metric combined action",
+      "default official source alias recovery falsely rejected identical official report",
+      "configured TaskPlan lacked actual new-policy opt-in"
+    ],
+    "remaining_task_engineering_blockers": [],
+    "unrelated_existing_C": "reader/recovery changed-while-planning test also fails on baseline; left unchanged",
+    "semantic_limit": "model still misses one known metric-scope case; not disguised as engineering completion"
+  },
+  "real_resources": {
+    "physical": 10,
+    "logical": 10,
+    "recoveries": 0,
+    "supplier_reported_tokens": 411019,
+    "conservative_ledger": 411019,
+    "group_wall_seconds": 882.2120524969941,
+    "group_stopped": false,
+    "transport_errors": 0,
+    "budget_denials": 0,
+    "current_model_execution_errors": 0,
+    "own_final_checks": 11,
+    "own_final_accepted": 11,
+    "own_final_rejected": 0,
+    "new_findings": 17,
+    "inherited_model_findings": 13,
+    "inherited_independent_decisions": 8,
+    "cost": "unknown",
+    "timing_basis": "Group monotonic dispatch-to-last-completion; per-stock TaskService control timestamps and transport durations reported separately; launch-to-process-exit wall not separately retained."
+  },
+  "protection": {
+    "prior_dirty": 20,
+    "other_dirty_paths_exact": true,
+    "six_prior_dirty_docs_only_own_delta_staged": true,
+    "original_research_files": 405,
+    "original_unchanged_except_authorized_navigation": 404,
+    "frozen_application_and_private_config_hashes_unchanged": true,
+    "service_reloaded_once": true,
+    "new_live_task_window": false,
+    "production_enabled": false
+  },
+  "cleanup": {
+    "A_path": "/home/python/Quote/data/QuoteBak/company-profile-6fx-a-b0JfJmfo",
+    "B1": {
+      "preflight": "only A's parallel 6FX root was present; prior B1 6FW roots already removed per card; no unknown/parallel root deleted",
+      "own_temporary_root": "/home/python/Quote/data/QuoteBak/company-profile-6fx-b1-cYv4ilyv",
+      "state": "removed the exact B1 root after completed processes, evidence/hash validation and path checks; 5196 KiB of regenerable test/runtime/database/baseline-helper artifacts removed; this self-check is the sole retained B1 handoff, no source assets or parallel roots removed"
+    },
+    "B1_followup": {
+      "preflight": "previous B1 root already removed; no A/B2 or unknown temporary root deleted",
+      "own_root": "/home/python/Quote/data/QuoteBak/company-profile-6fx-b1-entry-whDKiAOv",
+      "state": "all direct checks and finite review complete; removed this exact B1 root after process completion and path/evidence/hash checks, freeing 4808 KiB of regenerable test/runtime/database artifacts. No parallel roots, original reports, user dirty or B2 files removed; this appended section is the sole retained B1 follow-up"
+    },
+    "B2": {
+      "additional_run_or_test_root_deletions": 0,
+      "active_output_deletions": 14,
+      "remaining_B2_temp_roots": [],
+      "earlier_run_db_cleanup": "Already removed before this stop after minimal original-owner rows were persisted in b2-four-run-receipt.json; 15 files/5704236 bytes, no raw/wire/ledger removed.",
+      "state": "completed_after_A_publication",
+      "pre_publication_cleanup_snapshot": {
+        "active_output_deletions": 0,
+        "meaning": "historical pre-authorization snapshot; actual post-release deletions appended here"
+      },
+      "active_output_logical_bytes_deleted": 3347507,
+      "deleted_parent_copies": [
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-070141e2f3b0b8fd783e9995.json",
+          "sha256": "acc324d087dac9d27eb437b6d495bfbffa1fac9b190f41936be5c8b8acda7f31",
+          "bytes": 266523,
+          "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-070141e2f3b0b8fd783e9995.json"
+        },
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-1deffa57365ab12095599a8f.json",
+          "sha256": "9190ae2b833acf4118a90ece1d2f2ea2f0f5b2d33d89d43c0403625524fc6eb3",
+          "bytes": 238084,
+          "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-1deffa57365ab12095599a8f.json"
+        },
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-2d2d4d8fb14d282413fbbb1b.json",
+          "sha256": "85b839d02976e0be7b7964fd45727dc55cb420475c03e1dcae447f132a8921d0",
+          "bytes": 232095,
+          "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-2d2d4d8fb14d282413fbbb1b.json"
+        },
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-48e5b38db9e2d9737d7a6c78.json",
+          "sha256": "0e1ac61d276a45ee049c19458fb2c1ec3ac41aecc1c9b61fc19a9be6440eb2eb",
+          "bytes": 206628,
+          "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-48e5b38db9e2d9737d7a6c78.json"
+        },
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-5dd34b44ee0f10180cf07a8c.json",
+          "sha256": "a7067b5ef39f3be37727742c09122ec8e756ac47f43ec480d3eb2580c38b0637",
+          "bytes": 254318,
+          "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-5dd34b44ee0f10180cf07a8c.json"
+        },
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-6cb5e399db702402f828e710.json",
+          "sha256": "0b528fb3dc45a6ab52189ee27e826f3ad14e732bc294850307822dfa6a851eb5",
+          "bytes": 269919,
+          "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-6cb5e399db702402f828e710.json"
+        },
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-7bec633c2400d091092cd7b3.json",
+          "sha256": "a5dcc3deb95a9682b0daf85e43a101376c86a45814535f04ec5a09c7f3b8f10e",
+          "bytes": 199859,
+          "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-7bec633c2400d091092cd7b3.json"
+        },
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-90d584ecf4f680518ae247e7.json",
+          "sha256": "2399026406cb330a55e8b9f249e5f94456aa9736888492bf6bce4bb4153e0279",
+          "bytes": 231688,
+          "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-90d584ecf4f680518ae247e7.json"
+        },
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-9d9c2637afa2f4ffc35c6fcc.json",
+          "sha256": "843c1a5915371b8b19a70a1059ddbd2110f4aaadc5f79c68c454bd674e04ae96",
+          "bytes": 241365,
+          "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-9d9c2637afa2f4ffc35c6fcc.json"
+        },
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-cd0afb1f99731027937f26cf.json",
+          "sha256": "838108f15616b63ecb31001983bab9add15e191ca86b2d11d3997677f2621c9c",
+          "bytes": 275450,
+          "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-cd0afb1f99731027937f26cf.json"
+        },
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-ddc3409c996dd2bdcfb355eb.json",
+          "sha256": "a6458949b4b0a15c7b3e63e1dd6c55efc0af41b8c72feda0f73c64b860835553",
+          "bytes": 288723,
+          "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-ddc3409c996dd2bdcfb355eb.json"
+        },
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-f1cba483b4bf6e44862a2468.json",
+          "sha256": "9b9a5655e72a375b3e0ea19f0f596aa4a16f1d70457086a42d3b9d76cc076bf4",
+          "bytes": 259414,
+          "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-f1cba483b4bf6e44862a2468.json"
+        },
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-f324eb47588bae02e1a52b84.json",
+          "sha256": "b2f85d45048659b5151f520f2447b03746e224f810d6bcbdd2387f77769e43fa",
+          "bytes": 201954,
+          "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-f324eb47588bae02e1a52b84.json"
+        },
+        {
+          "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-f7e0f0a8da3af9c1e51ec585.json",
+          "sha256": "f6e526cfc4e6d663eaccd05b8348dd07f023e1a5b9279a43ed46fe701f1f2865",
+          "bytes": 181487,
+          "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-f7e0f0a8da3af9c1e51ec585.json"
+        }
+      ],
+      "authority": "A explicit post-publication cleanup instruction and a-release-result.json",
+      "A_release_result_sha256": "af5fb4f0e5555f503edb180cb9ff2eddbb1dcc82e7afa56b95019b0ae26d1b40",
+      "remaining_original_manifest_entries_verified": 50,
+      "raw_successors_preserved": 4,
+      "real_wires_preserved": 10,
+      "budgets_preserved": 4,
+      "compact_candidates": "b2-final20-metadata.json",
+      "removed_full_TOC_candidate_files": 3,
+      "removed_full_TOC_candidate_logical_bytes": 3280710,
+      "no_additional_deletions_in_this_document_sync": true
+    },
+    "retained": "one raw successor per actual company, real wires/ledgers/plans/freeze, minimal independent source/result/quality evidence and current four-company delivery; original sources/caches/history/parallel edits preserved",
+    "A_files": 52,
+    "A_logical_bytes": 42627004,
+    "A_path_absent_verified": true,
+    "post_release_duplicate_pruning": {
+      "receipt": "a-final-artifact-cleanup.json",
+      "files": 16,
+      "logical_bytes": 4977606
+    },
+    "final_pruning_root_removed": "/home/python/Quote/data/QuoteBak/company-profile-6fx-close-txgmESAL"
+  },
+  "links_checked": 37
+}

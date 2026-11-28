@@ -1,0 +1,45 @@
+{
+  "task": "6.FX",
+  "actual_url": "http://192.168.188.66:8000/api/v1/research/company",
+  "batch_status": 200,
+  "batch_companies": 39,
+  "batch_seconds": 25.604849,
+  "complete39_equals_original_reader_expected": true,
+  "details": [
+    {
+      "instrument_id": "920006.BJ",
+      "status": 200,
+      "seconds": 0.963879,
+      "visible_facts": 24,
+      "visible_metrics": 38,
+      "full_content_equals_original_reader": true
+    },
+    {
+      "instrument_id": "600350.SH",
+      "status": 200,
+      "seconds": 1.0502,
+      "visible_facts": 27,
+      "visible_metrics": 31,
+      "full_content_equals_original_reader": true
+    },
+    {
+      "instrument_id": "601328.SH",
+      "status": 200,
+      "seconds": 0.63704,
+      "visible_facts": 24,
+      "visible_metrics": 33,
+      "full_content_equals_original_reader": true
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "status": 200,
+      "seconds": 0.884025,
+      "visible_facts": 21,
+      "visible_metrics": 34,
+      "full_content_equals_original_reader": true
+    }
+  ],
+  "canonical_sha256": "9c7f623bfdd6e962a2e2f8f9cba2d3360a6a777526f8f4e64004af9e0c62d383",
+  "new_supplier_calls": 0,
+  "new_live_task_window": false
+}

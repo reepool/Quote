@@ -1,0 +1,408 @@
+{
+  "task": "6.FX",
+  "stage": "four_known_case_automatic_gate",
+  "result": "not_passed",
+  "automatic_new_behavior_demonstrated": true,
+  "all_four_business_core_answers_remain_supported": true,
+  "exact_reason_for_stopping_new20": "已知sm-12局部范围问题仍需人工保护，不满足发送前固定的自动无已知误放条件；不启动20，不靠换样或回算过关。",
+  "new20_started": false,
+  "new20_state": "not_started_due_to_four_gate; metadata/reference partial only",
+  "companies": [
+    {
+      "instrument_id": "920006.BJ",
+      "source_record": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-923127a5eb05a33c2b988507.json",
+      "source_record_sha256": "4e8a99a44a0c1d02f6f5e5184f6e88f28fc63e28fd99231c7de371f889f61136",
+      "work_id": "bp-work-923127a5eb05a33c2b988507",
+      "report": {
+        "instrument_id": "920006.BJ",
+        "report_id": "asset_5970980588f77117bc176f4988e30fec",
+        "document_version": "74903f868606e3b524205c525970e6660879ca416bab162e9c9b9d7e52a4288b",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-23T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "checked_new_or_repaired": [],
+      "new_model_findings": [
+        {
+          "id": "WR-LM-001",
+          "fact_id": "review-add:WRF-OM-001",
+          "resolution": "metrics_limited"
+        }
+      ],
+      "resources": {
+        "physical_requests": 1,
+        "charged_tokens": 47980,
+        "cost_status": "unknown",
+        "stopped_reason": null
+      },
+      "automatic_projection_without_A_is_observation_only": true,
+      "conservative_metric_opinion": "差价核减6762.86万元确属上年累计调减，原comparison_basis上年同期可被误解；模型保守只限metric0、原文保留。本卡不把这种保守metadata限用记为确认错数或强求修复。"
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "source_record": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-c9d017b96a4eaeda3021a128.json",
+      "source_record_sha256": "23437a1845499dca10df3011a53baf72197e8d5560c8500024912e724516f73a",
+      "work_id": "bp-work-c9d017b96a4eaeda3021a128",
+      "report": {
+        "instrument_id": "000039.SZ",
+        "report_id": "asset_1b1aa5ef27d445128b678487e2feec9f",
+        "document_version": "438e2d1c304b24311de907f012108270b38163769ece55d710ddae4b6fc3cf24",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "checked_new_or_repaired": [
+        {
+          "fact_id": "f-020",
+          "element": "operating_drivers",
+          "fact_sha256": "21090a81f5e34e6a2651c3d6b2177309efc9cdb89e3e8dd9297e3e6d584f8924",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "narrative_period_numbers_and_citations": "source_supported",
+          "reason": "A原PDF20直接核：集团通过中集来福士运营，12.0亿美元新签及50.9亿美元在手均位于其上下文；明确具名经营主体有据，不把订单误当收入或整个集团合计。",
+          "new_independent_decision": "source_checked"
+        },
+        {
+          "fact_id": "review-add:om-company-revenue",
+          "element": "scale_and_mix",
+          "fact_sha256": "74e284984ad59c25f52240ba72725ce93dba16a615b27b6ed9abdc149d97379b",
+          "evidence_ids": [
+            "source-0001",
+            "source-0005",
+            "source-0013"
+          ],
+          "narrative_period_numbers_and_citations": "source_supported",
+          "reason": "A原PDF9/16/28直接核人民币千元本期156611446、上期177664098及下降11.85%；原source-0001/0005/0013支持，括号降幅保raw/null，不靠分项加总猜公司总额。",
+          "new_independent_decision": "source_checked"
+        }
+      ],
+      "new_model_findings": [
+        {
+          "id": "f020-subject",
+          "fact_id": "f-020",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "id": "om-company-revenue",
+          "fact_id": null,
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "id": "om-elimination",
+          "fact_id": null,
+          "resolution": "omission_candidate"
+        }
+      ],
+      "resources": {
+        "physical_requests": 3,
+        "charged_tokens": 99656,
+        "cost_status": "unknown",
+        "stopped_reason": null
+      },
+      "automatic_projection_without_A_is_observation_only": true
+    },
+    {
+      "instrument_id": "600350.SH",
+      "source_record": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-0265278312fe929f77b71ae4.json",
+      "source_record_sha256": "6b0dd8285ca5697e36dcf397dfeee88d217fd6cd64fb8ae7eeb9436c7f4f1d8b",
+      "work_id": "bp-work-0265278312fe929f77b71ae4",
+      "report": {
+        "instrument_id": "600350.SH",
+        "report_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-03T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "checked_new_or_repaired": [
+        {
+          "fact_id": "op-01",
+          "element": "operations_and_inputs",
+          "fact_sha256": "e1d5f05427b2908656afa75899f3b4d50f02f468b41b5790b246f250e6fa33ab",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "narrative_period_numbers_and_citations": "source_supported",
+          "reason": "A原PDF17/6.FW精确原源再核，路桥运营小节明确救援圈/5分钟/99.54%及收费站外包；本次事实及metric改business_segment，原文/2025/引用不变，有自己的本次真实终核。按新hash独立确认原主体限制可解除，非继承旧pass。",
+          "new_independent_decision": "source_checked"
+        },
+        {
+          "fact_id": "review-add:f-od01-investment-driver-omission",
+          "element": "operating_drivers",
+          "fact_sha256": "1049a11c1f212f7dd1859d9f7198a62a0e53cecef71fdf34bd1999a5a7f1071b",
+          "evidence_ids": [
+            "source-0006",
+            "source-0019"
+          ],
+          "narrative_period_numbers_and_citations": "source_supported",
+          "reason": "A原PDF18/276直接核：处置长期股权投资本期792210900.14元、上期34492070.08元，粤高速A75350.24万元，权益法638611439.28元及同比-28.78%。单位、期间及分项均保原含义，可解释投资收益构成，不能当全部经常业务共同增长。",
+          "new_independent_decision": "source_checked"
+        }
+      ],
+      "new_model_findings": [
+        {
+          "id": "f-bs02-limit-subject-scope",
+          "fact_id": "bs-02",
+          "resolution": "subject_scope_limited"
+        },
+        {
+          "id": "f-bs02-limit-metrics",
+          "fact_id": "bs-02",
+          "resolution": "metrics_limited"
+        },
+        {
+          "id": "f-op01-wrong-subject",
+          "fact_id": "op-01",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "id": "f-od01-investment-driver-omission",
+          "fact_id": null,
+          "resolution": "corrected_pending_trust"
+        }
+      ],
+      "resources": {
+        "physical_requests": 3,
+        "charged_tokens": 110595,
+        "cost_status": "unknown",
+        "stopped_reason": null
+      },
+      "automatic_projection_without_A_is_observation_only": true,
+      "remaining_known_unresolved": {
+        "fact_id": "sm-12",
+        "metric_index": 1,
+        "reason": "原独判的租赁分解行范围问题本次仍无新发现；自动无A观察仍以group已核展示，原A指标限制继续必要。原金额并非错误，不将人工保护算自动改善。"
+      },
+      "supported_model_local_subject_limit": "bs-02: 原运营/自有/受托关系有据；单一枚举不确定可限用，原指标0/2额外保守限制不认定原错数收益。"
+    },
+    {
+      "instrument_id": "601328.SH",
+      "source_record": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-6bee35aa007675221a3f0124.json",
+      "source_record_sha256": "39548be6932e77ead616187260f057b1606d7030b342d00ec9d5ec4eec0771bd",
+      "work_id": "bp-work-6bee35aa007675221a3f0124",
+      "report": {
+        "instrument_id": "601328.SH",
+        "report_id": "asset_0644e80b9e8838a883359459eef02550",
+        "document_version": "df52361e0a40791e9a37634437700b168eb2f76a2db41fe70b6d17099a549963",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "checked_new_or_repaired": [
+        {
+          "fact_id": "F11A",
+          "element": "scale_and_mix",
+          "fact_sha256": "73d9060f37384161de5902be3ab6b5dd30c9a3d205e6532d0f12a20206e61c33",
+          "evidence_ids": [
+            "source-0020",
+            "source-0021"
+          ],
+          "narrative_period_numbers_and_citations": "source_supported",
+          "reason": "A原PDF44/45直接核客户贷款构成公司类6043810、个人2835038、贴现244723人民币百万元及原各占比，均非贷款净额；对应source-0020/0021完整表头/续页，不将分项重复当总额。",
+          "new_independent_decision": "source_checked"
+        },
+        {
+          "fact_id": "F12",
+          "element": "scale_and_mix",
+          "fact_sha256": "5616f7a8fe22ba6a5e088b346b06b9ad28740ac5b04216c1ef1a6b9d5eec11b6",
+          "evidence_ids": [
+            "source-0024"
+          ],
+          "narrative_period_numbers_and_citations": "source_supported",
+          "reason": "A原PDF51直接核公司金融132749、个人96724、资金34377、其他1221人民币百万元及占比；事实为集团收入构成，metric各为业务板块，不能以事实scope覆盖metric。",
+          "new_independent_decision": "source_checked"
+        },
+        {
+          "fact_id": "F13",
+          "element": "operations_and_inputs",
+          "fact_sha256": "b4df2d20fb7bcf275449f811f2e461ba227e803b4d76f4b0d085a29e228c3250",
+          "evidence_ids": [
+            "source-0017",
+            "source-0018"
+          ],
+          "narrative_period_numbers_and_citations": "source_supported",
+          "reason": "A原PDF38/39直接核平均余额客户存款8895868、同业2351242、债券及其他2120331、生息资产14370823人民币百万元，收益/成本率配各自列；补有必要续页引用，不能误作期末余额。",
+          "new_independent_decision": "source_checked"
+        },
+        {
+          "fact_id": "F14",
+          "element": "operations_and_inputs",
+          "fact_sha256": "6eec7946268205e19fa2789e7e828a997d8c0c3ac959a041789e40df06124bed",
+          "evidence_ids": [
+            "source-0020"
+          ],
+          "narrative_period_numbers_and_citations": "source_supported",
+          "reason": "A原PDF44直接核资产表明确拨备后，贷款8898768、金融投资4527914人民币百万元及占比，原数保持并补限定，不能与未扣减值客户贷款合计混同。",
+          "new_independent_decision": "source_checked"
+        },
+        {
+          "fact_id": "F19",
+          "element": "operating_drivers",
+          "fact_sha256": "ae4d6fb3e96d9fa5ec1c2167eb4ee8ef143ad35a25b75d8e72246a0e1f1052f0",
+          "evidence_ids": [
+            "source-0017",
+            "source-0018"
+          ],
+          "narrative_period_numbers_and_citations": "source_supported",
+          "reason": "A原PDF38/39直接核息差1.08%、净息收益1.20%、贷款3.03%、证券3.02%、存款1.74%及下降比较；当前source-0017页38+0018页39实含表和原因，初核文字称source0019非必要真值，最终实际引用/原源可核。",
+          "new_independent_decision": "source_checked"
+        },
+        {
+          "fact_id": "review-add:OM-interest-income",
+          "element": "revenue_model",
+          "fact_sha256": "e7be0514dc9aea6554b19a3dc69e814dcf8c5a91e918f0d7e5336974d8612980",
+          "evidence_ids": [
+            "source-0017",
+            "source-0016",
+            "source-0002"
+          ],
+          "narrative_period_numbers_and_citations": "source_supported",
+          "reason": "A原PDF37/38直接核利息净收入173075人民币百万元、占65.29%、同比1.91%，保集团2025及盈利机制，不把利息收入总额当净额。",
+          "new_independent_decision": "source_checked"
+        },
+        {
+          "fact_id": "review-add:OM-noninterest-mix",
+          "element": "revenue_model",
+          "fact_sha256": "d5c8a3d6c5737b04e8d21de6b217cc6ef48f3705ef7c34c60c64281c4bb2f53e",
+          "evidence_ids": [
+            "source-0016",
+            "source-0017"
+          ],
+          "narrative_period_numbers_and_citations": "source_supported",
+          "reason": "A原PDF37/38直接核非息91996、手续费净38183、投资24430、其他业务27779人民币百万元及各同口径比较；不与业务板块构成叠加或强补小尾差。",
+          "new_independent_decision": "source_checked"
+        }
+      ],
+      "new_model_findings": [
+        {
+          "id": "F11A-subject-scope",
+          "fact_id": "F11A",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "id": "F12-subject-scope",
+          "fact_id": "F12",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "id": "F13-citation",
+          "fact_id": "F13",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "id": "F14-provision-qualifier",
+          "fact_id": "F14",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "id": "F15-metric-scope",
+          "fact_id": "F15",
+          "resolution": "metrics_limited"
+        },
+        {
+          "id": "F19-citation",
+          "fact_id": "F19",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "id": "OM-interest-income",
+          "fact_id": null,
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "id": "OM-noninterest-mix",
+          "fact_id": null,
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "id": "OM-channels",
+          "fact_id": null,
+          "resolution": "omission_candidate"
+        }
+      ],
+      "resources": {
+        "physical_requests": 3,
+        "charged_tokens": 152788,
+        "cost_status": "unknown",
+        "stopped_reason": null
+      },
+      "automatic_projection_without_A_is_observation_only": true,
+      "conservative_metric_opinion": "F15境内行客户数与issuer母行范围不同，模型限原0/1，保正文及其余画像；不把数值吻合当统计对象等价。"
+    }
+  ],
+  "physical_requests": 10,
+  "charged_tokens": 411019,
+  "wall_seconds": 882.2120524969941,
+  "cost": "unknown",
+  "direct_source_checks_of_new_or_repaired_facts": 11,
+  "scope": "11 new/repaired facts and original high-risk/positive references; unchanged source facts reuse exact compatible prior decisions; not whole-population/new20 accuracy",
+  "main405_protected_before_any_safe_release": true,
+  "historical_scores_unchanged": true,
+  "original_run_manifest": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/000039.SZ/control/task_control.json": "5fd6ec78defecc00e05355994674f11411741ffaf0ccd6186356443affd4e1d0",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/000039.SZ/execution/authorized-plan.json": "e6f351871504705b030adf3e21ea39658f3c82989aa0145f38ac57305faf3a68",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/000039.SZ/execution/review-bases.json": "e889207b207b14da32d7f1f7ded71feb059f9ed363f61b314711a29cb56e3006",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/000039.SZ/execution/safe-profile.json": "8f60063044fac991496cc7e84caed45e2ba6644bf880dbe1a5722e4047090c35",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/000039.SZ/executions/6fx-000039-SZ-20261128/budget.json": "8b666ac451c80204bb637b513516cf4c776117bfe7cb69bddbe3af77842e3267",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/000039.SZ/executions/6fx-000039-SZ-20261128/receipts/001.json": "116e31264db2d5c3b599be9f19a1250cb159e1d82a09fd312200268eb041e37a",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/000039.SZ/executions/6fx-000039-SZ-20261128/receipts/002.json": "cbed5cc8db285a813503cca32f6edc8279474d4fc97ad47f157e70ad7c42e51c",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/000039.SZ/executions/6fx-000039-SZ-20261128/receipts/003.json": "bb3edd0cd10b64bba8005f57e624db5610a2848c07480cbfa19973e24cb75610",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/000039.SZ/executions/6fx-000039-SZ-20261128/result.json": "40465c3f712d4115312c8bced9d2dd0193891a0580a2226b7e22be76ac907819",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/000039.SZ/executions/6fx-000039-SZ-20261128/started.json": "b197cd504cad90ba0097a81daa6d90611f0824a88e54867af908475ca5c80132",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/000039.SZ/reports/company_profile_research_publication.v1.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/600350.SH/control/task_control.json": "3deb76a0dcc50c0ca08468159b8e314271afd561d45ee3a65c0e581ae6020459",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/600350.SH/execution/authorized-plan.json": "fdd9c72711c0369bea08cc21e832e79d8797a23c5e9b5452ea953ff4759115fb",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/600350.SH/execution/review-bases.json": "71c0d6bb402c2f31cd65753010b9e4a8392d502ab671ee1cd07ea3624f37e4c4",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/600350.SH/execution/safe-profile.json": "522315b253a98fd4de7ff8c06b9cd04007837d8a3106a04f8012749bc1bc66f7",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/600350.SH/executions/6fx-600350-SH-20261128/budget.json": "8e845c1625302d51863eeec82f99adc4b76e952b220ec6c34bd869a72c448bad",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/600350.SH/executions/6fx-600350-SH-20261128/receipts/001.json": "6d935724f22c57c191c9f826fd8fa357bd5a014da5fab8a413de7c979c24511b",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/600350.SH/executions/6fx-600350-SH-20261128/receipts/002.json": "9b306c16efa4312918aa1bbed81d1f1b1dc80df1816feecc0f2d91d6f80783fa",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/600350.SH/executions/6fx-600350-SH-20261128/receipts/003.json": "462791033a7487945412ce3ef3f84e397cba3c596c191e50e38bad1acc8dfbd4",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/600350.SH/executions/6fx-600350-SH-20261128/result.json": "3267a0b83a2d844967f38dd1c0c15e2df096782288c34fa192a9d08c9c368dcc",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/600350.SH/executions/6fx-600350-SH-20261128/started.json": "c7307efb0ada7f92a075c444b0c5762c73bf21c1742c5f83c780840dec72e70a",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/600350.SH/reports/company_profile_research_publication.v1.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/601328.SH/control/task_control.json": "8375287276d8724fd7857703cdc055d3249fdc2105cce60602157e016d812da2",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/601328.SH/execution/authorized-plan.json": "689a601f9d8ee9bcca15039bae58fb524886732ad409372a08a2a4a6037ee401",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/601328.SH/execution/review-bases.json": "c0187cd6d307fa12c4b8296b0550899a7db9339bff27013fc9a6fe47e701fe36",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/601328.SH/execution/safe-profile.json": "21275eb4c9f6162965d4defd492bc5e01a8f73a64981dc638873c83c7b2ca109",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/601328.SH/executions/6fx-601328-SH-20261128/budget.json": "20ef6a4ee46675144e2a7cee429ebc02812baf413b88029a7a7332847836f59d",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/601328.SH/executions/6fx-601328-SH-20261128/receipts/001.json": "6285d2cdbb5346b11fead998c0988267156960479ee7ce111505e22312b11ca3",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/601328.SH/executions/6fx-601328-SH-20261128/receipts/002.json": "560b30158f2b0e752aefa64eee67516a3506b5c630607d728b65bd9933b7e20b",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/601328.SH/executions/6fx-601328-SH-20261128/receipts/003.json": "2e968f024305774ff9195120a885a679fb2315fe8ea7f61f197326e21e77cbab",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/601328.SH/executions/6fx-601328-SH-20261128/result.json": "01f1a3e867b95e6a1ac421152ac87e094580b7bec847f025e88dcea50bf51d85",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/601328.SH/executions/6fx-601328-SH-20261128/started.json": "2e3977ec93824133de679d8a1579e2c54529fc9fab08234602c1bae0270f47b1",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/601328.SH/reports/company_profile_research_publication.v1.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/920006.BJ/control/task_control.json": "783b8596c76b7f42e791115fd12e0f01c3de16cc1c532aa565fccab1bd8a65a2",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/920006.BJ/execution/authorized-plan.json": "57db0e126dc034881047eecb7fc307f0e6917fb86d48540ecff983e293681017",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/920006.BJ/execution/review-bases.json": "ac40734395bec021a0c2b5409dfdf5ce43982bd142d75958fcd6946f19db60fd",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/920006.BJ/execution/safe-profile.json": "67eb118bd24412def53efc71f262034363f8fb35514deb6193e57a2e624258c1",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/920006.BJ/executions/6fx-920006-BJ-20261128/budget.json": "62c95f1f2d9357d30b76222166db4a657ea435550fecdbca35f6b815e096e439",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/920006.BJ/executions/6fx-920006-BJ-20261128/receipts/001.json": "d69ed98115a8901582803e080db43c7fc5ac13b96e95dad892611e0ab2eaccd6",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/920006.BJ/executions/6fx-920006-BJ-20261128/result.json": "42de642d8d81b08e71512bf7a141681c1d455d015eb862350559abac1e64ceb1",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/920006.BJ/executions/6fx-920006-BJ-20261128/started.json": "f38484b05127a5b942a1eeb123aad21a35b69834028792a92a19f113d47145c0",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/920006.BJ/reports/company_profile_research_publication.v1.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-0265278312fe929f77b71ae4.json": "6b0dd8285ca5697e36dcf397dfeee88d217fd6cd64fb8ae7eeb9436c7f4f1d8b",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-070141e2f3b0b8fd783e9995.json": "acc324d087dac9d27eb437b6d495bfbffa1fac9b190f41936be5c8b8acda7f31",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-1deffa57365ab12095599a8f.json": "9190ae2b833acf4118a90ece1d2f2ea2f0f5b2d33d89d43c0403625524fc6eb3",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-2d2d4d8fb14d282413fbbb1b.json": "85b839d02976e0be7b7964fd45727dc55cb420475c03e1dcae447f132a8921d0",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-48e5b38db9e2d9737d7a6c78.json": "0e1ac61d276a45ee049c19458fb2c1ec3ac41aecc1c9b61fc19a9be6440eb2eb",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-5dd34b44ee0f10180cf07a8c.json": "a7067b5ef39f3be37727742c09122ec8e756ac47f43ec480d3eb2580c38b0637",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-6bee35aa007675221a3f0124.json": "39548be6932e77ead616187260f057b1606d7030b342d00ec9d5ec4eec0771bd",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-6cb5e399db702402f828e710.json": "0b528fb3dc45a6ab52189ee27e826f3ad14e732bc294850307822dfa6a851eb5",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-7bec633c2400d091092cd7b3.json": "a5dcc3deb95a9682b0daf85e43a101376c86a45814535f04ec5a09c7f3b8f10e",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-90d584ecf4f680518ae247e7.json": "2399026406cb330a55e8b9f249e5f94456aa9736888492bf6bce4bb4153e0279",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-923127a5eb05a33c2b988507.json": "4e8a99a44a0c1d02f6f5e5184f6e88f28fc63e28fd99231c7de371f889f61136",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-9d9c2637afa2f4ffc35c6fcc.json": "843c1a5915371b8b19a70a1059ddbd2110f4aaadc5f79c68c454bd674e04ae96",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-c9d017b96a4eaeda3021a128.json": "23437a1845499dca10df3011a53baf72197e8d5560c8500024912e724516f73a",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-cd0afb1f99731027937f26cf.json": "838108f15616b63ecb31001983bab9add15e191ca86b2d11d3997677f2621c9c",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-ddc3409c996dd2bdcfb355eb.json": "a6458949b4b0a15c7b3e63e1dd6c55efc0af41b8c72feda0f73c64b860835553",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-f1cba483b4bf6e44862a2468.json": "9b9a5655e72a375b3e0ea19f0f596aa4a16f1d70457086a42d3b9d76cc076bf4",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-f324eb47588bae02e1a52b84.json": "b2f85d45048659b5151f520f2447b03746e224f810d6bcbdd2387f77769e43fa",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-f7e0f0a8da3af9c1e51ec585.json": "f6e526cfc4e6d663eaccd05b8348dd07f023e1a5b9279a43ed46fe701f1f2865",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/checkpoints/bp-work-0265278312fe929f77b71ae4.json": "2bdc666878bc66eb44d3bdf39713bb4b63e89f1ae717009b68cc836985a44ccc",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/checkpoints/bp-work-6bee35aa007675221a3f0124.json": "4fec8130460dd274efa5e5c59d1463c81c3896935de4a19b0ab721ddf66645a6",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/checkpoints/bp-work-923127a5eb05a33c2b988507.json": "bb5836edc350702b21cc797959cf347cd2f82ff8a76c14277b1f99f0ac194d4c",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/checkpoints/bp-work-c9d017b96a4eaeda3021a128.json": "69ab6f548f2381c869c3dec9830ba87c62161a435c58aeddea22b335d179862e"
+  }
+}

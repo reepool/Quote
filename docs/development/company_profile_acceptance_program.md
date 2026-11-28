@@ -1,5 +1,7 @@
 # 公司画像分阶段验收计划
 
+2026-11-28[6.FX四类自动流程观察已结束](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/result.md)：模型自主subject限用/联合metric限用真实生效，op-01范围修订及公司/银行收入等11项新增/改动经A原PDF支持，4家基础业务仍成立；10物理411019账本、0恢复、882.212组秒、unknown费用。sm-12租赁metric1本轮仍无新finding，自动无A观察继续依赖旧保护，故预冻四类gate未过，新20未启动、不换样/追加窗。研究四安全后继可用，39现1102/1699、其他35完整保持；这不是新的自动准确率或旧S2回算，不因局部有效宣称95%/99%达标、S3或生产。原入口别名与新计划flag必要修复/直接验证及清理同卡完成。
+
 2026-11-28[6.FW主体口径分级消费](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-subject-consumption-card.md)按已授权零调用开发执行：有据原文与不确定标准化主体分开，API明示主体缺口及使用限制；指标按自身依据，整事实错误仍隔离，后续模型改稿不能解除原限制。B原owner实现及最终69项定向回归通过，A旧39完整兼容核对通过。此为研究交付消费修正及独立源判，不重算6.FU/FV模型目标或6.FN/S2自动准确率，不改95%/99%、S3及生产边界；当前发布实物与清理见本卡结果。
 
 2026-11-27[6.FV单股v15验证已结束](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-v15-subject-observation-20261127/result.md)：用户确认后3物理/107381供应商total账本/0恢复/723.105秒unknown费用，全200/stop无超时；完整25facts/24metric及索引真正使用，3正控未变，但op-01/sm-12仍无新finding，目标0/2未达标。本次不支持索引/优先级解决两项的假设，按卡结束该同股策略，不自动v16/再发或扩20。新增有源营收变动解释经真final和A独核交研究，另1原metric保守限用不当错数；原两安全限制继续，主39=1097/1687、其他38完整不变。旧6.FN/S2失败及95%/99%、S3未启/生产边界保持，新增解释不替代失败结论。

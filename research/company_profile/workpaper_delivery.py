@@ -90,7 +90,7 @@ def project_workpaper_delivery(paper: CompanyProfileWorkpaper) -> dict:
                 reasons.append(decision.reason)
             elif review:
                 unresolved = [f for f in review.findings if f.affected_fact_id == fid
-                              and f.original_fact is not None and f.resolution not in {"corrected_pending_trust", "metrics_limited"}]
+                              and f.original_fact is not None and f.resolution not in {"corrected_pending_trust", "metrics_limited", "subject_scope_limited"}]
                 corrected = [f for f in review.findings if f.resolution == "corrected_pending_trust"
                              and f.revised_fact is not None and f.revised_fact.fact_id == fid]
                 if unresolved:
@@ -118,10 +118,36 @@ def project_workpaper_delivery(paper: CompanyProfileWorkpaper) -> dict:
                                or "保留原文主体、数值或近似限定，不作为确定值使用。")
             restrictions = list(decision.metric_restrictions if decision is not None else ())
             subject_restriction = decision.subject_scope_restriction if decision is not None else None
-            if review and (review.metric_limit_policy == "source_review_exact_metric_limits.v1" or subject_restriction):
+            subject_limits = [finding for finding in (review.findings if review else ())
+                              if finding.resolution == "subject_scope_limited" and finding.affected_fact_id == fid]
+            subject_gap_source = {}
+            if subject_limits:
+                valid_subject_limits = (initial and checked.get(fid) == 1
+                    and review.subject_scope_limit_policy == "source_review_exact_subject_limits.v1"
+                    and all(f.subject_scope_limit is not None
+                            and f.subject_scope_limit.fact_sha256 == workpaper_fact_hash(fact)
+                            and f.element == element and set(f.evidence_ids) == set(fact.evidence_ids)
+                            for f in subject_limits))
+                if valid_subject_limits:
+                    subject_gap_source = {
+                        "review_basis": "independent_and_model_source_check" if subject_restriction else "model_source_check",
+                        "model_finding_ids": [f.finding_id for f in subject_limits],
+                        "model_reasons": [f.explanation for f in subject_limits],
+                        **({"model_review_origin": "inherited_prior_review"}
+                           if all(f.finding_id.startswith("inherited:") for f in subject_limits) else {}),
+                    }
+                    subject_restriction = "；".join(dict.fromkeys(filter(None, (
+                        subject_restriction, *(f.explanation for f in subject_limits)))))
+                    if decision is None:
+                        basis, model_stage = "model_source_check", "initial"
+                elif decision is None or decision.disposition == "source_checked":
+                    state = "withheld"
+                    reasons.append("主体局部核验缺少匹配当前内容/原源核回执的有效绑定，暂隔离整条。")
+            if review and (review.metric_limit_policy == "source_review_exact_metric_limits.v1"
+                           or review.subject_scope_limit_policy == "source_review_exact_subject_limits.v1" or subject_restriction):
                 whole_defects = [finding for finding in review.findings if finding.affected_fact_id == fid
                                  and finding.original_fact is not None
-                                 and finding.resolution not in {"corrected_pending_trust", "metrics_limited"}]
+                                 and finding.resolution not in {"corrected_pending_trust", "metrics_limited", "subject_scope_limited"}]
                 if whole_defects and state not in {"withheld", "source_only", "duplicate"}:
                     state = "withheld"
                     reasons.extend(finding.explanation for finding in whole_defects)
@@ -161,7 +187,8 @@ def project_workpaper_delivery(paper: CompanyProfileWorkpaper) -> dict:
                 payload["uncertainty_reason"] = "；".join(dict.fromkeys(
                     reason for reason in (fact.uncertainty_reason, subject_restriction) if reason))
                 gap = {"field": "subject_scope", "state": "unclear", "reason": subject_restriction,
-                       "consolidated_aggregation_allowed": False, "usage_restriction": usage_restriction}
+                       "consolidated_aggregation_allowed": False, "usage_restriction": usage_restriction,
+                       **subject_gap_source}
                 component_metadata["subject_scope_gap"] = gap
                 subject_scope_gaps.append({"element": element, "fact_id": fid, "status": "unclear",
                     **gap, "evidence_ids": list(fact.evidence_ids),

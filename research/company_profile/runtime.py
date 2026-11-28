@@ -210,6 +210,7 @@ def _reading_policy(identity: Mapping[str, Any] | None) -> tuple:
             "product_contract",
             "workpaper_review_policy",
             "workpaper_metric_limit_policy",
+            "workpaper_subject_scope_limit_policy",
             "workpaper_metric_format_policy",
             "source_recheck_policy",
             "current_review_binding",
@@ -509,11 +510,11 @@ class CompanyProfileStageRuntime:
         if not state.processing_identity.get("workpaper_extraction_resume_hash"):
             state.workpaper_extraction_resume = None
         if item.get("review_seed") is not None:
-            from .workpaper_review import REVIEW_POLICY, workpaper_hash
+            from .workpaper_review import REVIEW_POLICY, SUBJECT_REVIEW_POLICY, workpaper_hash
 
             seed = CompanyProfileWorkpaper.model_validate(item["review_seed"])
             if (
-                state.processing_identity.get("workpaper_review_policy") != REVIEW_POLICY
+                state.processing_identity.get("workpaper_review_policy") not in {REVIEW_POLICY, SUBJECT_REVIEW_POLICY}
                 or state.processing_identity.get("review_existing_draft_hash") != workpaper_hash(seed)
                 or seed.report != state.report
             ):
@@ -689,9 +690,9 @@ class CompanyProfileStageRuntime:
                     state.workpaper_receipts = [dict(item) for item in result.receipts]
                 self._persist_work(state)
             if state.processing_identity.get("workpaper_review_policy") and review_execution != "deferred":
-                from .workpaper_review import REVIEW_POLICY, review_workpaper
+                from .workpaper_review import REVIEW_POLICY, SUBJECT_REVIEW_POLICY, review_workpaper
 
-                if state.processing_identity["workpaper_review_policy"] != REVIEW_POLICY:
+                if state.processing_identity["workpaper_review_policy"] not in {REVIEW_POLICY, SUBJECT_REVIEW_POLICY}:
                     raise ValueError("unknown workpaper review policy")
                 if state.processing_identity.get("review_resume_hash") and state.review_resume is None:
                     raise ValueError("hash-bound review continuation payload is missing")

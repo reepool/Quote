@@ -1,0 +1,106 @@
+{
+  "task": "6.FX",
+  "phase": "post_release_duplicate_pruning",
+  "deleted_files": 16,
+  "deleted_logical_bytes": 4977606,
+  "deleted": [
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/checkpoints/bp-work-923127a5eb05a33c2b988507.json",
+      "sha256": "bb5836edc350702b21cc797959cf347cd2f82ff8a76c14277b1f99f0ac194d4c",
+      "bytes": 565246,
+      "authority": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-923127a5eb05a33c2b988507.json#workpaper/workpaper_receipts; original PDFs and real requests retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/920006.BJ/execution/review-bases.json",
+      "sha256": "ac40734395bec021a0c2b5409dfdf5ce43982bd142d75958fcd6946f19db60fd",
+      "bytes": 6481,
+      "authority": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-923127a5eb05a33c2b988507.json#workpaper.quality_review/use_review"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/920006.BJ/execution/safe-profile.json",
+      "sha256": "67eb118bd24412def53efc71f262034363f8fb35514deb6193e57a2e624258c1",
+      "bytes": 628409,
+      "authority": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-923127a5eb05a33c2b988507.json plus immutable parent records in main root; exact original reader can regenerate pre-A projection"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/920006.BJ/reports/company_profile_research_publication.v1.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "authority": "completed non-production task; no active writer or resumable allowance"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/checkpoints/bp-work-c9d017b96a4eaeda3021a128.json",
+      "sha256": "69ab6f548f2381c869c3dec9830ba87c62161a435c58aeddea22b335d179862e",
+      "bytes": 655576,
+      "authority": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-c9d017b96a4eaeda3021a128.json#workpaper/workpaper_receipts; original PDFs and real requests retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/000039.SZ/execution/review-bases.json",
+      "sha256": "e889207b207b14da32d7f1f7ded71feb059f9ed363f61b314711a29cb56e3006",
+      "bytes": 13678,
+      "authority": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-c9d017b96a4eaeda3021a128.json#workpaper.quality_review/use_review"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/000039.SZ/execution/safe-profile.json",
+      "sha256": "8f60063044fac991496cc7e84caed45e2ba6644bf880dbe1a5722e4047090c35",
+      "bytes": 591264,
+      "authority": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-c9d017b96a4eaeda3021a128.json plus immutable parent records in main root; exact original reader can regenerate pre-A projection"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/000039.SZ/reports/company_profile_research_publication.v1.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "authority": "completed non-production task; no active writer or resumable allowance"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/checkpoints/bp-work-0265278312fe929f77b71ae4.json",
+      "sha256": "2bdc666878bc66eb44d3bdf39713bb4b63e89f1ae717009b68cc836985a44ccc",
+      "bytes": 545512,
+      "authority": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-0265278312fe929f77b71ae4.json#workpaper/workpaper_receipts; original PDFs and real requests retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/600350.SH/execution/review-bases.json",
+      "sha256": "71c0d6bb402c2f31cd65753010b9e4a8392d502ab671ee1cd07ea3624f37e4c4",
+      "bytes": 21588,
+      "authority": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-0265278312fe929f77b71ae4.json#workpaper.quality_review/use_review"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/600350.SH/execution/safe-profile.json",
+      "sha256": "522315b253a98fd4de7ff8c06b9cd04007837d8a3106a04f8012749bc1bc66f7",
+      "bytes": 807794,
+      "authority": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-0265278312fe929f77b71ae4.json plus immutable parent records in main root; exact original reader can regenerate pre-A projection"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/600350.SH/reports/company_profile_research_publication.v1.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "authority": "completed non-production task; no active writer or resumable allowance"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/checkpoints/bp-work-6bee35aa007675221a3f0124.json",
+      "sha256": "4fec8130460dd274efa5e5c59d1463c81c3896935de4a19b0ab721ddf66645a6",
+      "bytes": 674017,
+      "authority": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-6bee35aa007675221a3f0124.json#workpaper/workpaper_receipts; original PDFs and real requests retained"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/601328.SH/execution/review-bases.json",
+      "sha256": "c0187cd6d307fa12c4b8296b0550899a7db9339bff27013fc9a6fe47e701fe36",
+      "bytes": 47267,
+      "authority": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-6bee35aa007675221a3f0124.json#workpaper.quality_review/use_review"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/601328.SH/execution/safe-profile.json",
+      "sha256": "21275eb4c9f6162965d4defd492bc5e01a8f73a64981dc638873c83c7b2ca109",
+      "bytes": 420774,
+      "authority": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-6bee35aa007675221a3f0124.json plus immutable parent records in main root; exact original reader can regenerate pre-A projection"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/601328.SH/reports/company_profile_research_publication.v1.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "authority": "completed non-production task; no active writer or resumable allowance"
+    }
+  ],
+  "preserved": "4 original raw successors, 10 actual wires, 4 ledgers, original started/authorized/result/timeout receipts, A references and current delivery",
+  "recoverability": "exact result data retained in immutable raw records and original sources; completed writer locks are disposable; no new model call required to reconstruct these projections"
+}

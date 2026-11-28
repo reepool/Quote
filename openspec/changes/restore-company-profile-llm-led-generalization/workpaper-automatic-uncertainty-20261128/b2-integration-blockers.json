@@ -1,0 +1,29 @@
+{
+  "state": "resolved_by_B1_original_owner_fix; outer_2_passed; no_model_sends",
+  "owner": "B2 evidence; app fixes belong to B1",
+  "real_model_sends": 0,
+  "main_database_writes": 0,
+  "findings": [
+    {
+      "priority": "P1",
+      "file": "research/company_profile/operations.py",
+      "function": "CompanyProfileTaskService.execute_review_recovery.saved_source (line 785)",
+      "trigger": "First-read original official PDF; current effective asset_id changes, while stock/report period/source announcement/publication/document hash remain the same.",
+      "actual": "Queue terminal_failure ValueError: review recovery source differs from its bound report; zero review transport sends. Batch top-level completed alone is insufficient proof.",
+      "test": "tests/unit/test_research/test_company_profile_6fx_original_entry.py::test_original_first_read_current_review_raw_null_and_fresh_exports[True]",
+      "scope": "Original default OfficialAnnualReportPageSource, real repository and PDF parser, only model transport replaced.",
+      "needed": "Safely verify same-document aliases and keep original evidence/report binding. Different document/source/period must still fail before sending.",
+      "b2_modified_app": false,
+      "current_status": "resolved by B1 official owner alias proof; same B2 outer test now passes; original failure preserved in b2-alias-failure.json"
+    }
+  ],
+  "passing_path": "real execution identity and authorization branches, scripted HTTP only: nonempty 4 facts, raw/null retained, v16 source review, automatic subject limit, inherited independent guard, disk new instance, original reader/export and idempotent retry passed.",
+  "test_fixture_corrections": "severity material; exact recovery work_id selection; real execution identity with scripted HTTP, so model-consumption branches are exercised. All fixture issues resolved; remaining alias failure is in the original owner.",
+  "entry_opt_in": "B1 added compatible strict bool to CompanyProfileTaskPlan, false omitted for old fingerprints. B2 fresh plans set true and operator uses original execute_configured_task -> TaskService/identity factory; B2 did not edit app.",
+  "latest_command": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_6fx_original_entry.py --basetemp=/home/python/Quote/data/QuoteBak/company-profile-6fx-b2-m12VGcQz/final-outer --disable-warnings --tb=short",
+  "historical_result": "1 passed, 1 failed; 114.33 seconds; 0 actual model requests; preserved",
+  "latest_result": "2 passed; 175.90 seconds; 0 actual model requests",
+  "latest_verification_root": "/home/python/Quote/data/QuoteBak/company-profile-6fx-b2-refresh-XLtJ28F3/post-fix-tests",
+  "temporary_evidence": "concise passing/failure evidence persisted; regenerable test roots removed at closeout",
+  "cleanup": "Retain only until direct fix verification; persist concise results then remove B2 test root."
+}

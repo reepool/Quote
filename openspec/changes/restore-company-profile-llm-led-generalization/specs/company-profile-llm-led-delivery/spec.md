@@ -685,6 +685,13 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **AND** operation, the population measured by a statistic and asset ownership MUST remain distinct source relationships; uncertain enumeration alone does not establish a false narrative, and a sourced number alone does not establish the enumeration
 - **AND** absent metadata MUST preserve existing serialization/hash inputs and projections, extraction responses cannot author the independent decision, and unknown or stale bindings MUST be rejected
 
+#### Scenario: Versioned model source review limits only unsupported subject enumeration
+- **WHEN** a newly enabled source-review policy explicitly confirms narrative, period and citations while identifying only an unreliable fact subject enumeration
+- **THEN** the original review contract MAY return an exact fact/evidence-bound subject-only limitation, and the original delivery owner MUST keep supported prose with subject_scope=unclear, reason, source-model attribution, information gap and aggregation restriction without authoring an independent UseReview
+- **AND** the extraction, initial review, repair and final verification contracts MUST distinguish operational actor, statistical population and asset ownership, preserving source-native relationships when one enumeration cannot express them
+- **AND** every metric retains independent support; whole-fact defects and independent restrictions prevail, malformed/stale/unknown limit bindings fail closed, and later edits MUST NOT implicitly lift the prior model or independent restriction
+- **AND** old requests without that policy retain their wire contract and serialization, controlled transport tests establish engineering behavior only, and historical formal failures remain unchanged
+
 #### Scenario: Human reference is rendered for review
 - **WHEN** a human_reference JSON workpaper is used to check presentation and local mapping
 - **THEN** the rendered facts, metrics and evidence remain the same as the JSON and their origin remains visible

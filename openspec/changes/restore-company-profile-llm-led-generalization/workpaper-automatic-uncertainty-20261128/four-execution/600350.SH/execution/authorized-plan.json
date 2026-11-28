@@ -1,0 +1,90 @@
+{
+  "schema_version": "company_profile_task_plan.v1",
+  "run_id": "6fx-600350-SH-20261128",
+  "authorization_status": "authorized",
+  "approval_reference": "User 2026-11-28 explicitly approved the three-part OpenSpec implementation and causal prospective validation; A executes the independently bounded four-known-case prerequisite under company-profile-automatic-uncertainty-card.md",
+  "action": "review_batch",
+  "instrument_ids": [
+    "600350.SH"
+  ],
+  "document_versions": {
+    "600350.SH": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059"
+  },
+  "knowledge_cutoff": "2026-11-28",
+  "output_root": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output",
+  "checkpoint_root": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/600350.SH",
+  "extract": {
+    "name": "semantic_extraction__deepseek",
+    "model": "deepseek-flash",
+    "host": "api.deepseek.com",
+    "attempt_seconds": 600.0,
+    "reasoning_effort": "high",
+    "disable_thinking": null,
+    "max_output_tokens_field": null
+  },
+  "review": {
+    "name": "semantic_extraction__scorpio_grok",
+    "model": "grok-4.7",
+    "host": "scorpio.reepool.com",
+    "attempt_seconds": 1200.0,
+    "reasoning_effort": "high",
+    "disable_thinking": null,
+    "max_output_tokens_field": null
+  },
+  "budget": {
+    "seconds": 6000.0,
+    "tokens": 1000000,
+    "physical_requests": 6,
+    "recoveries": 3,
+    "logical_seconds": 2450.0,
+    "priced_cost_cny": "10",
+    "billing_mode": "development_unpriced"
+  },
+  "review_plans": [
+    {
+      "schema_version": "company_profile_review_recovery_plan.v1",
+      "request_id": "6fx-600350-SH-20261128",
+      "state": "planned",
+      "execution_started": false,
+      "instrument_id": "600350.SH",
+      "report": {
+        "instrument_id": "600350.SH",
+        "report_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-03T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reading_work_id": "bp-work-90d584ecf4f680518ae247e7",
+      "workpaper_sha256": "a9ef920ac78c0f7d6843cda8a01938bc3f4c53298b3f3086ae44d38cc7dc2660",
+      "review_follow_up": {
+        "state": "planned",
+        "execution_started": false,
+        "next_purpose": "review_profile_workpaper",
+        "resume_mode": "review_saved_draft",
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 3,
+        "original_draft_sha256": "6a7eca93f94ba2c5ac0d9fbd7860399fc2c620a57019b654abb9c0f7f8a8f5ed",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_not_started"
+      },
+      "research_only": true,
+      "production_authorization": "not_authorized",
+      "source_recheck_policy": "source_review_current_draft.v1",
+      "current_review_binding": {
+        "current_draft_sha256": "6a7eca93f94ba2c5ac0d9fbd7860399fc2c620a57019b654abb9c0f7f8a8f5ed",
+        "request_draft_sha256": "c6e62121a5c8de5078a0dd15ec2fa523e6738487458913faaf984b47935ffc9f",
+        "source_packet_sha256": "9e530899c73fb0f0f509786c7731648556a43e9069adfe80decb4f17e6bc9fb2"
+      }
+    }
+  ],
+  "enrichment_plan": null,
+  "subject_scope_limits": true
+}

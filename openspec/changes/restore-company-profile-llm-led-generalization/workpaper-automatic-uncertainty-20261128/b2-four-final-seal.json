@@ -1,0 +1,817 @@
+{
+  "schema_version": "6fx_b2_terminal_seal.v1",
+  "status": "sealed_four_gate_not_passed_new20_not_started",
+  "A_verdict": {
+    "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/a-four-source-adjudication.json",
+    "sha256": "c9405b83a44e175d789ddc1d956c46d8e82404761c6b3bb69162f8bbf87e054b",
+    "gate": "not_passed",
+    "new_behavior_demonstrated": true,
+    "four_core_answers_supported": true,
+    "independently_source_checked_new_repaired": 11,
+    "reason": "已知sm-12局部范围问题仍需人工保护，不满足发送前固定的自动无已知误放条件；不启动20，不靠换样或回算过关。",
+    "new_conservative_limits_are_not_confirmed_wrong_number_repairs": true,
+    "not_a_claim_of_no_model_effect": true,
+    "not_a_claim_all_old_targets_solved": true
+  },
+  "original_run_manifest": {
+    "authority": "a-four-source-adjudication.json#original_run_manifest",
+    "files": 64,
+    "all_hashes_verified": true,
+    "manifest_file_sha256": "c9405b83a44e175d789ddc1d956c46d8e82404761c6b3bb69162f8bbf87e054b",
+    "content_copies_not_duplicated": true
+  },
+  "contract": {
+    "path": "b2-runtime-contract.json",
+    "sha256": "6ecaacf3bb02fe0dfd8617ab80ebb1a97cdfc9056b26523d7fb95c4eebf64409",
+    "frozen_code_config_files": 62,
+    "mismatches": []
+  },
+  "resources": {
+    "physical": 10,
+    "logical": 10,
+    "recoveries": 0,
+    "supplier_reported_tokens": 411019,
+    "conservative_ledger": 411019,
+    "group_wall_seconds": 882.2120524969941,
+    "group_stopped": false,
+    "transport_errors": 0,
+    "budget_denials": 0,
+    "current_model_execution_errors": 0,
+    "own_final_checks": 11,
+    "own_final_accepted": 11,
+    "own_final_rejected": 0,
+    "new_findings": 17,
+    "inherited_model_findings": 13,
+    "inherited_independent_decisions": 8,
+    "cost": "unknown",
+    "timing_basis": "Group monotonic dispatch-to-last-completion; per-stock TaskService control timestamps and transport durations reported separately; launch-to-process-exit wall not separately retained."
+  },
+  "cases": [
+    {
+      "instrument_id": "920006.BJ",
+      "work_id": "bp-work-923127a5eb05a33c2b988507",
+      "raw_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-923127a5eb05a33c2b988507.json",
+      "raw_sha256": "4e8a99a44a0c1d02f6f5e5184f6e88f28fc63e28fd99231c7de371f889f61136",
+      "review_status": "completed_with_open_findings",
+      "physical": 1,
+      "logical": 1,
+      "recoveries": 0,
+      "supplier_usage": 47980,
+      "ledger": 47980,
+      "cost": "unknown",
+      "current_execution_errors": null,
+      "budget_stop": null,
+      "budget_denied": null,
+      "task_started_at": "2026-11-28T13:35:10.720772+08:00",
+      "task_finished_at": "2026-11-28T13:40:23.034978+08:00",
+      "task_control_wall_seconds": 312.314206,
+      "transport_seconds": 266.61569765600143,
+      "wires": [
+        {
+          "path": "four-execution/920006.BJ/executions/6fx-920006-BJ-20261128/receipts/001.json",
+          "sha256": "d69ed98115a8901582803e080db43c7fc5ac13b96e95dad892611e0ab2eaccd6",
+          "http": 200,
+          "seconds": 266.61569765600143,
+          "physical_timeout_seconds": 1200,
+          "usage_total": 47980,
+          "own_final_checks": []
+        }
+      ],
+      "new_findings": [
+        {
+          "finding_id": "WR-LM-001",
+          "affected_fact_id": "review-add:WRF-OM-001",
+          "element": "operating_drivers",
+          "issue_type": "other",
+          "resolution": "metrics_limited"
+        }
+      ],
+      "inherited_findings": [
+        {
+          "finding_id": "inherited:inherited:WRF-F004-1",
+          "affected_fact_id": "F004",
+          "resolution": "unresolved"
+        },
+        {
+          "finding_id": "inherited:inherited:WRF-F004-2",
+          "affected_fact_id": "F004",
+          "resolution": "unresolved"
+        }
+      ],
+      "inherited_independent_decisions": [
+        {
+          "fact_id": "F009",
+          "fact_sha256": "5b9f70b2756fa12f1b4019818d07bcd781b2418d8c23194a1ec17521ce38f436",
+          "disposition": "source_checked"
+        },
+        {
+          "fact_id": "F021",
+          "fact_sha256": "f6c890b38473297adf5330d66b813bc3a7431b0f7ec9bdfb0deeff1ba8bc6951",
+          "disposition": "source_checked"
+        }
+      ],
+      "parent_chain_work_ids": [
+        "bp-work-923127a5eb05a33c2b988507",
+        "bp-work-6cb5e399db702402f828e710",
+        "bp-work-070141e2f3b0b8fd783e9995",
+        "bp-work-9d9c2637afa2f4ffc35c6fcc",
+        "bp-work-7bec633c2400d091092cd7b3"
+      ],
+      "parent_chain_complete": true
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "work_id": "bp-work-c9d017b96a4eaeda3021a128",
+      "raw_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-c9d017b96a4eaeda3021a128.json",
+      "raw_sha256": "23437a1845499dca10df3011a53baf72197e8d5560c8500024912e724516f73a",
+      "review_status": "completed_with_open_findings",
+      "physical": 3,
+      "logical": 3,
+      "recoveries": 0,
+      "supplier_usage": 99656,
+      "ledger": 99656,
+      "cost": "unknown",
+      "current_execution_errors": null,
+      "budget_stop": null,
+      "budget_denied": null,
+      "task_started_at": "2026-11-28T13:35:12.603652+08:00",
+      "task_finished_at": "2026-11-28T13:43:25.096605+08:00",
+      "task_control_wall_seconds": 492.492953,
+      "transport_seconds": 445.965990591998,
+      "wires": [
+        {
+          "path": "four-execution/000039.SZ/executions/6fx-000039-SZ-20261128/receipts/001.json",
+          "sha256": "116e31264db2d5c3b599be9f19a1250cb159e1d82a09fd312200268eb041e37a",
+          "http": 200,
+          "seconds": 381.71018130800803,
+          "physical_timeout_seconds": 1200,
+          "usage_total": 57883,
+          "own_final_checks": []
+        },
+        {
+          "path": "four-execution/000039.SZ/executions/6fx-000039-SZ-20261128/receipts/002.json",
+          "sha256": "cbed5cc8db285a813503cca32f6edc8279474d4fc97ad47f157e70ad7c42e51c",
+          "http": 200,
+          "seconds": 16.611989755998366,
+          "physical_timeout_seconds": 600,
+          "usage_total": 19189,
+          "own_final_checks": []
+        },
+        {
+          "path": "four-execution/000039.SZ/executions/6fx-000039-SZ-20261128/receipts/003.json",
+          "sha256": "bb3edd0cd10b64bba8005f57e624db5610a2848c07480cbfa19973e24cb75610",
+          "http": 200,
+          "seconds": 47.64381952799158,
+          "physical_timeout_seconds": 1200,
+          "usage_total": 22584,
+          "own_final_checks": [
+            {
+              "fact_id": "f-020",
+              "accepted": true
+            },
+            {
+              "fact_id": "review-add:om-company-revenue",
+              "accepted": true
+            }
+          ]
+        }
+      ],
+      "new_findings": [
+        {
+          "finding_id": "f020-subject",
+          "affected_fact_id": "f-020",
+          "element": "operating_drivers",
+          "issue_type": "wrong_subject",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "om-company-revenue",
+          "affected_fact_id": null,
+          "element": "scale_and_mix",
+          "issue_type": "material_omission",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "om-elimination",
+          "affected_fact_id": null,
+          "element": "scale_and_mix",
+          "issue_type": "material_omission",
+          "resolution": "omission_candidate"
+        }
+      ],
+      "inherited_findings": [
+        {
+          "finding_id": "inherited:rev-omit-group-revenue",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "inherited:rev-omit-elimination",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate"
+        },
+        {
+          "finding_id": "inherited:inherited:wr-003",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "inherited:inherited:wr-004",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate"
+        },
+        {
+          "finding_id": "inherited:inherited:wr-005",
+          "affected_fact_id": null,
+          "resolution": "omission_candidate"
+        }
+      ],
+      "inherited_independent_decisions": [
+        {
+          "fact_id": "f-023",
+          "fact_sha256": "63fb1da36523a4527b25872adc05ec87ecb7cbd7c921d8d01667e307efaa2256",
+          "disposition": "source_checked"
+        }
+      ],
+      "parent_chain_work_ids": [
+        "bp-work-c9d017b96a4eaeda3021a128",
+        "bp-work-ddc3409c996dd2bdcfb355eb",
+        "bp-work-cd0afb1f99731027937f26cf",
+        "bp-work-2d2d4d8fb14d282413fbbb1b"
+      ],
+      "parent_chain_complete": true
+    },
+    {
+      "instrument_id": "600350.SH",
+      "work_id": "bp-work-0265278312fe929f77b71ae4",
+      "raw_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-0265278312fe929f77b71ae4.json",
+      "raw_sha256": "6b0dd8285ca5697e36dcf397dfeee88d217fd6cd64fb8ae7eeb9436c7f4f1d8b",
+      "review_status": "completed_with_open_findings",
+      "physical": 3,
+      "logical": 3,
+      "recoveries": 0,
+      "supplier_usage": 110595,
+      "ledger": 110595,
+      "cost": "unknown",
+      "current_execution_errors": null,
+      "budget_stop": null,
+      "budget_denied": null,
+      "task_started_at": "2026-11-28T13:35:12.583370+08:00",
+      "task_finished_at": "2026-11-28T13:46:01.143507+08:00",
+      "task_control_wall_seconds": 648.560137,
+      "transport_seconds": 603.9599711819901,
+      "wires": [
+        {
+          "path": "four-execution/600350.SH/executions/6fx-600350-SH-20261128/receipts/001.json",
+          "sha256": "6d935724f22c57c191c9f826fd8fa357bd5a014da5fab8a413de7c979c24511b",
+          "http": 200,
+          "seconds": 491.95499525399646,
+          "physical_timeout_seconds": 1200,
+          "usage_total": 64112,
+          "own_final_checks": []
+        },
+        {
+          "path": "four-execution/600350.SH/executions/6fx-600350-SH-20261128/receipts/002.json",
+          "sha256": "9b306c16efa4312918aa1bbed81d1f1b1dc80df1816feecc0f2d91d6f80783fa",
+          "http": 200,
+          "seconds": 33.02951321398723,
+          "physical_timeout_seconds": 600,
+          "usage_total": 21430,
+          "own_final_checks": []
+        },
+        {
+          "path": "four-execution/600350.SH/executions/6fx-600350-SH-20261128/receipts/003.json",
+          "sha256": "462791033a7487945412ce3ef3f84e397cba3c596c191e50e38bad1acc8dfbd4",
+          "http": 200,
+          "seconds": 78.97546271400643,
+          "physical_timeout_seconds": 1200,
+          "usage_total": 25053,
+          "own_final_checks": [
+            {
+              "fact_id": "op-01",
+              "accepted": true
+            },
+            {
+              "fact_id": "review-add:f-od01-investment-driver-omission",
+              "accepted": true
+            }
+          ]
+        }
+      ],
+      "new_findings": [
+        {
+          "finding_id": "f-bs02-limit-subject-scope",
+          "affected_fact_id": "bs-02",
+          "element": "business_structure",
+          "issue_type": "wrong_subject",
+          "resolution": "subject_scope_limited"
+        },
+        {
+          "finding_id": "f-bs02-limit-metrics",
+          "affected_fact_id": "bs-02",
+          "element": "business_structure",
+          "issue_type": "wrong_subject",
+          "resolution": "metrics_limited"
+        },
+        {
+          "finding_id": "f-op01-wrong-subject",
+          "affected_fact_id": "op-01",
+          "element": "operations_and_inputs",
+          "issue_type": "wrong_subject",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "f-od01-investment-driver-omission",
+          "affected_fact_id": null,
+          "element": "operating_drivers",
+          "issue_type": "material_omission",
+          "resolution": "corrected_pending_trust"
+        }
+      ],
+      "inherited_findings": [
+        {
+          "finding_id": "inherited:f-bs-02-m2-scope",
+          "affected_fact_id": "bs-02",
+          "resolution": "metrics_limited"
+        },
+        {
+          "finding_id": "inherited:inherited:f003",
+          "affected_fact_id": null,
+          "resolution": "unresolved"
+        }
+      ],
+      "inherited_independent_decisions": [
+        {
+          "fact_id": "sm-12",
+          "fact_sha256": "2a896714deae169fc01c1aa2ff0ae5b53948867904561c6d356e500c0d577e08",
+          "disposition": "source_checked"
+        },
+        {
+          "fact_id": "op-01",
+          "fact_sha256": "e1d5f05427b2908656afa75899f3b4d50f02f468b41b5790b246f250e6fa33ab",
+          "disposition": "withheld"
+        },
+        {
+          "fact_id": "cm-01",
+          "fact_sha256": "2567cad8afc854140876eaa1b047966d5c064ca0a484ab49220e99c20dc0400d",
+          "disposition": "source_checked"
+        },
+        {
+          "fact_id": "review-add:f-revenue-decline-driver",
+          "fact_sha256": "11592ee89dd8c1ec4ea64f42422f518065d703c4f077b03ce414900885e280ca",
+          "disposition": "source_checked"
+        },
+        {
+          "fact_id": "bs-02",
+          "fact_sha256": "93c7d09ec8b14fa2cea4f9eb1958d2d862092f0e96f17022236734fa537c2229",
+          "disposition": "source_checked"
+        }
+      ],
+      "parent_chain_work_ids": [
+        "bp-work-0265278312fe929f77b71ae4",
+        "bp-work-90d584ecf4f680518ae247e7",
+        "bp-work-5dd34b44ee0f10180cf07a8c",
+        "bp-work-1deffa57365ab12095599a8f",
+        "bp-work-48e5b38db9e2d9737d7a6c78",
+        "bp-work-f7e0f0a8da3af9c1e51ec585"
+      ],
+      "parent_chain_complete": true,
+      "sm12_gate_failure": {
+        "metric_index": 1,
+        "new_findings": 0,
+        "raw_scope": "consolidated_group",
+        "model_checked_fact": true,
+        "safe_basis": "independent_source_check",
+        "safe_metric1_withheld": true,
+        "A_observation_without_guard": "group and reviewed; known narrow-scope error remains; raw amount itself is not wrong"
+      }
+    },
+    {
+      "instrument_id": "601328.SH",
+      "work_id": "bp-work-6bee35aa007675221a3f0124",
+      "raw_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-6bee35aa007675221a3f0124.json",
+      "raw_sha256": "39548be6932e77ead616187260f057b1606d7030b342d00ec9d5ec4eec0771bd",
+      "review_status": "completed_with_open_findings",
+      "physical": 3,
+      "logical": 3,
+      "recoveries": 0,
+      "supplier_usage": 152788,
+      "ledger": 152788,
+      "cost": "unknown",
+      "current_execution_errors": null,
+      "budget_stop": null,
+      "budget_denied": null,
+      "task_started_at": "2026-11-28T13:34:29.923037+08:00",
+      "task_finished_at": "2026-11-28T13:48:14.852901+08:00",
+      "task_control_wall_seconds": 824.929864,
+      "transport_seconds": 771.8604854680307,
+      "wires": [
+        {
+          "path": "four-execution/601328.SH/executions/6fx-601328-SH-20261128/receipts/001.json",
+          "sha256": "6285d2cdbb5346b11fead998c0988267156960479ee7ce111505e22312b11ca3",
+          "http": 200,
+          "seconds": 414.8487463259953,
+          "physical_timeout_seconds": 1200,
+          "usage_total": 62861,
+          "own_final_checks": []
+        },
+        {
+          "path": "four-execution/601328.SH/executions/6fx-601328-SH-20261128/receipts/002.json",
+          "sha256": "560b30158f2b0e752aefa64eee67516a3506b5c630607d728b65bd9933b7e20b",
+          "http": 200,
+          "seconds": 72.7279532670218,
+          "physical_timeout_seconds": 600,
+          "usage_total": 37272,
+          "own_final_checks": []
+        },
+        {
+          "path": "four-execution/601328.SH/executions/6fx-601328-SH-20261128/receipts/003.json",
+          "sha256": "2e968f024305774ff9195120a885a679fb2315fe8ea7f61f197326e21e77cbab",
+          "http": 200,
+          "seconds": 284.28378587501356,
+          "physical_timeout_seconds": 1200,
+          "usage_total": 52655,
+          "own_final_checks": [
+            {
+              "fact_id": "F11A",
+              "accepted": true
+            },
+            {
+              "fact_id": "F12",
+              "accepted": true
+            },
+            {
+              "fact_id": "F13",
+              "accepted": true
+            },
+            {
+              "fact_id": "F14",
+              "accepted": true
+            },
+            {
+              "fact_id": "F19",
+              "accepted": true
+            },
+            {
+              "fact_id": "review-add:OM-interest-income",
+              "accepted": true
+            },
+            {
+              "fact_id": "review-add:OM-noninterest-mix",
+              "accepted": true
+            }
+          ]
+        }
+      ],
+      "new_findings": [
+        {
+          "finding_id": "F11A-subject-scope",
+          "affected_fact_id": "F11A",
+          "element": "scale_and_mix",
+          "issue_type": "wrong_subject",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "F12-subject-scope",
+          "affected_fact_id": "F12",
+          "element": "scale_and_mix",
+          "issue_type": "wrong_subject",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "F13-citation",
+          "affected_fact_id": "F13",
+          "element": "operations_and_inputs",
+          "issue_type": "other",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "F14-provision-qualifier",
+          "affected_fact_id": "F14",
+          "element": "operations_and_inputs",
+          "issue_type": "other",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "F15-metric-scope",
+          "affected_fact_id": "F15",
+          "element": "customers_channels_markets",
+          "issue_type": "wrong_subject",
+          "resolution": "metrics_limited"
+        },
+        {
+          "finding_id": "F19-citation",
+          "affected_fact_id": "F19",
+          "element": "operating_drivers",
+          "issue_type": "other",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "OM-interest-income",
+          "affected_fact_id": null,
+          "element": "revenue_model",
+          "issue_type": "material_omission",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "OM-noninterest-mix",
+          "affected_fact_id": null,
+          "element": "revenue_model",
+          "issue_type": "material_omission",
+          "resolution": "corrected_pending_trust"
+        },
+        {
+          "finding_id": "OM-channels",
+          "affected_fact_id": null,
+          "element": "customers_channels_markets",
+          "issue_type": "material_omission",
+          "resolution": "omission_candidate"
+        }
+      ],
+      "inherited_findings": [
+        {
+          "finding_id": "inherited:R1",
+          "affected_fact_id": "F15",
+          "resolution": "metrics_limited"
+        },
+        {
+          "finding_id": "inherited:R4",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "inherited:R5",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        },
+        {
+          "finding_id": "inherited:R6",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected"
+        }
+      ],
+      "inherited_independent_decisions": [],
+      "parent_chain_work_ids": [
+        "bp-work-6bee35aa007675221a3f0124",
+        "bp-work-f1cba483b4bf6e44862a2468",
+        "bp-work-f324eb47588bae02e1a52b84"
+      ],
+      "parent_chain_complete": true
+    }
+  ],
+  "original405": {
+    "count": 405,
+    "mismatches": [],
+    "B2_main_writes": 0,
+    "B2_existing_dirty_edits": 0,
+    "services": 0,
+    "commits": 0,
+    "pushes": 0
+  },
+  "new20": {
+    "state": "planned/not_started_due_to_four_gate",
+    "actual_sends": 0,
+    "new_body_reading_stopped": true,
+    "adapter_development_stopped": true,
+    "unused_adapter_removed": {
+      "path": "b2_twenty_adapter.py",
+      "sha256_before_delete": "aaa1a41ead027aa44a8993501de2a918b8d998aca57bc027858c40c0c6bd102e",
+      "bytes": 8349,
+      "executed": false,
+      "rebuildable_from": "existing original 6FN original_phases and prior task scope"
+    },
+    "final_candidate_catalog": {
+      "path": "b2-final20-metadata.json",
+      "sha256": "59a6ed50cd96b66030d6dccdbd93b392ddb6b9bb7a46e836a44aab25ba51007e",
+      "state": "planned/not_started_due_to_four_gate",
+      "full_TOC": false,
+      "historical_full_catalog": {
+        "path": "b2-revised-candidate-sources-v2.json",
+        "sha256": "f8e6fb14e1ad1ceddc8231308beaae5e5eaf9c1917150587de66c49007790dc4",
+        "removed_after_compact_metadata_persisted": true
+      }
+    },
+    "partial_A_references": "retained; no new reading by B2; never treated as fully frozen or executed"
+  },
+  "pending_parent_copy_cleanup": {
+    "state": "completed_after_A_safe_publication_and_explicit_authorization",
+    "count": 14,
+    "logical_bytes": 3347507,
+    "deletions_now": 14,
+    "duplicates": [
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-070141e2f3b0b8fd783e9995.json",
+        "original_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-070141e2f3b0b8fd783e9995.json",
+        "sha256": "acc324d087dac9d27eb437b6d495bfbffa1fac9b190f41936be5c8b8acda7f31",
+        "bytes": 266523,
+        "deleted_after_A_publication": true
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-1deffa57365ab12095599a8f.json",
+        "original_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-1deffa57365ab12095599a8f.json",
+        "sha256": "9190ae2b833acf4118a90ece1d2f2ea2f0f5b2d33d89d43c0403625524fc6eb3",
+        "bytes": 238084,
+        "deleted_after_A_publication": true
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-2d2d4d8fb14d282413fbbb1b.json",
+        "original_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-2d2d4d8fb14d282413fbbb1b.json",
+        "sha256": "85b839d02976e0be7b7964fd45727dc55cb420475c03e1dcae447f132a8921d0",
+        "bytes": 232095,
+        "deleted_after_A_publication": true
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-48e5b38db9e2d9737d7a6c78.json",
+        "original_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-48e5b38db9e2d9737d7a6c78.json",
+        "sha256": "0e1ac61d276a45ee049c19458fb2c1ec3ac41aecc1c9b61fc19a9be6440eb2eb",
+        "bytes": 206628,
+        "deleted_after_A_publication": true
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-5dd34b44ee0f10180cf07a8c.json",
+        "original_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-5dd34b44ee0f10180cf07a8c.json",
+        "sha256": "a7067b5ef39f3be37727742c09122ec8e756ac47f43ec480d3eb2580c38b0637",
+        "bytes": 254318,
+        "deleted_after_A_publication": true
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-6cb5e399db702402f828e710.json",
+        "original_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-6cb5e399db702402f828e710.json",
+        "sha256": "0b528fb3dc45a6ab52189ee27e826f3ad14e732bc294850307822dfa6a851eb5",
+        "bytes": 269919,
+        "deleted_after_A_publication": true
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-7bec633c2400d091092cd7b3.json",
+        "original_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-7bec633c2400d091092cd7b3.json",
+        "sha256": "a5dcc3deb95a9682b0daf85e43a101376c86a45814535f04ec5a09c7f3b8f10e",
+        "bytes": 199859,
+        "deleted_after_A_publication": true
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-90d584ecf4f680518ae247e7.json",
+        "original_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-90d584ecf4f680518ae247e7.json",
+        "sha256": "2399026406cb330a55e8b9f249e5f94456aa9736888492bf6bce4bb4153e0279",
+        "bytes": 231688,
+        "deleted_after_A_publication": true
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-9d9c2637afa2f4ffc35c6fcc.json",
+        "original_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-9d9c2637afa2f4ffc35c6fcc.json",
+        "sha256": "843c1a5915371b8b19a70a1059ddbd2110f4aaadc5f79c68c454bd674e04ae96",
+        "bytes": 241365,
+        "deleted_after_A_publication": true
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-cd0afb1f99731027937f26cf.json",
+        "original_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-cd0afb1f99731027937f26cf.json",
+        "sha256": "838108f15616b63ecb31001983bab9add15e191ca86b2d11d3997677f2621c9c",
+        "bytes": 275450,
+        "deleted_after_A_publication": true
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-ddc3409c996dd2bdcfb355eb.json",
+        "original_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-ddc3409c996dd2bdcfb355eb.json",
+        "sha256": "a6458949b4b0a15c7b3e63e1dd6c55efc0af41b8c72feda0f73c64b860835553",
+        "bytes": 288723,
+        "deleted_after_A_publication": true
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-f1cba483b4bf6e44862a2468.json",
+        "original_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-f1cba483b4bf6e44862a2468.json",
+        "sha256": "9b9a5655e72a375b3e0ea19f0f596aa4a16f1d70457086a42d3b9d76cc076bf4",
+        "bytes": 259414,
+        "deleted_after_A_publication": true
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-f324eb47588bae02e1a52b84.json",
+        "original_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-f324eb47588bae02e1a52b84.json",
+        "sha256": "b2f85d45048659b5151f520f2447b03746e224f810d6bcbdd2387f77769e43fa",
+        "bytes": 201954,
+        "deleted_after_A_publication": true
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-f7e0f0a8da3af9c1e51ec585.json",
+        "original_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-f7e0f0a8da3af9c1e51ec585.json",
+        "sha256": "f6e526cfc4e6d663eaccd05b8348dd07f023e1a5b9279a43ed46fe701f1f2865",
+        "bytes": 181487,
+        "deleted_after_A_publication": true
+      }
+    ],
+    "keep": "raw4, all10 real wires, budget4 and retained original manifest evidence; deleted ancestors recoverable at original main-root authorities"
+  },
+  "cleanup": {
+    "additional_run_or_test_root_deletions": 0,
+    "active_output_deletions": 14,
+    "remaining_B2_temp_roots": [],
+    "earlier_run_db_cleanup": "Already removed before this stop after minimal original-owner rows were persisted in b2-four-run-receipt.json; 15 files/5704236 bytes, no raw/wire/ledger removed.",
+    "state": "completed_after_A_publication",
+    "pre_publication_cleanup_snapshot": {
+      "active_output_deletions": 0,
+      "meaning": "historical pre-authorization snapshot; actual post-release deletions appended here"
+    },
+    "active_output_logical_bytes_deleted": 3347507,
+    "deleted_parent_copies": [
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-070141e2f3b0b8fd783e9995.json",
+        "sha256": "acc324d087dac9d27eb437b6d495bfbffa1fac9b190f41936be5c8b8acda7f31",
+        "bytes": 266523,
+        "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-070141e2f3b0b8fd783e9995.json"
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-1deffa57365ab12095599a8f.json",
+        "sha256": "9190ae2b833acf4118a90ece1d2f2ea2f0f5b2d33d89d43c0403625524fc6eb3",
+        "bytes": 238084,
+        "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-1deffa57365ab12095599a8f.json"
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-2d2d4d8fb14d282413fbbb1b.json",
+        "sha256": "85b839d02976e0be7b7964fd45727dc55cb420475c03e1dcae447f132a8921d0",
+        "bytes": 232095,
+        "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-2d2d4d8fb14d282413fbbb1b.json"
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-48e5b38db9e2d9737d7a6c78.json",
+        "sha256": "0e1ac61d276a45ee049c19458fb2c1ec3ac41aecc1c9b61fc19a9be6440eb2eb",
+        "bytes": 206628,
+        "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-48e5b38db9e2d9737d7a6c78.json"
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-5dd34b44ee0f10180cf07a8c.json",
+        "sha256": "a7067b5ef39f3be37727742c09122ec8e756ac47f43ec480d3eb2580c38b0637",
+        "bytes": 254318,
+        "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-5dd34b44ee0f10180cf07a8c.json"
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-6cb5e399db702402f828e710.json",
+        "sha256": "0b528fb3dc45a6ab52189ee27e826f3ad14e732bc294850307822dfa6a851eb5",
+        "bytes": 269919,
+        "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-6cb5e399db702402f828e710.json"
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-7bec633c2400d091092cd7b3.json",
+        "sha256": "a5dcc3deb95a9682b0daf85e43a101376c86a45814535f04ec5a09c7f3b8f10e",
+        "bytes": 199859,
+        "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-7bec633c2400d091092cd7b3.json"
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-90d584ecf4f680518ae247e7.json",
+        "sha256": "2399026406cb330a55e8b9f249e5f94456aa9736888492bf6bce4bb4153e0279",
+        "bytes": 231688,
+        "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-90d584ecf4f680518ae247e7.json"
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-9d9c2637afa2f4ffc35c6fcc.json",
+        "sha256": "843c1a5915371b8b19a70a1059ddbd2110f4aaadc5f79c68c454bd674e04ae96",
+        "bytes": 241365,
+        "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-9d9c2637afa2f4ffc35c6fcc.json"
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-cd0afb1f99731027937f26cf.json",
+        "sha256": "838108f15616b63ecb31001983bab9add15e191ca86b2d11d3997677f2621c9c",
+        "bytes": 275450,
+        "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-cd0afb1f99731027937f26cf.json"
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-ddc3409c996dd2bdcfb355eb.json",
+        "sha256": "a6458949b4b0a15c7b3e63e1dd6c55efc0af41b8c72feda0f73c64b860835553",
+        "bytes": 288723,
+        "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-ddc3409c996dd2bdcfb355eb.json"
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-f1cba483b4bf6e44862a2468.json",
+        "sha256": "9b9a5655e72a375b3e0ea19f0f596aa4a16f1d70457086a42d3b9d76cc076bf4",
+        "bytes": 259414,
+        "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-f1cba483b4bf6e44862a2468.json"
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-f324eb47588bae02e1a52b84.json",
+        "sha256": "b2f85d45048659b5151f520f2447b03746e224f810d6bcbdd2387f77769e43fa",
+        "bytes": 201954,
+        "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-f324eb47588bae02e1a52b84.json"
+      },
+      {
+        "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-f7e0f0a8da3af9c1e51ec585.json",
+        "sha256": "f6e526cfc4e6d663eaccd05b8348dd07f023e1a5b9279a43ed46fe701f1f2865",
+        "bytes": 181487,
+        "original_main_root_authority": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-f7e0f0a8da3af9c1e51ec585.json"
+      }
+    ],
+    "authority": "A explicit post-publication cleanup instruction and a-release-result.json",
+    "A_release_result_sha256": "af5fb4f0e5555f503edb180cb9ff2eddbb1dcc82e7afa56b95019b0ae26d1b40",
+    "remaining_original_manifest_entries_verified": 50,
+    "raw_successors_preserved": 4,
+    "real_wires_preserved": 10,
+    "budgets_preserved": 4,
+    "compact_candidates": "b2-final20-metadata.json",
+    "removed_full_TOC_candidate_files": 3,
+    "removed_full_TOC_candidate_logical_bytes": 3280710,
+    "no_additional_deletions_in_this_document_sync": true
+  },
+  "snapshot_binding": {
+    "b2-four-run-receipt.json": "6739365a2e5f090978e11b31724b01dde8f91528692fb22adaa2306d6d92a2ca",
+    "b2-four-results.json": "b0ee51f156a22c152329c9034724e0fd8262e6af494b4e86472ddc8609238f28",
+    "b2-four-started.json": "055b6aa8c6b6585e1361a32bd74b8547c3273603e3711a179cf681b91c573c6b",
+    "a-four-run-freeze.json": "6a4abe51c5e721b1365c4f79815d3f141e803c5a986e6427c3ef39cf9ffb1d5a"
+  }
+}

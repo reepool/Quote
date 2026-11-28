@@ -23,7 +23,7 @@ from .workpaper_sections import (
     extract_selected_layout, index_sections, selected_pages,
 )
 
-WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-19.independent-assertions.v21"
+WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-28.subject-relationships.v22"
 SECTION_GUIDE_VERSION = "company_profile_section_guide.2026-11-15.company-features.v4"
 SECTION_GUIDE = (
     {"questions": "做什么、产品/服务用途、怎么经营", "sources": "公司业务/经营模式；公司经营讨论/经营综述/业务回顾的实质子节，优先于纯行业背景和泛化核心竞争力", "priority": "primary"},
@@ -47,9 +47,12 @@ to disguise incorrect narrative/evidence. Source review is still required."""
 def workpaper_processing_identity(
     *, real: bool = True, review: bool = False, review_profile: str | None = None,
     defer_review: bool = False,
+    subject_scope_limits: bool = False,
 ) -> dict[str, Any]:
     if defer_review and not review:
         raise ValueError("deferred workpaper review requires an enabled review policy")
+    if subject_scope_limits and not review:
+        raise ValueError("subject scope limits require an enabled source review")
     identity = {
         "semantic_policy": "company_profile_llm_led.v2",
         "reading_strategy": WORKPAPER_READING_STRATEGY,
@@ -68,16 +71,18 @@ def workpaper_processing_identity(
         "logical_request_timeout_seconds": 620,
     }
     if review:
-        from .workpaper_review import REVIEW_POLICY, METRIC_LIMIT_POLICY
+        from .workpaper_review import REVIEW_POLICY, METRIC_LIMIT_POLICY, SUBJECT_REVIEW_POLICY, SUBJECT_LIMIT_POLICY, SUBJECT_LIMIT_FLAG
 
         if real and not review_profile:
             raise ValueError("real workpaper review requires an explicitly selected enabled profile")
         identity.update(
-            workpaper_review_policy=REVIEW_POLICY,
+            workpaper_review_policy=SUBJECT_REVIEW_POLICY if subject_scope_limits else REVIEW_POLICY,
             workpaper_metric_limit_policy=METRIC_LIMIT_POLICY,
             quality_review_profile=review_profile,
             repair_profile="semantic_extraction__deepseek" if real else None,
         )
+        if subject_scope_limits:
+            identity[SUBJECT_LIMIT_FLAG] = SUBJECT_LIMIT_POLICY
         if defer_review:
             identity["workpaper_review_execution"] = "deferred"
     return identity

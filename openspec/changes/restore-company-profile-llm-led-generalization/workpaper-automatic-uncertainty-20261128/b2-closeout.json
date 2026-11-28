@@ -1,0 +1,138 @@
+{
+  "role": "B2",
+  "state": "four_executed_safe_published_by_A_cleanup_completed; gate_not_passed_new20_not_started",
+  "actual_model_sends": 10,
+  "pre_execution_snapshot": {
+    "state": "engineering_and_four_run_preparation_ready_waiting_A_explicit_freeze",
+    "actual_model_sends": 0,
+    "meaning": "Historical preparation snapshot only; actual execution is appended below, not replaced by the earlier zero-send claim."
+  },
+  "main_database_writes": 0,
+  "original_39_research_writes": 0,
+  "services_started": 0,
+  "commits": 0,
+  "pushes": 0,
+  "plans_state": "planned",
+  "original_research_files_unchanged": 405,
+  "prior_6FW_roots": "absent before preparation",
+  "review": {
+    "blocking_findings_discovered": "P1 official same-document alias refusal; P2 missing explicit task-plan subject opt-in",
+    "resolution": "B1 fixed both in original owners under A authorization; B2 did not edit app files",
+    "engineering_blockers_remaining": 0,
+    "business_gate": "not_passed; sm-12 metric1 still needs inherited independent restriction; new20 stopped",
+    "operator": "original task_entry; ThreadPool max_workers=4; one group-level frozen client wrapper installation; independent per-stock TaskService, DB, checkpoint, started marker and budget; ordinary company failures do not stop other in-flight requests; global stop only for freeze/authentication/deadline; group guard restored only after all workers finish",
+    "preserved_failure": "b2-alias-failure.json; old 6FN/S2 scores not changed"
+  },
+  "verification": {
+    "original_entry_outer": "2 passed in 175.90 seconds; real identity/auth/source/parser/owner/writer/reader/export branches, HTTP transmission controlled only",
+    "reused_B1": "entry_follow_up original-owner plan compatibility and strict alias positive/negative proofs; no broad repeated suite",
+    "static": "Ruff F checks passed for both operators and new test; operator syntax valid; concurrency and group-level wrapper placement reviewed",
+    "network": "require_escalated DNS/TLS/config preflight passed; no model HTTP request; DeepSeek physical600/Grok physical1200/logical2450/runtime2450/provider2450",
+    "fresh_contract": "new process rebuilt all four current-draft bindings, subject_scope_limits=true plans, v16 identity, Schema/code/config hashes and final card hash",
+    "contract_sha256": "6ecaacf3bb02fe0dfd8617ab80ebb1a97cdfc9056b26523d7fb95c4eebf64409",
+    "final_card_sha256": "9d3cd79b848dcb92358bceb00832baa07edee316aeea8f3b4237c25f01fea35b"
+  },
+  "prospective20": {
+    "state": "planned/not_started_due_to_four_gate; metadata and partial A reference only",
+    "catalog": "b2-final20-metadata.json",
+    "counts_by_layer": {"manufacturing": 5, "services": 5, "financial": 5, "multiple_businesses": 5},
+    "counts_by_exchange": {"SH": 12, "SZ": 6, "BJ": 2},
+    "sw_l1_industries": 10,
+    "financial_types": "bank/insurance/securities",
+    "last_correction": "only unread 601860.SH -> first locally valid unused-priority 002807.SZ; preserve already-read 600928/601336/601108 and all other revised-v1 candidates",
+    "reserve_history": "601336/002807 reserve-only metadata and inherited exclusions retained, no observed semantic run/wire/preview; new eligibility is explicit and does not erase an old denominator",
+    "BSE_old_aliases_checked": ["873702", "873726"],
+    "model_answers_loaded": false,
+    "actual_model_sends": 0,
+    "further_adapter_development_and_new_source_body_reading": "stopped",
+    "source_truth_owner": "A only; B2 provides metadata/readiness, not source-semantic verdicts"
+  },
+  "cleanup": {
+    "removed_roots": [
+      "/home/python/Quote/data/QuoteBak/company-profile-6fx-b2-m12VGcQz",
+      "/home/python/Quote/data/QuoteBak/company-profile-6fx-b2-refresh-XLtJ28F3",
+      "/home/python/Quote/data/QuoteBak/company-profile-6fx-b2-final-xZfYqfU7"
+    ],
+    "removed_files": 115,
+    "removed_file_bytes": 10932154,
+    "recoverability": "regenerable controlled test databases/PDF fixtures, repeated exports and process logs; necessary positive/failure/input/source/hash evidence retained once in this workpaper",
+    "remaining_B2_temp_roots": [],
+    "preserved": "formal PDFs/native caches, protected original 405 files, old results and scores, existing dirty20, A/B1 and parallel roots/configuration",
+    "pre_execution_instruction_history": "The former future-run instruction applied to the now-completed authorized four run only; no further company invocation is authorized.",
+    "actual_run_cleanup_already_completed": {
+      "root": "/home/python/Quote/data/QuoteBak/company-profile-6fx-b2-run-CCA1pQBI",
+      "removed_files": 15,
+      "removed_file_bytes": 5704236,
+      "when": "Before A's later retention instruction, after run processes finished and concise original-work provenance was persisted; no raw successor, wire, ledger or parent output removed."
+    },
+    "unused_new20_adapter_removed": {
+      "path": "b2_twenty_adapter.py",
+      "bytes": 8349,
+      "sha256_before_delete": "aaa1a41ead027aa44a8993501de2a918b8d998aca57bc027858c40c0c6bd102e",
+      "invoked": false,
+      "recoverability": "Regenerable from existing 6FN original_phases and task scope; deleted under A's explicit stop."
+    },
+    "pending_duplicate_parent_cleanup": {
+      "list": "b2-four-final.json#cleanup.removed_original_manifest_duplicates",
+      "count": 14,
+      "logical_bytes": 3347507,
+      "deleted_under_A_post_publication_authorization": 14,
+      "logical_bytes_removed": 3347507,
+      "condition": "A published safe4 and explicitly authorized cleanup; every removed ancestor was byte-identical to its preserved main-root authority. Full path/hash/authority mapping is in b2-four-final.json cleanup; raw4/wire10/budget4 remain."
+    },
+    "completed_metadata_cleanup": {
+      "removed_files": 3,
+      "logical_bytes_removed": 3280710,
+      "retained_compact_identity_qualification_and_differences": "b2-final20-metadata.json",
+      "removed_paths_and_hashes": "b2-four-final.json#cleanup.removed_development_candidate_files",
+      "frozen_used_operator_prepare_plan_contract": "retained unchanged as original execution evidence"
+    }
+  },
+  "actual_execution": {
+    "A_freeze": "a-four-run-freeze.json",
+    "authoritative_run_receipt": "b2-four-run-receipt.json",
+    "terminal_self_check_and_seal": "b2-four-final-seal.json; cleanup and pending-parent section now reflect completed14 post-release removals; original0 snapshot retained explicitly as historical",
+    "A_independent_verdict": "a-four-source-adjudication.json",
+    "companies": 4,
+    "physical_requests": 10,
+    "logical_requests": 10,
+    "recoveries": 0,
+    "supplier_reported_total_tokens": 411019,
+    "conservative_ledger": 411019,
+    "group_wall_seconds": 882.2120524969941,
+    "cost": "unknown",
+    "transport_or_http_errors": 0,
+    "budget_denials": 0,
+    "current_model_execution_errors": 0,
+    "new_findings": 17,
+    "inherited_model_findings": 13,
+    "inherited_independent_decisions": 8,
+    "own_final_accepted_checks": 11,
+    "A_independently_source_checked_new_or_repaired_facts": 11,
+    "automatic_no_known_unsafe_gate": "not_passed",
+    "remaining_error": "600350.SH sm-12 metric1 has no new finding, remains group and reviewed without A guard; raw amount is not wrong, inherited A metric restriction remains necessary.",
+    "scope": "New joint subject/metric limit and separately final-checked useful changes are real; do not claim no model effect, all old targets solved or whole-population accuracy.",
+    "all_64_original_manifest_hashes_verified": true,
+    "frozen_code_and_configuration_unchanged": true,
+    "raw4_and_real_wire_and_ledger_unchanged": true,
+    "old_6FN_S2_scores": "unchanged",
+    "new20_sent": 0,
+    "A_safe_publication": {
+      "authority": "a-release-result.json",
+      "safe_successors": 4,
+      "current_companies": 39,
+      "visible_facts": 1102,
+      "visible_metrics": 1699,
+      "other35_complete_unchanged": true,
+      "actual_HTTP": "A verified catalog39 and all four details HTTP200 and full equality",
+      "original_raw_and_model_review_equal": true,
+      "original_recovery_links_point_directly_to_main_parents": true,
+      "raw4_copied_to_main": false,
+      "only_op01_current_new_hash_A_decision_lifts_inherited_withheld": true,
+      "release_model_calls": 0,
+      "B2_main_writes": 0
+    },
+    "final_result_and_cleanup": "b2-four-final.json"
+  },
+  "limits": "Four run, A independent adjudication, A safe publication and authorized cleanup are complete. Automatic no-A gate failed, so no additional four calls/repair/window, no new20 or adapter development/body reading. Frozen original contract/card hash and earlier0-send preparation records remain historical; B2 made no main39 or Git writes."
+}

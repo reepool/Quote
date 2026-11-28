@@ -1,0 +1,18 @@
+{
+  "kind": "original TaskService controlled-transmission engineering failure; not model failure",
+  "actual_model_sends": 0,
+  "original_official_asset_id": "asset-annual-2025",
+  "current_same_document_asset_alias": "same-document-current-asset-alias",
+  "unchanged_fields": ["instrument_id=600000.SH", "source=cninfo", "source_announcement_id=recovery-report", "report_period=2025-12-31", "published_at=2026-03-20T08:00:00+08:00", "PDF content SHA256"],
+  "observed_gateway_sequence": ["select", "extract"],
+  "review_transmissions": 0,
+  "queue": [
+    {"work_id": "bp-work-eee3a4ccbc6a82a44731283e", "state": "completed"},
+    {"work_id": "bp-work-468400eba07c522db4c8f99d", "state": "terminal_failure", "last_error": "ValueError: review recovery source differs from its bound report"}
+  ],
+  "failed_assertion": "Original nonempty sequence must be select -> extract -> review; alias variant never reaches review.",
+  "minimum_location": "research/company_profile/operations.py:785; CompanyProfileTaskService.execute_review_recovery.saved_source",
+  "reproduction": "tests/unit/test_research/test_company_profile_6fx_original_entry.py::test_original_first_read_current_review_raw_null_and_fresh_exports[True]",
+  "readiness": "blocked; no four-class actual group started",
+  "historical_6FN_results": "unchanged"
+}

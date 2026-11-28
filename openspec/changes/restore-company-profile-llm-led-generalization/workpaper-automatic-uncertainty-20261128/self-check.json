@@ -1,0 +1,149 @@
+{
+  "role": "B1",
+  "card": "6.FX",
+  "status": "B1_complete; engineering_ready_for_B2_outer_validation_and_A_independent_source_review",
+  "baseline": "3f7e724d9cbccc4197bd393cce5926ccb5c9c985",
+  "policy": {
+    "identity_factory": "workpaper_processing_identity(real=False, review=True, subject_scope_limits=True)",
+    "workpaper_review_policy": "company_profile_workpaper_review.v16",
+    "workpaper_subject_scope_limit_policy": "source_review_exact_subject_limits.v1",
+    "workpaper_metric_limit_policy": "source_review_exact_metric_limits.v1",
+    "prompt_version": "company_profile_workpaper.2026-11-28.subject-relationships.v22",
+    "response_model": "research.company_profile.workpaper.WorkpaperSubjectReviewResponse",
+    "action": "limit_subject_scope",
+    "subject_scope_limit": {
+      "fact_sha256": "copy the exact fact_hashes entry from this request",
+      "narrative_supported": true,
+      "period_supported": true,
+      "evidence_supported": true
+    },
+    "finding_binding": "exact element + affected_fact_id + fact hash + ALL fact evidence_ids exactly once; explanation must describe the unresolved source relationship; issue_type wrong_subject or other",
+    "persisted_resolution": "subject_scope_limited",
+    "persisted_review_field": "subject_scope_limit_policy",
+    "current_draft_recheck": "retain the original source_recheck_policy=source_review_current_draft.v1; enable the new action via processing identity, not by changing the source-recheck selector"
+  },
+  "scope_and_semantics": {
+    "true_flags": "model source-support judgments only; local code validates strict booleans and exact bindings, not semantic truth",
+    "consumer": "original fact remains unchanged; delivery projects fact subject_scope=unclear, specific reason, gap/acquisition suggestion, model_source_check basis and no consolidated aggregation/comparison",
+    "metrics": "each metric retains its own scope and evidence; original model metric limits and independent restrictions form a conservative union",
+    "whole_fact_errors": "whole narrative/period/citation defects override local scope/metric limits",
+    "independent_review": "model cannot author UseReview or lift independent restrictions",
+    "inheritance": "same hash retains model guard; changed content quarantines rather than retargeting the old subject limit/hash; removed facts retain their gap",
+    "retained_wire": "a v15 current review may inherit a v16 restriction without authorizing the new wire: retained response parsing follows the actual review policy version; inherited limit metadata cannot upgrade that parser",
+    "joint_action_prompt": "only the new subject policy sends SUBJECT_METRIC_LIMIT_INSTRUCTIONS, replacing the old own-scope-support prohibition with explicit same-fact coexistence; wrong narrative/period/citations still require whole-fact handling. The old METRIC_LIMIT_INSTRUCTIONS string and no-flag metric wire remain unchanged",
+    "compatibility": "no-policy wire response/schema unchanged; absent new persisted fields omitted from JSON/hash",
+    "claim": "controlled transport proves engineering only; new-model understanding and four-class acceptance remain unevaluated by B1"
+  },
+  "files_sha256": {
+    "research/company_profile/workpaper.py": "66cd72a62391d5899f905385d4853eebd449128f728d2d93d75c2dd3ceba70a8",
+    "research/company_profile/workpaper_review.py": "c97edbae57e600965d79db07ab5560405d0d2f4a5f04e350d6b9c256317a4782",
+    "research/company_profile/workpaper_llm.py": "5f8935f24794ba6b15c62c2bf5ef4b370756a289b4dc0f08f6cd5fd9d1af51ca",
+    "research/company_profile/workpaper_delivery.py": "b8067b76ee464352e8041720efdbeed1915cb86ca90ca24d0b0cbd02e26dd066",
+    "research/company_profile/runtime.py": "4f52c12b57bf549130f89ab05f5109bda936886d398a507907df837388bf5074",
+    "research/company_profile/operations.py": "39048897d2d7481f2ccbe5c84f5774f795f0a96a8fbc40c1fee31a17dac53072",
+    "research/company_profile/reads.py": "6ae23b97d42ca3eb29ceaecbb1af0f87e0fde0b3b8da9ddd7ab88d5a2b968aee",
+    "tests/unit/test_research/test_company_profile_model_subject_limits.py": "a38ad7eec321ec9f0d8ed07dc141d2b11e77cd7f9e83b2886e6afcea6f500a88"
+  },
+  "verification": [
+    {
+      "command": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_model_subject_limits.py tests/unit/test_research/test_company_profile_review_metric_limits.py tests/unit/test_research/test_company_profile_scope_review_index.py --basetemp /home/python/Quote/data/QuoteBak/company-profile-6fx-b1-cYv4ilyv/final-joint-policy-check",
+      "result": "78 passed in 25.84s; exit 0; includes all 48 new-action cases on the final files_sha256 snapshot",
+      "coverage": "actual new Schema/system-message/parser/automatic delivery joint subject+metric limit; old no-flag metric instructions and Schema unchanged; strict support flags; all exact-binding failures; persistence, whole-fact precedence, independent limits, current-review inheritance and retained v15 wire isolation"
+    },
+    {
+      "command": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_model_subject_limits.py tests/unit/test_research/test_company_profile_scope_review_index.py tests/unit/test_research/test_company_profile_review_recovery.py -k 'not api and not test_plan_rejects_a_reading_that_changes_between_projection_and_binding' --basetemp /home/python/Quote/data/QuoteBak/company-profile-6fx-b1-cYv4ilyv/final-review-recheck",
+      "result": "74 passed, 2 deselected in 39.39s; exit 0; after retained-wire fix, before final prompt-only clarification",
+      "coverage": "retained response parsing, new/old policy boundaries and saved old source-review recovery"
+    },
+    {
+      "command": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_model_subject_limits.py tests/unit/test_research/test_company_profile_current_recheck.py tests/unit/test_research/test_company_profile_scope_review_index.py tests/unit/test_research/test_company_profile_review_metric_limits.py tests/unit/test_research/test_company_profile_workpaper_review.py tests/unit/test_research/test_company_profile_workpaper_delivery.py tests/unit/test_research/test_company_profile_subject_consumption.py -k 'not API' --basetemp /home/python/Quote/data/QuoteBak/company-profile-6fx-b1-cYv4ilyv/regression",
+      "result": "206 passed, 3 deselected in 308.12s; exit 0; before the final retained-wire and prompt-only fixes, which were rechecked separately above",
+      "coverage": "existing current-draft guards, TaskService recovery, repair/final semantics, original writer/reads/export and legacy serialization/frozen hash assertions"
+    },
+    {
+      "command": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_model_subject_limits.py --basetemp /home/python/Quote/data/QuoteBak/company-profile-6fx-b1-cYv4ilyv/subject-wire-final",
+      "result": "46 passed; exit 0",
+      "coverage": "actual wire schema and parser gates, strict true values, invalid bindings, no repair for faithful uncertainty, separate metric limits/independent review, whole-fact precedence, persistent reread, actual extract/review/repair/final system messages, retained initial resume and current-review guards"
+    },
+    {
+      "command": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_review_metric_limits.py tests/unit/test_research/test_company_profile_subject_consumption.py -k 'not runtime_writer and not http and not API' --basetemp /home/python/Quote/data/QuoteBak/company-profile-6fx-b1-cYv4ilyv/initial-check",
+      "result": "49 passed, 3 deselected; exit 0",
+      "coverage": "old model metric limits, independent subject limits, legacy JSON/fact/use-review/delivery/Markdown frozen hashes"
+    }
+  ],
+  "review": {
+    "status": "finite diff review complete; no known remaining blocking defect in B1 scope",
+    "blocking_fixed": [
+      "An inherited v16 subject guard on a new v15 review must not upgrade retained-response parsing or continuation wire authorization; fixed response selection and resume metadata, added direct regression.",
+      "A found conflicting old metric own-scope instructions versus v16 same-fact subject+metric limits. Only the opted-in instruction variant was clarified; actual old/new messages, Schemas, parsing and automatic combined consumption were tested."
+    ],
+    "unrelated_existing_failure": {
+      "test": "tests/unit/test_research/test_company_profile_review_recovery.py::test_plan_rejects_a_reading_that_changes_between_projection_and_binding",
+      "current_run": "18 passed, 1 failed, 1 deselected; expected ValueError('changed while planning') was not raised",
+      "baseline_reproduction": "Same failure reproduced at 3f7e724d9cbccc4197bd393cce5926ccb5c9c985: a temporary importlib loader loaded all seven B1 business modules from git show of that commit, without editing the workspace; the same unchanged test failed at line 195 with DID NOT RAISE ValueError.",
+      "classification": "C: unrelated pre-existing test/reader conflict; left unchanged"
+    },
+    "static_check": "git diff --check for all seven business modules passed"
+  },
+  "resources": {
+    "network_model_calls": 0,
+    "main_research_root_writes": 0,
+    "services_started_or_restarted": 0,
+    "git_mutations": 0,
+    "tooling_note": "Read-only OpenSpec status/instructions CLI attempted its built-in PostHog flush to edge.openspec.dev; restricted DNS failed with EAI_AGAIN. No model request was made.",
+    "asgi_tests": "B1 did not run ASGI; B2 owns the external TaskService/API checks in the authorized environment"
+  },
+  "protection": "B1 edits only the seven named business/runtime modules, the new model-subject unit test and this authorized self-check. Existing core_evidence_selection/core_skeleton/tests and A/B2 documents/operator/tests were not edited by B1.",
+  "cleanup": {
+    "preflight": "only A's parallel 6FX root was present; prior B1 6FW roots already removed per card; no unknown/parallel root deleted",
+    "own_temporary_root": "/home/python/Quote/data/QuoteBak/company-profile-6fx-b1-cYv4ilyv",
+    "state": "removed the exact B1 root after completed processes, evidence/hash validation and path checks; 5196 KiB of regenerable test/runtime/database/baseline-helper artifacts removed; this self-check is the sole retained B1 handoff, no source assets or parallel roots removed"
+  },
+  "entry_follow_up": {
+    "reason": "A/B2 original-entry P1/P2, authorized within 6.FX; original 78/206 results above are preserved as their original snapshots",
+    "status": "P1/P2_fixed; direct_regression_passed; ready_for_B2_A_same_card_acceptance",
+    "parameters_for_B2": {
+      "task_plan_field": "subject_scope_limits",
+      "default": false,
+      "enable_new_contract": true,
+      "default_serialization": "omitted from plan dump, JSON and nested HTTP policy fingerprint, including explicit false",
+      "enabled_identity": "workpaper_review_policy=company_profile_workpaper_review.v16; workpaper_subject_scope_limit_policy=source_review_exact_subject_limits.v1",
+      "owner": "execute_configured_task passes the plan flag into the existing workpaper_processing_identity factory and original execute_published_task/TaskService"
+    },
+    "fixes": [
+      "OfficialAnnualReportPageSource proves the alias through the original work row and its saved execution identity, matching source/announcement/stock/period/document type and queue publication, then reuses repository.get_bound_source_asset's exact local observation proof for current stock/period/hash/publication/source/announcement/asset ID/path. Only the official PageSource may use the exception; different report fields or absent provenance remain rejected.",
+      "After proof, loaded report is projected back to the original saved ReportIdentity; the original workpaper/Evidence and prior model replies are unchanged. This does not accept arbitrary report IDs based only on matching PDF bytes.",
+      "CompanyProfileTaskPlan has a strict bool subject_scope_limits=False; its serializer omits false, preserving existing plan/HTTP fingerprints. Explicit true follows the original task entry into the new source-review identity."
+    ],
+    "files_sha256": {
+      "research/company_profile/operations.py": "86e66d65176df05a87df4dcc0082abd6be0ef49a44eee10b9707a5a34ae64789",
+      "research/company_profile/task_entry.py": "c010ecb9e897dab8396e837fa2a152a5784f04834525d96dd75cfb746a0d6f95",
+      "tests/unit/test_research/test_company_profile_model_subject_limits.py": "0b9bcd101c3e4a7bbf26dfecb8ee8d70d71ab7c82ab83f925615ef610b35a771"
+    },
+    "unchanged_source_hashes": "The other six business module hashes remain exactly as in the original files_sha256 map above.",
+    "verification": [
+      {
+        "command": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_model_subject_limits.py tests/unit/test_research/test_company_profile_configured_task.py::test_started_plan_cannot_get_new_budget_or_change_parameters 'tests/unit/test_research/test_company_profile_configured_task.py::test_explicit_plan_uses_official_source_gateway_first_read_and_saved_review_on_same_owner[source_recheck]' 'tests/unit/test_research/test_company_profile_6fx_original_entry.py::test_original_first_read_current_review_raw_null_and_fresh_exports[False]' --basetemp /home/python/Quote/data/QuoteBak/company-profile-6fx-b1-entry-whDKiAOv/entry-final-regression",
+        "result": "67 passed in 212.39s; exit 0 on this entry_follow_up.files_sha256 snapshot",
+        "meaning": "all 64 B1 subject/action/entry cases, unchanged legacy started-marker fingerprint and no-budget-reopen behavior, original configured first-read/review/source-recheck chain, and B2 unchanged no-alias control through official source/TaskService/persistence/exports"
+      },
+      {
+        "command": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest -q 'tests/unit/test_research/test_company_profile_6fx_original_entry.py::test_original_first_read_current_review_raw_null_and_fresh_exports[True]' --basetemp /home/python/Quote/data/QuoteBak/company-profile-6fx-b1-entry-whDKiAOv/b2-alias-positive",
+        "result": "1 passed in 63.09s; exit 0, before the additional strict document-type rejection check",
+        "meaning": "B2's unchanged original first-read/current-review test: original official asset access/PDF parser/TaskService/gateway/writer/fresh reads and exports, only model transport controlled; no actual model understanding claim"
+      },
+      {
+        "command": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_model_subject_limits.py -k 'task_plan_subject or configured_original_entry or official_alias_proof' --basetemp /home/python/Quote/data/QuoteBak/company-profile-6fx-b1-entry-whDKiAOv/entry-unit",
+        "result": "16 passed, 48 deselected in 10.45s; exit 0",
+        "meaning": "old plan/HTTP fingerprint preservation; explicit flag through execute_configured_task; positive alias and negative stock/period/hash/publication/announcement/source/document-type/queue-time/arbitrary-ID/path/original-identity/missing-work provenance"
+      }
+    ],
+    "review": "finite review complete: P1 official-source alias rejection and P2 plan/identity wiring fixed; direct positive/negative checks passed; no known remaining B1-scope blocking defect. B2 test/operator and A document files unchanged by B1; no further framework or broad-suite work added.",
+    "boundaries": "0 real model/network sends, 0 main database/research-root writes, 0 services, 0 Git mutations; old dirty and parallel A/B2 content protected",
+    "cleanup": {
+      "preflight": "previous B1 root already removed; no A/B2 or unknown temporary root deleted",
+      "own_root": "/home/python/Quote/data/QuoteBak/company-profile-6fx-b1-entry-whDKiAOv",
+      "state": "all direct checks and finite review complete; removed this exact B1 root after process completion and path/evidence/hash checks, freeing 4808 KiB of regenerable test/runtime/database artifacts. No parallel roots, original reports, user dirty or B2 files removed; this appended section is the sole retained B1 follow-up"
+    }
+  }
+}

@@ -6,6 +6,8 @@
 
 ## 当前39股研究读取（2026-11-27，6.FR）
 
+2026-11-28当前增量：四类已核后继已进入同一读取root，现39股1102条内容、1699个可见指标；[四家最新人读版](../../data/research/company_profile_research_v1_20261123/four-reviewed-current-6fx-20261128.md)及[JSON](../../data/research/company_profile_research_v1_20261123/four-reviewed-current-6fx-20261128.json)。新计划可显式设置`subject_scope_limits: true`，经原task_entry启用v16模型主体局部限用；未设置或false保旧计划指纹/行为，不改变现有耗尽live窗口。模型判断显示在subject_scope_gap的review_basis/model_finding_ids中，人工限制另保。四类自动gate因仍漏一项指标范围未过，新20未启动，当前内容不代表新的正式准确率或生产许可；下方6.FR数量与窗口为原轮历史。
+
 API进程显式设置`QUOTE_COMPANY_PROFILE_RESEARCH_ROOT=/home/python/Quote/data/research/company_profile_research_v1_20261123`。
 该变量必须在服务器端启动API的环境中设置；Postman请求或另一个终端里的export不会改变已运行的进程。
 当前`192.168.188.66:8000`由`quote-system.service`启动，沿应用既有启动逻辑读取项目`.env`中的这一个目录变量。

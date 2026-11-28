@@ -1,0 +1,63 @@
+{
+  "task": "6.FX",
+  "state": "partial_reference_stopped_after_four_gate_not_passed; new20_not_started",
+  "model_sends": 0,
+  "authority": "A original PDF reading; no model output used as source truth; reference excluded from model input",
+  "method": "TOC/bookmarks locate business overview and operating/income sections. Read dense sources and necessary table continuations; physical pages are per-report coordinates, not a reusable page-selection rule. Three basic questions require all material source businesses, with company scale and major income categories as important support. Optional supply chain/features may be absent.",
+  "companies": [
+    {
+      "instrument_id": "920022.BJ",
+      "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+      "name": "世昌股份",
+      "source": "第四节/一、业务概要及二、经营回顾/营业情况分析，物理12–13、17–19；封面2/提示4另核身份",
+      "core_questions": ["汽车燃料系统研发制造销售服务，热管理子业务仍在初期", "常压/高压塑料燃油箱总成，辅以配件及热管理产品", "以销定产、以产定购，对整车厂/系统集成商直销，项目定点后量产交付"],
+      "important_numbers": {"company_revenue_CNY": "667113776.81", "fuel_tank_revenue_CNY": "626910726.45", "main_business_revenue_CNY": "654239392.25"},
+      "qualifications": ["热管理规模较小不能冒称主业收入", "跨页18–19产品表延续原表头/元；境内外分类不是独立经营分部", "客户代称豁免披露，不能猜全称"]
+    },
+    {
+      "instrument_id": "002050.SZ",
+      "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+      "name": "三花智控",
+      "source": "第三节/一、主要业务、三、主营分析/收入与成本，物理10、15–16",
+      "core_questions": ["围绕热管理/热泵技术，制冷空调电器零部件与汽车零部件两大业务", "阀/换热器/泵/控制器传感器及汽车热管理控制部件，面向暖通家电和汽车应用", "研发制造销售零部件及解决方案，以直销为主，主收入两板块均需描述"],
+      "important_numbers": {"company_revenue_CNY": "31011744510.27", "refrigeration_revenue_CNY": "18584743718.09", "automotive_revenue_CNY": "12427000792.18", "refrigeration_share": "59.93%", "automotive_share": "40.07%"},
+      "qualifications": ["整车制造不适用不等于没有汽车零部件业务", "仿生机器人执行器为新兴拓展，不编造独立收入", "区域/销售模式分类与产品表不同轴，不重复加总"]
+    },
+    {
+      "instrument_id": "002463.SZ",
+      "document_version": "9810736ee50d0fa7f4d8e8370e3965bde8e24c6dbafb86593ae2206b0e2f2f15",
+      "name": "沪电股份",
+      "source": "第三节/一、主要业务、主营分析/收入与成本，物理10、20（印刷页8/18）",
+      "core_questions": ["专注PCB印制电路板制造", "以数据通讯、智能汽车应用为核心，辅以工业控制及其他PCB", "研发生产销售PCB并提供售后服务，产品销售为收入主体"],
+      "important_numbers": {"company_revenue_CNY": "18945220585", "PCB_revenue_CNY": "18143308261", "data_communications_CNY": "14656300288", "smart_auto_CNY": "3044579100", "industrial_other_CNY": "442428873"},
+      "qualifications": ["房屋销售/物业费/可回收边角料及租赁仍有其他收入，不将非核心收入改成零", "按PCB应用划分与内外销是不同分类轴；名称优化未改变原统计口径"]
+    },
+    {
+      "instrument_id": "920026.BJ",
+      "document_version": "01c7633ee247fcdba006c7007279cf005c92fa90f9638b9ab3e3ed676819aac0",
+      "name": "卓兆点胶",
+      "source": "第四节/一、业务概要及二、营业情况分析/收入构成，物理12–13、19–21；年度大事记2核并购时点",
+      "core_questions": ["高精度智能点胶设备、阀及核心部件、耗材配件的研发生产销售", "智能点胶设备、点胶阀及配件、点胶耗材三类主要收入产品", "标准化模块硬件加定制功能，直接销售为主、少量经贸易商，主业产品销售另有厂租等其他收入"],
+      "important_numbers": {"company_revenue_CNY": "378588845.41", "main_business_revenue_CNY": "372004939.24", "equipment_CNY": "78924520.62", "valves_parts_CNY": "185327234.79", "consumables_CNY": "100413711.33"},
+      "qualifications": ["收购广东浦森51%在2025年1月完成，2026年施工合同不能标成2025已完工", "耗材是重要新增收入，不能只写设备/阀", "跨页19–21保本上期、费用与产品表口径，不把其他业务全说成厂租"]
+    },
+    {
+      "instrument_id": "603605.SH",
+      "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+      "name": "珀莱雅",
+      "source": "第三节/一、业务情况及三、经营讨论，物理11–13",
+      "core_questions": ["多品牌化妆品研发生产销售，覆盖护肤、彩妆和洗护", "珀莱雅/彩棠/OR等品牌，产品主类护肤含洁肤、美容彩妆、洗护", "线上直营/分销为主、线下经销并行；自主生产为主并有OEM/ODM"],
+      "important_numbers": {"company_revenue_raw": "105.97亿元", "main_business_revenue_raw": "105.85亿元", "skin_care_raw": "81.82亿元", "makeup_raw": "15.63亿元", "hair_body_care_raw": "8.40亿元", "online_main_share": "95.58%"},
+      "qualifications": ["收入同比实际下降1.68%，不可照模板小标题写增长", "品牌/渠道/品类是同一主营收入的不同拆分不能加总", "渠道/品牌占比的分母是主营业务总收入，源表已明示，保原文即可"]
+    },
+    {
+      "instrument_id": "601000.SH",
+      "document_version": "2a609f967dbcd75e6db696a1aa4ac10a205a5c12c02ca974b55ccedf72f307dc",
+      "name": "唐山港",
+      "source": "第三节/一、业务情况、三、经营讨论及五、主要经营/利润表分析，物理10–12",
+      "core_questions": ["京唐港区港口建设运营与综合运输服务", "装卸堆存、运输物流、保税仓储和港口综合服务，以矿石煤炭钢材等货种为主", "按港口作业/运输合同提供作业增值服务，收作业包干费、库场使用费及理货服务费"],
+      "important_numbers": {"company_revenue_CNY": "5683742176.20", "cargo_throughput_raw": "2.42亿吨", "ore_raw": "1.29亿吨", "coal_raw": "0.66亿吨"},
+      "qualifications": ["全国港口183.4亿吨不是公司吞吐量", "收入下降0.71%而利润总额增长2.09%，指标含义不能互换", "51/52泊位即将实质建设与已投产项目需区分"]
+    }
+  ]
+}

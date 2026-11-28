@@ -51,6 +51,12 @@ WORKPAPER_SUBJECT_INSTRUCTIONS = SUBJECT_SCOPE_DESCRIPTION + (
     "to original and repaired facts alike; never change a label just to pass review. "
     "A locatable amount, similar amounts or an arithmetic sum alone cannot establish "
     "subject scope or equivalence between source categories."
+    "\nAn operating/management actor, a metric's statistical slice and asset ownership "
+    "are different relationships. Entrusted management does not establish ownership. "
+    "Geography or sales mode alone does not establish a business segment. Preserve the "
+    "source's actual relationships in the narrative; when one enum cannot faithfully "
+    "express them, use unclear with a specific reason. Unclear/unknown cannot excuse "
+    "known wrong narrative, period or citations. Metrics keep their own source scope."
 )
 Status = Literal[
     "observed", "not_disclosed", "not_applicable", "extraction_failed", "unclear"
@@ -813,6 +819,43 @@ class WorkpaperReviewResponse(_Model):
     findings: tuple[WorkpaperReviewFindingDraft, ...] = ()
 
 
+class WorkpaperReviewSubjectScopeLimit(_Model):
+    """Support for the original assertion, without asserting its scope enum."""
+
+    fact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    narrative_supported: Literal[True]
+    period_supported: Literal[True]
+    evidence_supported: Literal[True]
+
+    @model_validator(mode="before")
+    @classmethod
+    def strict_support(cls, value):
+        if isinstance(value, Mapping) and any(value.get(key) is not True for key in (
+            "narrative_supported", "period_supported", "evidence_supported",
+        )):
+            raise ValueError("subject scope limit requires explicit true narrative/period/evidence support")
+        return value
+
+
+class WorkpaperSubjectReviewFindingDraft(WorkpaperReviewFindingDraft):
+    """Only the opted-in wire advertises the new action and support payload."""
+
+    action: Literal["quarantine", "correct", "possible_omission", "human_review", "limit_metrics", "limit_subject_scope"]
+    subject_scope_limit: WorkpaperReviewSubjectScopeLimit | None = None
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_shape(self, handler):
+        payload = handler(self)
+        for key in ("metric_limit", "subject_scope_limit"):
+            if getattr(self, key) is None:
+                payload.pop(key, None)
+        return payload
+
+
+class WorkpaperSubjectReviewResponse(WorkpaperReviewResponse):
+    findings: tuple[WorkpaperSubjectReviewFindingDraft, ...] = ()
+
+
 class WorkpaperRepairResponse(_Model):
     """Raw candidates: identities first, then each full fact is validated locally."""
 
@@ -857,16 +900,20 @@ class WorkpaperReviewFinding(_Model):
     resolution: Literal[
         "quarantined", "corrected_pending_trust", "unresolved",
         "omission_candidate", "repair_rejected", "verification_failed", "metrics_limited",
+        "subject_scope_limited",
     ]
     original_fact: WorkpaperFact | None = None
     revised_fact: WorkpaperFact | None = None
     metric_limit: WorkpaperReviewMetricLimit | None = None
+    subject_scope_limit: WorkpaperReviewSubjectScopeLimit | None = None
 
     @model_serializer(mode="wrap")
     def preserve_legacy_shape(self, handler):
         payload = handler(self)
         if self.metric_limit is None:
             payload.pop("metric_limit", None)
+        if self.subject_scope_limit is None:
+            payload.pop("subject_scope_limit", None)
         return payload
 
     @model_validator(mode="after")
@@ -881,6 +928,16 @@ class WorkpaperReviewFinding(_Model):
                 raise ValueError("metric-only review requires exact original fact/hash and unique valid indices")
         elif self.metric_limit is not None:
             raise ValueError("metric-only support cannot accompany a whole-fact resolution")
+        if self.resolution == "subject_scope_limited":
+            limit, fact = self.subject_scope_limit, self.original_fact
+            if (limit is None or fact is None or self.affected_fact_id != fact.fact_id
+                or self.revised_fact is not None or limit.fact_sha256 != workpaper_fact_hash(fact)
+                or set(self.evidence_ids) != set(fact.evidence_ids)
+                or len(self.evidence_ids) != len(set(self.evidence_ids))
+                or self.issue_type not in {"wrong_subject", "other"} or not self.explanation.strip()):
+                raise ValueError("subject scope review requires exact fact/hash, all evidence and specific scope reason")
+        elif self.subject_scope_limit is not None:
+            raise ValueError("subject scope support cannot accompany another resolution")
         return self
 
 
@@ -909,6 +966,7 @@ class WorkpaperQualityReview(_Model):
     checked_fact_hashes: dict[str, str] | None = None
     execution_failure: WorkpaperReviewExecutionFailure | None = None
     metric_limit_policy: Literal["source_review_exact_metric_limits.v1"] | None = None
+    subject_scope_limit_policy: Literal["source_review_exact_subject_limits.v1"] | None = None
 
     @model_serializer(mode="wrap")
     def preserve_legacy_shape(self, handler):
@@ -919,6 +977,8 @@ class WorkpaperQualityReview(_Model):
             payload.pop("execution_failure", None)
         if self.metric_limit_policy is None:
             payload.pop("metric_limit_policy", None)
+        if self.subject_scope_limit_policy is None:
+            payload.pop("subject_scope_limit_policy", None)
         return payload
 
 
@@ -1016,16 +1076,26 @@ class CompanyProfileWorkpaper(_Model):
                 if set(finding.evidence_ids) - sources_set:
                     raise ValueError("review finding cites unknown source evidence")
         ids: set[str] = set()
-        facts = {}
-        for section in workpaper_elements(self).values():
+        facts, fact_elements = {}, {}
+        for name, section in workpaper_elements(self).items():
             for fact in section.facts:
                 if fact.fact_id in ids:
                     raise ValueError("duplicate fact identity")
                 ids.add(fact.fact_id)
                 facts[fact.fact_id] = fact
+                fact_elements[fact.fact_id] = name
                 _check_fact_source(fact, sources)
         if self.quality_review is not None:
             for finding in self.quality_review.findings:
+                if finding.resolution == "subject_scope_limited":
+                    if self.quality_review.subject_scope_limit_policy != "source_review_exact_subject_limits.v1":
+                        raise ValueError("subject scope source review requires its explicit policy")
+                    current = facts.get(finding.affected_fact_id)
+                    if current is not None and (
+                        workpaper_fact_hash(current) != finding.subject_scope_limit.fact_sha256
+                        or fact_elements[current.fact_id] != finding.element
+                    ):
+                        raise ValueError("subject scope source review content/element is stale")
                 if finding.resolution != "metrics_limited":
                     continue
                 if self.quality_review.metric_limit_policy != "source_review_exact_metric_limits.v1":

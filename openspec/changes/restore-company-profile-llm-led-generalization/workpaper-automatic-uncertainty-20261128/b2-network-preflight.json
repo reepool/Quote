@@ -1,0 +1,49 @@
+{
+  "state": "passed",
+  "actual_model_sends": 0,
+  "config_sha256": "7650f2960b036815a6c05649ca9caba7d518b73380e561e334db49d062d82233",
+  "environment_file_sha256": "cdaff5c614ae2269e98f35527d70bc6c141b5f78418f21f020623135c00d907a",
+  "profiles": [
+    {
+      "profile_sha256": "7b340448768a9fda1b23ce9c1bc92db45819375c3bc5d5378349dcb8fbf8bdd3",
+      "endpoint_sha256": "a34e2a4708ed1c61008a151688838dcf1c44d4e7f08054633e72ba7c0b16cfc1",
+      "model": "deepseek-flash",
+      "credential_present": true,
+      "reasoning_effort": "high",
+      "logical_seconds": 2450.0,
+      "physical_seconds": 600.0
+    },
+    {
+      "profile_sha256": "48ee950c15c8b8aa41765932b1ab77af4d960eda43984d7c6ab043387789e0e0",
+      "endpoint_sha256": "b7caeb14fd29ea24d2e4cd72f2215d2520b374903908df863a705d2ebe86674a",
+      "model": "grok-4.7",
+      "credential_present": true,
+      "reasoning_effort": "high",
+      "logical_seconds": 2450.0,
+      "physical_seconds": 1200.0
+    }
+  ],
+  "checks": [
+    {
+      "endpoint_sha256": "a34e2a4708ed1c61008a151688838dcf1c44d4e7f08054633e72ba7c0b16cfc1",
+      "dns_address_count": 2,
+      "tls_version": "TLSv1.3",
+      "tls_verified": true,
+      "profile_timeout_seconds": 2450.0,
+      "physical_attempt_seconds": 600.0,
+      "runtime_logical_seconds": 2450.0,
+      "provider_logical_seconds": 2450.0
+    },
+    {
+      "endpoint_sha256": "b7caeb14fd29ea24d2e4cd72f2215d2520b374903908df863a705d2ebe86674a",
+      "dns_address_count": 1,
+      "tls_version": "TLSv1.3",
+      "tls_verified": true,
+      "profile_timeout_seconds": 2450.0,
+      "physical_attempt_seconds": 1200.0,
+      "runtime_logical_seconds": 2450.0,
+      "provider_logical_seconds": 2450.0
+    }
+  ],
+  "note": "DNS/TLS only; no model endpoint HTTP request or ASGI/service start"
+}

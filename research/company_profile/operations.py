@@ -502,6 +502,45 @@ class OfficialAnnualReportPageSource:
             "source_pdf_path": str(asset.get("archive_path") or ""),
         }
 
+    def bind_saved_report_alias(self, loaded, item, record):
+        """Prove a local asset alias through the original queue and verified owner.
+
+        A matching PDF hash alone cannot substitute a different filing. Retain
+        the saved report/Evidence identity after checking both work provenance
+        and the current immutable asset observation.
+        """
+        from research.company_profile.models import ReportIdentity
+
+        expected = record.report
+        actual = ReportIdentity.model_validate(loaded.get("report"))
+        if actual.model_dump(exclude={"report_id"}) != expected.model_dump(exclude={"report_id"}):
+            raise ValueError("review recovery source differs from its bound report")
+        try:
+            previous = self.repository.get(record.work_id)
+        except KeyError as exc:
+            raise ValueError("review recovery alias has no original work provenance") from exc
+        identity = record.execution.input_identity
+        if (identity is None or any(getattr(identity, key) != getattr(expected, key) for key in (
+            "instrument_id", "report_id", "document_version", "report_period"))
+            or any(not previous.get(key) or previous[key] != item.get(key) for key in (
+                "instrument_id", "source", "announcement_id", "report_period", "document_type"))
+            or not (previous.get("metadata") or {}).get("published_at")
+            or (previous.get("metadata") or {}).get("published_at") != (item.get("metadata") or {}).get("published_at")):
+            raise ValueError("review recovery alias has different original work/filing provenance")
+        # This existing owner verifies the exact observation locally, including
+        # its content hash, instead of trusting the loaded report's ID spelling.
+        asset = self.repository.get_bound_source_asset(item)
+        if (not asset or asset.get("status") != "verified" or asset.get("integrity_status") != "valid"
+            or any(str(asset.get(key) or "") != value for key, value in (
+                ("instrument_id", expected.instrument_id), ("report_period", expected.report_period),
+                ("content_hash", expected.document_version), ("published_at", expected.published_at),
+                ("report_type", expected.document_type),
+                ("source", previous["source"]), ("filing_id", previous["announcement_id"]),
+                ("source_asset_id", actual.report_id), ("archive_path", str(loaded.get("source_pdf_path") or "")),
+            ))):
+            raise ValueError("review recovery alias lacks the same verified official document")
+        return {**loaded, "report": expected}
+
 
 class CompanyProfileTaskControl:
     """Cooperative stop/progress snapshot for the published task operations."""
@@ -753,6 +792,13 @@ class CompanyProfileTaskService:
         from .workpaper_metric_format import METRIC_FORMAT_FLAG
 
         if source_recheck_policy is None:
+            from .workpaper_review import REVIEW_POLICY, SUBJECT_LIMIT_FLAG
+
+            identity.pop(SUBJECT_LIMIT_FLAG, None)
+            if saved_identity.get(SUBJECT_LIMIT_FLAG) is not None:
+                identity[SUBJECT_LIMIT_FLAG] = saved_identity[SUBJECT_LIMIT_FLAG]
+            identity["workpaper_review_policy"] = (resume["review_policy_version"] if resume is not None
+                else saved_identity.get("workpaper_review_policy") or REVIEW_POLICY)
             saved_policy = saved_identity.get(METRIC_FORMAT_FLAG)
             identity.pop(METRIC_FORMAT_FLAG, None)
             if saved_policy is not None:
@@ -776,8 +822,12 @@ class CompanyProfileTaskService:
 
         def saved_source(item):
             loaded = old_source(item)
-            if not loaded or ReportIdentity.model_validate(loaded.get("report")) != base.report:
+            if not loaded:
                 raise ValueError("review recovery source differs from its bound report")
+            if ReportIdentity.model_validate(loaded.get("report")) != base.report:
+                if not isinstance(old_source, OfficialAnnualReportPageSource):
+                    raise ValueError("review recovery source differs from its bound report")
+                loaded = old_source.bind_saved_report_alias(loaded, item, base)
             return {**loaded, "review_seed": seed.model_dump(mode="json"), "review_resume": resume,
                     "review_seed_receipts": receipts}
 

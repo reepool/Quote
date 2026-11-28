@@ -1,0 +1,117 @@
+{
+  "state": "pending_A_gate",
+  "results": [
+    {
+      "instrument_id": "920006.BJ",
+      "result": {
+        "action": "review_batch",
+        "state": "completed",
+        "items": [
+          {
+            "instrument_id": "920006.BJ",
+            "request_id": "6fx-920006-BJ-20261128",
+            "state": "completed",
+            "work_id": "bp-work-923127a5eb05a33c2b988507",
+            "review_status": "completed_with_open_findings"
+          }
+        ],
+        "stop_reason": null,
+        "remaining_request_ids": [],
+        "research_only": true,
+        "production_authorization": "not_authorized",
+        "execution_plan": {
+          "run_id": "6fx-920006-BJ-20261128",
+          "plan_sha256": "5da1e84597dd2b6797727a860c0fd227ecb57d08524af264eacc0cfa83dd6699",
+          "budget_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/920006.BJ/executions/6fx-920006-BJ-20261128/budget.json",
+          "production_authorization": "not_authorized"
+        }
+      }
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "result": {
+        "action": "review_batch",
+        "state": "completed",
+        "items": [
+          {
+            "instrument_id": "000039.SZ",
+            "request_id": "6fx-000039-SZ-20261128",
+            "state": "completed",
+            "work_id": "bp-work-c9d017b96a4eaeda3021a128",
+            "review_status": "completed_with_open_findings"
+          }
+        ],
+        "stop_reason": null,
+        "remaining_request_ids": [],
+        "research_only": true,
+        "production_authorization": "not_authorized",
+        "execution_plan": {
+          "run_id": "6fx-000039-SZ-20261128",
+          "plan_sha256": "6514d8ff301945c2b5a7cfc147dfc83cc9e0ad82ab68d6ad1d58fa06caae97d4",
+          "budget_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/000039.SZ/executions/6fx-000039-SZ-20261128/budget.json",
+          "production_authorization": "not_authorized"
+        }
+      }
+    },
+    {
+      "instrument_id": "600350.SH",
+      "result": {
+        "action": "review_batch",
+        "state": "completed",
+        "items": [
+          {
+            "instrument_id": "600350.SH",
+            "request_id": "6fx-600350-SH-20261128",
+            "state": "completed",
+            "work_id": "bp-work-0265278312fe929f77b71ae4",
+            "review_status": "completed_with_open_findings"
+          }
+        ],
+        "stop_reason": null,
+        "remaining_request_ids": [],
+        "research_only": true,
+        "production_authorization": "not_authorized",
+        "execution_plan": {
+          "run_id": "6fx-600350-SH-20261128",
+          "plan_sha256": "6585e7bf79f15296f455cdfbdf7cf2cd63e14889da60e4e47de73ed578d92ff7",
+          "budget_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/600350.SH/executions/6fx-600350-SH-20261128/budget.json",
+          "production_authorization": "not_authorized"
+        }
+      }
+    },
+    {
+      "instrument_id": "601328.SH",
+      "result": {
+        "action": "review_batch",
+        "state": "completed",
+        "items": [
+          {
+            "instrument_id": "601328.SH",
+            "request_id": "6fx-601328-SH-20261128",
+            "state": "completed",
+            "work_id": "bp-work-6bee35aa007675221a3f0124",
+            "review_status": "completed_with_open_findings"
+          }
+        ],
+        "stop_reason": null,
+        "remaining_request_ids": [],
+        "research_only": true,
+        "production_authorization": "not_authorized",
+        "execution_plan": {
+          "run_id": "6fx-601328-SH-20261128",
+          "plan_sha256": "6c2f66aee7c983adff561200df3f4942535590187bface0fed6d71bb493ad4bf",
+          "budget_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-execution/601328.SH/executions/6fx-601328-SH-20261128/budget.json",
+          "production_authorization": "not_authorized"
+        }
+      }
+    }
+  ],
+  "elapsed_seconds": 882.2120524969941,
+  "concurrency": 4,
+  "group_stopped": false,
+  "new20_started": false,
+  "main_protection": {
+    "original_research_files_unchanged": 405
+  },
+  "cost": "unknown"
+}

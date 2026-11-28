@@ -1,0 +1,22 @@
+{
+  "kind": "controlled transport engineering only",
+  "actual_model_sends": 0,
+  "official_source_parser": true,
+  "same_document_alias": false,
+  "sequence": [
+    "select",
+    "extract",
+    "review"
+  ],
+  "pending_visible": 4,
+  "safe_visible": 4,
+  "raw_null_preserved": true,
+  "new_model_scope_basis": "model_source_check",
+  "safe_scope_basis": "independent_and_model_source_check",
+  "prior_A_opinion_not_sent": true,
+  "original_record_unchanged": true,
+  "persisted_new_instance_equal": true,
+  "original_reader_export_equal": true,
+  "review_work_id": "bp-work-468400eba07c522db4c8f99d",
+  "policy": "company_profile_workpaper_review.v16"
+}
