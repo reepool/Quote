@@ -1,0 +1,46 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "instrument_id": "601336.SH",
+  "name": "新华保险",
+  "report": {"content_hash": "4a5d6ee54dc0a351acac6d9d3ce1d0eee6d4a388c4c36c1668a35d5ffd35c528", "report_period": "2025-12-31", "fiscal_year": 2025, "published_at": "2026-03-27T16:00:00+00:00", "source": "cninfo", "source_announcement_id": "1225047616", "asset_id": "asset_7dfa55216253948350c368466383da45", "title": "2025年年度报告", "variant": "original"},
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/4a/4a5d6ee54dc0a351acac6d9d3ce1d0eee6d4a388c4c36c1668a35d5ffd35c528.pdf",
+  "pdf_sha256": "4a5d6ee54dc0a351acac6d9d3ce1d0eee6d4a388c4c36c1668a35d5ffd35c528",
+  "document_version": "601336.SH / 2025年年度报告 original / 公告1225047616 / SHA256同pdf_sha256",
+  "source_sections_and_physical_pages": "释义3；关于公司6；第四节/主要会计数据28；公司保险业务32–40（渠道33–36、险种36、产品38）；公司资产管理业务42–43。物理页比印刷页大1。",
+  "physical_pages_read": [1, 2, 3, 4, 6, 28, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43],
+  "core_conditions": [
+    {"condition_id": "C1", "question": "公司做什么", "expected_source_answer": "全国性寿险企业，以人身保险保障及长期养老、财富需求为核心；依托控股资产管理公司专业运用资金、养老保险公司提供养老保险服务，康养健康产业服务寿险主业。不能只概括为投资公司或只列保费数字。", "source_physical_pages": [6, 32, 38, 42]},
+    {"condition_id": "C2", "question": "主要产品/服务与板块", "expected_source_answer": "覆盖传统型寿险、分红型保险、健康险及意外险/万能险等人身保险，产品包括终身寿险、年金、两全、重疾、医疗、护理及个人养老金等；个险、银保、团体和互联网构成多元销售渠道；资产管理提供保险资金投资运用，康养健康是支持生态。渠道、险种和保险/资管业务是不同维度，不能互相替代或相加。", "source_physical_pages": [6, 32, 33, 36, 38, 42]},
+    {"condition_id": "C3", "question": "怎么赚钱", "expected_source_answer": "向客户提供保险保障收取保费，按保险合同确认保险服务收入和服务业绩，并运用长期保险资金投资获取收益；不能把原保险保费收入195,871百万元、保险服务收入50,297百万元、营业收入157,745百万元混作同一科目。保费主来源为个险120,581百万元和银保72,102百万元，团体3,188百万元；主要险种传统型106,690、分红型37,604、健康50,766百万元。", "source_physical_pages": [28, 33, 36, 40, 42, 43]}
+  ],
+  "important_numbers": [
+    {"source_name": "营业收入", "raw_value": "157,745", "unit": "百万元", "period": "2025-01-01/2025-12-31", "physical_page": 28, "source_relation": "公司主要会计数据；同比19.0%"},
+    {"source_name": "归属于母公司股东的净利润", "raw_value": "36,284", "unit": "百万元", "period": "2025-01-01/2025-12-31", "physical_page": 28},
+    {"source_name": "总资产", "raw_value": "1,899,484", "unit": "百万元", "period": "2025-12-31", "physical_page": 28},
+    {"source_name": "原保险保费收入", "raw_value": "195,871", "unit": "百万元", "period": "2025-01-01/2025-12-31", "physical_page": 33, "source_relation": "旧保险合同准则计算，不等于营业收入；同比14.9%"},
+    {"source_name": "个险渠道/银保渠道/团体保险保费收入合计", "raw_value": ["120,581", "72,102", "3,188"], "unit": "百万元", "period": "2025-01-01/2025-12-31", "physical_page": 33, "source_relation": "按渠道，非三个独立公司总收入"},
+    {"source_name": "传统型保险/分红型保险/健康保险/意外保险/万能型保险", "raw_value": ["106,690", "37,604", "50,766", "743", "68"], "unit": "百万元", "period": "2025-01-01/2025-12-31", "physical_page": 36, "source_relation": "原保险保费按险种；分红型健康险计入分红、万能型健康险计入万能；四舍五入"},
+    {"source_name": "保险服务收入", "raw_value": "50,297", "unit": "百万元", "period": "2025-01-01/2025-12-31", "physical_page": 40, "source_relation": "保费分配法3,668；非保费分配法46,629；不等于保费收款"},
+    {"source_name": "保险服务费用/原保险合同保险服务业绩", "raw_value": ["(31,748)", "18,549"], "unit": "百万元", "period": "2025-01-01/2025-12-31", "physical_page": 40},
+    {"source_name": "投资资产", "raw_value": "1,841,227", "unit": "百万元", "period": "2025-12-31", "physical_page": 43, "source_relation": "投资组合规模，不是全部总资产"},
+    {"source_name": "总投资收益率/综合投资收益率/净投资收益率", "raw_value": ["6.6%", "5.0%", "2.8%"], "unit": "%", "period": "2025-01-01/2025-12-31", "physical_page": 42, "source_relation": "不同收益率口径，不是产品保底回报"},
+    {"source_name": "个人客户/机构客户", "raw_value": ["3,062.1万名", "7.8万家"], "unit": "原文复合单位", "period": "2025年报公司介绍披露", "physical_page": 6}
+  ],
+  "native_pdf_anchors": [
+    {"physical_page": 6, "quote": "全国性的大型寿险企", "native_text_start": 30, "native_text_end": 39, "bbox_pdf_points": [428.23, 258.481, 537.953, 269.689]},
+    {"physical_page": 28, "quote": "营业收入 157,745 132,555 19.0%", "native_text_start": 99, "native_text_end": 125, "bbox_pdf_points": [63.265, 562.752, 478.073, 572.242]},
+    {"physical_page": 36, "quote": "传统型保险 106,690 88,887 20.0%", "native_text_start": 680, "native_text_end": 706, "bbox_pdf_points": [72.549, 364.996, 546.105, 374.401]}
+  ],
+  "coordinate_system": "原PDF物理页1起；pypdfium2原文本字符偏移；bbox为PDF points左下原点。",
+  "qualifications": [
+    "物理3释义明确本公司含控股子公司及受控结构化主体；仍按局部科目/关系，不用一个scope标签代替判断。",
+    "原保险保费、保险服务收入、营业收入、保户投资款新增交费、新业务价值均不可互换；不以保费加投资资产凑营收。",
+    "个险/银保是销售渠道；险种是另一维度；互联网被列为渠道，不臆造独立表外保费金额。",
+    "市场、信用、保险和流动性等风险存在；投资历史收益率与未来承诺分开，未来战略不算已实现。",
+    "非核心康养/特色细项缺失本身不拒绝已有完整保险及投资机制画像。"
+  ],
+  "basis": "本审核助手直接亲读指定原PDF及目录定位，逐份核SHA256；无旧模型答案/画像真值输入。",
+  "reference_sent_to_model": false,
+  "output_assessment": "not_assessed; source-only, awaiting first/automatic-final consumer objects"
+}

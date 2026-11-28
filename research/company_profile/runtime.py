@@ -211,6 +211,7 @@ def _reading_policy(identity: Mapping[str, Any] | None) -> tuple:
             "workpaper_review_policy",
             "workpaper_metric_limit_policy",
             "workpaper_subject_scope_limit_policy",
+            "workpaper_business_role_review_policy",
             "workpaper_metric_format_policy",
             "source_recheck_policy",
             "current_review_binding",

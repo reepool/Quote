@@ -1,0 +1,42 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "instrument_id": "002575.SZ",
+  "name": "群兴玩具",
+  "report": {"content_hash": "e4ab21072b7da70251a833b13da381e215f24f65be67f71a760c815a1a6e7a81", "report_period": "2025-12-31", "fiscal_year": 2025, "published_at": "2026-04-27T16:00:00+00:00", "source": "cninfo", "source_announcement_id": "1225209223", "asset_id": "asset_3abf8b3c8e26653471bfe64b314ee2c7", "title": "2025年年度报告", "variant": "original"},
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/e4/e4ab21072b7da70251a833b13da381e215f24f65be67f71a760c815a1a6e7a81.pdf",
+  "pdf_sha256": "e4ab21072b7da70251a833b13da381e215f24f65be67f71a760c815a1a6e7a81",
+  "document_version": "002575.SZ / 2025年年度报告 original / 公告1225209223 / SHA256同pdf_sha256",
+  "source_sections_and_physical_pages": "目录物理3；主要财务指标8；第三节管理层讨论与分析/主要业务11、主营业务分析/收入与成本13。物理页与印刷页一致。",
+  "physical_pages_read": [1, 3, 8, 11, 13],
+  "core_conditions": [
+    {"condition_id": "C1", "question": "公司做什么", "expected_source_answer": "2025主要从事酒类销售、智能算力服务、物业租赁及物业管理的多业务企业；不能因名称为群兴玩具而说当期主业是玩具制造。", "source_physical_pages": [11, 13]},
+    {"condition_id": "C2", "question": "主要产品/服务与板块", "expected_source_answer": "中高端白酒销售；面向行业客户的GPU算力租赁及计算/网络/存储、调度与技术支持；汕头澄海自有工业物业出租及长三角尤其杭州商住物业管理。三个收入类别都为重要业务，不能以白酒一项覆盖全部。", "source_physical_pages": [11, 13]},
+    {"condition_id": "C3", "question": "怎么赚钱", "expected_source_answer": "采购酒类经线上电商直播及线下团购批发销售，收算力资源租赁/服务费，出租自有物业收租并向商住客户提供物业管理服务收费。2025酒类383,975,161.20元/81.62%、智算53,368,396.24元/11.34%、物业租赁管理33,126,534.86元/7.04%；不能把智算租赁写为GPU制造或物业管理写为自有全部受管物业。", "source_physical_pages": [11, 13]}
+  ],
+  "important_numbers": [
+    {"source_name": "营业收入合计", "raw_value": "470,470,092.30", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 13, "source_relation": "同比27.32%"},
+    {"source_name": "酒类销售/酒", "raw_value": "383,975,161.20", "unit": "元", "period": "2025-01-01/2025-12-31", "revenue_share_raw": "81.62%", "physical_page": 13, "source_relation": "分行业及分产品重复分类同一收入"},
+    {"source_name": "智算业务", "raw_value": "53,368,396.24", "unit": "元", "period": "2025-01-01/2025-12-31", "revenue_share_raw": "11.34%", "physical_page": 13},
+    {"source_name": "物业租赁及物业管理服务", "raw_value": "33,126,534.86", "unit": "元", "period": "2025-01-01/2025-12-31", "revenue_share_raw": "7.04%", "physical_page": 13, "source_relation": "出租与管理合并披露，不擅自拆金额"},
+    {"source_name": "酒类/物业/智算营业成本", "raw_value": ["373,517,363.47", "13,085,221.56", "68,375,219.40"], "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 13},
+    {"source_name": "酒类/物业/智算毛利率", "raw_value": ["2.72%", "60.50%", "-28.12%"], "unit": "%", "period": "2025-01-01/2025-12-31", "physical_page": 13, "source_relation": "智算为负，不因收入新增就宣称盈利"},
+    {"source_name": "国内/直接销售", "raw_value": "470,470,092.30", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 13, "source_relation": "两种分类均100%，不是额外两份收入"},
+    {"source_name": "总资产/归属于上市公司股东净资产", "raw_value": ["931,948,280.28", "841,392,509.87"], "unit": "元", "period": "2025-12-31", "physical_page": 8}
+  ],
+  "native_pdf_anchors": [
+    {"physical_page": 11, "quote": "公司从事的主要业务涵盖酒类销售、智算业务、物业管理及物业租赁", "native_text_start": 116, "native_text_end": 146, "bbox_pdf_points": [57.27, 655.882, 325.938, 664.315]},
+    {"physical_page": 13, "quote": "营业收入合计 470,470,092.30 100%", "native_text_start": 416, "native_text_end": 442, "bbox_pdf_points": [62.67, 471.906, 297.479, 480.474]}
+  ],
+  "coordinate_system": "原PDF物理页1起；pypdfium2原文本字符偏移；bbox为PDF points左下原点。",
+  "qualifications": [
+    "白酒为销售贸易，原文未说自产酿酒；不以名称或行业常识替代实际经营。",
+    "自有的是澄海出租物业；杭州商住物业管理是服务关系，不能推为全属公司产权。",
+    "智算中心总体建设完成时点为2024年；2025收入表上期为0，原表同比100%保raw，不据此计算通常增长率或说全部中心2025才建成。",
+    "物业出租与管理虽合并一行收入，两个变现机制仍需实质说明；group/issuer/segment标签不单独决定范围错误。",
+    "互联网头部客户未具名，不能补出客户名；未来拓展不当既有成果。"
+  ],
+  "basis": "本审核助手直接亲读指定原PDF及目录定位，逐份核SHA256；无旧模型答案/画像真值输入。",
+  "reference_sent_to_model": false,
+  "output_assessment": "not_assessed; source-only, awaiting first/automatic-final consumer objects"
+}

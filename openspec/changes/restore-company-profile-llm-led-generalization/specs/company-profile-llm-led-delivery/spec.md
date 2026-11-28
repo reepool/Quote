@@ -2,6 +2,14 @@ Current policy: product v9 (2026-11-11), acceptance section 7.109 and company-pr
 
 ## ADDED Requirements
 
+### Requirement: Local format and source-alignment improvements preserve frozen results
+A grouped-decimal consumption policy MUST be explicit and versioned. It MAY remove correctly formed thousands separators from a model value only when its unchanged raw number, sign and units agree. It MUST retain raw values, decimal precision, citations and all existing typed/source checks; it MUST NOT join malformed groups or lines, guess a sign/unit, borrow an old final review, or rewrite frozen results. An explicit source-alignment model policy MUST consistently instruct extraction, initial review, one repair and final verification to preserve material earning roles, fact-level time and plan status, read-scope limits, complete compound citations and numeric direction. It MUST NOT add per-company semantic rules, required supplementary fields, sources or calls. Unflagged historical request/schema/identity behavior MUST remain compatible. Engineering replay and request-wiring checks MUST NOT establish improved model semantic accuracy.
+
+#### Scenario: An ended cohort supplies evidence for two bounded common improvements
+- **WHEN** saved real responses expose valid grouped numbers rejected by local consumption and independently read source exposes omitted roles or source-alignment errors
+- **THEN** the existing owners MAY implement these two explicit policies and verify them with saved source/response cases and the original four-stage transport
+- **AND** restored local candidates remain unreviewed until their own authorized source review; original first/post-review scores, rejection receipts and supported current deliveries remain unchanged, and no new paid run or production authority is implied
+
 ### Requirement: Failed assessments drive bounded evidence-based improvements
 For prospectively frozen contracts after the user's 2026-11-27 instruction, each failed company-profile iteration MUST identify the applicable metric/version/denominator and gap, trace its main causes from actual sources and execution, and implement a corresponding minimal code or processing-policy improvement before using another formal run to validate that improvement. Code defects MUST be fixed in the existing owner; source/prompt/model-policy faults MUST be addressed at their responsible layer. Transient environment failures MAY use the original bounded recovery without speculative code changes. The next task MUST state the actual change, causal evidence, expected effect and verification question. Saved-response replay MUST NOT establish improved new-model semantic understanding. Historical scores, automatic versus independently protected results, and normal request retries versus new assessment windows MUST remain distinct.
 
@@ -691,6 +699,13 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **AND** the extraction, initial review, repair and final verification contracts MUST distinguish operational actor, statistical population and asset ownership, preserving source-native relationships when one enumeration cannot express them
 - **AND** every metric retains independent support; whole-fact defects and independent restrictions prevail, malformed/stale/unknown limit bindings fail closed, and later edits MUST NOT implicitly lift the prior model or independent restriction
 - **AND** old requests without that policy retain their wire contract and serialization, controlled transport tests establish engineering behavior only, and historical formal failures remain unchanged
+
+#### Scenario: Prospective cohort evaluates tolerable local limitations by fixed group criteria
+- **WHEN** a newly authorized cohort freezes its sources, independent references, version, budgets and company/recall/accuracy criteria
+- **THEN** an isolated supplementary defect, faithful uncertainty or missing optional item MUST NOT add an unplanned zero-omission or zero-human-dependence prerequisite or reject unrelated readable business content
+- **AND** subject judgments MUST use the complete sourced assertion, metric name and relationship qualifications rather than equating a scope enum with a company total; false entity/amount/period/citation claims remain errors, and calculable normalization coverage is reported separately from faithful limited quotations
+- **AND** first-read, automatic post-review and independently protected API results retain separate denominators and interventions, actual supplementary populations below the sampling target are fully checked without fabricated entries, and the fixed numeric thresholds and historical failures remain unchanged
+- **AND** only the frozen hard stopping conditions halt unrelated dispatch, normal in-flight cases finish under their original budgets, and completed invocations cannot reopen their allowance
 
 #### Scenario: Human reference is rendered for review
 - **WHEN** a human_reference JSON workpaper is used to check presentation and local mapping

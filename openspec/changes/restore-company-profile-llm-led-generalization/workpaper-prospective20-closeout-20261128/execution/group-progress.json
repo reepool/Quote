@@ -1,0 +1,228 @@
+{
+  "results": [
+    {
+      "instrument_id": "002316.SZ",
+      "state": "completed",
+      "review_status": "completed",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 487.7626704959839,
+      "physical_requests": 3,
+      "charged_tokens": 97161
+    },
+    {
+      "instrument_id": "601000.SH",
+      "state": "completed",
+      "review_status": "completed",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 615.3607489329879,
+      "physical_requests": 3,
+      "charged_tokens": 108908
+    },
+    {
+      "instrument_id": "920022.BJ",
+      "state": "completed",
+      "review_status": "completed_with_open_findings",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 788.4668746440148,
+      "physical_requests": 5,
+      "charged_tokens": 138964
+    },
+    {
+      "instrument_id": "002050.SZ",
+      "state": "completed",
+      "review_status": "completed_with_open_findings",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 596.8162972120044,
+      "physical_requests": 5,
+      "charged_tokens": 118662
+    },
+    {
+      "instrument_id": "600928.SH",
+      "state": "completed",
+      "review_status": "completed_with_open_findings",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 1209.5985834010062,
+      "physical_requests": 5,
+      "charged_tokens": 274921
+    },
+    {
+      "instrument_id": "603128.SH",
+      "state": "completed",
+      "review_status": "completed",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 770.7590410769917,
+      "physical_requests": 5,
+      "charged_tokens": 163792
+    },
+    {
+      "instrument_id": "601336.SH",
+      "state": "completed",
+      "review_status": "completed_with_open_findings",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 828.7727174120082,
+      "physical_requests": 5,
+      "charged_tokens": 153720
+    },
+    {
+      "instrument_id": "002420.SZ",
+      "state": "completed",
+      "review_status": "completed_with_open_findings",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 563.7613240449864,
+      "physical_requests": 3,
+      "charged_tokens": 109272
+    },
+    {
+      "instrument_id": "002463.SZ",
+      "state": "completed",
+      "review_status": "completed_with_open_findings",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 890.2764447779919,
+      "physical_requests": 5,
+      "charged_tokens": 165337
+    },
+    {
+      "instrument_id": "601098.SH",
+      "state": "completed",
+      "review_status": "completed_with_open_findings",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 777.1027866950026,
+      "physical_requests": 5,
+      "charged_tokens": 166636
+    },
+    {
+      "instrument_id": "002575.SZ",
+      "state": "completed",
+      "review_status": "completed",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 665.8703444830026,
+      "physical_requests": 5,
+      "charged_tokens": 129523
+    },
+    {
+      "instrument_id": "601108.SH",
+      "state": "completed",
+      "review_status": "completed_with_open_findings",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 802.5587000329979,
+      "physical_requests": 5,
+      "charged_tokens": 154231
+    },
+    {
+      "instrument_id": "601156.SH",
+      "state": "completed",
+      "review_status": "completed_with_open_findings",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 794.8981382950151,
+      "physical_requests": 5,
+      "charged_tokens": 183755
+    },
+    {
+      "instrument_id": "920026.BJ",
+      "state": "completed",
+      "review_status": "completed_with_open_findings",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 1000.3516707810049,
+      "physical_requests": 5,
+      "charged_tokens": 218739
+    },
+    {
+      "instrument_id": "600673.SH",
+      "state": "completed",
+      "review_status": "completed_with_open_findings",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 847.385097041988,
+      "physical_requests": 5,
+      "charged_tokens": 185888
+    },
+    {
+      "instrument_id": "601665.SH",
+      "state": "completed",
+      "review_status": "completed",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 974.8776695760025,
+      "physical_requests": 5,
+      "charged_tokens": 200305
+    },
+    {
+      "instrument_id": "600717.SH",
+      "state": "completed",
+      "review_status": "completed",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 473.3236250659975,
+      "physical_requests": 3,
+      "charged_tokens": 95099
+    },
+    {
+      "instrument_id": "603605.SH",
+      "state": "completed",
+      "review_status": "completed_with_open_findings",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 855.4808075369801,
+      "physical_requests": 5,
+      "charged_tokens": 233507
+    },
+    {
+      "instrument_id": "002807.SZ",
+      "state": "completed",
+      "review_status": "completed_with_open_findings",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 761.4130021129968,
+      "physical_requests": 3,
+      "charged_tokens": 123429
+    },
+    {
+      "instrument_id": "600881.SH",
+      "state": "completed",
+      "review_status": "completed_with_open_findings",
+      "error_type": null,
+      "execution_root_key": null,
+      "first_readable": true,
+      "elapsed_seconds": 1048.011154256994,
+      "physical_requests": 5,
+      "charged_tokens": 179364
+    }
+  ],
+  "unstarted": [],
+  "in_flight": [],
+  "stop_reason": null,
+  "elapsed_seconds": 4337.247994097997
+}

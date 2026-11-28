@@ -1,0 +1,167 @@
+{
+  "task": "6.FY",
+  "assessment_complete": true,
+  "formal_acceptance": "not_passed",
+  "reason": "First-read audited accuracy 394/400=98.5% is 0.5 percentage points below the frozen99% threshold.",
+  "phases": {
+    "first": {
+      "usable_exact": {
+        "numerator": 19,
+        "denominator": 20,
+        "fraction": "19/20",
+        "rate": 0.95,
+        "percent": 95.0
+      },
+      "accuracy_exact": {
+        "numerator": 394,
+        "denominator": 400,
+        "fraction": "394/400",
+        "rate": 0.985,
+        "percent": 98.5
+      },
+      "core_macro_recall_exact": {
+        "numerator": 59,
+        "denominator": 60,
+        "fraction": "59/60",
+        "rate": 0.9833333333333333,
+        "percent": 98.33333333333333
+      },
+      "metric_accuracy_exact": {
+        "numerator": 571,
+        "denominator": 572,
+        "fraction": "571/572",
+        "rate": 0.9982517482517482,
+        "percent": 99.82517482517483
+      },
+      "standardized_nonnull_coverage_exact": {
+        "numerator": 557,
+        "denominator": 572,
+        "fraction": "557/572",
+        "rate": 0.9737762237762237,
+        "percent": 97.37762237762237
+      },
+      "sampling": {
+        "supplement_target": 400,
+        "actual_supplement_universe": 74,
+        "selected_supplement": 74,
+        "reviewed_supplement": 74,
+        "population_review_coverage": {
+          "numerator": 74,
+          "denominator": 74,
+          "fraction": "74/74",
+          "rate": 1.0,
+          "percent": 100.0
+        },
+        "mandatory_unique_objects": 326,
+        "selected_unique_union": 400,
+        "every_company_supplement_within_target": true,
+        "selection_states": {
+          "final": 20
+        },
+        "all_actual_unique_objects_reviewed": true
+      }
+    },
+    "automatic_final": {
+      "usable_exact": {
+        "numerator": 19,
+        "denominator": 20,
+        "fraction": "19/20",
+        "rate": 0.95,
+        "percent": 95.0
+      },
+      "accuracy_exact": {
+        "numerator": 417,
+        "denominator": 417,
+        "fraction": "417/417",
+        "rate": 1.0,
+        "percent": 100.0
+      },
+      "core_macro_recall_exact": {
+        "numerator": 59,
+        "denominator": 60,
+        "fraction": "59/60",
+        "rate": 0.9833333333333333,
+        "percent": 98.33333333333333
+      },
+      "metric_accuracy_exact": {
+        "numerator": 631,
+        "denominator": 631,
+        "fraction": "631/631",
+        "rate": 1.0,
+        "percent": 100.0
+      },
+      "standardized_nonnull_coverage_exact": {
+        "numerator": 613,
+        "denominator": 631,
+        "fraction": "613/631",
+        "rate": 0.971473851030111,
+        "percent": 97.14738510301109
+      },
+      "sampling": {
+        "supplement_target": 400,
+        "actual_supplement_universe": 80,
+        "selected_supplement": 80,
+        "reviewed_supplement": 80,
+        "population_review_coverage": {
+          "numerator": 80,
+          "denominator": 80,
+          "fraction": "80/80",
+          "rate": 1.0,
+          "percent": 100.0
+        },
+        "mandatory_unique_objects": 337,
+        "selected_unique_union": 417,
+        "every_company_supplement_within_target": true,
+        "selection_states": {
+          "final": 20
+        },
+        "all_actual_unique_objects_reviewed": true
+      }
+    }
+  },
+  "automatic_final_known_factual_errors_in_audited_visible_objects": 0,
+  "core_remaining": {
+    "instrument_id": "601156.SH",
+    "condition": "C3",
+    "reason": "Material goods-trading earning role omitted from both actual drafts; source was supplied.",
+    "initial_source_reference_limit": "A pre-send overview did not separately expand this role; original broad C3 and denominator preserved."
+  },
+  "ordinary_optional_gap_not_a_company_failure": "600881.SH financial-investment details; optional supply chain and supplementary rows.",
+  "source_judgments": {
+    "path": "a-audit-final.json",
+    "sha256": "96efe13aada4523fda78c24097588de2399a90c0fb0b41432920892924de3336"
+  },
+  "mechanical_counts": {
+    "path": "b-audit-counts.json",
+    "sha256": "4799641ed763c782d7d2bbbc88708e452f3d8fb2bdee58eb9042f3bb0bdbdf04"
+  },
+  "original_run": {
+    "sealed_files_checked": 393,
+    "changed_files": 0,
+    "physical_requests": 90,
+    "logical_requests": 90,
+    "recoveries": 0,
+    "known_usage_and_ledger": 3201213,
+    "cost": "unknown",
+    "group_business_seconds": 4337.250995573995,
+    "mean_company_seconds": 787.6423848937978,
+    "nearest_rank_p90_company_seconds": 1000.3516707810049,
+    "company_budget_client_deadline_shared": true
+  },
+  "code_review": {
+    "classification": "two bounded cause-driven common improvements; no remaining known blocking defect in reviewed changes",
+    "format_proof": "102 distinct direct/saved-source cases, exact final hashes checked; no copied old final adopted",
+    "source_alignment_proof": "7 final direct cases; all four actual wires and old message/schema/identity hashes checked",
+    "rerun_broad_suites": false,
+    "new_model_effect": "unmeasured",
+    "original_score_changed": false,
+    "new_real_calls_in_closeout": 0
+  },
+  "boundaries": {
+    "S3_started": false,
+    "production_authorized": false,
+    "new_company_or_paid_window": false,
+    "sample_support_is_population_accuracy": false,
+    "whole_report_coverage_claimed": false
+  }
+}

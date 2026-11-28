@@ -1,0 +1,1679 @@
+{
+  "schema_version": "company_profile_research_api.v1",
+  "instrument_id": "002050.SZ",
+  "report": {
+    "instrument_id": "002050.SZ",
+    "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+    "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-23T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "base_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+  "latest_reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+  "readings": [
+    {
+      "work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "workpaper_sha256": "79d91b0ec28675ed030ca6183c6bcd65dcc53805e4929eb290d93ae705f8aadf",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_execution": "deferred",
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0014",
+            "section_path": [
+              "第二节 公司简介和主要财务指标",
+              "六、主要会计数据和财务指标"
+            ],
+            "start_page": 7,
+            "end_page": 8,
+            "rationale": "选择公司主要会计数据和财务指标，用于建立报告期公司级收入、利润和规模基线；选择报告期内主要业务，覆盖制冷空调电器零部件、汽车零部件及战略新兴业务的产品与业务结构；选择主营业务分析，获取分业务经营概述、收入与成本、产品/业务权重及本期变化，是解释赚钱方式和收入结构的核心；选择主要销售客户情况，补充客户集中度与市场侧信息。四节均为公司层面经营与收入相关实质内容，且避免同时选择父子节点。"
+          },
+          {
+            "section_id": "section-0021",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "一、报告期内公司从事的主要业务"
+            ],
+            "start_page": 10,
+            "end_page": 10,
+            "rationale": "选择公司主要会计数据和财务指标，用于建立报告期公司级收入、利润和规模基线；选择报告期内主要业务，覆盖制冷空调电器零部件、汽车零部件及战略新兴业务的产品与业务结构；选择主营业务分析，获取分业务经营概述、收入与成本、产品/业务权重及本期变化，是解释赚钱方式和收入结构的核心；选择主要销售客户情况，补充客户集中度与市场侧信息。四节均为公司层面经营与收入相关实质内容，且避免同时选择父子节点。"
+          },
+          {
+            "section_id": "section-0041",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "四、主营业务分析"
+            ],
+            "start_page": 14,
+            "end_page": 17,
+            "rationale": "选择公司主要会计数据和财务指标，用于建立报告期公司级收入、利润和规模基线；选择报告期内主要业务，覆盖制冷空调电器零部件、汽车零部件及战略新兴业务的产品与业务结构；选择主营业务分析，获取分业务经营概述、收入与成本、产品/业务权重及本期变化，是解释赚钱方式和收入结构的核心；选择主要销售客户情况，补充客户集中度与市场侧信息。四节均为公司层面经营与收入相关实质内容，且避免同时选择父子节点。"
+          },
+          {
+            "section_id": "section-0057",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "公司主要销售客户情况"
+            ],
+            "start_page": 17,
+            "end_page": 18,
+            "rationale": "选择公司主要会计数据和财务指标，用于建立报告期公司级收入、利润和规模基线；选择报告期内主要业务，覆盖制冷空调电器零部件、汽车零部件及战略新兴业务的产品与业务结构；选择主营业务分析，获取分业务经营概述、收入与成本、产品/业务权重及本期变化，是解释赚钱方式和收入结构的核心；选择主要销售客户情况，补充客户集中度与市场侧信息。四节均为公司层面经营与收入相关实质内容，且避免同时选择父子节点。"
+          }
+        ],
+        "unread_or_deferred": [
+          "行业情况与行业地位：属于行业背景，主要业务和主营业务分析已能解释公司层面经营与收入结构，暂不扩读。",
+          "核心竞争力、研发投入及供应商细项：与主营分析部分重叠，当前未形成必须靠这些章节才能填补的收入或业务缺口。",
+          "资产及负债、投资、子公司、募集资金及财务报告附注：偏财务明细或专项事项，非本期业务模式与收入结构的主线。",
+          "公司治理、股份变动、未来展望与风险：治理和股份事项非经营核心；展望与风险可在主营分析已覆盖的本期变化之外暂不扩展。"
+        ],
+        "selection_rationale": "选择公司主要会计数据和财务指标，用于建立报告期公司级收入、利润和规模基线；选择报告期内主要业务，覆盖制冷空调电器零部件、汽车零部件及战略新兴业务的产品与业务结构；选择主营业务分析，获取分业务经营概述、收入与成本、产品/业务权重及本期变化，是解释赚钱方式和收入结构的核心；选择主要销售客户情况，补充客户集中度与市场侧信息。四节均为公司层面经营与收入相关实质内容，且避免同时选择父子节点。",
+        "stop_reason": "已覆盖公司级财务规模、主要产品与业务板块、分业务收入成本及客户市场信息，足以回答业务结构、 monetization、规模与主要构成及本期经营变化；继续阅读将进入行业背景、治理或财务附注等次要范围，故在此停止。",
+        "transcription_version": "shared-pdf-pypdf-layout.structured-notes.v1"
+      },
+      "limitations": [],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-28.subject-relationships.v22",
+        "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-bbf1d6652ff60cfb2e9310ba:workpaper:sections",
+          "request_hash": "c26af0e054cc9dea5faa4760ed8760268ba3f031bf4eac8712a6daecd49908ce",
+          "response_hash": "1b283d03c08194ce193ec9a400835111f8e478eb01a8b6b3e89fa479c4274701",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 17798,
+            "output_tokens": 4918,
+            "total_tokens": 22716
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 684,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0039",
+            "section-0040",
+            "section-0041",
+            "section-0042",
+            "section-0043",
+            "section-0044",
+            "section-0045",
+            "section-0046",
+            "section-0053",
+            "section-0054",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0070",
+            "section-0071",
+            "section-0072",
+            "section-0075",
+            "section-0076",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0088",
+            "section-0089",
+            "section-0090",
+            "section-0091",
+            "section-0092",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0099",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0103",
+            "section-0104",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0136",
+            "section-0137",
+            "section-0138",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0300",
+            "section-0301",
+            "section-0302",
+            "section-0303",
+            "section-0304",
+            "section-0305",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0310",
+            "section-0311",
+            "section-0312",
+            "section-0313",
+            "section-0314",
+            "section-0315",
+            "section-0316",
+            "section-0317",
+            "section-0318",
+            "section-0319",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0329",
+            "section-0330",
+            "section-0331",
+            "section-0332",
+            "section-0333",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0343",
+            "section-0344",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0402",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0407",
+            "section-0412",
+            "section-0413",
+            "section-0417",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0423",
+            "section-0424",
+            "section-0425",
+            "section-0426",
+            "section-0427",
+            "section-0428",
+            "section-0429",
+            "section-0430",
+            "section-0434",
+            "section-0435",
+            "section-0436",
+            "section-0437",
+            "section-0438",
+            "section-0441",
+            "section-0442",
+            "section-0443",
+            "section-0444",
+            "section-0445",
+            "section-0446",
+            "section-0447",
+            "section-0448",
+            "section-0449",
+            "section-0450",
+            "section-0451",
+            "section-0452",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0468",
+            "section-0469",
+            "section-0470",
+            "section-0475",
+            "section-0476",
+            "section-0477",
+            "section-0478",
+            "section-0479",
+            "section-0480",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0484",
+            "section-0485",
+            "section-0486",
+            "section-0489",
+            "section-0490",
+            "section-0491",
+            "section-0492",
+            "section-0493",
+            "section-0494",
+            "section-0495",
+            "section-0500",
+            "section-0501",
+            "section-0502",
+            "section-0503",
+            "section-0504",
+            "section-0508",
+            "section-0509",
+            "section-0510",
+            "section-0511",
+            "section-0512",
+            "section-0513",
+            "section-0514",
+            "section-0515",
+            "section-0516",
+            "section-0522",
+            "section-0527",
+            "section-0529",
+            "section-0530",
+            "section-0533",
+            "section-0536",
+            "section-0537",
+            "section-0540",
+            "section-0541",
+            "section-0542",
+            "section-0543",
+            "section-0545",
+            "section-0546",
+            "section-0547",
+            "section-0552",
+            "section-0555",
+            "section-0556",
+            "section-0557",
+            "section-0558",
+            "section-0561",
+            "section-0564",
+            "section-0565",
+            "section-0566",
+            "section-0567",
+            "section-0569",
+            "section-0572",
+            "section-0573",
+            "section-0574",
+            "section-0575",
+            "section-0576",
+            "section-0578",
+            "section-0579",
+            "section-0580",
+            "section-0585",
+            "section-0587",
+            "section-0588",
+            "section-0589",
+            "section-0590",
+            "section-0593",
+            "section-0595",
+            "section-0596",
+            "section-0597",
+            "section-0598",
+            "section-0600",
+            "section-0602",
+            "section-0603",
+            "section-0604",
+            "section-0605",
+            "section-0610",
+            "section-0614",
+            "section-0616",
+            "section-0617",
+            "section-0618",
+            "section-0621",
+            "section-0623",
+            "section-0624",
+            "section-0625",
+            "section-0626",
+            "section-0629",
+            "section-0631",
+            "section-0632",
+            "section-0633",
+            "section-0634",
+            "section-0636",
+            "section-0638",
+            "section-0639",
+            "section-0640",
+            "section-0641",
+            "section-0642",
+            "section-0644",
+            "section-0645",
+            "section-0646",
+            "section-0649",
+            "section-0651",
+            "section-0652",
+            "section-0653",
+            "section-0654",
+            "section-0657",
+            "section-0659",
+            "section-0660",
+            "section-0661",
+            "section-0662",
+            "section-0664",
+            "section-0666",
+            "section-0667",
+            "section-0668",
+            "section-0669",
+            "section-0670",
+            "section-0673",
+            "section-0674",
+            "section-0680",
+            "section-0681",
+            "section-0682",
+            "section-0683",
+            "section-0684",
+            "section-0686",
+            "section-0687",
+            "section-0688",
+            "section-0690",
+            "section-0694",
+            "section-0695",
+            "section-0697",
+            "section-0698",
+            "section-0699",
+            "section-0701",
+            "section-0702",
+            "section-0703",
+            "section-0704",
+            "section-0705",
+            "section-0706",
+            "section-0707",
+            "section-0708",
+            "section-0709",
+            "section-0711",
+            "section-0712",
+            "section-0713",
+            "section-0714",
+            "section-0715",
+            "section-0716",
+            "section-0718",
+            "section-0719",
+            "section-0721",
+            "section-0722",
+            "section-0723",
+            "section-0724",
+            "section-0725",
+            "section-0726",
+            "section-0727",
+            "section-0728",
+            "section-0729",
+            "section-0730",
+            "section-0731",
+            "section-0732",
+            "section-0733",
+            "section-0734",
+            "section-0735",
+            "section-0736",
+            "section-0737",
+            "section-0738",
+            "section-0739",
+            "section-0740",
+            "section-0741",
+            "section-0742",
+            "section-0743",
+            "section-0744",
+            "section-0745",
+            "section-0748",
+            "section-0749",
+            "section-0753",
+            "section-0756",
+            "section-0758",
+            "section-0759",
+            "section-0760",
+            "section-0762",
+            "section-0763",
+            "section-0765",
+            "section-0768",
+            "section-0771",
+            "section-0772",
+            "section-0773",
+            "section-0774",
+            "section-0775",
+            "section-0776",
+            "section-0777",
+            "section-0779",
+            "section-0780",
+            "section-0781",
+            "section-0784",
+            "section-0785",
+            "section-0786",
+            "section-0787",
+            "section-0788",
+            "section-0789",
+            "section-0790",
+            "section-0791",
+            "section-0792",
+            "section-0793",
+            "section-0794",
+            "section-0795",
+            "section-0798",
+            "section-0799",
+            "section-0800",
+            "section-0803",
+            "section-0804",
+            "section-0805",
+            "section-0806",
+            "section-0807",
+            "section-0808",
+            "section-0809",
+            "section-0810",
+            "section-0811",
+            "section-0814",
+            "section-0815",
+            "section-0816",
+            "section-0817",
+            "section-0818",
+            "section-0819",
+            "section-0820",
+            "section-0821",
+            "section-0822",
+            "section-0823",
+            "section-0830",
+            "section-0833",
+            "section-0834",
+            "section-0835",
+            "section-0838",
+            "section-0839",
+            "section-0840",
+            "section-0841",
+            "section-0842",
+            "section-0843",
+            "section-0844",
+            "section-0845",
+            "section-0848",
+            "section-0849",
+            "section-0850",
+            "section-0851",
+            "section-0852",
+            "section-0853",
+            "section-0855",
+            "section-0856",
+            "section-0860",
+            "section-0862",
+            "section-0865",
+            "section-0866",
+            "section-0870",
+            "section-0871",
+            "section-0872",
+            "section-0873",
+            "section-0874",
+            "section-0875",
+            "section-0876",
+            "section-0880",
+            "section-0881",
+            "section-0884"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-bbf1d6652ff60cfb2e9310ba:workpaper:extract",
+          "request_hash": "180f338a6a616805609c920cf3cb56a1364eb7682903cf4798b4d8c43698c84a",
+          "response_hash": "0e5187b9c0be114838cfb70e03a0719e2db9b36efe48c07996233d8a816f7eed",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 9874,
+            "output_tokens": 18479,
+            "total_tokens": 28353
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0014",
+            "section-0021",
+            "section-0041",
+            "section-0057"
+          ],
+          "physical_pages": [
+            7,
+            8,
+            10,
+            14,
+            15,
+            16,
+            17,
+            18
+          ]
+        }
+      },
+      "review_status": "not_reviewed",
+      "review_follow_up": {
+        "state": "planned",
+        "execution_started": false,
+        "next_purpose": "review_profile_workpaper",
+        "resume_mode": "review_saved_draft",
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 3,
+        "original_draft_sha256": "79d91b0ec28675ed030ca6183c6bcd65dcc53805e4929eb290d93ae705f8aadf",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_not_started"
+      },
+      "review_calls": [],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+          "section_path": [
+            "第二节 公司简介和主要财务指标",
+            "六、主要会计数据和财务指标"
+          ],
+          "physical_pages": [
+            7
+          ],
+          "source_spans": [
+            {
+              "page": 7,
+              "start": 900,
+              "end": 2734,
+              "quote": "六、主要会计数据和财务指标\n\n\n公司是否需追溯调整或重述以前年度会计数据\n□是  否\n\n                                      2025  年                      2024  年                本年比上年增减                           2023  年\n\n 营业收入（元）                           31,011,744,510.27            27,947,164,515.93                       10.97%           24,557,802,066.59\n 归属于上市公司股东                          4,062,891,412.10             3,099,165,128.06                       31.10%            2,920,992,940.01\n 的净利润（元）\n 归属于上市公司股东\n 的扣除非经常性损益                          3,958,316,943.01             3,117,935,212.81                       26.95%            2,917,029,188.01\n 的净利润（元）\n 经营活动产生的现金                          5,090,762,717.98             4,366,630,948.36                       16.58%            3,723,964,354.63\n 流量净额（元）\n 基本每股收益（元/                                        1.03                         0.84                     22.62%                          0.81\n 股）\n 稀释每股收益（元/                                        1.03                         0.84                     22.62%                          0.81\n 股）\n 加权平均净资产收益                                     15.80%                       16.77%                       -0.97%                      19.18%\n 率\n\n                                     2025  年末                     2024年末                本年末比上年末增减                          2023年末\n\n 总资产（元）                            49,406,130,603.74            36,354,748,426.21                       35.90%           31,890,584,773.41\n 归属于上市公司股东                         31,748,926,577.96            19,297,769,106.48                       64.52%           17,894,403,984.79\n 的净资产（元）\n\n公司最近三个会计年度扣除非经常性损益前后净利润孰低者均为负值，且最近一年审计报告显示公司持续经营能力存在\n不确定性\n□是  否\n\n\n                                                                                                                                             7"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的主要业务"
+          ],
+          "physical_pages": [
+            10
+          ],
+          "source_spans": [
+            {
+              "page": 10,
+              "start": 162,
+              "end": 1165,
+              "quote": "一、报告期内公司从事的主要业务\n\n\n公司需遵守《深圳证券交易所上市公司自律监管指引第                          3 号——行业信息披露》中汽车制造相关业的披露要求\n\n\n    公司秉持“专注领先、创新超越”的发展战略，始终专注于热管理技术的研发、推广和应用，以行业领先的高质量产\n品为全球客户提供能效解决方案。公司以热泵技术和热管理系统的研发与应用为核心，专注于开发可实现高效换热和温\n度智能控制的环境热管理解决方案，业务横跨制冷空调电器零部件及汽车零部件两大板块，并基于长期的技术积累与研\n发创新，向仿生机器人机电执行器等新兴领域进行业务拓展。\n\n\n     1、 制冷空调电器零部件业务\n\n\n     公司主要从事控制元器件、子系统和技术解决方案的开发和应用，成就高性能的建筑暖通空调系统和家电设备热管\n理系统，是全球家用空调、商用空调、商用制冷、工业制冷和小家电设备等市场制冷空调控制元器件的关键供应商，产\n品涵盖阀、换热器、泵、控制器及传感器等。公司于该业务板块的关键产品由各种阀类产品组成，包括电子膨胀阀、四\n通换向阀、截止阀、电磁阀及球阀。公司亦提供换热器产品，特别是微通道换热器、泵类产品（如                                               Omega 泵）及控制器\n产品。有关产品广泛应用于空调、冰箱、工业制冷、冷链运输、热泵采暖及洗衣机等领域。\n\n\n     2、 汽车零部件业务\n\n\n     作为新能源汽车热管理领域的重要参与者和先行者，公司凭借前瞻性的战略布局，持续引领行业应用创新与发展方\n向，已成为全球市场领先的热管理系统零部件供应商。公司专注于为新能源汽车提供全面、可靠的热管理控制解决方案，\n并持续为传统燃油车提供节能高效的高性能产品。\n\n\n    公司积极投入关键技术研发，涵盖电子膨胀阀、电子水泵、电子水阀、板式换热器及集成组件等战略产品，全面覆\n盖满足座舱热管理、电池热管理及电机/电控系统热管理等多种应用场景的各方面需求，实现对整车热管理的精准控制和\n高效协同。目前，公司多款产品已经进入大部分头部新能源汽车企业的供应链进行批量供应，显示出强劲的市场竞争力\n和客户认可。在制造与技术创新方面，公司始终处于行业前列，持续在开发资源方面投入，让公司核心产品技术保持量\n产一代、设计一代、构思一代。\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "source_spans": [
+            {
+              "page": 14,
+              "start": 359,
+              "end": 1609,
+              "quote": "四、主营业务分析\n\n1、概述\n\n\n    报告期内，公司实现营业收入              310.12亿元，同比增长        10.97%；归属于上市公司股东的净利润                40.63亿元，同比增长\n\n31.10%。按照产品划分，制冷空调电器零部件业务营业收入为                          185.85亿元，同比上升        12.22%；汽车零部件业务营业收\n\n入为  124.27亿元，同比上升        9.14%。\n\n\n    1、制冷空调电器零部件业务\n\n\n    2025年，公司积极调整市场策略，聚焦核心客户和主导产品，加快新产品及迭代产品市场化，开拓重要市场项目，\n\n推进数据中心领域项目，降本增效提升产品力，市场份额得到稳步提升。此外，不断调整销售策略，优化产品销售结构，\n\n狠抓生产效率，产品竞争力得到进一步巩固。\n\n\n    在市场巩固与提升上，公司落实各区域销售目标，积极提升市场占有率，进一步深化与客户的全面合作，紧抓阀类\n\n产品的迭代切换，提升利润率及市场竞争力。同时，公司推进数据中心领域发展，围绕全球数据中心及算力产业，持续\n\n跟踪行业趋势与需求变化。在产品力打造上，公司注重新品研发，制定研发项目，持续推进效率提升。公司通过关注质\n\n量问题攻关，推进新品成熟度管理，实现质量数字化，并启动                             AI数字员工试点，精准提效。同时公司通过数字赋能，信\n\n息化建设从“系统上线”逐渐迈向数字化“效率提升与赋能”。\n\n\n    2、汽车零部件业务\n\n\n    2025年，公司通过果断的策略和战略调整，实现了从“跑马圈地”到“精耕细作”的转型。\n\n\n    在市场与业务上，公司持续开拓全球各地区业务，公司在海外工厂的制度建设、本地化人才培养、绩效管理及文化\n建设方面，取得了初步成效，通过对安全、合规、库存、交付、费用及效率方面的改善，提升了工厂运营能力。在经营\n\n与管理上，公司秉持“精耕细作”的经营策略，在高目标的牵引下，围绕目标成本、综合降成、组织优化与精兵强将，全\n\n面推进降本增效与组织优化，实现利润增长。在产品与技术研发上，公司持续打造产品力，持续增强自主研发能力，改\n\n善产品质量，加快数智化转型与               AI 技术应用，引入数字员工等智能工具，为业务的可持续增长奠定坚实基础。在供应链\n\n与运营管理上，公司建设采购管理及全球供应链，开发海外供应链、优化采购流程，实现采购降成，规范运营管理，实\n\n现运营优化与效益提升。\n\n\n    3、战略新兴业务（包括仿生机器人机电执行器行业）\n\n\n\n\n\n                                                                                                            14"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0005",
+          "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "source_spans": [
+            {
+              "page": 15,
+              "start": 0,
+              "end": 4436,
+              "quote": "                                                                                             浙江三花智能控制股份有限公司                              2025年年度报告全文\n\n\n      2025年，公司聚焦多款关键型号产品开展技术改进，配合客户进行重点产品研发、试制、迭代、送样，获得客户高\n\n度评价，并取得了一系列围绕现有产品的创新成果，实现了产品力的整体提升。\n\n\n2、收入与成本\n\n（1）       营业收入构成\n\n\n                                                                                                                                                       单位：元\n                                                  2025   年                                                2024年                                   同比增减\n                                      金额                  占营业收入比重                             金额                  占营业收入比重\n 营业收入合计                       31,011,744,510.27                           100%       27,947,164,515.93                           100%                      10.97%\n 分行业\n 通用设备制造业                      31,011,744,510.27                       100.00%        27,947,164,515.93                       100.00%                       10.97%\n 分产品\n 制冷空调电器零                      18,584,743,718.09                        59.93%        16,560,605,388.30                         59.26%                      12.22%\n 部件\n 汽车零部件                        12,427,000,792.18                        40.07%        11,386,559,127.63                         40.74%                       9.14%\n 分地区\n 国内销售                         17,688,255,578.87                        57.04%        15,446,505,381.49                         55.27%                      14.51%\n 国外销售                         13,323,488,931.40                        42.96%        12,500,659,134.44                         44.73%                       6.58%\n 分销售模式\n 直销                           30,589,094,259.69                        98.64%        27,545,064,298.92                         98.56%                      11.05%\n 经销                               422,650,250.58                         1.36%           402,100,217.01                         1.44%                       5.11%\n\n\n（2）     占公司营业收入或营业利润                          10%以上的行业、产品、地区、销售模式的情况\n\n\n适用      □不适用\n                                                                                                                                                       单位：元\n                             营业收入                    营业成本                     毛利率                营业收入比上                  营业成本比上                  毛利率比上年\n                                                                                                   年同期增减                   年同期增减                    同期增减\n 分行业\n 通用设备制造                   31,011,744,510          22,087,497,052                   28.78%                  10.97%                   8.97%                   1.31%\n 业                                       .27                     .41\n 分产品\n 制冷空调电器                   18,584,743,718          13,238,149,193                   28.77%                  12.22%                  10.03%                   1.42%\n 零部件                                     .09                     .04\n 汽车零部件                    12,427,000,792          8,849,347,859.                   28.79%                    9.14%                  7.41%                   1.15%\n                                         .18                      37\n 分地区\n 国内销售                     17,688,255,578          12,918,945,187                   26.96%                  14.51%                  12.40%                   1.37%\n                                         .87                     .44\n 国外销售                     13,323,488,931          9,168,551,864.                   31.19%                    6.58%                  4.47%                   1.40%\n                                         .40                      97\n 分销售模式\n 直销                       30,589,094,259          21,841,098,595                   28.60%                  11.05%                   9.23%                   1.19%\n                                         .69                     .78\n 经销                       422,650,250.58          246,398,456.63                   41.70%                    5.11%                -10.33%                  10.04%\n公司主营业务数据统计口径在报告期发生调整的情况下，公司最近                                                              1 年按报告期末口径调整后的主营业务数据\n□适用     不适用\n                                                                                                                                                                   15"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0007",
+          "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 3363,
+              "quote": "                                                                                    浙江三花智能控制股份有限公司                          2025年年度报告全文\n\n\n                                                           80                                         63\n 汽车零部件                 人工                    1,009,909,936.                 4.57%       1,005,010,229.                 4.96%                 0.49%\n                                                           66                                         04\n 汽车零部件                 折旧                    517,688,629.69                 2.34%      348,371,093.60                  1.72%               48.60%\n 汽车零部件                 运费                    203,339,551.44                 0.92%      234,274,248.14                  1.16%              -13.20%\n 汽车零部件                 能源                    293,738,770.64                 1.33%      283,128,439.56                  1.40%                 3.75%\n 汽车零部件                 其他                    217,000,194.14                 0.98%      238,341,014.43                  1.18%                -8.95%\n\n\n（6）    报告期内合并范围是否发生变动\n\n\n是    □否\n\n      1. 合并范围增加\n\n                     子公司名称                                       股权取得方式                     股权取得时点                    期末实际               出资比例\n                                                                                                                       出资额\n\n绍兴三花智能装备有限公司                                                        新设投资                        2025-04              1,000  万元             100%\n\n香港三花有限公司                                                            新设投资                        2025-09                   —                100%\n\n浙江三花商用制冷部件贸易有限公司                                                    新设投资                        2025-10                   —                100%\n\nSH  ADVANSER,       S. DE   R.L.  DE  C.V.                          新设投资                        2025-04                   —                100%\n\nSANHUA      AUTOMOTIVE         USA，LLC        USA                   新设投资                        2025-10                   —                100%\n\nXIANTU     SINGAPORE       PTE.   LTD                               新设投资                        2025-09                   —                100%\n\nXIANTU     SINGAPORE       INDUSTRY       PTE.   LTD                新设投资                        2025-09                   —                100%\n\n      2. 合并范围减少\n\n                                                                                                                                     单位：万元\n\n                公司名称                                   股权                         股权                       处置日                   期初至处置日\n                                                    处置方式                       处置时点                        净资产                        净利润\n\nSanhua  Automotive     USA   INC                       注销                       2025-02                       —                         —\n\n珠海恒途电子有限公司                                             注销                       2025-12                            281.59                   1,632.71\n\n绍兴三花新能源汽车部件有限公司                                     吸收合并                        2025-04                       247,160.63                  12,114.37\n\n\n\n（7）     公司报告期内业务、产品或服务发生重大变化或调整有关情况\n\n\n□适用    不适用\n\n\n（8）    主要销售客户和主要供应商情况\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "公司主要销售客户情况"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 3363,
+              "end": 3982,
+              "quote": "公司主要销售客户情况\n\n 前五名客户合计销售金额（元）                                                                                                                 9,971,542,582.30\n 前五名客户合计销售金额占年度销售总额比例                                                                                                                      32.14%\n 前五名客户销售额中关联方销售额占年度销售总额比例                                                                                                                    0.00%\n\n公司前      5 大客户资料\n\n\n                                                                                                                                                   17"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "fact_id": "F01",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F01",
+        "text": "公司以热泵技术和热管理系统的研发与应用为核心，业务横跨制冷空调电器零部件和汽车零部件两大板块，并基于长期技术积累向仿生机器人机电执行器等新兴领域拓展。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "fact_id": "F02",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F02",
+        "text": "制冷空调电器零部件业务提供控制元器件、子系统和技术解决方案，关键产品包括电子膨胀阀、四通换向阀、截止阀、电磁阀、球阀等阀类，以及微通道换热器、Omega泵和控制器；产品用于空调、冰箱、工业制冷、冷链运输、热泵采暖及洗衣机等领域。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "fact_id": "F03",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F03",
+        "text": "汽车零部件业务为新能源汽车及传统燃油车提供热管理控制解决方案，产品包括电子膨胀阀、电子水泵、电子水阀、板式换热器和集成组件，覆盖座舱热管理、电池热管理及电机/电控系统热管理。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "fact_id": "F04",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F04",
+        "text": "战略新兴业务包括仿生机器人机电执行器，属于公司基于技术积累拓展的新兴领域。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "fact_id": "F05",
+      "element": "revenue_model",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F05",
+        "text": "公司通过销售制冷空调电器零部件、汽车零部件等产品取得收入，销售模式以直销为主；2025年直销收入占营业收入98.64%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [
+          {
+            "name": "直销收入占营业收入比重",
+            "raw_value": "98.64%",
+            "value": "98.64",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": "销售模式为收入渠道口径，非业务板块或公司整体；保留原文直销占比。"
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "fact_id": "F06",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F06",
+        "text": "2025年公司实现营业收入31,011,744,510.27元，同比增长10.97%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入",
+            "raw_value": "31,011,744,510.27",
+            "value": "31011744510.27",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业收入同比增减",
+            "raw_value": "10.97%",
+            "value": "10.97",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "fact_id": "F07",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F07",
+        "text": "2025年归属于上市公司股东的净利润4,062,891,412.10元，同比增长31.10%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [
+          {
+            "name": "归属于上市公司股东的净利润",
+            "raw_value": "4,062,891,412.10",
+            "value": "4062891412.10",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于上市公司股东的净利润同比增减",
+            "raw_value": "31.10%",
+            "value": "31.10",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "fact_id": "F08",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F08",
+        "text": "制冷空调电器零部件业务2025年营业收入18,584,743,718.09元，占营业收入59.93%，同比增长12.22%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [
+          {
+            "name": "制冷空调电器零部件营业收入",
+            "raw_value": "18,584,743,718.09",
+            "value": "18584743718.09",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "制冷空调电器零部件营业收入占营业收入比重",
+            "raw_value": "59.93%",
+            "value": "59.93",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "制冷空调电器零部件营业收入同比增减",
+            "raw_value": "12.22%",
+            "value": "12.22",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "fact_id": "F09",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F09",
+        "text": "汽车零部件业务2025年营业收入12,427,000,792.18元，占营业收入40.07%，同比增长9.14%。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [
+          {
+            "name": "汽车零部件营业收入",
+            "raw_value": "12,427,000,792.18",
+            "value": "12427000792.18",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "汽车零部件营业收入占营业收入比重",
+            "raw_value": "40.07%",
+            "value": "40.07",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "汽车零部件营业收入同比增减",
+            "raw_value": "9.14%",
+            "value": "9.14",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "fact_id": "F11",
+      "element": "customers_channels_markets",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F11",
+        "text": "2025年国内销售营业收入17,688,255,578.87元，占营业收入57.04%；国外销售营业收入13,323,488,931.40元，占42.96%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [
+          {
+            "name": "国内销售营业收入",
+            "raw_value": "17,688,255,578.87",
+            "value": "17688255578.87",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": "地区销售为集团营业收入按地区拆分，枚举无地区维度；保留国内销售口径。"
+          },
+          {
+            "name": "国内销售营业收入占营业收入比重",
+            "raw_value": "57.04%",
+            "value": "57.04",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": "地区销售为集团营业收入按地区拆分，枚举无地区维度；保留国内销售口径。"
+          },
+          {
+            "name": "国外销售营业收入",
+            "raw_value": "13,323,488,931.40",
+            "value": "13323488931.40",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": "地区销售为集团营业收入按地区拆分，枚举无地区维度；保留国外销售口径。"
+          },
+          {
+            "name": "国外销售营业收入占营业收入比重",
+            "raw_value": "42.96%",
+            "value": "42.96",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": "地区销售为集团营业收入按地区拆分，枚举无地区维度；保留国外销售口径。"
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "fact_id": "F12",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F12",
+        "text": "2025年前五名客户合计销售金额9,971,542,582.30元，占年度销售总额32.14%；前五名客户销售额中关联方销售额占年度销售总额0.00%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "前五名客户合计销售金额",
+            "raw_value": "9,971,542,582.30",
+            "value": "9971542582.30",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "前五名客户合计销售金额占年度销售总额比例",
+            "raw_value": "32.14%",
+            "value": "32.14",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "前五名客户销售额中关联方销售额占年度销售总额比例",
+            "raw_value": "0.00%",
+            "value": "0.00",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "fact_id": "F13",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F13",
+        "text": "制冷空调电器零部件业务是全球家用空调、商用空调、商用制冷、工业制冷和小家电设备等市场的关键供应商；汽车零部件业务多款产品已进入大部分头部新能源汽车企业供应链批量供应。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "fact_id": "F14",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F14",
+        "text": "2025年制冷空调电器零部件业务聚焦核心客户和主导产品，推进新产品及迭代产品市场化、数据中心领域项目、阀类产品迭代切换和降本增效，以提升市场份额与产品竞争力。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "fact_id": "F15",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F15",
+        "text": "2025年汽车零部件业务从“跑马圈地”转向“精耕细作”，继续开拓全球业务，改善海外工厂运营，推进目标成本、综合降成、组织优化、产品研发、数智化及全球供应链和采购降成。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "fact_id": "F16",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F16",
+        "text": "2025年战略新兴业务聚焦多款关键型号产品开展技术改进，配合客户进行研发、试制、迭代和送样，获得客户高度评价，并形成围绕现有产品的创新成果。",
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "fact_id": "F17",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F17",
+        "text": "报告期内公司合并范围发生变动：新增绍兴三花智能装备有限公司、香港三花有限公司、浙江三花商用制冷部件贸易有限公司等子公司；减少Sanhua Automotive USA INC、珠海恒途电子有限公司（注销）及绍兴三花新能源汽车部件有限公司（吸收合并）。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    }
+  ],
+  "information_gaps": [
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "element": "products_services",
+      "status": "observed",
+      "reasons": [
+        "所选章节未披露战略新兴业务的收入金额，故未纳入收入构成。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "element": "operations_and_inputs",
+      "status": "unclear",
+      "reasons": [
+        "所选章节仅披露成本构成，未披露具体原材料品种或供应商。",
+        "事实F10已隔离，未作为结论采用：metric number is absent from cited source: 通用设备制造业营业成本中材料金额"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "未披露前五名客户的具体名称，仅列示第一名至第五名，故不推断具体客户。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "element": "material_changes",
+      "status": "observed",
+      "reasons": [
+        "未在所选章节展开各合并范围变动对收入或利润的影响。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    }
+  ],
+  "suggested_acquisitions": [],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "cross_reading_reconciliation": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,380 @@
+{
+  "schema_version": "6fy_observed_mechanical_inputs.v1",
+  "authority": "observed original paths under frozen b-plan; not B runtime or semantic truth",
+  "plan": {
+    "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/b-plan.json",
+    "sha256": "85eeb4033daba7956a3865bd3b2b9e47f7fad1e4d4560e34bc32fe0f61edbc66"
+  },
+  "companies": [
+    {
+      "instrument_id": "920022.BJ",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/920022.BJ/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/920022.BJ/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-c18b69c650f98f5458c670f9.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-e7dfb860aa313dfdccf6141e.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/920022.BJ/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/920022.BJ/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/920022.BJ/run/wires/003.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/920022.BJ/run/wires/004.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/920022.BJ/run/wires/005.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-920022.BJ.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/920022.BJ/run/budget.json"
+    },
+    {
+      "instrument_id": "601000.SH",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601000.SH/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601000.SH/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-4ad2ae08576c3df0ccf722ba.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-7572f39ffbd25e16bc37d177.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601000.SH/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601000.SH/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601000.SH/run/wires/003.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-601000.SH.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601000.SH/run/budget.json"
+    },
+    {
+      "instrument_id": "600928.SH",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600928.SH/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600928.SH/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-36b2fe8ca8f5441fa4b41ca2.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-3e61143b1556be9637978a0e.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600928.SH/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600928.SH/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600928.SH/run/wires/003.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600928.SH/run/wires/004.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600928.SH/run/wires/005.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-600928.SH.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600928.SH/run/budget.json"
+    },
+    {
+      "instrument_id": "002316.SZ",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002316.SZ/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002316.SZ/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-27af25647bf58c8005c1b75a.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-ab6d6648c525066ca11e8a92.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002316.SZ/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002316.SZ/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002316.SZ/run/wires/003.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-002316.SZ.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002316.SZ/run/budget.json"
+    },
+    {
+      "instrument_id": "002050.SZ",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002050.SZ/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002050.SZ/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002050.SZ/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002050.SZ/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002050.SZ/run/wires/003.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002050.SZ/run/wires/004.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002050.SZ/run/wires/005.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-002050.SZ.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002050.SZ/run/budget.json"
+    },
+    {
+      "instrument_id": "603128.SH",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603128.SH/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603128.SH/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-c4b9d3276ec652e2444e0f6c.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-ee7bc410aaf52a67ad3c82e6.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603128.SH/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603128.SH/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603128.SH/run/wires/003.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603128.SH/run/wires/004.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603128.SH/run/wires/005.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-603128.SH.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603128.SH/run/budget.json"
+    },
+    {
+      "instrument_id": "601336.SH",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601336.SH/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601336.SH/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-406e2ee2dd9631a69c4b76d8.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-902387591f4553d15f15cfb5.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601336.SH/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601336.SH/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601336.SH/run/wires/003.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601336.SH/run/wires/004.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601336.SH/run/wires/005.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-601336.SH.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601336.SH/run/budget.json"
+    },
+    {
+      "instrument_id": "002420.SZ",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002420.SZ/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002420.SZ/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-0b6cae2abdc5fb6a836c5afe.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-b38bcf758f0aeffd75b9964e.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002420.SZ/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002420.SZ/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002420.SZ/run/wires/003.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-002420.SZ.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002420.SZ/run/budget.json"
+    },
+    {
+      "instrument_id": "002463.SZ",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002463.SZ/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002463.SZ/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-0e8b9cabc3cd0c265479f82e.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-ead3d24df2986375eab05f80.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002463.SZ/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002463.SZ/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002463.SZ/run/wires/003.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002463.SZ/run/wires/004.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002463.SZ/run/wires/005.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-002463.SZ.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002463.SZ/run/budget.json"
+    },
+    {
+      "instrument_id": "601098.SH",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601098.SH/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601098.SH/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b1cd9d7aab6b57fcc9874f5.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-d6a3fe38614c1779135e0ace.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601098.SH/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601098.SH/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601098.SH/run/wires/003.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601098.SH/run/wires/004.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601098.SH/run/wires/005.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-601098.SH.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601098.SH/run/budget.json"
+    },
+    {
+      "instrument_id": "601108.SH",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601108.SH/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601108.SH/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-67026e9cd3df148113130024.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-e87eafc5cf10236c1a8b2ae0.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601108.SH/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601108.SH/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601108.SH/run/wires/003.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601108.SH/run/wires/004.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601108.SH/run/wires/005.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-601108.SH.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601108.SH/run/budget.json"
+    },
+    {
+      "instrument_id": "002575.SZ",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002575.SZ/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002575.SZ/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-42a7fd466b7455d1cdf900f6.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-42af67a5c4e56eaaf01a9ef9.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002575.SZ/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002575.SZ/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002575.SZ/run/wires/003.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002575.SZ/run/wires/004.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002575.SZ/run/wires/005.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-002575.SZ.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002575.SZ/run/budget.json"
+    },
+    {
+      "instrument_id": "920026.BJ",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/920026.BJ/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/920026.BJ/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-22af4e6aa963a0c1b081f1af.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b6c38b98748cf3fa241cf4b.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/920026.BJ/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/920026.BJ/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/920026.BJ/run/wires/003.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/920026.BJ/run/wires/004.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/920026.BJ/run/wires/005.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-920026.BJ.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/920026.BJ/run/budget.json"
+    },
+    {
+      "instrument_id": "601156.SH",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601156.SH/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601156.SH/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-63c3d112b7c9ccca06c71e33.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-cf26bf2d28be95ad860b9198.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601156.SH/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601156.SH/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601156.SH/run/wires/003.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601156.SH/run/wires/004.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601156.SH/run/wires/005.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-601156.SH.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601156.SH/run/budget.json"
+    },
+    {
+      "instrument_id": "601665.SH",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601665.SH/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601665.SH/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-24622706e15f5d412a9c4258.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-7fddfbf0fd3c066b0df1a401.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601665.SH/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601665.SH/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601665.SH/run/wires/003.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601665.SH/run/wires/004.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601665.SH/run/wires/005.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-601665.SH.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601665.SH/run/budget.json"
+    },
+    {
+      "instrument_id": "600673.SH",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600673.SH/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600673.SH/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-1ea30c1a2639a5d6fab4f322.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-a0d276b02ebba6321ecec474.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600673.SH/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600673.SH/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600673.SH/run/wires/003.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600673.SH/run/wires/004.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600673.SH/run/wires/005.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-600673.SH.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600673.SH/run/budget.json"
+    },
+    {
+      "instrument_id": "603605.SH",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603605.SH/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603605.SH/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-a9b750074793e8ae0317da86.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-d08bc2adf7cd270f103a03fb.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603605.SH/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603605.SH/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603605.SH/run/wires/003.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603605.SH/run/wires/004.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603605.SH/run/wires/005.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-603605.SH.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603605.SH/run/budget.json"
+    },
+    {
+      "instrument_id": "600717.SH",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600717.SH/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600717.SH/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-7ed5bb4a0760aac9764c3c62.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-a0233d34e1951d1c4e380c6e.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600717.SH/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600717.SH/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600717.SH/run/wires/003.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-600717.SH.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600717.SH/run/budget.json"
+    },
+    {
+      "instrument_id": "002807.SZ",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002807.SZ/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002807.SZ/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-44a1b4a34da40e2ab79e62fd.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-44beaf33e968ddf38dc6db9e.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002807.SZ/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002807.SZ/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002807.SZ/run/wires/003.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-002807.SZ.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002807.SZ/run/budget.json"
+    },
+    {
+      "instrument_id": "600881.SH",
+      "state": "completed",
+      "first_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600881.SH/run/first-api.json",
+      "automatic_final_api": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600881.SH/run/automatic-final-api.json",
+      "records": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-00bac93a5c4871545f8008bf.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-a0dc1e715ff38dba1d2c5f49.json"
+      ],
+      "wires": [
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600881.SH/run/wires/001.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600881.SH/run/wires/002.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600881.SH/run/wires/003.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600881.SH/run/wires/004.json",
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600881.SH/run/wires/005.json"
+      ],
+      "source_reference": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-600881.SH.json",
+      "budget": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/600881.SH/run/budget.json"
+    }
+  ]
+}

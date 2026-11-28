@@ -1,0 +1,80 @@
+{
+  "physical_requests": 2,
+  "charged_tokens": 74283,
+  "charged_cost_cny": "unknown",
+  "cost_status": "unknown",
+  "billing_mode": "development_unpriced",
+  "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+  "stopped_reason": null,
+  "denied_request": null,
+  "attempts": [
+    {
+      "sequence": 1,
+      "request_id": "c878ae4ee5d2415ca5d4236dad72b57a",
+      "logical_request_id": "0d8a70694101703736e3f91a315729b4a0fe0b87f27704a9b0e47ad2f4571547",
+      "source_label": "deepseek:deepseek-flash",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 66694,
+      "reserved_output_tokens": 2500,
+      "charged_tokens": 23427,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 18056,
+        "output_tokens": 5371,
+        "total_tokens": 23427
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown",
+      "finish_reason": "stop",
+      "stream_summary": {
+        "event_count": 5372,
+        "content_fragments": 398,
+        "content_chars": 778,
+        "content_sha256": "264daebc01fd423237bcb3476bcdd4117c6310d4d3d1d207f34aeda51b0aaddb",
+        "reasoning_present": true,
+        "reasoning_chars": 18910,
+        "finish_reason": "stop",
+        "done": true,
+        "usage_present": true
+      }
+    },
+    {
+      "sequence": 2,
+      "request_id": "b85465a82326406f92123a9ae1af35cd",
+      "logical_request_id": "72f0114fbe39c23ccec671fb29f1c36f4f55b3ab6fafe4badf27d937d89145a1",
+      "source_label": "deepseek:deepseek-flash",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 111255,
+      "reserved_output_tokens": 12000,
+      "charged_tokens": 50856,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 21913,
+        "output_tokens": 28943,
+        "total_tokens": 50856
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown",
+      "finish_reason": "stop",
+      "stream_summary": {
+        "event_count": 28944,
+        "content_fragments": 5797,
+        "content_chars": 21200,
+        "content_sha256": "876ae91170a1edf0563bb7c293dff97711383b13cbc103314838f034ea3f9f55",
+        "reasoning_present": true,
+        "reasoning_chars": 80195,
+        "finish_reason": "stop",
+        "done": true,
+        "usage_present": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,3155 @@
+{
+  "schema_version": "company_profile_scope_checkpoint.v3",
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "llm_generated",
+    "report": {
+      "instrument_id": "920022.BJ",
+      "report_id": "asset_2e5f514bffd07480b7f0b9e0630fff50",
+      "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-25T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0028",
+          "section_path": [
+            "第四节管理层讨论与分析",
+            "一、业务概要"
+          ],
+          "start_page": 12,
+          "end_page": 13,
+          "rationale": "选择“业务概要”了解公司产品、采购/生产/销售/研发模式及经营角色；选择“经营计划”中的业绩增长、产能提升、产品多元化和客户突破，获取本期经营驱动与变化；选择“境外资产占比较高的情况”所在段落实质包含的营业情况分析，获取营业收入、营业成本及费用变化；选择“其他业务”中的收入构成、产品分类和区域分类，补足收入来源、业务权重与市场结构。上述均为公司层面实质经营内容，合计篇幅适中，避免扩读行业背景、治理和完整财报。"
+        },
+        {
+          "section_id": "section-0035",
+          "section_path": [
+            "第四节管理层讨论与分析",
+            "二、经营情况回顾",
+            "(一)经营计划"
+          ],
+          "start_page": 13,
+          "end_page": 14,
+          "rationale": "选择“业务概要”了解公司产品、采购/生产/销售/研发模式及经营角色；选择“经营计划”中的业绩增长、产能提升、产品多元化和客户突破，获取本期经营驱动与变化；选择“境外资产占比较高的情况”所在段落实质包含的营业情况分析，获取营业收入、营业成本及费用变化；选择“其他业务”中的收入构成、产品分类和区域分类，补足收入来源、业务权重与市场结构。上述均为公司层面实质经营内容，合计篇幅适中，避免扩读行业背景、治理和完整财报。"
+        },
+        {
+          "section_id": "section-0072",
+          "section_path": [
+            "第四节管理层讨论与分析",
+            "境外资产占比较高的情况"
+          ],
+          "start_page": 17,
+          "end_page": 19,
+          "rationale": "选择“业务概要”了解公司产品、采购/生产/销售/研发模式及经营角色；选择“经营计划”中的业绩增长、产能提升、产品多元化和客户突破，获取本期经营驱动与变化；选择“境外资产占比较高的情况”所在段落实质包含的营业情况分析，获取营业收入、营业成本及费用变化；选择“其他业务”中的收入构成、产品分类和区域分类，补足收入来源、业务权重与市场结构。上述均为公司层面实质经营内容，合计篇幅适中，避免扩读行业背景、治理和完整财报。"
+        },
+        {
+          "section_id": "section-0086",
+          "section_path": [
+            "第四节管理层讨论与分析",
+            "其他业务"
+          ],
+          "start_page": 19,
+          "end_page": 21,
+          "rationale": "选择“业务概要”了解公司产品、采购/生产/销售/研发模式及经营角色；选择“经营计划”中的业绩增长、产能提升、产品多元化和客户突破，获取本期经营驱动与变化；选择“境外资产占比较高的情况”所在段落实质包含的营业情况分析，获取营业收入、营业成本及费用变化；选择“其他业务”中的收入构成、产品分类和区域分类，补足收入来源、业务权重与市场结构。上述均为公司层面实质经营内容，合计篇幅适中，避免扩读行业背景、治理和完整财报。"
+        }
+      ],
+      "unread_or_deferred": [
+        "section-0351（第十一节财务会计报告及附注）",
+        "section-0234（公司治理、内部控制和投资者保护）",
+        "section-0190（股份变动及股东情况）",
+        "section-0199（融资与利润分配）",
+        "section-0168（风险因素）",
+        "section-0153（未来展望）",
+        "section-0040（行业情况）",
+        "section-0047（财务分析中的资产负债结构分析）",
+        "section-0114（主要控股参股公司分析）",
+        "section-0127（研发情况明细）"
+      ],
+      "selection_rationale": "选择“业务概要”了解公司产品、采购/生产/销售/研发模式及经营角色；选择“经营计划”中的业绩增长、产能提升、产品多元化和客户突破，获取本期经营驱动与变化；选择“境外资产占比较高的情况”所在段落实质包含的营业情况分析，获取营业收入、营业成本及费用变化；选择“其他业务”中的收入构成、产品分类和区域分类，补足收入来源、业务权重与市场结构。上述均为公司层面实质经营内容，合计篇幅适中，避免扩读行业背景、治理和完整财报。",
+      "stop_reason": "已覆盖业务模式、产品用途、收入来源与构成、成本费用变化和本期经营驱动；剩余信息主要为财报附注、治理、股东、融资分红、风险展望等，非本次公司经营与货币化主问题所需，停止扩读。",
+      "transcription_version": "shared-pdf-pypdf-layout.structured-notes.v1"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "bs-1",
+            "text": "公司是一家专业从事汽车燃料系统研发、制造、销售与服务的高新技术企业、专精特新“小巨人”企业，总部和技术中心位于河北廊坊，建有国家级CNAS实验室；报告期内在全国布局廊坊、宝鸡、台州、福州四个汽车燃料系统生产基地。公司为河北省制造业单项冠军企业，在国内塑料燃油箱行业内资企业中排名前列；已获授权专利245项，其中发明专利18项。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [
+              {
+                "name": "授权专利总数",
+                "raw_value": "245",
+                "value": "245",
+                "unit": "项",
+                "source_unit": "项",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "报告期末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "发明专利数量",
+                "raw_value": "18",
+                "value": "18",
+                "unit": "项",
+                "source_unit": "项",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "报告期末",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "bs-2",
+            "text": "公司设立控股子公司九昌新能源进行热管理系统产品研发与市场开拓，目前该业务发展规模较小，处于初级阶段。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未展开各生产基地产能、产量及子公司股权比例等明细。"
+        ]
+      },
+      "products_services": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "ps-1",
+            "text": "燃料系统产品主要有常压、高压塑料燃油箱总成等，主要客户为国内优秀自主品牌整车制造企业。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ps-2",
+            "text": "热管理系统产品主要有电导率传感器、氢浓度传感器、去离子器、颗粒过滤器、冷却液膨胀水箱等，由控股子公司九昌新能源开发，已批量生产并应用到新能源纯电动汽车与氢能领域；主要客户为广汽领程新能源商用车有限公司、上海重塑能源科技有限公司、苏州驿力机车科技股份有限公司、应雪汽车科技（常熟）有限公司等整车制造和系统集成企业。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0004"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ps-3",
+            "text": "公司完成塑料甲醇燃料箱的设计开发与批量生产，为下步拓展绿色燃料系统开发积累先期经验。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未披露各产品具体收入、单价、销量及热管理系统收入规模。"
+        ]
+      },
+      "revenue_model": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "rm-1",
+            "text": "公司采用直销模式，主要面向整车制造企业和系统集成企业销售；进入客户合格供应商体系后，通过参与项目竞标取得项目定点，经过产品设计、模具开发、样件制造、实验验证、OTS产品制造准备、生产件批准程序（PPAP）等环节后取得量产订单并签订框架协议，随后按客户具体订单需求安排生产及发货。收入主要来自上述产品的直接销售及量产订单。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未披露分产品定价机制、信用政策及收入确认具体时点。"
+        ]
+      },
+      "scale_and_mix": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "sm-1",
+            "text": "2025年公司实现营业收入66,711.38万元，同比增长29.57%；营业成本51,816.19万元，同比增长35.05%；综合毛利率22.33%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005",
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入",
+                "raw_value": "66,711.38",
+                "value": "66711.38",
+                "unit": "万元",
+                "source_unit": "万元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入同比变动比例",
+                "raw_value": "29.57",
+                "value": "29.57",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业成本",
+                "raw_value": "51,816.19",
+                "value": "51816.19",
+                "unit": "万元",
+                "source_unit": "万元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业成本同比变动比例",
+                "raw_value": "35.05",
+                "value": "35.05",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "毛利率",
+                "raw_value": "22.33",
+                "value": "22.33",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-2",
+            "text": "主营业务收入654,239,392.25元，同比增长28.00%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "主营业务收入",
+                "raw_value": "654,239,392.25",
+                "value": "654239392.25",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "主营业务收入同比变动比例",
+                "raw_value": "28.00",
+                "value": "28.00",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-3",
+            "text": "其他业务收入12,874,384.56元，同比增长245.35%，主要系原材料销售增加。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "其他业务收入",
+                "raw_value": "12,874,384.56",
+                "value": "12874384.56",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他业务收入同比变动比例",
+                "raw_value": "245.35",
+                "value": "245.35",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-4",
+            "text": "产品分类中，塑料燃油箱总成收入626,910,726.45元，同比增长25.87%，毛利率22.36%，毛利率同比减少3.34个百分点。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "塑料燃油箱总成营业收入",
+                "raw_value": "626,910,726.45",
+                "value": "626910726.45",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "塑料燃油箱总成营业收入同比变动比例",
+                "raw_value": "25.87",
+                "value": "25.87",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "塑料燃油箱总成毛利率",
+                "raw_value": "22.36",
+                "value": "22.36",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "塑料燃油箱总成毛利率同比增减",
+                "raw_value": "减少3.34",
+                "value": null,
+                "unit": "百分点",
+                "source_unit": "个百分点",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": "源文以“减少3.34个百分点”表述方向，未给出带符号数值。"
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-5",
+            "text": "配件收入12,844,780.89元，同比增长51.64%，毛利率7.68%，毛利率同比增加5.55个百分点，主要系随着塑料燃油箱总成销量增加，根据客户需求相关配件销量增加。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "配件营业收入",
+                "raw_value": "12,844,780.89",
+                "value": "12844780.89",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "配件营业收入同比变动比例",
+                "raw_value": "51.64",
+                "value": "51.64",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "配件毛利率",
+                "raw_value": "7.68",
+                "value": "7.68",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "配件毛利率同比增减",
+                "raw_value": "增加5.55",
+                "value": null,
+                "unit": "百分点",
+                "source_unit": "个百分点",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": "源文以“增加5.55个百分点”表述方向，未给出带符号数值。"
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-6",
+            "text": "产品分类中的“其他”（主营业务内其他）收入14,483,884.91元，同比增长214.72%，毛利率51.04%，毛利率同比减少2.09个百分点，主要系技术开发合同收入及结转成本增加。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "产品分类其他营业收入",
+                "raw_value": "14,483,884.91",
+                "value": "14483884.91",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "产品分类其他营业收入同比变动比例",
+                "raw_value": "214.72",
+                "value": "214.72",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "产品分类其他毛利率",
+                "raw_value": "51.04",
+                "value": "51.04",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "产品分类其他毛利率同比增减",
+                "raw_value": "减少2.09",
+                "value": null,
+                "unit": "百分点",
+                "source_unit": "个百分点",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": "源文以“减少2.09个百分点”表述方向，未给出带符号数值。"
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未纳入现金流量、资产负债结构及全部费用明细；产品分类表未直接披露各产品收入占比，本稿不自行计算。"
+        ]
+      },
+      "operations_and_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "oi-1",
+            "text": "公司生产所需原材料主要包括原料、阀类、管路件、金属件、电器件等，市场供应充足，主要采用“以产定购”模式：根据生产计划安排采购计划，与主要合格供应商签订框架协议，执行《供应商管理程序》《采购控制程序》，按生产物料需求下达采购订单并在原材料入库前进行数量、质量检验。生产方面采取“以销定产”方式，根据客户月度需求安排和组织生产；市场部制定月度销售订单计划和发货计划，生产部结合成品及原辅材料库存情况制定生产计划，生产过程管理涵盖设计、运行、监视测量分析和异常处理。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "oi-2",
+            "text": "公司坚持自主研发创新，研发工作主要分为两类：一是将市场及客户需求转化为产品技术要求、规格和性能要求，制定新产品研发方案，经可行性评估、评审批准后进行样件试制和测试，再评估是否批量生产；二是针对日常生产中的技术问题或创新方案，制定新技术或工艺研发方案，经评审批准后试制和测试并评估量产。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未展开原材料采购金额、主要供应商名称（除源表已披露者）、产能利用率及研发项目明细。"
+        ]
+      },
+      "customers_channels_markets": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "cm-1",
+            "text": "境内收入667,007,453.64元，同比增长29.55%，毛利率22.32%；主要客户以国内排名靠前的自主品牌车企为主，主要产品为塑料燃油箱且绝大部分在国内市场生产销售，是公司主要收入来源。境外收入106,323.17元，为首次实现，主要系九昌新能源产品电导率传感器实现出口；境外毛利率56.42%，主要系出口产品销售价格较高。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "境内营业收入",
+                "raw_value": "667,007,453.64",
+                "value": "667007453.64",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "境内营业收入同比变动比例",
+                "raw_value": "29.55",
+                "value": "29.55",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "境内毛利率",
+                "raw_value": "22.32",
+                "value": "22.32",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "境外营业收入",
+                "raw_value": "106,323.17",
+                "value": "106323.17",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "境外毛利率",
+                "raw_value": "56.42",
+                "value": "56.42",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "cm-2",
+            "text": "前五大客户合计销售606,654,951.30元，占年度销售90.94%；其中客户A销售297,970,630.54元，占44.67%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [
+              {
+                "name": "前五大客户合计销售金额",
+                "raw_value": "606,654,951.30",
+                "value": "606654951.30",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "前五大客户年度销售占比",
+                "raw_value": "90.94",
+                "value": "90.94",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "客户A销售金额",
+                "raw_value": "297,970,630.54",
+                "value": "297970630.54",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "客户A年度销售占比",
+                "raw_value": "44.67",
+                "value": "44.67",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "cm-3",
+            "text": "报告期内，在原有主要客户基础上，公司已获得多家大型（包括合资）整车制造企业新能源汽车高压塑料燃油箱项目定点。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "cm-4",
+            "text": "电导率传感器已通过全球汽车零部件企业法国彼欧认可与采购，首批产品已出口至国外市场。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "客户表以客户A/B等匿名披露，未获取最终客户名称及分客户产品结构；未展开销售渠道费用及境外客户明细。"
+        ]
+      },
+      "operating_drivers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "od-1",
+            "text": "2025年营业收入增长主要系公司以客户需求为导向，不断加大研发投入，与主要客户保持稳定合作关系，持续取得新增定点项目，且2025年多个高压塑料燃油箱定点项目开始批量供货，主要产品塑料燃油箱销量增长。其中，高压塑料燃油箱销售收入同比增加9,086.58万元，同比增长137.43%；常压塑料燃油箱业务保持相对稳定，销售收入略有增长。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "高压塑料燃油箱销售收入同比增加额",
+                "raw_value": "9,086.58",
+                "value": "9086.58",
+                "unit": "万元",
+                "source_unit": "万元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "高压塑料燃油箱销售收入同比变动比例",
+                "raw_value": "增长137.43",
+                "value": null,
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": "源文以“同比增长137.43%”表述方向，未给出带符号数值。"
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "od-2",
+            "text": "受主要客户价格年降以及销售返利的影响，塑料燃油箱总成成本增长幅度高于收入增长幅度，毛利率同比下降。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未量化各客户/项目对收入增长的贡献，未展开价格年降幅度、销售返利金额及费用明细。"
+        ]
+      },
+      "material_changes": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "mc-1",
+            "text": "2025年公司成功登陆北京证券交易所，报告期内向不特定合格投资者公开发行股票并上市收到募集资金。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003",
+              "source-0009"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "mc-2",
+            "text": "2025年1月公司设立福州世昌汽车部件有限公司，进一步增加对客户的属地化配套供货能力，降低包装运输成本；同时推进浙江星昌新能源高压油箱项目（二期）建设，预计2026年上半年完成项目建设与验收，届时将提升产能储备与制造自动化水平。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "mc-3",
+            "text": "2025年归属于上市公司股东的净利润6,887.23万元，同比降低0.53%；归属于上市公司股东的扣除非经常性损益的净利润6,652.55万元，同比增长8.69%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [
+              {
+                "name": "归属于上市公司股东的净利润",
+                "raw_value": "6,887.23",
+                "value": "6887.23",
+                "unit": "万元",
+                "source_unit": "万元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "归属于上市公司股东的净利润同比变动比例",
+                "raw_value": "降低0.53",
+                "value": null,
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": "源文以“同比降低0.53%”表述方向，未给出带符号数值。"
+              },
+              {
+                "name": "归属于上市公司股东的扣除非经常性损益的净利润",
+                "raw_value": "6,652.55",
+                "value": "6652.55",
+                "unit": "万元",
+                "source_unit": "万元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "扣除非经常性损益的净利润同比变动比例",
+                "raw_value": "增长8.69",
+                "value": null,
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": "源文以“同比增长8.69%”表述方向，未给出带符号数值。"
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未展开资产负债结构、现金流量及募集资金使用明细；重大变化以源文披露为限。"
+        ]
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "一、业务概要"
+        ],
+        "physical_pages": [
+          12
+        ],
+        "source_spans": [
+          {
+            "page": 12,
+            "start": 44,
+            "end": 1620,
+            "quote": "一、 业务概要\n\n商业模式报告期内变化情况：\n     公司是一家专业从事汽车燃料系统研发、制造、销售与服务的高新技术企业、专精特新“小巨人”\n 企业，总部和技术中心位于河北廊坊，建有国家级                       CNAS 实验室。报告期内公司在全国布局廊坊、宝\n 鸡、台州、福州四个汽车燃料系统生产基地，同时结合新能源汽车行业发展趋势以及自身研发能力，\n 公司设立控股子公司九昌新能源进行热管理系统产品的研发与市场开拓，目前业务发展规模较小，处\n 于初级阶段。\n     燃料系统产品主要有：常压、高压塑料燃油箱总成等，主要客户为国内优秀自主品牌整车制造企\n 业。热管理系统产品主要有：电导率传感器、氢浓度传感器、去离子器、颗粒过滤器、冷却液膨胀水\n 箱等，主要客户为广汽领程新能源商用车有限公司、上海重塑能源科技有限公司、苏州驿力机车科技\n 股份有限公司、应雪汽车科技（常熟）有限公司等整车制造和系统集成企业。\n     公司持续加强创新，通过自主研发掌握产品核心技术，建立了较为完善的自主知识产权体系，已\n 获得授权专利      245 项，其中发明专利        18 项。成立以来，世昌股份始终坚持聚焦实业、做强主业，致力\n 于打造节能、安全、环保的汽车系统产品，现已成为河北省制造业单项冠军企业，在国内塑料燃油箱\n 行业内资企业中排名前列。\n     公司的商业模式主要分为采购模式、生产模式、销售模式、研发模式，具体如下：\n     1.采购模式\n     公司生产所需的原材料主要包括原料、阀类、管路件、金属件、电器件等，市场供应充足，因此\n 主要采用“以产定购”的采购模式，根据生产计划安排采购计划，并与主要合格供应商签订框架协议，\n 确保原材料供应的及时、稳定。公司制定并实施了《供应商管理程序》《采购控制程序》等制度，对\n 供应商管理和采购过程进行有效控制，确保所采购的原材料符合规定要求。在具体采购流程中，根据\n 生产物料需求向相关合格供应商下达采购订单，并持续跟踪订单执行进度，在原材料入库前进行数量、\n 质量检验等工作。\n     2.生产模式\n     公司产品系根据客户的要求进行设计、开发，因此采取“以销定产”方式进行生产，即根据客户\n 的月度需求情况安排、组织生产。市场部根据客户需求制定月度销售订单计划和发货计划，生产部结\n 合成品及原辅材料库存情况制定相应的生产计划并安排生产，生产过程管理涉及生产过程设计、生产\n 过程的运行、生产过程监视、测量与分析、生产过程异常处理等方面。\n     3.销售模式\n     公司采用直销模式，主要面向整车制造企业和系统集成企业进行销售，由市场部负责进行客户的\n 维护、开发等工作。客户企业均有严格的供应商质量管理制度和评价标准，公司需要在技术研发、质\n 量体系、生产制造等方面评审后进入其合格供应商体系，随后根据客户开发需求，通过参与项目竞标\n 取得项目定点，经过产品设计、模具开发、样件制造、实验验证、OTS                              产品制造准备、生产件批准程\n 序（PPAP）等环节后取得量产订单，并签订框架协议，随后公司根据客户的具体订单需求安排生产及\n 发货。\n     特别是整车制造企业的供应商管理十分严格，存在较高的进入壁垒，在成功进入整车制造企业的\n 配套体系并批量供货后，基于零部件供应的稳定性、可靠性、安全性、一致性要求，以及时间成本、\n 机会成本的考虑，整车制造企业一般不会轻易更换供应商。因此，公司与主要客户的合作粘性较强，\n 有利于公司市场业务的开拓与持续发展。\n     4.研发模式\n\n                                            12\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "一、业务概要"
+        ],
+        "physical_pages": [
+          13
+        ],
+        "source_spans": [
+          {
+            "page": 13,
+            "start": 0,
+            "end": 432,
+            "quote": "     公司高度重视并坚持自主研发创新，以行业发展趋势及市场需求为指导，采取改进、创新的研发\n 模式，从产品材料结构、生产工艺、设备自动化等多方面进行技术创新，不断优化提升产品品质与技\n 术含量。\n     公司研发工作主要分为两类，一是根据市场及客户需求，将其转化为具体的产品技术要求、产品\n 规格、性能要求，并制定相应的新产品研发方案，包括产品的材料选择、结构设计、模具设计、工艺\n 设计等，然后召集相关部门对产品研发方案进行可行性评估，在通过方案评审并经公司批准后，进行\n 样件的试制和测试，根据测试情况和项目进度评估是否投入批量生产。二是结合日常生产过程中发现\n 的技术问题或提出的技术创新方案，制定出新技术或工艺研发方案，在通过方案评审并经公司批准后\n 进行试制和测试，根据测试情况评估是否将新技术或工艺投入批量生产。\n     报告期内，公司的主营业务与产品较为稳定，公司商业模式未发生重大变化。\n\n报告期内核心竞争力变化情况：\n□适用 √不适用\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "二、经营情况回顾",
+          "(一)经营计划"
+        ],
+        "physical_pages": [
+          13
+        ],
+        "source_spans": [
+          {
+            "page": 13,
+            "start": 713,
+            "end": 1721,
+            "quote": "(一) 经营计划\n\n     2025 年，公司成功登陆北京证券交易所，这一年也是公司规模化业务拓展和高质量发展的关键之\n 年。面对激烈的市场竞争，世昌股份保持战略定力，稳步推进市场开拓，较好地完成了年度经营任务。\n     1.经营业绩稳健增长，财务结构不断优化\n     2025 年度，公司实现营业收入            66,711.38 万元，同比增长        29.57%；归属于上市公司股东的净利润\n 6,887.23 万元，同比降低        0.53%；归属于上市公司股东的扣除非经常性损益的净利润6,652.55                            万元，\n 同比增长     8.69%。报告期末，公司资产总额为               75,060.76 万元，较报告期初增长            67.30%；归属于上市\n 公司股东的所有者权益为             42,875.01 万元，较报告期初增长            93.57%；公司资产负债率为           42.58%，较\n 报告期初降低       7.73 个百分点，保持合理水平，财务结构稳健，抗风险能力显著增强。\n     2.产能规模稳步提升，夯实业务增长基础\n     2025 年 1 月公司设立福州世昌汽车部件有限公司，进一步增加了公司对于客户的属地化配套供货\n 能力，降低了包装运输成本，收到客户好评。同时，公司严格遵循募集资金管理相关规定，规范使用\n 募集资金，认真推进“浙江星昌年产                  60 万台新能源高压油箱项目（二期）”建设，预计2026                         年上半\n 年完成项目建设与验收，届时将提升产能储备与制造自动化水平，为后续增长提供有力支撑。\n     3.产品种类多元化，收入结构向优发展\n     一是在常压燃油箱收入保持稳定增长的同时，高压燃油箱量产订单数量明显提升，形成“常压稳\n 基+高压增效”的双轮驱动格局，燃油箱收入结构更优。二是完成塑料甲醇燃料箱的设计开发与批量生\n 产，为下步拓展绿色燃料系统开发积累了先期经验。三是子公司九昌新能源结合客户需求，完成多种\n\n                                              13\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "二、经营情况回顾",
+          "(一)经营计划"
+        ],
+        "physical_pages": [
+          14
+        ],
+        "source_spans": [
+          {
+            "page": 14,
+            "start": 0,
+            "end": 515,
+            "quote": " 热管理系统部件开发与设计，并通过客户与第三方检测机构验证，已批量生产电导率传感器、氢浓度\n 传感器、去离子器、颗粒过滤器、冷却液膨胀水箱等，产品应用到新能源纯电动汽车与氢能领域。\n     4.市场客户突破升级，获取更多优质客户\n     报告期内，在原有主要客户的基础上，已获得多家大型（包括合资）整车制造企业新能源汽车高\n 压塑料燃油箱项目定点，为公司客户结构持续优化及业务持续稳定发展奠定了良好的市场基础。公司\n 热管理系统产品销售覆盖广汽领程新能源商用车有限公司、上海重塑能源科技有限公司、苏州驿力机\n 车科技股份有限公司、应雪汽车科技（常熟）有限公司                         等新能源整车制造和氢能系统集成企业。其中，\n 电导率传感器已通过全球汽车零部件企业法国彼欧认可与采购，首批产品已出口至国外市场。\n     2025 年，公司凭借稳定的产品质量、高效的交付能力及持续的技术创                              新，获核心主机厂颁发“最\n 具价值贡献奖”“卓越创新奖”“最佳合作奖”，高工氢电“电导率传感器技术引领奖”，公司品牌\n 影响力与行业地位持续巩固。\n\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "境外资产占比较高的情况"
+        ],
+        "physical_pages": [
+          17
+        ],
+        "source_spans": [
+          {
+            "page": 17,
+            "start": 1385,
+            "end": 3487,
+            "quote": "境外资产占比较高的情况\n□适用 √不适用\n\n2.   营业情况分析\n(1)  利润构成\n                                                                                                                 单位：元\n                                          2025  年                                  2024  年\n          项目                       金额               占营业收入                   金额               占营业收入            变动比例%\n                                                      的比重%                                     的比重%\n 营业收入                        667,113,776.81               -           514,858,876.81               -              29.57%\n 营业成本                        518,161,881.57              77.67%       383,684,853.80              74.52%          35.05%\n 毛利率                                    22.33%            -                       25.48%           -                -\n 销售费用                          15,620,276.85               2.34%        13,376,286.90               2.60%         16.78%\n 管理费用                          25,027,305.84               3.75%        20,600,277.18               4.00%         21.49%\n 研发费用                          24,340,906.52               3.65%        18,886,572.19               3.67%         28.88%\n 财务费用                              766,200.75              0.11%         2,116,550.03               0.41%        -63.80%\n 信用减值损失                        -2,708,629.07             -0.41%             314,802.15              0.06%       -960.42%\n 资产减值损失                        -2,691,344.81             -0.40%         -1,375,586.57             -0.27%         -95.65%\n 其他收益                           4,783,836.08               0.72%        10,346,018.39               2.01%        -53.76%\n 投资收益                          -1,137,179.05             -0.17%         -1,528,589.33             -0.30%          25.61%\n 公允价值变动收益                          145,393.32              0.02%             66,316.34              0.01%        119.24%\n 资产处置收益                             13,409.80              0.00%               7,964.61             0.00%         68.37%\n                                                            17\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "境外资产占比较高的情况"
+        ],
+        "physical_pages": [
+          18
+        ],
+        "source_spans": [
+          {
+            "page": 18,
+            "start": 0,
+            "end": 3343,
+            "quote": " 汇兑收益                                       -               -                     -               -              -\n 营业利润                       78,751,831.62            11.80%        81,645,611.70            15.86%         -3.54%\n 营业外收入                          141,910.86             0.02%            23,026.22            0.00%       516.30%\n 营业外支出                             8,833.23            0.00%            35,267.09            0.01%       -74.95%\n 净利润                        69,704,571.85            10.45%        69,949,274.81            13.59%         -0.35%\n\n项目重大变动原因：\n 1. 营业收入：公司报告期内营业收入为                          66,711.38   万元，同比增长           29.57%，主要系公司以客户需求为\n 导向，不断加大研发投入，与主要客户保持稳定合作关系，持续取得新增定点项目，且                                                           2025  年多个高\n 压塑料燃油箱定点项目开始批量供货，业务开展情况良好，主要产品塑料燃油箱销量增长，使得营业\n 收入保持良好的增长趋势。\n 2. 营业成本：公司报告期内营业成本为                          51,816.19   万元，同比增长           35.05%，主要系随着报告期内营业\n 收入增加，营业成本相应增加。\n 3. 财务费用：公司报告期内财务费用为                          76.62  万元，同比减少           63.80%，主要系报告期内银行借款减少\n 使得利息费用相应减少所致。\n 4. 信用减值损失：公司报告期内信用减值损失为                                 270.86  万元，上年同期为收益                 31.48  万元，主要系\n 报告期内计提的应收账款坏账准备增加所致。\n 5. 资产减值损失：公司报告期内资产减值损失为                                269.13  万元，上年同期损失为                 137.56  万元，主要系\n 报告期内计提存货跌价准备增加所致。\n 6. 其他收益：公司报告期内其他收益为                          478.38  万元，同比减少            53.76%，主要系报告期内确认的政府\n 补助减少所致。\n 7. 公允价值变动收益：公司报告期内公允价值变动收益为                                       14.54  万元，同比增长            119.24%，主要系报\n 告期内交易性金融资产公允价值变动所致。\n 8. 资产处置收益：公司报告期内资产处置收益为                                1.34  万元，同比增长            68.37%，主要系报告期内提前\n 终止租赁合同形成的收益增加所致。\n 9. 营业外收入：公司报告期内营业外收入为                             14.19  万元，同比增长            516.30%，主要系报告期内供应商\n 扣款增加所致。\n 10. 营业外支出：公司报告期内营业外支出为                             0.88  万元，同比减少           74.95%，主要系报告期内固定资产\n 报废损失减少所致。\n\n(2)  收入构成\n                                                                                                         单位：元\n           项目                         2025  年                       2024  年                    变动比例%\n 主营业务收入                               654,239,392.25               511,130,905.91                          28.00%\n 其他业务收入                                 12,874,384.56                 3,727,970.90                       245.35%\n 主营业务成本                               505,696,317.35               380,510,644.54                          32.90%\n 其他业务成本                                 12,465,564.22                 3,174,209.26                       292.71%\n\n按产品分类分析：\n                                                                                                         单位：元\n                                                                        营业收入          营业成本\n   分产品              营业收入                营业成本              毛利率%          比上年同          比上年同           毛利率比上\n                                                                            期             期          年同期增减\n                                                                          增减%           增减%\n 塑料燃油           626,910,726.45      486,746,265.95          22.36%         25.87%         31.53%       减少3.34\n 箱总成                                                                                                    个百分点\n\n                                                        18\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "境外资产占比较高的情况"
+        ],
+        "physical_pages": [
+          19
+        ],
+        "source_spans": [
+          {
+            "page": 19,
+            "start": 0,
+            "end": 399,
+            "quote": " 配件            12,844,780.89     11,858,211.92         7.68%       51.64%       43.04%      增加   5.55\n                                                                                            个百分点\n 其他            14,483,884.91       7,091,839.48      51.04%       214.72%      228.75%      减少   2.09\n                                                                                            个百分点\n "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "其他业务"
+        ],
+        "physical_pages": [
+          19
+        ],
+        "source_spans": [
+          {
+            "page": 19,
+            "start": 399,
+            "end": 2648,
+            "quote": "其他业务          12,874,384.56     12,465,564.22         3.18%      245.35%      292.71%     减少11.67\n 收入                                                                                         个百分点\n    合计        667,113,776.81    518,161,881.57         -            -            -             -\n\n按区域分类分析：\n                                                                                              单位：元\n                                                                营业收入         营业成本\n   分地区           营业收入               营业成本           毛利率%         比上年同         比上年同        毛利率比上\n                                                                   期            期        年同期增减\n                                                                 增减%          增减%\n    境内        667,007,453.64    518,115,544.45       22.32%        29.55%       35.04%      减少3.16\n                                                                                            个百分点\n    境外            106,323.17          46,337.12      56.42%         -            -             不适用\n    合计        667,113,776.81    518,161,881.57         -            -            -             -\n\n收入构成变动的原因：\n 1.按收入构成分析：\n （1）其他业务收入：公司报告期内其他业务收入为1,287.44万元，较上年同期增加914.64万元，同\n 比增长245.35%，主要系报告期内原材料销售增加所致。\n （2）主营业务成本：公司报告期内主营业务成本为50,569.63万元，较上年同期增加12,518.57万\n 元，同比增长32.90%，主要系随着报告期内主营业务收入增加，主营业务成本相应增加所致。\n （3）其他业务成本：公司报告期内其他业务成本为1,246.56万元，较上年同期增加929.14万元，同\n 比增长292.71%，主要系随着报告期内其他业务收入增加，其他业务成本相应增加所致。\n 2.按产品分类分析：\n （1）报告期内，公司塑料燃油箱总成收入为62,691.07万元，较上年同期增加12,885.24万元，同比\n 增长25.87%，主要系公司报告期内常压塑料燃油箱业务保持相对稳定，销售收入略有增长，同时报告\n 期内多个高压塑料燃油箱定点项目开始批量供货，高压塑料燃油箱销量增加，使得高压塑料燃油箱销\n 售收入较上年增加9,086.58万元，同比增长137.43%。在收入增长的情况下，受主要客户价格年降以\n 及销售返利的影响，成本增长的幅度高于收入增长的幅度，塑料燃油箱总成毛利率同比下降。\n （2）报告期内，公司配件收入、成本较上年同期分别增长                                 51.64%、43.04%，主要系随着塑料燃油箱\n 总成销量的增加，根据客户需求，相关配件销量增加所致。\n （3）报告期内，公司主营业务中其他收入、其他成本较上年同期分别                                       增长   214.72%、228.75%，主要\n 系报告期内确认的技术开发合同收入及结转成本增加所致。\n 3.按区域分类分析：\n （1）报告期内，公司在境内实现销售收入                       66,700.75  万元，主要客户以国内排名靠前的自主品牌车企\n 为主，主要产品为塑料燃油箱且绝大部分在国内市场进行生产销售，是公司主要收入来源。\n （2）报告期内，公司首次在境外实现销售收入                         10.63  万元，主要系九昌新能源产品电导率传感器实现\n 出口所致，境外出口产品毛利率高主要系出口产品销售价格较高所致。\n\n(3) 主要客户情况\n                                                  19\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "其他业务"
+        ],
+        "physical_pages": [
+          20
+        ],
+        "source_spans": [
+          {
+            "page": 20,
+            "start": 0,
+            "end": 3381,
+            "quote": "                                                                                                             单位：元\n 序号                客户                        销售金额                       年度销售占比%                  是否存在关联关系\n   1              客户    A                     297,970,630.54                          44.67%              否\n   2              客户    B                     214,124,225.04                          32.10%              否\n   3              客户    C                      67,766,624.78                          10.16%              否\n   4              客户    D                      14,167,639.04                           2.12%              否\n   5              客户    E                      12,625,831.90                           1.89%              否\n               合计                             606,654,951.30                          90.94%               -\n\n(4)  主要供应商情况\n                                                                                                             单位：元\n 序号               供应商                        采购金额                       年度采购占比%                  是否存在关联关系\n   1             供应商     H                     93,272,800.93                          20.06%              否\n   2      宁波洛卡特汽车零部                            70,197,936.10                          15.10%              否\n               件有限公司\n   3             供应商     I                     30,185,280.80                           6.49%              否\n   4             供应商     J                     29,153,814.41                           6.27%              否\n   5             供应商     K                     26,273,991.15                           5.65%              否\n               合计                             249,083,823.39                          53.57%               -\n\n(5)  报告期内公司贸易业务收入占营业收入比例超过                                    10%情况\n □适用 √不适用\n3.   现金流量状况\n                                                                                                             单位：元\n                 项目                               2025  年                      2024  年                 变动比例%\n  经营活动产生的现金流量净额                                    -7,189,648.12               48,748,087.25               -114.75%\n  投资活动产生的现金流量净额                                  -72,934,095.55                -9,727,107.44               -649.80%\n  筹资活动产生的现金流量净额                                  162,263,336.38               -28,469,273.50                 669.96%\n\n现金流量分析：\n 1.报告期内，公司经营活动产生的现金流量净额为-718.96                                       万元，较上年同期减少                 5,593.77   万元，同\n 比下降      114.75%，主要原因系随着采购规模的增加，公司报告期内购买商品、接受劳务支付的现金较\n 上年同期大幅增加              6,248.67   万元，同时由于应收账款余额增加，部分营业收入尚未回款，使得报告期\n 内销售商品、提供劳务收到的现金增加金额较少。此外，公司将信用等级较低的承兑汇票贴现流入计\n 入收到的其他与筹资活动有关的现金科目，2024                                  年度、2025      年度该部分现金流入分别为                     3,555.11   万\n 元、1,984.83      万元，经营活动产生的现金流量净额与该部分票据贴现流入金额合计（即调整后经营活\n 动产生的现金流量净额）分别为                        8,429.92   万元、1,265.87         万元，均为净流入。\n 2.报告期内，公司投资活动产生的现金流量净额为-7,293.41                                       万元，净流出较上年同期增加                      6,320.70\n 万元，主要系报告期内公司使用                        5,000  万元闲置募集资金进行现金管理计入投资支付的现金所致。\n 3.报告期内，公司筹资活动产生的现金流量净额为                                    16,226.33    万元，较上年增加              19,073.26    万元，主\n 要系报告期内公司向不特定合格投资者公开发行股票并上市收到募集资金所致。\n\n\n                                                          20\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0010",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "其他业务"
+        ],
+        "physical_pages": [
+          21
+        ],
+        "source_spans": [
+          {
+            "page": 21,
+            "start": 0,
+            "end": 665,
+            "quote": "(四) 投资状况分析\n\n1、  总体情况\n√适用 □不适用\n                                                                                单位：元\n          报告期投资额                            上年同期投资额                               变动比例%\n         81,389,927.56                       27,781,270.35                         192.97%\n\n2、  报告期内获取的重大的股权投资情况\n□适用 √不适用\n\n3、  报告期内正在进行的重大的非股权投资情况\n√适用 □不适用\n                                                                                               单位：元\n                                                                                      截止报       是否达\n                                                                                      告期末       到计划\n      "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "limitations": [
+      "本稿仅依据选定的业务概要、经营计划、营业情况分析、收入构成及客户/供应商章节，未覆盖财报附注、治理、股东、融资分红、风险展望、研发明细等。",
+      "未获取部分补充明细（如各产品销量/单价、分客户产品结构、产能利用率、资产负债结构、现金流量细节），未以猜测填补。",
+      "产品分类表未直接披露各产品收入占比，本稿不自行计算；客户名称按源表匿名列示。"
+    ],
+    "supply_chain": {
+      "position": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次未返回该项供应链信息；不代表全报告未披露。"
+        ]
+      },
+      "upstream_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "sc-up-1",
+            "text": "前五大供应商合计采购249,083,823.39元，占年度采购53.57%；其中供应商H采购93,272,800.93元，占20.06%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [
+              {
+                "name": "前五大供应商合计采购金额",
+                "raw_value": "249,083,823.39",
+                "value": "249083823.39",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "前五大供应商年度采购占比",
+                "raw_value": "53.57",
+                "value": "53.57",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "供应商H采购金额",
+                "raw_value": "93,272,800.93",
+                "value": "93272800.93",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "供应商H年度采购占比",
+                "raw_value": "20.06",
+                "value": "20.06",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "仅补充供应商集中度，未展开全部供应商、原材料采购金额及供应协议期限。"
+        ]
+      },
+      "downstream_customers": {
+        "status": "unclear",
+        "facts": [],
+        "limitations": [
+          "本次未返回该项供应链信息；不代表全报告未披露。"
+        ]
+      }
+    },
+    "generation": {
+      "prompt_version": "company_profile_workpaper.2026-11-28.subject-relationships.v22",
+      "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+      "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+      "selection": {
+        "purpose": "select_profile_sections",
+        "request_id": "bp-work-e7dfb860aa313dfdccf6141e:workpaper:sections",
+        "request_hash": "b2d3c08a3d1584742b80054768f010f4702bf34838568b9b0372ffa506fbf736",
+        "response_hash": "b969ca157532f5d6c640b3770d65f99d12a2b2109b754ecdb6341c70c7a9559e",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 15299,
+          "output_tokens": 5937,
+          "total_tokens": 21236
+        },
+        "scope_kind": "report_heading_index",
+        "heading_count": 581,
+        "section_ids": [
+          "section-0001",
+          "section-0002",
+          "section-0003",
+          "section-0004",
+          "section-0005",
+          "section-0006",
+          "section-0007",
+          "section-0008",
+          "section-0009",
+          "section-0011",
+          "section-0012",
+          "section-0013",
+          "section-0014",
+          "section-0015",
+          "section-0016",
+          "section-0017",
+          "section-0018",
+          "section-0019",
+          "section-0020",
+          "section-0021",
+          "section-0022",
+          "section-0023",
+          "section-0024",
+          "section-0025",
+          "section-0026",
+          "section-0027",
+          "section-0028",
+          "section-0029",
+          "section-0030",
+          "section-0031",
+          "section-0032",
+          "section-0033",
+          "section-0034",
+          "section-0035",
+          "section-0036",
+          "section-0037",
+          "section-0038",
+          "section-0039",
+          "section-0040",
+          "section-0041",
+          "section-0042",
+          "section-0046",
+          "section-0047",
+          "section-0048",
+          "section-0049",
+          "section-0050",
+          "section-0051",
+          "section-0052",
+          "section-0053",
+          "section-0054",
+          "section-0055",
+          "section-0056",
+          "section-0057",
+          "section-0058",
+          "section-0059",
+          "section-0060",
+          "section-0061",
+          "section-0062",
+          "section-0063",
+          "section-0064",
+          "section-0065",
+          "section-0066",
+          "section-0067",
+          "section-0068",
+          "section-0069",
+          "section-0070",
+          "section-0071",
+          "section-0072",
+          "section-0073",
+          "section-0075",
+          "section-0076",
+          "section-0077",
+          "section-0078",
+          "section-0079",
+          "section-0080",
+          "section-0081",
+          "section-0082",
+          "section-0083",
+          "section-0084",
+          "section-0086",
+          "section-0087",
+          "section-0091",
+          "section-0095",
+          "section-0101",
+          "section-0102",
+          "section-0103",
+          "section-0104",
+          "section-0105",
+          "section-0106",
+          "section-0107",
+          "section-0108",
+          "section-0109",
+          "section-0110",
+          "section-0111",
+          "section-0112",
+          "section-0113",
+          "section-0114",
+          "section-0117",
+          "section-0119",
+          "section-0120",
+          "section-0121",
+          "section-0123",
+          "section-0124",
+          "section-0125",
+          "section-0126",
+          "section-0127",
+          "section-0128",
+          "section-0129",
+          "section-0130",
+          "section-0131",
+          "section-0132",
+          "section-0133",
+          "section-0134",
+          "section-0135",
+          "section-0136",
+          "section-0139",
+          "section-0142",
+          "section-0143",
+          "section-0144",
+          "section-0145",
+          "section-0146",
+          "section-0147",
+          "section-0148",
+          "section-0149",
+          "section-0150",
+          "section-0151",
+          "section-0152",
+          "section-0153",
+          "section-0154",
+          "section-0155",
+          "section-0156",
+          "section-0157",
+          "section-0158",
+          "section-0159",
+          "section-0160",
+          "section-0161",
+          "section-0162",
+          "section-0163",
+          "section-0164",
+          "section-0165",
+          "section-0166",
+          "section-0167",
+          "section-0168",
+          "section-0169",
+          "section-0170",
+          "section-0171",
+          "section-0172",
+          "section-0173",
+          "section-0174",
+          "section-0175",
+          "section-0176",
+          "section-0177",
+          "section-0178",
+          "section-0179",
+          "section-0180",
+          "section-0181",
+          "section-0182",
+          "section-0183",
+          "section-0184",
+          "section-0185",
+          "section-0186",
+          "section-0187",
+          "section-0188",
+          "section-0189",
+          "section-0190",
+          "section-0191",
+          "section-0192",
+          "section-0193",
+          "section-0194",
+          "section-0195",
+          "section-0196",
+          "section-0197",
+          "section-0198",
+          "section-0199",
+          "section-0200",
+          "section-0201",
+          "section-0204",
+          "section-0205",
+          "section-0206",
+          "section-0207",
+          "section-0208",
+          "section-0209",
+          "section-0210",
+          "section-0211",
+          "section-0212",
+          "section-0213",
+          "section-0214",
+          "section-0215",
+          "section-0216",
+          "section-0217",
+          "section-0218",
+          "section-0219",
+          "section-0220",
+          "section-0221",
+          "section-0222",
+          "section-0223",
+          "section-0224",
+          "section-0225",
+          "section-0226",
+          "section-0227",
+          "section-0228",
+          "section-0229",
+          "section-0230",
+          "section-0231",
+          "section-0232",
+          "section-0233",
+          "section-0234",
+          "section-0235",
+          "section-0236",
+          "section-0237",
+          "section-0238",
+          "section-0239",
+          "section-0240",
+          "section-0241",
+          "section-0242",
+          "section-0312",
+          "section-0313",
+          "section-0314",
+          "section-0315",
+          "section-0316",
+          "section-0335",
+          "section-0336",
+          "section-0337",
+          "section-0338",
+          "section-0339",
+          "section-0340",
+          "section-0341",
+          "section-0342",
+          "section-0343",
+          "section-0344",
+          "section-0345",
+          "section-0346",
+          "section-0347",
+          "section-0348",
+          "section-0349",
+          "section-0350",
+          "section-0351",
+          "section-0352",
+          "section-0353",
+          "section-0354",
+          "section-0355",
+          "section-0356",
+          "section-0359",
+          "section-0362",
+          "section-0363",
+          "section-0364",
+          "section-0365",
+          "section-0366",
+          "section-0367",
+          "section-0368",
+          "section-0369",
+          "section-0370",
+          "section-0371",
+          "section-0372",
+          "section-0373",
+          "section-0374",
+          "section-0375",
+          "section-0376",
+          "section-0377",
+          "section-0378",
+          "section-0379",
+          "section-0380",
+          "section-0381",
+          "section-0382",
+          "section-0383",
+          "section-0384",
+          "section-0385",
+          "section-0386",
+          "section-0387",
+          "section-0388",
+          "section-0394",
+          "section-0402",
+          "section-0403",
+          "section-0404",
+          "section-0405",
+          "section-0406",
+          "section-0407",
+          "section-0408",
+          "section-0409",
+          "section-0410",
+          "section-0411",
+          "section-0412",
+          "section-0413",
+          "section-0414",
+          "section-0415",
+          "section-0416",
+          "section-0417",
+          "section-0418",
+          "section-0419",
+          "section-0420",
+          "section-0421",
+          "section-0422",
+          "section-0423",
+          "section-0424",
+          "section-0425",
+          "section-0426",
+          "section-0427",
+          "section-0428",
+          "section-0429",
+          "section-0430",
+          "section-0431",
+          "section-0432",
+          "section-0433",
+          "section-0434",
+          "section-0435",
+          "section-0436",
+          "section-0437",
+          "section-0438",
+          "section-0439",
+          "section-0440",
+          "section-0441",
+          "section-0442",
+          "section-0443",
+          "section-0444",
+          "section-0445",
+          "section-0446",
+          "section-0447",
+          "section-0448",
+          "section-0449",
+          "section-0450",
+          "section-0451",
+          "section-0452",
+          "section-0453",
+          "section-0454",
+          "section-0455",
+          "section-0456",
+          "section-0457",
+          "section-0458",
+          "section-0459",
+          "section-0460",
+          "section-0461",
+          "section-0462",
+          "section-0463",
+          "section-0464",
+          "section-0465",
+          "section-0466",
+          "section-0467",
+          "section-0468",
+          "section-0469",
+          "section-0470",
+          "section-0471",
+          "section-0472",
+          "section-0473",
+          "section-0474",
+          "section-0475",
+          "section-0476",
+          "section-0477",
+          "section-0478",
+          "section-0479",
+          "section-0480",
+          "section-0481",
+          "section-0482",
+          "section-0483",
+          "section-0484",
+          "section-0485",
+          "section-0486",
+          "section-0487",
+          "section-0488",
+          "section-0489",
+          "section-0490",
+          "section-0491",
+          "section-0492",
+          "section-0493",
+          "section-0494",
+          "section-0495",
+          "section-0496",
+          "section-0497",
+          "section-0498",
+          "section-0499",
+          "section-0500",
+          "section-0501",
+          "section-0502",
+          "section-0503",
+          "section-0504",
+          "section-0505",
+          "section-0506",
+          "section-0507",
+          "section-0508",
+          "section-0509",
+          "section-0510",
+          "section-0511",
+          "section-0512",
+          "section-0513",
+          "section-0514",
+          "section-0515",
+          "section-0516",
+          "section-0517",
+          "section-0518",
+          "section-0519",
+          "section-0520",
+          "section-0521",
+          "section-0522",
+          "section-0523",
+          "section-0524",
+          "section-0525",
+          "section-0526",
+          "section-0527",
+          "section-0528",
+          "section-0529",
+          "section-0530",
+          "section-0531",
+          "section-0532",
+          "section-0533",
+          "section-0534",
+          "section-0535",
+          "section-0536",
+          "section-0537",
+          "section-0538",
+          "section-0539",
+          "section-0540",
+          "section-0541",
+          "section-0542",
+          "section-0543",
+          "section-0544",
+          "section-0545",
+          "section-0546",
+          "section-0547",
+          "section-0548",
+          "section-0549",
+          "section-0550",
+          "section-0551",
+          "section-0552",
+          "section-0553",
+          "section-0554",
+          "section-0555",
+          "section-0556",
+          "section-0557",
+          "section-0558",
+          "section-0559",
+          "section-0560",
+          "section-0561",
+          "section-0562",
+          "section-0563",
+          "section-0564",
+          "section-0565",
+          "section-0568",
+          "section-0571",
+          "section-0572",
+          "section-0573",
+          "section-0577",
+          "section-0582",
+          "section-0588",
+          "section-0591",
+          "section-0594",
+          "section-0598",
+          "section-0599",
+          "section-0604",
+          "section-0610",
+          "section-0611",
+          "section-0612",
+          "section-0613",
+          "section-0618",
+          "section-0622",
+          "section-0626",
+          "section-0629",
+          "section-0633",
+          "section-0638",
+          "section-0639",
+          "section-0642",
+          "section-0644",
+          "section-0647",
+          "section-0659",
+          "section-0660",
+          "section-0661",
+          "section-0664",
+          "section-0665",
+          "section-0666",
+          "section-0668",
+          "section-0673",
+          "section-0678",
+          "section-0681",
+          "section-0684",
+          "section-0686",
+          "section-0687",
+          "section-0688",
+          "section-0689",
+          "section-0690",
+          "section-0693",
+          "section-0694",
+          "section-0696",
+          "section-0697",
+          "section-0698",
+          "section-0699",
+          "section-0701",
+          "section-0702",
+          "section-0704",
+          "section-0706",
+          "section-0708",
+          "section-0709",
+          "section-0714",
+          "section-0715",
+          "section-0716",
+          "section-0717",
+          "section-0718",
+          "section-0719",
+          "section-0721",
+          "section-0722",
+          "section-0724",
+          "section-0726",
+          "section-0730",
+          "section-0731",
+          "section-0733",
+          "section-0734",
+          "section-0735",
+          "section-0736",
+          "section-0737",
+          "section-0738",
+          "section-0739",
+          "section-0740",
+          "section-0741",
+          "section-0742",
+          "section-0743",
+          "section-0744",
+          "section-0745",
+          "section-0746",
+          "section-0747",
+          "section-0748",
+          "section-0749",
+          "section-0750",
+          "section-0751",
+          "section-0752",
+          "section-0753",
+          "section-0754",
+          "section-0755",
+          "section-0756",
+          "section-0757",
+          "section-0760",
+          "section-0764",
+          "section-0765",
+          "section-0769",
+          "section-0771",
+          "section-0773",
+          "section-0774",
+          "section-0775",
+          "section-0776",
+          "section-0777",
+          "section-0778",
+          "section-0782",
+          "section-0784",
+          "section-0785",
+          "section-0786",
+          "section-0787",
+          "section-0788",
+          "section-0792",
+          "section-0793",
+          "section-0796",
+          "section-0797",
+          "section-0798",
+          "section-0799",
+          "section-0800",
+          "section-0801",
+          "section-0802",
+          "section-0806",
+          "section-0807",
+          "section-0808",
+          "section-0809",
+          "section-0810",
+          "section-0811",
+          "section-0812",
+          "section-0813",
+          "section-0814",
+          "section-0815",
+          "section-0816",
+          "section-0817",
+          "section-0818",
+          "section-0819",
+          "section-0824",
+          "section-0826",
+          "section-0827",
+          "section-0828",
+          "section-0829",
+          "section-0830",
+          "section-0832",
+          "section-0833",
+          "section-0834",
+          "section-0835",
+          "section-0836",
+          "section-0837",
+          "section-0838",
+          "section-0839",
+          "section-0840"
+        ],
+        "physical_pages": []
+      },
+      "extraction": {
+        "purpose": "extract_profile_workpaper",
+        "request_id": "bp-work-e7dfb860aa313dfdccf6141e:workpaper:extract",
+        "request_hash": "08e08c38377daaef4e7a4b2de22e1db7b3a298988a0caf3b8e743000c60746bc",
+        "response_hash": "ed4558bfb8b572a8ebae74a14686919e435b659aeeadaec561a4c17bd43c22f5",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 10498,
+          "output_tokens": 37341,
+          "total_tokens": 47839
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0028",
+          "section-0035",
+          "section-0072",
+          "section-0086"
+        ],
+        "physical_pages": [
+          12,
+          13,
+          14,
+          17,
+          18,
+          19,
+          20,
+          21
+        ]
+      }
+    },
+    "quality_review": null,
+    "standardization_notes": []
+  },
+  "workpaper_packet": {
+    "report": {
+      "instrument_id": "920022.BJ",
+      "report_id": "asset_2e5f514bffd07480b7f0b9e0630fff50",
+      "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-25T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0028",
+          "section_path": [
+            "第四节管理层讨论与分析",
+            "一、业务概要"
+          ],
+          "start_page": 12,
+          "end_page": 13,
+          "rationale": "选择“业务概要”了解公司产品、采购/生产/销售/研发模式及经营角色；选择“经营计划”中的业绩增长、产能提升、产品多元化和客户突破，获取本期经营驱动与变化；选择“境外资产占比较高的情况”所在段落实质包含的营业情况分析，获取营业收入、营业成本及费用变化；选择“其他业务”中的收入构成、产品分类和区域分类，补足收入来源、业务权重与市场结构。上述均为公司层面实质经营内容，合计篇幅适中，避免扩读行业背景、治理和完整财报。"
+        },
+        {
+          "section_id": "section-0035",
+          "section_path": [
+            "第四节管理层讨论与分析",
+            "二、经营情况回顾",
+            "(一)经营计划"
+          ],
+          "start_page": 13,
+          "end_page": 14,
+          "rationale": "选择“业务概要”了解公司产品、采购/生产/销售/研发模式及经营角色；选择“经营计划”中的业绩增长、产能提升、产品多元化和客户突破，获取本期经营驱动与变化；选择“境外资产占比较高的情况”所在段落实质包含的营业情况分析，获取营业收入、营业成本及费用变化；选择“其他业务”中的收入构成、产品分类和区域分类，补足收入来源、业务权重与市场结构。上述均为公司层面实质经营内容，合计篇幅适中，避免扩读行业背景、治理和完整财报。"
+        },
+        {
+          "section_id": "section-0072",
+          "section_path": [
+            "第四节管理层讨论与分析",
+            "境外资产占比较高的情况"
+          ],
+          "start_page": 17,
+          "end_page": 19,
+          "rationale": "选择“业务概要”了解公司产品、采购/生产/销售/研发模式及经营角色；选择“经营计划”中的业绩增长、产能提升、产品多元化和客户突破，获取本期经营驱动与变化；选择“境外资产占比较高的情况”所在段落实质包含的营业情况分析，获取营业收入、营业成本及费用变化；选择“其他业务”中的收入构成、产品分类和区域分类，补足收入来源、业务权重与市场结构。上述均为公司层面实质经营内容，合计篇幅适中，避免扩读行业背景、治理和完整财报。"
+        },
+        {
+          "section_id": "section-0086",
+          "section_path": [
+            "第四节管理层讨论与分析",
+            "其他业务"
+          ],
+          "start_page": 19,
+          "end_page": 21,
+          "rationale": "选择“业务概要”了解公司产品、采购/生产/销售/研发模式及经营角色；选择“经营计划”中的业绩增长、产能提升、产品多元化和客户突破，获取本期经营驱动与变化；选择“境外资产占比较高的情况”所在段落实质包含的营业情况分析，获取营业收入、营业成本及费用变化；选择“其他业务”中的收入构成、产品分类和区域分类，补足收入来源、业务权重与市场结构。上述均为公司层面实质经营内容，合计篇幅适中，避免扩读行业背景、治理和完整财报。"
+        }
+      ],
+      "unread_or_deferred": [
+        "section-0351（第十一节财务会计报告及附注）",
+        "section-0234（公司治理、内部控制和投资者保护）",
+        "section-0190（股份变动及股东情况）",
+        "section-0199（融资与利润分配）",
+        "section-0168（风险因素）",
+        "section-0153（未来展望）",
+        "section-0040（行业情况）",
+        "section-0047（财务分析中的资产负债结构分析）",
+        "section-0114（主要控股参股公司分析）",
+        "section-0127（研发情况明细）"
+      ],
+      "selection_rationale": "选择“业务概要”了解公司产品、采购/生产/销售/研发模式及经营角色；选择“经营计划”中的业绩增长、产能提升、产品多元化和客户突破，获取本期经营驱动与变化；选择“境外资产占比较高的情况”所在段落实质包含的营业情况分析，获取营业收入、营业成本及费用变化；选择“其他业务”中的收入构成、产品分类和区域分类，补足收入来源、业务权重与市场结构。上述均为公司层面实质经营内容，合计篇幅适中，避免扩读行业背景、治理和完整财报。",
+      "stop_reason": "已覆盖业务模式、产品用途、收入来源与构成、成本费用变化和本期经营驱动；剩余信息主要为财报附注、治理、股东、融资分红、风险展望等，非本次公司经营与货币化主问题所需，停止扩读。",
+      "transcription_version": "shared-pdf-pypdf-layout.structured-notes.v1"
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "一、业务概要"
+        ],
+        "physical_pages": [
+          12
+        ],
+        "source_spans": [
+          {
+            "page": 12,
+            "start": 44,
+            "end": 1620,
+            "quote": "一、 业务概要\n\n商业模式报告期内变化情况：\n     公司是一家专业从事汽车燃料系统研发、制造、销售与服务的高新技术企业、专精特新“小巨人”\n 企业，总部和技术中心位于河北廊坊，建有国家级                       CNAS 实验室。报告期内公司在全国布局廊坊、宝\n 鸡、台州、福州四个汽车燃料系统生产基地，同时结合新能源汽车行业发展趋势以及自身研发能力，\n 公司设立控股子公司九昌新能源进行热管理系统产品的研发与市场开拓，目前业务发展规模较小，处\n 于初级阶段。\n     燃料系统产品主要有：常压、高压塑料燃油箱总成等，主要客户为国内优秀自主品牌整车制造企\n 业。热管理系统产品主要有：电导率传感器、氢浓度传感器、去离子器、颗粒过滤器、冷却液膨胀水\n 箱等，主要客户为广汽领程新能源商用车有限公司、上海重塑能源科技有限公司、苏州驿力机车科技\n 股份有限公司、应雪汽车科技（常熟）有限公司等整车制造和系统集成企业。\n     公司持续加强创新，通过自主研发掌握产品核心技术，建立了较为完善的自主知识产权体系，已\n 获得授权专利      245 项，其中发明专利        18 项。成立以来，世昌股份始终坚持聚焦实业、做强主业，致力\n 于打造节能、安全、环保的汽车系统产品，现已成为河北省制造业单项冠军企业，在国内塑料燃油箱\n 行业内资企业中排名前列。\n     公司的商业模式主要分为采购模式、生产模式、销售模式、研发模式，具体如下：\n     1.采购模式\n     公司生产所需的原材料主要包括原料、阀类、管路件、金属件、电器件等，市场供应充足，因此\n 主要采用“以产定购”的采购模式，根据生产计划安排采购计划，并与主要合格供应商签订框架协议，\n 确保原材料供应的及时、稳定。公司制定并实施了《供应商管理程序》《采购控制程序》等制度，对\n 供应商管理和采购过程进行有效控制，确保所采购的原材料符合规定要求。在具体采购流程中，根据\n 生产物料需求向相关合格供应商下达采购订单，并持续跟踪订单执行进度，在原材料入库前进行数量、\n 质量检验等工作。\n     2.生产模式\n     公司产品系根据客户的要求进行设计、开发，因此采取“以销定产”方式进行生产，即根据客户\n 的月度需求情况安排、组织生产。市场部根据客户需求制定月度销售订单计划和发货计划，生产部结\n 合成品及原辅材料库存情况制定相应的生产计划并安排生产，生产过程管理涉及生产过程设计、生产\n 过程的运行、生产过程监视、测量与分析、生产过程异常处理等方面。\n     3.销售模式\n     公司采用直销模式，主要面向整车制造企业和系统集成企业进行销售，由市场部负责进行客户的\n 维护、开发等工作。客户企业均有严格的供应商质量管理制度和评价标准，公司需要在技术研发、质\n 量体系、生产制造等方面评审后进入其合格供应商体系，随后根据客户开发需求，通过参与项目竞标\n 取得项目定点，经过产品设计、模具开发、样件制造、实验验证、OTS                              产品制造准备、生产件批准程\n 序（PPAP）等环节后取得量产订单，并签订框架协议，随后公司根据客户的具体订单需求安排生产及\n 发货。\n     特别是整车制造企业的供应商管理十分严格，存在较高的进入壁垒，在成功进入整车制造企业的\n 配套体系并批量供货后，基于零部件供应的稳定性、可靠性、安全性、一致性要求，以及时间成本、\n 机会成本的考虑，整车制造企业一般不会轻易更换供应商。因此，公司与主要客户的合作粘性较强，\n 有利于公司市场业务的开拓与持续发展。\n     4.研发模式\n\n                                            12\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "一、业务概要"
+        ],
+        "physical_pages": [
+          13
+        ],
+        "source_spans": [
+          {
+            "page": 13,
+            "start": 0,
+            "end": 432,
+            "quote": "     公司高度重视并坚持自主研发创新，以行业发展趋势及市场需求为指导，采取改进、创新的研发\n 模式，从产品材料结构、生产工艺、设备自动化等多方面进行技术创新，不断优化提升产品品质与技\n 术含量。\n     公司研发工作主要分为两类，一是根据市场及客户需求，将其转化为具体的产品技术要求、产品\n 规格、性能要求，并制定相应的新产品研发方案，包括产品的材料选择、结构设计、模具设计、工艺\n 设计等，然后召集相关部门对产品研发方案进行可行性评估，在通过方案评审并经公司批准后，进行\n 样件的试制和测试，根据测试情况和项目进度评估是否投入批量生产。二是结合日常生产过程中发现\n 的技术问题或提出的技术创新方案，制定出新技术或工艺研发方案，在通过方案评审并经公司批准后\n 进行试制和测试，根据测试情况评估是否将新技术或工艺投入批量生产。\n     报告期内，公司的主营业务与产品较为稳定，公司商业模式未发生重大变化。\n\n报告期内核心竞争力变化情况：\n□适用 √不适用\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "二、经营情况回顾",
+          "(一)经营计划"
+        ],
+        "physical_pages": [
+          13
+        ],
+        "source_spans": [
+          {
+            "page": 13,
+            "start": 713,
+            "end": 1721,
+            "quote": "(一) 经营计划\n\n     2025 年，公司成功登陆北京证券交易所，这一年也是公司规模化业务拓展和高质量发展的关键之\n 年。面对激烈的市场竞争，世昌股份保持战略定力，稳步推进市场开拓，较好地完成了年度经营任务。\n     1.经营业绩稳健增长，财务结构不断优化\n     2025 年度，公司实现营业收入            66,711.38 万元，同比增长        29.57%；归属于上市公司股东的净利润\n 6,887.23 万元，同比降低        0.53%；归属于上市公司股东的扣除非经常性损益的净利润6,652.55                            万元，\n 同比增长     8.69%。报告期末，公司资产总额为               75,060.76 万元，较报告期初增长            67.30%；归属于上市\n 公司股东的所有者权益为             42,875.01 万元，较报告期初增长            93.57%；公司资产负债率为           42.58%，较\n 报告期初降低       7.73 个百分点，保持合理水平，财务结构稳健，抗风险能力显著增强。\n     2.产能规模稳步提升，夯实业务增长基础\n     2025 年 1 月公司设立福州世昌汽车部件有限公司，进一步增加了公司对于客户的属地化配套供货\n 能力，降低了包装运输成本，收到客户好评。同时，公司严格遵循募集资金管理相关规定，规范使用\n 募集资金，认真推进“浙江星昌年产                  60 万台新能源高压油箱项目（二期）”建设，预计2026                         年上半\n 年完成项目建设与验收，届时将提升产能储备与制造自动化水平，为后续增长提供有力支撑。\n     3.产品种类多元化，收入结构向优发展\n     一是在常压燃油箱收入保持稳定增长的同时，高压燃油箱量产订单数量明显提升，形成“常压稳\n 基+高压增效”的双轮驱动格局，燃油箱收入结构更优。二是完成塑料甲醇燃料箱的设计开发与批量生\n 产，为下步拓展绿色燃料系统开发积累了先期经验。三是子公司九昌新能源结合客户需求，完成多种\n\n                                              13\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "二、经营情况回顾",
+          "(一)经营计划"
+        ],
+        "physical_pages": [
+          14
+        ],
+        "source_spans": [
+          {
+            "page": 14,
+            "start": 0,
+            "end": 515,
+            "quote": " 热管理系统部件开发与设计，并通过客户与第三方检测机构验证，已批量生产电导率传感器、氢浓度\n 传感器、去离子器、颗粒过滤器、冷却液膨胀水箱等，产品应用到新能源纯电动汽车与氢能领域。\n     4.市场客户突破升级，获取更多优质客户\n     报告期内，在原有主要客户的基础上，已获得多家大型（包括合资）整车制造企业新能源汽车高\n 压塑料燃油箱项目定点，为公司客户结构持续优化及业务持续稳定发展奠定了良好的市场基础。公司\n 热管理系统产品销售覆盖广汽领程新能源商用车有限公司、上海重塑能源科技有限公司、苏州驿力机\n 车科技股份有限公司、应雪汽车科技（常熟）有限公司                         等新能源整车制造和氢能系统集成企业。其中，\n 电导率传感器已通过全球汽车零部件企业法国彼欧认可与采购，首批产品已出口至国外市场。\n     2025 年，公司凭借稳定的产品质量、高效的交付能力及持续的技术创                              新，获核心主机厂颁发“最\n 具价值贡献奖”“卓越创新奖”“最佳合作奖”，高工氢电“电导率传感器技术引领奖”，公司品牌\n 影响力与行业地位持续巩固。\n\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "境外资产占比较高的情况"
+        ],
+        "physical_pages": [
+          17
+        ],
+        "source_spans": [
+          {
+            "page": 17,
+            "start": 1385,
+            "end": 3487,
+            "quote": "境外资产占比较高的情况\n□适用 √不适用\n\n2.   营业情况分析\n(1)  利润构成\n                                                                                                                 单位：元\n                                          2025  年                                  2024  年\n          项目                       金额               占营业收入                   金额               占营业收入            变动比例%\n                                                      的比重%                                     的比重%\n 营业收入                        667,113,776.81               -           514,858,876.81               -              29.57%\n 营业成本                        518,161,881.57              77.67%       383,684,853.80              74.52%          35.05%\n 毛利率                                    22.33%            -                       25.48%           -                -\n 销售费用                          15,620,276.85               2.34%        13,376,286.90               2.60%         16.78%\n 管理费用                          25,027,305.84               3.75%        20,600,277.18               4.00%         21.49%\n 研发费用                          24,340,906.52               3.65%        18,886,572.19               3.67%         28.88%\n 财务费用                              766,200.75              0.11%         2,116,550.03               0.41%        -63.80%\n 信用减值损失                        -2,708,629.07             -0.41%             314,802.15              0.06%       -960.42%\n 资产减值损失                        -2,691,344.81             -0.40%         -1,375,586.57             -0.27%         -95.65%\n 其他收益                           4,783,836.08               0.72%        10,346,018.39               2.01%        -53.76%\n 投资收益                          -1,137,179.05             -0.17%         -1,528,589.33             -0.30%          25.61%\n 公允价值变动收益                          145,393.32              0.02%             66,316.34              0.01%        119.24%\n 资产处置收益                             13,409.80              0.00%               7,964.61             0.00%         68.37%\n                                                            17\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "境外资产占比较高的情况"
+        ],
+        "physical_pages": [
+          18
+        ],
+        "source_spans": [
+          {
+            "page": 18,
+            "start": 0,
+            "end": 3343,
+            "quote": " 汇兑收益                                       -               -                     -               -              -\n 营业利润                       78,751,831.62            11.80%        81,645,611.70            15.86%         -3.54%\n 营业外收入                          141,910.86             0.02%            23,026.22            0.00%       516.30%\n 营业外支出                             8,833.23            0.00%            35,267.09            0.01%       -74.95%\n 净利润                        69,704,571.85            10.45%        69,949,274.81            13.59%         -0.35%\n\n项目重大变动原因：\n 1. 营业收入：公司报告期内营业收入为                          66,711.38   万元，同比增长           29.57%，主要系公司以客户需求为\n 导向，不断加大研发投入，与主要客户保持稳定合作关系，持续取得新增定点项目，且                                                           2025  年多个高\n 压塑料燃油箱定点项目开始批量供货，业务开展情况良好，主要产品塑料燃油箱销量增长，使得营业\n 收入保持良好的增长趋势。\n 2. 营业成本：公司报告期内营业成本为                          51,816.19   万元，同比增长           35.05%，主要系随着报告期内营业\n 收入增加，营业成本相应增加。\n 3. 财务费用：公司报告期内财务费用为                          76.62  万元，同比减少           63.80%，主要系报告期内银行借款减少\n 使得利息费用相应减少所致。\n 4. 信用减值损失：公司报告期内信用减值损失为                                 270.86  万元，上年同期为收益                 31.48  万元，主要系\n 报告期内计提的应收账款坏账准备增加所致。\n 5. 资产减值损失：公司报告期内资产减值损失为                                269.13  万元，上年同期损失为                 137.56  万元，主要系\n 报告期内计提存货跌价准备增加所致。\n 6. 其他收益：公司报告期内其他收益为                          478.38  万元，同比减少            53.76%，主要系报告期内确认的政府\n 补助减少所致。\n 7. 公允价值变动收益：公司报告期内公允价值变动收益为                                       14.54  万元，同比增长            119.24%，主要系报\n 告期内交易性金融资产公允价值变动所致。\n 8. 资产处置收益：公司报告期内资产处置收益为                                1.34  万元，同比增长            68.37%，主要系报告期内提前\n 终止租赁合同形成的收益增加所致。\n 9. 营业外收入：公司报告期内营业外收入为                             14.19  万元，同比增长            516.30%，主要系报告期内供应商\n 扣款增加所致。\n 10. 营业外支出：公司报告期内营业外支出为                             0.88  万元，同比减少           74.95%，主要系报告期内固定资产\n 报废损失减少所致。\n\n(2)  收入构成\n                                                                                                         单位：元\n           项目                         2025  年                       2024  年                    变动比例%\n 主营业务收入                               654,239,392.25               511,130,905.91                          28.00%\n 其他业务收入                                 12,874,384.56                 3,727,970.90                       245.35%\n 主营业务成本                               505,696,317.35               380,510,644.54                          32.90%\n 其他业务成本                                 12,465,564.22                 3,174,209.26                       292.71%\n\n按产品分类分析：\n                                                                                                         单位：元\n                                                                        营业收入          营业成本\n   分产品              营业收入                营业成本              毛利率%          比上年同          比上年同           毛利率比上\n                                                                            期             期          年同期增减\n                                                                          增减%           增减%\n 塑料燃油           626,910,726.45      486,746,265.95          22.36%         25.87%         31.53%       减少3.34\n 箱总成                                                                                                    个百分点\n\n                                                        18\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "境外资产占比较高的情况"
+        ],
+        "physical_pages": [
+          19
+        ],
+        "source_spans": [
+          {
+            "page": 19,
+            "start": 0,
+            "end": 399,
+            "quote": " 配件            12,844,780.89     11,858,211.92         7.68%       51.64%       43.04%      增加   5.55\n                                                                                            个百分点\n 其他            14,483,884.91       7,091,839.48      51.04%       214.72%      228.75%      减少   2.09\n                                                                                            个百分点\n "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "其他业务"
+        ],
+        "physical_pages": [
+          19
+        ],
+        "source_spans": [
+          {
+            "page": 19,
+            "start": 399,
+            "end": 2648,
+            "quote": "其他业务          12,874,384.56     12,465,564.22         3.18%      245.35%      292.71%     减少11.67\n 收入                                                                                         个百分点\n    合计        667,113,776.81    518,161,881.57         -            -            -             -\n\n按区域分类分析：\n                                                                                              单位：元\n                                                                营业收入         营业成本\n   分地区           营业收入               营业成本           毛利率%         比上年同         比上年同        毛利率比上\n                                                                   期            期        年同期增减\n                                                                 增减%          增减%\n    境内        667,007,453.64    518,115,544.45       22.32%        29.55%       35.04%      减少3.16\n                                                                                            个百分点\n    境外            106,323.17          46,337.12      56.42%         -            -             不适用\n    合计        667,113,776.81    518,161,881.57         -            -            -             -\n\n收入构成变动的原因：\n 1.按收入构成分析：\n （1）其他业务收入：公司报告期内其他业务收入为1,287.44万元，较上年同期增加914.64万元，同\n 比增长245.35%，主要系报告期内原材料销售增加所致。\n （2）主营业务成本：公司报告期内主营业务成本为50,569.63万元，较上年同期增加12,518.57万\n 元，同比增长32.90%，主要系随着报告期内主营业务收入增加，主营业务成本相应增加所致。\n （3）其他业务成本：公司报告期内其他业务成本为1,246.56万元，较上年同期增加929.14万元，同\n 比增长292.71%，主要系随着报告期内其他业务收入增加，其他业务成本相应增加所致。\n 2.按产品分类分析：\n （1）报告期内，公司塑料燃油箱总成收入为62,691.07万元，较上年同期增加12,885.24万元，同比\n 增长25.87%，主要系公司报告期内常压塑料燃油箱业务保持相对稳定，销售收入略有增长，同时报告\n 期内多个高压塑料燃油箱定点项目开始批量供货，高压塑料燃油箱销量增加，使得高压塑料燃油箱销\n 售收入较上年增加9,086.58万元，同比增长137.43%。在收入增长的情况下，受主要客户价格年降以\n 及销售返利的影响，成本增长的幅度高于收入增长的幅度，塑料燃油箱总成毛利率同比下降。\n （2）报告期内，公司配件收入、成本较上年同期分别增长                                 51.64%、43.04%，主要系随着塑料燃油箱\n 总成销量的增加，根据客户需求，相关配件销量增加所致。\n （3）报告期内，公司主营业务中其他收入、其他成本较上年同期分别                                       增长   214.72%、228.75%，主要\n 系报告期内确认的技术开发合同收入及结转成本增加所致。\n 3.按区域分类分析：\n （1）报告期内，公司在境内实现销售收入                       66,700.75  万元，主要客户以国内排名靠前的自主品牌车企\n 为主，主要产品为塑料燃油箱且绝大部分在国内市场进行生产销售，是公司主要收入来源。\n （2）报告期内，公司首次在境外实现销售收入                         10.63  万元，主要系九昌新能源产品电导率传感器实现\n 出口所致，境外出口产品毛利率高主要系出口产品销售价格较高所致。\n\n(3) 主要客户情况\n                                                  19\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "其他业务"
+        ],
+        "physical_pages": [
+          20
+        ],
+        "source_spans": [
+          {
+            "page": 20,
+            "start": 0,
+            "end": 3381,
+            "quote": "                                                                                                             单位：元\n 序号                客户                        销售金额                       年度销售占比%                  是否存在关联关系\n   1              客户    A                     297,970,630.54                          44.67%              否\n   2              客户    B                     214,124,225.04                          32.10%              否\n   3              客户    C                      67,766,624.78                          10.16%              否\n   4              客户    D                      14,167,639.04                           2.12%              否\n   5              客户    E                      12,625,831.90                           1.89%              否\n               合计                             606,654,951.30                          90.94%               -\n\n(4)  主要供应商情况\n                                                                                                             单位：元\n 序号               供应商                        采购金额                       年度采购占比%                  是否存在关联关系\n   1             供应商     H                     93,272,800.93                          20.06%              否\n   2      宁波洛卡特汽车零部                            70,197,936.10                          15.10%              否\n               件有限公司\n   3             供应商     I                     30,185,280.80                           6.49%              否\n   4             供应商     J                     29,153,814.41                           6.27%              否\n   5             供应商     K                     26,273,991.15                           5.65%              否\n               合计                             249,083,823.39                          53.57%               -\n\n(5)  报告期内公司贸易业务收入占营业收入比例超过                                    10%情况\n □适用 √不适用\n3.   现金流量状况\n                                                                                                             单位：元\n                 项目                               2025  年                      2024  年                 变动比例%\n  经营活动产生的现金流量净额                                    -7,189,648.12               48,748,087.25               -114.75%\n  投资活动产生的现金流量净额                                  -72,934,095.55                -9,727,107.44               -649.80%\n  筹资活动产生的现金流量净额                                  162,263,336.38               -28,469,273.50                 669.96%\n\n现金流量分析：\n 1.报告期内，公司经营活动产生的现金流量净额为-718.96                                       万元，较上年同期减少                 5,593.77   万元，同\n 比下降      114.75%，主要原因系随着采购规模的增加，公司报告期内购买商品、接受劳务支付的现金较\n 上年同期大幅增加              6,248.67   万元，同时由于应收账款余额增加，部分营业收入尚未回款，使得报告期\n 内销售商品、提供劳务收到的现金增加金额较少。此外，公司将信用等级较低的承兑汇票贴现流入计\n 入收到的其他与筹资活动有关的现金科目，2024                                  年度、2025      年度该部分现金流入分别为                     3,555.11   万\n 元、1,984.83      万元，经营活动产生的现金流量净额与该部分票据贴现流入金额合计（即调整后经营活\n 动产生的现金流量净额）分别为                        8,429.92   万元、1,265.87         万元，均为净流入。\n 2.报告期内，公司投资活动产生的现金流量净额为-7,293.41                                       万元，净流出较上年同期增加                      6,320.70\n 万元，主要系报告期内公司使用                        5,000  万元闲置募集资金进行现金管理计入投资支付的现金所致。\n 3.报告期内，公司筹资活动产生的现金流量净额为                                    16,226.33    万元，较上年增加              19,073.26    万元，主\n 要系报告期内公司向不特定合格投资者公开发行股票并上市收到募集资金所致。\n\n\n                                                          20\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0010",
+        "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+        "section_path": [
+          "第四节管理层讨论与分析",
+          "其他业务"
+        ],
+        "physical_pages": [
+          21
+        ],
+        "source_spans": [
+          {
+            "page": 21,
+            "start": 0,
+            "end": 665,
+            "quote": "(四) 投资状况分析\n\n1、  总体情况\n√适用 □不适用\n                                                                                单位：元\n          报告期投资额                            上年同期投资额                               变动比例%\n         81,389,927.56                       27,781,270.35                         192.97%\n\n2、  报告期内获取的重大的股权投资情况\n□适用 √不适用\n\n3、  报告期内正在进行的重大的非股权投资情况\n√适用 □不适用\n                                                                                               单位：元\n                                                                                      截止报       是否达\n                                                                                      告期末       到计划\n      "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "transcription_version": "shared-pdf-pypdf-layout.structured-notes.v1",
+    "limitations": []
+  },
+  "workpaper_receipts": [
+    {
+      "request_id": "bp-work-e7dfb860aa313dfdccf6141e:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "b2d3c08a3d1584742b80054768f010f4702bf34838568b9b0372ffa506fbf736",
+      "response_hash": "b969ca157532f5d6c640b3770d65f99d12a2b2109b754ecdb6341c70c7a9559e",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0028\",\"section-0035\",\"section-0072\",\"section-0086\"],\"rationale\":\"选择“业务概要”了解公司产品、采购/生产/销售/研发模式及经营角色；选择“经营计划”中的业绩增长、产能提升、产品多元化和客户突破，获取本期经营驱动与变化；选择“境外资产占比较高的情况”所在段落实质包含的营业情况分析，获取营业收入、营业成本及费用变化；选择“其他业务”中的收入构成、产品分类和区域分类，补足收入来源、业务权重与市场结构。上述均为公司层面实质经营内容，合计篇幅适中，避免扩读行业背景、治理和完整财报。\",\"stop_reason\":\"已覆盖业务模式、产品用途、收入来源与构成、成本费用变化和本期经营驱动；剩余信息主要为财报附注、治理、股东、融资分红、风险展望等，非本次公司经营与货币化主问题所需，停止扩读。\",\"deferred\":[\"section-0351（第十一节财务会计报告及附注）\",\"section-0234（公司治理、内部控制和投资者保护）\",\"section-0190（股份变动及股东情况）\",\"section-0199（融资与利润分配）\",\"section-0168（风险因素）\",\"section-0153（未来展望）\",\"section-0040（行业情况）\",\"section-0047（财务分析中的资产负债结构分析）\",\"section-0114（主要控股参股公司分析）\",\"section-0127（研发情况明细）\"]}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0028",
+          "section-0035",
+          "section-0072",
+          "section-0086"
+        ],
+        "rationale": "选择“业务概要”了解公司产品、采购/生产/销售/研发模式及经营角色；选择“经营计划”中的业绩增长、产能提升、产品多元化和客户突破，获取本期经营驱动与变化；选择“境外资产占比较高的情况”所在段落实质包含的营业情况分析，获取营业收入、营业成本及费用变化；选择“其他业务”中的收入构成、产品分类和区域分类，补足收入来源、业务权重与市场结构。上述均为公司层面实质经营内容，合计篇幅适中，避免扩读行业背景、治理和完整财报。",
+        "stop_reason": "已覆盖业务模式、产品用途、收入来源与构成、成本费用变化和本期经营驱动；剩余信息主要为财报附注、治理、股东、融资分红、风险展望等，非本次公司经营与货币化主问题所需，停止扩读。",
+        "deferred": [
+          "section-0351（第十一节财务会计报告及附注）",
+          "section-0234（公司治理、内部控制和投资者保护）",
+          "section-0190（股份变动及股东情况）",
+          "section-0199（融资与利润分配）",
+          "section-0168（风险因素）",
+          "section-0153（未来展望）",
+          "section-0040（行业情况）",
+          "section-0047（财务分析中的资产负债结构分析）",
+          "section-0114（主要控股参股公司分析）",
+          "section-0127（研发情况明细）"
+        ]
+      },
+      "usage": {
+        "input_tokens": 15299,
+        "output_tokens": 5937,
+        "total_tokens": 21236
+      }
+    },
+    {
+      "request_id": "bp-work-e7dfb860aa313dfdccf6141e:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "08e08c38377daaef4e7a4b2de22e1db7b3a298988a0caf3b8e743000c60746bc",
+      "response_hash": "ed4558bfb8b572a8ebae74a14686919e435b659aeeadaec561a4c17bd43c22f5",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"bs-1\",\"text\":\"公司是一家专业从事汽车燃料系统研发、制造、销售与服务的高新技术企业、专精特新“小巨人”企业，总部和技术中心位于河北廊坊，建有国家级CNAS实验室；报告期内在全国布局廊坊、宝鸡、台州、福州四个汽车燃料系统生产基地。公司为河北省制造业单项冠军企业，在国内塑料燃油箱行业内资企业中排名前列；已获授权专利245项，其中发明专利18项。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"授权专利总数\",\"raw_value\":\"245\",\"value\":\"245\",\"unit\":\"项\",\"source_unit\":\"项\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"报告期末\",\"qualifier\":\"exact\"},{\"name\":\"发明专利数量\",\"raw_value\":\"18\",\"value\":\"18\",\"unit\":\"项\",\"source_unit\":\"项\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"报告期末\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"bs-2\",\"text\":\"公司设立控股子公司九昌新能源进行热管理系统产品研发与市场开拓，目前该业务发展规模较小，处于初级阶段。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"未展开各生产基地产能、产量及子公司股权比例等明细。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"ps-1\",\"text\":\"燃料系统产品主要有常压、高压塑料燃油箱总成等，主要客户为国内优秀自主品牌整车制造企业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"ps-2\",\"text\":\"热管理系统产品主要有电导率传感器、氢浓度传感器、去离子器、颗粒过滤器、冷却液膨胀水箱等，由控股子公司九昌新能源开发，已批量生产并应用到新能源纯电动汽车与氢能领域；主要客户为广汽领程新能源商用车有限公司、上海重塑能源科技有限公司、苏州驿力机车科技股份有限公司、应雪汽车科技（常熟）有限公司等整车制造和系统集成企业。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0004\"]},{\"fact_id\":\"ps-3\",\"text\":\"公司完成塑料甲醇燃料箱的设计开发与批量生产，为下步拓展绿色燃料系统开发积累先期经验。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}],\"limitations\":[\"未披露各产品具体收入、单价、销量及热管理系统收入规模。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"rm-1\",\"text\":\"公司采用直销模式，主要面向整车制造企业和系统集成企业销售；进入客户合格供应商体系后，通过参与项目竞标取得项目定点，经过产品设计、模具开发、样件制造、实验验证、OTS产品制造准备、生产件批准程序（PPAP）等环节后取得量产订单并签订框架协议，随后按客户具体订单需求安排生产及发货。收入主要来自上述产品的直接销售及量产订单。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"未披露分产品定价机制、信用政策及收入确认具体时点。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sm-1\",\"text\":\"2025年公司实现营业收入66,711.38万元，同比增长29.57%；营业成本51,816.19万元，同比增长35.05%；综合毛利率22.33%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0006\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"66,711.38\",\"value\":\"66711.38\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比变动比例\",\"raw_value\":\"29.57\",\"value\":\"29.57\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\"},{\"name\":\"营业成本\",\"raw_value\":\"51,816.19\",\"value\":\"51816.19\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业成本同比变动比例\",\"raw_value\":\"35.05\",\"value\":\"35.05\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\"},{\"name\":\"毛利率\",\"raw_value\":\"22.33\",\"value\":\"22.33\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-2\",\"text\":\"主营业务收入654,239,392.25元，同比增长28.00%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"主营业务收入\",\"raw_value\":\"654,239,392.25\",\"value\":\"654239392.25\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"主营业务收入同比变动比例\",\"raw_value\":\"28.00\",\"value\":\"28.00\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\"}]},{\"fact_id\":\"sm-3\",\"text\":\"其他业务收入12,874,384.56元，同比增长245.35%，主要系原材料销售增加。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0008\"],\"metrics\":[{\"name\":\"其他业务收入\",\"raw_value\":\"12,874,384.56\",\"value\":\"12874384.56\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"其他业务收入同比变动比例\",\"raw_value\":\"245.35\",\"value\":\"245.35\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\"}]},{\"fact_id\":\"sm-4\",\"text\":\"产品分类中，塑料燃油箱总成收入626,910,726.45元，同比增长25.87%，毛利率22.36%，毛利率同比减少3.34个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"塑料燃油箱总成营业收入\",\"raw_value\":\"626,910,726.45\",\"value\":\"626910726.45\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"塑料燃油箱总成营业收入同比变动比例\",\"raw_value\":\"25.87\",\"value\":\"25.87\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\"},{\"name\":\"塑料燃油箱总成毛利率\",\"raw_value\":\"22.36\",\"value\":\"22.36\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"塑料燃油箱总成毛利率同比增减\",\"raw_value\":\"减少3.34\",\"value\":null,\"unit\":\"百分点\",\"source_unit\":\"个百分点\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"源文以“减少3.34个百分点”表述方向，未给出带符号数值。\",\"comparison_basis\":\"同比\"}]},{\"fact_id\":\"sm-5\",\"text\":\"配件收入12,844,780.89元，同比增长51.64%，毛利率7.68%，毛利率同比增加5.55个百分点，主要系随着塑料燃油箱总成销量增加，根据客户需求相关配件销量增加。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"metrics\":[{\"name\":\"配件营业收入\",\"raw_value\":\"12,844,780.89\",\"value\":\"12844780.89\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"配件营业收入同比变动比例\",\"raw_value\":\"51.64\",\"value\":\"51.64\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\"},{\"name\":\"配件毛利率\",\"raw_value\":\"7.68\",\"value\":\"7.68\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"配件毛利率同比增减\",\"raw_value\":\"增加5.55\",\"value\":null,\"unit\":\"百分点\",\"source_unit\":\"个百分点\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"源文以“增加5.55个百分点”表述方向，未给出带符号数值。\",\"comparison_basis\":\"同比\"}]},{\"fact_id\":\"sm-6\",\"text\":\"产品分类中的“其他”（主营业务内其他）收入14,483,884.91元，同比增长214.72%，毛利率51.04%，毛利率同比减少2.09个百分点，主要系技术开发合同收入及结转成本增加。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"metrics\":[{\"name\":\"产品分类其他营业收入\",\"raw_value\":\"14,483,884.91\",\"value\":\"14483884.91\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"产品分类其他营业收入同比变动比例\",\"raw_value\":\"214.72\",\"value\":\"214.72\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\"},{\"name\":\"产品分类其他毛利率\",\"raw_value\":\"51.04\",\"value\":\"51.04\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"产品分类其他毛利率同比增减\",\"raw_value\":\"减少2.09\",\"value\":null,\"unit\":\"百分点\",\"source_unit\":\"个百分点\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"源文以“减少2.09个百分点”表述方向，未给出带符号数值。\",\"comparison_basis\":\"同比\"}]}],\"limitations\":[\"未纳入现金流量、资产负债结构及全部费用明细；产品分类表未直接披露各产品收入占比，本稿不自行计算。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"oi-1\",\"text\":\"公司生产所需原材料主要包括原料、阀类、管路件、金属件、电器件等，市场供应充足，主要采用“以产定购”模式：根据生产计划安排采购计划，与主要合格供应商签订框架协议，执行《供应商管理程序》《采购控制程序》，按生产物料需求下达采购订单并在原材料入库前进行数量、质量检验。生产方面采取“以销定产”方式，根据客户月度需求安排和组织生产；市场部制定月度销售订单计划和发货计划，生产部结合成品及原辅材料库存情况制定生产计划，生产过程管理涵盖设计、运行、监视测量分析和异常处理。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"oi-2\",\"text\":\"公司坚持自主研发创新，研发工作主要分为两类：一是将市场及客户需求转化为产品技术要求、规格和性能要求，制定新产品研发方案，经可行性评估、评审批准后进行样件试制和测试，再评估是否批量生产；二是针对日常生产中的技术问题或创新方案，制定新技术或工艺研发方案，经评审批准后试制和测试并评估量产。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}],\"limitations\":[\"未展开原材料采购金额、主要供应商名称（除源表已披露者）、产能利用率及研发项目明细。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"cm-1\",\"text\":\"境内收入667,007,453.64元，同比增长29.55%，毛利率22.32%；主要客户以国内排名靠前的自主品牌车企为主，主要产品为塑料燃油箱且绝大部分在国内市场生产销售，是公司主要收入来源。境外收入106,323.17元，为首次实现，主要系九昌新能源产品电导率传感器实现出口；境外毛利率56.42%，主要系出口产品销售价格较高。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"境内营业收入\",\"raw_value\":\"667,007,453.64\",\"value\":\"667007453.64\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"境内营业收入同比变动比例\",\"raw_value\":\"29.55\",\"value\":\"29.55\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\"},{\"name\":\"境内毛利率\",\"raw_value\":\"22.32\",\"value\":\"22.32\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"境外营业收入\",\"raw_value\":\"106,323.17\",\"value\":\"106323.17\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"境外毛利率\",\"raw_value\":\"56.42\",\"value\":\"56.42\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"cm-2\",\"text\":\"前五大客户合计销售606,654,951.30元，占年度销售90.94%；其中客户A销售297,970,630.54元，占44.67%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"前五大客户合计销售金额\",\"raw_value\":\"606,654,951.30\",\"value\":\"606654951.30\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五大客户年度销售占比\",\"raw_value\":\"90.94\",\"value\":\"90.94\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"客户A销售金额\",\"raw_value\":\"297,970,630.54\",\"value\":\"297970630.54\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"客户A年度销售占比\",\"raw_value\":\"44.67\",\"value\":\"44.67\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"cm-3\",\"text\":\"报告期内，在原有主要客户基础上，公司已获得多家大型（包括合资）整车制造企业新能源汽车高压塑料燃油箱项目定点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"cm-4\",\"text\":\"电导率传感器已通过全球汽车零部件企业法国彼欧认可与采购，首批产品已出口至国外市场。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}],\"limitations\":[\"客户表以客户A/B等匿名披露，未获取最终客户名称及分客户产品结构；未展开销售渠道费用及境外客户明细。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"od-1\",\"text\":\"2025年营业收入增长主要系公司以客户需求为导向，不断加大研发投入，与主要客户保持稳定合作关系，持续取得新增定点项目，且2025年多个高压塑料燃油箱定点项目开始批量供货，主要产品塑料燃油箱销量增长。其中，高压塑料燃油箱销售收入同比增加9,086.58万元，同比增长137.43%；常压塑料燃油箱业务保持相对稳定，销售收入略有增长。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0008\"],\"metrics\":[{\"name\":\"高压塑料燃油箱销售收入同比增加额\",\"raw_value\":\"9,086.58\",\"value\":\"9086.58\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比\"},{\"name\":\"高压塑料燃油箱销售收入同比变动比例\",\"raw_value\":\"增长137.43\",\"value\":null,\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"源文以“同比增长137.43%”表述方向，未给出带符号数值。\",\"comparison_basis\":\"同比\"}]},{\"fact_id\":\"od-2\",\"text\":\"受主要客户价格年降以及销售返利的影响，塑料燃油箱总成成本增长幅度高于收入增长幅度，毛利率同比下降。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]}],\"limitations\":[\"未量化各客户/项目对收入增长的贡献，未展开价格年降幅度、销售返利金额及费用明细。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"mc-1\",\"text\":\"2025年公司成功登陆北京证券交易所，报告期内向不特定合格投资者公开发行股票并上市收到募集资金。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0009\"]},{\"fact_id\":\"mc-2\",\"text\":\"2025年1月公司设立福州世昌汽车部件有限公司，进一步增加对客户的属地化配套供货能力，降低包装运输成本；同时推进浙江星昌新能源高压油箱项目（二期）建设，预计2026年上半年完成项目建设与验收，届时将提升产能储备与制造自动化水平。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"mc-3\",\"text\":\"2025年归属于上市公司股东的净利润6,887.23万元，同比降低0.53%；归属于上市公司股东的扣除非经常性损益的净利润6,652.55万元，同比增长8.69%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"6,887.23\",\"value\":\"6887.23\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"归属于上市公司股东的净利润同比变动比例\",\"raw_value\":\"降低0.53\",\"value\":null,\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"源文以“同比降低0.53%”表述方向，未给出带符号数值。\",\"comparison_basis\":\"同比\"},{\"name\":\"归属于上市公司股东的扣除非经常性损益的净利润\",\"raw_value\":\"6,652.55\",\"value\":\"6652.55\",\"unit\":\"万元\",\"source_unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"扣除非经常性损益的净利润同比变动比例\",\"raw_value\":\"增长8.69\",\"value\":null,\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"源文以“同比增长8.69%”表述方向，未给出带符号数值。\",\"comparison_basis\":\"同比\"}]}],\"limitations\":[\"未展开资产负债结构、现金流量及募集资金使用明细；重大变化以源文披露为限。\"]}},\"supply_chain\":{\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sc-up-1\",\"text\":\"前五大供应商合计采购249,083,823.39元，占年度采购53.57%；其中供应商H采购93,272,800.93元，占20.06%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"前五大供应商合计采购金额\",\"raw_value\":\"249,083,823.39\",\"value\":\"249083823.39\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五大供应商年度采购占比\",\"raw_value\":\"53.57\",\"value\":\"53.57\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"供应商H采购金额\",\"raw_value\":\"93,272,800.93\",\"value\":\"93272800.93\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"供应商H年度采购占比\",\"raw_value\":\"20.06\",\"value\":\"20.06\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"仅补充供应商集中度，未展开全部供应商、原材料采购金额及供应协议期限。\"]}},\"limitations\":[\"本稿仅依据选定的业务概要、经营计划、营业情况分析、收入构成及客户/供应商章节，未覆盖财报附注、治理、股东、融资分红、风险展望、研发明细等。\",\"未获取部分补充明细（如各产品销量/单价、分客户产品结构、产能利用率、资产负债结构、现金流量细节），未以猜测填补。\",\"产品分类表未直接披露各产品收入占比，本稿不自行计算；客户名称按源表匿名列示。\"]}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "bs-1",
+                "text": "公司是一家专业从事汽车燃料系统研发、制造、销售与服务的高新技术企业、专精特新“小巨人”企业，总部和技术中心位于河北廊坊，建有国家级CNAS实验室；报告期内在全国布局廊坊、宝鸡、台州、福州四个汽车燃料系统生产基地。公司为河北省制造业单项冠军企业，在国内塑料燃油箱行业内资企业中排名前列；已获授权专利245项，其中发明专利18项。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ],
+                "metrics": [
+                  {
+                    "name": "授权专利总数",
+                    "raw_value": "245",
+                    "value": "245",
+                    "unit": "项",
+                    "source_unit": "项",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "报告期末",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "发明专利数量",
+                    "raw_value": "18",
+                    "value": "18",
+                    "unit": "项",
+                    "source_unit": "项",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "报告期末",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "bs-2",
+                "text": "公司设立控股子公司九昌新能源进行热管理系统产品研发与市场开拓，目前该业务发展规模较小，处于初级阶段。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "未展开各生产基地产能、产量及子公司股权比例等明细。"
+            ]
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "ps-1",
+                "text": "燃料系统产品主要有常压、高压塑料燃油箱总成等，主要客户为国内优秀自主品牌整车制造企业。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "ps-2",
+                "text": "热管理系统产品主要有电导率传感器、氢浓度传感器、去离子器、颗粒过滤器、冷却液膨胀水箱等，由控股子公司九昌新能源开发，已批量生产并应用到新能源纯电动汽车与氢能领域；主要客户为广汽领程新能源商用车有限公司、上海重塑能源科技有限公司、苏州驿力机车科技股份有限公司、应雪汽车科技（常熟）有限公司等整车制造和系统集成企业。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0004"
+                ]
+              },
+              {
+                "fact_id": "ps-3",
+                "text": "公司完成塑料甲醇燃料箱的设计开发与批量生产，为下步拓展绿色燃料系统开发积累先期经验。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露各产品具体收入、单价、销量及热管理系统收入规模。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "rm-1",
+                "text": "公司采用直销模式，主要面向整车制造企业和系统集成企业销售；进入客户合格供应商体系后，通过参与项目竞标取得项目定点，经过产品设计、模具开发、样件制造、实验验证、OTS产品制造准备、生产件批准程序（PPAP）等环节后取得量产订单并签订框架协议，随后按客户具体订单需求安排生产及发货。收入主要来自上述产品的直接销售及量产订单。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露分产品定价机制、信用政策及收入确认具体时点。"
+            ]
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "sm-1",
+                "text": "2025年公司实现营业收入66,711.38万元，同比增长29.57%；营业成本51,816.19万元，同比增长35.05%；综合毛利率22.33%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005",
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "66,711.38",
+                    "value": "66711.38",
+                    "unit": "万元",
+                    "source_unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "营业收入同比变动比例",
+                    "raw_value": "29.57",
+                    "value": "29.57",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比"
+                  },
+                  {
+                    "name": "营业成本",
+                    "raw_value": "51,816.19",
+                    "value": "51816.19",
+                    "unit": "万元",
+                    "source_unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "营业成本同比变动比例",
+                    "raw_value": "35.05",
+                    "value": "35.05",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比"
+                  },
+                  {
+                    "name": "毛利率",
+                    "raw_value": "22.33",
+                    "value": "22.33",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-2",
+                "text": "主营业务收入654,239,392.25元，同比增长28.00%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "主营业务收入",
+                    "raw_value": "654,239,392.25",
+                    "value": "654239392.25",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "主营业务收入同比变动比例",
+                    "raw_value": "28.00",
+                    "value": "28.00",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-3",
+                "text": "其他业务收入12,874,384.56元，同比增长245.35%，主要系原材料销售增加。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006",
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "其他业务收入",
+                    "raw_value": "12,874,384.56",
+                    "value": "12874384.56",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "其他业务收入同比变动比例",
+                    "raw_value": "245.35",
+                    "value": "245.35",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-4",
+                "text": "产品分类中，塑料燃油箱总成收入626,910,726.45元，同比增长25.87%，毛利率22.36%，毛利率同比减少3.34个百分点。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "塑料燃油箱总成营业收入",
+                    "raw_value": "626,910,726.45",
+                    "value": "626910726.45",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "塑料燃油箱总成营业收入同比变动比例",
+                    "raw_value": "25.87",
+                    "value": "25.87",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比"
+                  },
+                  {
+                    "name": "塑料燃油箱总成毛利率",
+                    "raw_value": "22.36",
+                    "value": "22.36",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "塑料燃油箱总成毛利率同比增减",
+                    "raw_value": "减少3.34",
+                    "value": null,
+                    "unit": "百分点",
+                    "source_unit": "个百分点",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "uncertainty_reason": "源文以“减少3.34个百分点”表述方向，未给出带符号数值。",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-5",
+                "text": "配件收入12,844,780.89元，同比增长51.64%，毛利率7.68%，毛利率同比增加5.55个百分点，主要系随着塑料燃油箱总成销量增加，根据客户需求相关配件销量增加。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007",
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "配件营业收入",
+                    "raw_value": "12,844,780.89",
+                    "value": "12844780.89",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "配件营业收入同比变动比例",
+                    "raw_value": "51.64",
+                    "value": "51.64",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比"
+                  },
+                  {
+                    "name": "配件毛利率",
+                    "raw_value": "7.68",
+                    "value": "7.68",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "配件毛利率同比增减",
+                    "raw_value": "增加5.55",
+                    "value": null,
+                    "unit": "百分点",
+                    "source_unit": "个百分点",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "uncertainty_reason": "源文以“增加5.55个百分点”表述方向，未给出带符号数值。",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-6",
+                "text": "产品分类中的“其他”（主营业务内其他）收入14,483,884.91元，同比增长214.72%，毛利率51.04%，毛利率同比减少2.09个百分点，主要系技术开发合同收入及结转成本增加。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007",
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "产品分类其他营业收入",
+                    "raw_value": "14,483,884.91",
+                    "value": "14483884.91",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "产品分类其他营业收入同比变动比例",
+                    "raw_value": "214.72",
+                    "value": "214.72",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比"
+                  },
+                  {
+                    "name": "产品分类其他毛利率",
+                    "raw_value": "51.04",
+                    "value": "51.04",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "产品分类其他毛利率同比增减",
+                    "raw_value": "减少2.09",
+                    "value": null,
+                    "unit": "百分点",
+                    "source_unit": "个百分点",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "uncertainty_reason": "源文以“减少2.09个百分点”表述方向，未给出带符号数值。",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未纳入现金流量、资产负债结构及全部费用明细；产品分类表未直接披露各产品收入占比，本稿不自行计算。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "oi-1",
+                "text": "公司生产所需原材料主要包括原料、阀类、管路件、金属件、电器件等，市场供应充足，主要采用“以产定购”模式：根据生产计划安排采购计划，与主要合格供应商签订框架协议，执行《供应商管理程序》《采购控制程序》，按生产物料需求下达采购订单并在原材料入库前进行数量、质量检验。生产方面采取“以销定产”方式，根据客户月度需求安排和组织生产；市场部制定月度销售订单计划和发货计划，生产部结合成品及原辅材料库存情况制定生产计划，生产过程管理涵盖设计、运行、监视测量分析和异常处理。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "oi-2",
+                "text": "公司坚持自主研发创新，研发工作主要分为两类：一是将市场及客户需求转化为产品技术要求、规格和性能要求，制定新产品研发方案，经可行性评估、评审批准后进行样件试制和测试，再评估是否批量生产；二是针对日常生产中的技术问题或创新方案，制定新技术或工艺研发方案，经评审批准后试制和测试并评估量产。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              }
+            ],
+            "limitations": [
+              "未展开原材料采购金额、主要供应商名称（除源表已披露者）、产能利用率及研发项目明细。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "cm-1",
+                "text": "境内收入667,007,453.64元，同比增长29.55%，毛利率22.32%；主要客户以国内排名靠前的自主品牌车企为主，主要产品为塑料燃油箱且绝大部分在国内市场生产销售，是公司主要收入来源。境外收入106,323.17元，为首次实现，主要系九昌新能源产品电导率传感器实现出口；境外毛利率56.42%，主要系出口产品销售价格较高。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "境内营业收入",
+                    "raw_value": "667,007,453.64",
+                    "value": "667007453.64",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "境内营业收入同比变动比例",
+                    "raw_value": "29.55",
+                    "value": "29.55",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比"
+                  },
+                  {
+                    "name": "境内毛利率",
+                    "raw_value": "22.32",
+                    "value": "22.32",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "境外营业收入",
+                    "raw_value": "106,323.17",
+                    "value": "106323.17",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "境外毛利率",
+                    "raw_value": "56.42",
+                    "value": "56.42",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "cm-2",
+                "text": "前五大客户合计销售606,654,951.30元，占年度销售90.94%；其中客户A销售297,970,630.54元，占44.67%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五大客户合计销售金额",
+                    "raw_value": "606,654,951.30",
+                    "value": "606654951.30",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "前五大客户年度销售占比",
+                    "raw_value": "90.94",
+                    "value": "90.94",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "客户A销售金额",
+                    "raw_value": "297,970,630.54",
+                    "value": "297970630.54",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "客户A年度销售占比",
+                    "raw_value": "44.67",
+                    "value": "44.67",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              },
+              {
+                "fact_id": "cm-3",
+                "text": "报告期内，在原有主要客户基础上，公司已获得多家大型（包括合资）整车制造企业新能源汽车高压塑料燃油箱项目定点。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ]
+              },
+              {
+                "fact_id": "cm-4",
+                "text": "电导率传感器已通过全球汽车零部件企业法国彼欧认可与采购，首批产品已出口至国外市场。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ]
+              }
+            ],
+            "limitations": [
+              "客户表以客户A/B等匿名披露，未获取最终客户名称及分客户产品结构；未展开销售渠道费用及境外客户明细。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "od-1",
+                "text": "2025年营业收入增长主要系公司以客户需求为导向，不断加大研发投入，与主要客户保持稳定合作关系，持续取得新增定点项目，且2025年多个高压塑料燃油箱定点项目开始批量供货，主要产品塑料燃油箱销量增长。其中，高压塑料燃油箱销售收入同比增加9,086.58万元，同比增长137.43%；常压塑料燃油箱业务保持相对稳定，销售收入略有增长。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006",
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "高压塑料燃油箱销售收入同比增加额",
+                    "raw_value": "9,086.58",
+                    "value": "9086.58",
+                    "unit": "万元",
+                    "source_unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "comparison_basis": "同比"
+                  },
+                  {
+                    "name": "高压塑料燃油箱销售收入同比变动比例",
+                    "raw_value": "增长137.43",
+                    "value": null,
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "uncertainty_reason": "源文以“同比增长137.43%”表述方向，未给出带符号数值。",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              },
+              {
+                "fact_id": "od-2",
+                "text": "受主要客户价格年降以及销售返利的影响，塑料燃油箱总成成本增长幅度高于收入增长幅度，毛利率同比下降。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ]
+              }
+            ],
+            "limitations": [
+              "未量化各客户/项目对收入增长的贡献，未展开价格年降幅度、销售返利金额及费用明细。"
+            ]
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "mc-1",
+                "text": "2025年公司成功登陆北京证券交易所，报告期内向不特定合格投资者公开发行股票并上市收到募集资金。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003",
+                  "source-0009"
+                ]
+              },
+              {
+                "fact_id": "mc-2",
+                "text": "2025年1月公司设立福州世昌汽车部件有限公司，进一步增加对客户的属地化配套供货能力，降低包装运输成本；同时推进浙江星昌新能源高压油箱项目（二期）建设，预计2026年上半年完成项目建设与验收，届时将提升产能储备与制造自动化水平。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              },
+              {
+                "fact_id": "mc-3",
+                "text": "2025年归属于上市公司股东的净利润6,887.23万元，同比降低0.53%；归属于上市公司股东的扣除非经常性损益的净利润6,652.55万元，同比增长8.69%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": [
+                  {
+                    "name": "归属于上市公司股东的净利润",
+                    "raw_value": "6,887.23",
+                    "value": "6887.23",
+                    "unit": "万元",
+                    "source_unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "归属于上市公司股东的净利润同比变动比例",
+                    "raw_value": "降低0.53",
+                    "value": null,
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "uncertainty_reason": "源文以“同比降低0.53%”表述方向，未给出带符号数值。",
+                    "comparison_basis": "同比"
+                  },
+                  {
+                    "name": "归属于上市公司股东的扣除非经常性损益的净利润",
+                    "raw_value": "6,652.55",
+                    "value": "6652.55",
+                    "unit": "万元",
+                    "source_unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "扣除非经常性损益的净利润同比变动比例",
+                    "raw_value": "增长8.69",
+                    "value": null,
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact",
+                    "uncertainty_reason": "源文以“同比增长8.69%”表述方向，未给出带符号数值。",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未展开资产负债结构、现金流量及募集资金使用明细；重大变化以源文披露为限。"
+            ]
+          }
+        },
+        "supply_chain": {
+          "upstream_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "sc-up-1",
+                "text": "前五大供应商合计采购249,083,823.39元，占年度采购53.57%；其中供应商H采购93,272,800.93元，占20.06%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五大供应商合计采购金额",
+                    "raw_value": "249,083,823.39",
+                    "value": "249083823.39",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "前五大供应商年度采购占比",
+                    "raw_value": "53.57",
+                    "value": "53.57",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "供应商H采购金额",
+                    "raw_value": "93,272,800.93",
+                    "value": "93272800.93",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  },
+                  {
+                    "name": "供应商H年度采购占比",
+                    "raw_value": "20.06",
+                    "value": "20.06",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "qualifier": "exact"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "仅补充供应商集中度，未展开全部供应商、原材料采购金额及供应协议期限。"
+            ]
+          }
+        },
+        "limitations": [
+          "本稿仅依据选定的业务概要、经营计划、营业情况分析、收入构成及客户/供应商章节，未覆盖财报附注、治理、股东、融资分红、风险展望、研发明细等。",
+          "未获取部分补充明细（如各产品销量/单价、分客户产品结构、产能利用率、资产负债结构、现金流量细节），未以猜测填补。",
+          "产品分类表未直接披露各产品收入占比，本稿不自行计算；客户名称按源表匿名列示。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 10498,
+        "output_tokens": 37341,
+        "total_tokens": 47839
+      }
+    }
+  ],
+  "review_seed": null,
+  "review_resume": null,
+  "workpaper_extraction_resume": null,
+  "source_pdf_path": "/home/python/Quote/data/filings/announcements/blobs/9d/9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a.pdf",
+  "report_interpretation": null,
+  "work_id": "bp-work-e7dfb860aa313dfdccf6141e",
+  "report": {
+    "instrument_id": "920022.BJ",
+    "report_id": "asset_2e5f514bffd07480b7f0b9e0630fff50",
+    "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-25T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "pages": [
+    {
+      "page": 12,
+      "text": "                              第四节 管理层讨论与分析\n\n一、 业务概要\n\n商业模式报告期内变化情况：\n     公司是一家专业从事汽车燃料系统研发、制造、销售与服务的高新技术企业、专精特新“小巨人”\n 企业，总部和技术中心位于河北廊坊，建有国家级                       CNAS 实验室。报告期内公司在全国布局廊坊、宝\n 鸡、台州、福州四个汽车燃料系统生产基地，同时结合新能源汽车行业发展趋势以及自身研发能力，\n 公司设立控股子公司九昌新能源进行热管理系统产品的研发与市场开拓，目前业务发展规模较小，处\n 于初级阶段。\n     燃料系统产品主要有：常压、高压塑料燃油箱总成等，主要客户为国内优秀自主品牌整车制造企\n 业。热管理系统产品主要有：电导率传感器、氢浓度传感器、去离子器、颗粒过滤器、冷却液膨胀水\n 箱等，主要客户为广汽领程新能源商用车有限公司、上海重塑能源科技有限公司、苏州驿力机车科技\n 股份有限公司、应雪汽车科技（常熟）有限公司等整车制造和系统集成企业。\n     公司持续加强创新，通过自主研发掌握产品核心技术，建立了较为完善的自主知识产权体系，已\n 获得授权专利      245 项，其中发明专利        18 项。成立以来，世昌股份始终坚持聚焦实业、做强主业，致力\n 于打造节能、安全、环保的汽车系统产品，现已成为河北省制造业单项冠军企业，在国内塑料燃油箱\n 行业内资企业中排名前列。\n     公司的商业模式主要分为采购模式、生产模式、销售模式、研发模式，具体如下：\n     1.采购模式\n     公司生产所需的原材料主要包括原料、阀类、管路件、金属件、电器件等，市场供应充足，因此\n 主要采用“以产定购”的采购模式，根据生产计划安排采购计划，并与主要合格供应商签订框架协议，\n 确保原材料供应的及时、稳定。公司制定并实施了《供应商管理程序》《采购控制程序》等制度，对\n 供应商管理和采购过程进行有效控制，确保所采购的原材料符合规定要求。在具体采购流程中，根据\n 生产物料需求向相关合格供应商下达采购订单，并持续跟踪订单执行进度，在原材料入库前进行数量、\n 质量检验等工作。\n     2.生产模式\n     公司产品系根据客户的要求进行设计、开发，因此采取“以销定产”方式进行生产，即根据客户\n 的月度需求情况安排、组织生产。市场部根据客户需求制定月度销售订单计划和发货计划，生产部结\n 合成品及原辅材料库存情况制定相应的生产计划并安排生产，生产过程管理涉及生产过程设计、生产\n 过程的运行、生产过程监视、测量与分析、生产过程异常处理等方面。\n     3.销售模式\n     公司采用直销模式，主要面向整车制造企业和系统集成企业进行销售，由市场部负责进行客户的\n 维护、开发等工作。客户企业均有严格的供应商质量管理制度和评价标准，公司需要在技术研发、质\n 量体系、生产制造等方面评审后进入其合格供应商体系，随后根据客户开发需求，通过参与项目竞标\n 取得项目定点，经过产品设计、模具开发、样件制造、实验验证、OTS                              产品制造准备、生产件批准程\n 序（PPAP）等环节后取得量产订单，并签订框架协议，随后公司根据客户的具体订单需求安排生产及\n 发货。\n     特别是整车制造企业的供应商管理十分严格，存在较高的进入壁垒，在成功进入整车制造企业的\n 配套体系并批量供货后，基于零部件供应的稳定性、可靠性、安全性、一致性要求，以及时间成本、\n 机会成本的考虑，整车制造企业一般不会轻易更换供应商。因此，公司与主要客户的合作粘性较强，\n 有利于公司市场业务的开拓与持续发展。\n     4.研发模式\n\n                                            12\n",
+      "readable": true,
+      "text_hash": "a9aed9a27aab0eb0afa08696a7fa64d7fd522c4b55f5bf6a63a3e4072bb14484",
+      "extraction_method": "shared-pdf-pypdf-layout.structured-notes.v1",
+      "layout_quality": "usable"
+    },
+    {
+      "page": 13,
+      "text": "     公司高度重视并坚持自主研发创新，以行业发展趋势及市场需求为指导，采取改进、创新的研发\n 模式，从产品材料结构、生产工艺、设备自动化等多方面进行技术创新，不断优化提升产品品质与技\n 术含量。\n     公司研发工作主要分为两类，一是根据市场及客户需求，将其转化为具体的产品技术要求、产品\n 规格、性能要求，并制定相应的新产品研发方案，包括产品的材料选择、结构设计、模具设计、工艺\n 设计等，然后召集相关部门对产品研发方案进行可行性评估，在通过方案评审并经公司批准后，进行\n 样件的试制和测试，根据测试情况和项目进度评估是否投入批量生产。二是结合日常生产过程中发现\n 的技术问题或提出的技术创新方案，制定出新技术或工艺研发方案，在通过方案评审并经公司批准后\n 进行试制和测试，根据测试情况评估是否将新技术或工艺投入批量生产。\n     报告期内，公司的主营业务与产品较为稳定，公司商业模式未发生重大变化。\n\n报告期内核心竞争力变化情况：\n□适用 √不适用\n\n专精特新等认定情况\n√适用 □不适用\n “专精特新”认定                         √国家级 □省（市）级\n “单项冠军”认定                         □国家级 √省（市）级\n “高新技术企业”认定                       是\n 其他相关的认定情况                        河北省科技型中小企业 - 河北省科学技术厅\n 其他相关的认定情况                        河北省科学技术成果：塑料高压燃油箱总成 - 河北省科学技术厅\n\n\n二、 经营情况回顾\n\n(一) 经营计划\n\n     2025 年，公司成功登陆北京证券交易所，这一年也是公司规模化业务拓展和高质量发展的关键之\n 年。面对激烈的市场竞争，世昌股份保持战略定力，稳步推进市场开拓，较好地完成了年度经营任务。\n     1.经营业绩稳健增长，财务结构不断优化\n     2025 年度，公司实现营业收入            66,711.38 万元，同比增长        29.57%；归属于上市公司股东的净利润\n 6,887.23 万元，同比降低        0.53%；归属于上市公司股东的扣除非经常性损益的净利润6,652.55                            万元，\n 同比增长     8.69%。报告期末，公司资产总额为               75,060.76 万元，较报告期初增长            67.30%；归属于上市\n 公司股东的所有者权益为             42,875.01 万元，较报告期初增长            93.57%；公司资产负债率为           42.58%，较\n 报告期初降低       7.73 个百分点，保持合理水平，财务结构稳健，抗风险能力显著增强。\n     2.产能规模稳步提升，夯实业务增长基础\n     2025 年 1 月公司设立福州世昌汽车部件有限公司，进一步增加了公司对于客户的属地化配套供货\n 能力，降低了包装运输成本，收到客户好评。同时，公司严格遵循募集资金管理相关规定，规范使用\n 募集资金，认真推进“浙江星昌年产                  60 万台新能源高压油箱项目（二期）”建设，预计2026                         年上半\n 年完成项目建设与验收，届时将提升产能储备与制造自动化水平，为后续增长提供有力支撑。\n     3.产品种类多元化，收入结构向优发展\n     一是在常压燃油箱收入保持稳定增长的同时，高压燃油箱量产订单数量明显提升，形成“常压稳\n 基+高压增效”的双轮驱动格局，燃油箱收入结构更优。二是完成塑料甲醇燃料箱的设计开发与批量生\n 产，为下步拓展绿色燃料系统开发积累了先期经验。三是子公司九昌新能源结合客户需求，完成多种\n\n                                              13\n",
+      "readable": true,
+      "text_hash": "ee17ffe9d252461101c619a4bc3e87cc5b6ed260b0c14f4f63040d8b94be025b",
+      "extraction_method": "shared-pdf-pypdf-layout.structured-notes.v1",
+      "layout_quality": "usable"
+    },
+    {
+      "page": 14,
+      "text": " 热管理系统部件开发与设计，并通过客户与第三方检测机构验证，已批量生产电导率传感器、氢浓度\n 传感器、去离子器、颗粒过滤器、冷却液膨胀水箱等，产品应用到新能源纯电动汽车与氢能领域。\n     4.市场客户突破升级，获取更多优质客户\n     报告期内，在原有主要客户的基础上，已获得多家大型（包括合资）整车制造企业新能源汽车高\n 压塑料燃油箱项目定点，为公司客户结构持续优化及业务持续稳定发展奠定了良好的市场基础。公司\n 热管理系统产品销售覆盖广汽领程新能源商用车有限公司、上海重塑能源科技有限公司、苏州驿力机\n 车科技股份有限公司、应雪汽车科技（常熟）有限公司                         等新能源整车制造和氢能系统集成企业。其中，\n 电导率传感器已通过全球汽车零部件企业法国彼欧认可与采购，首批产品已出口至国外市场。\n     2025 年，公司凭借稳定的产品质量、高效的交付能力及持续的技术创                              新，获核心主机厂颁发“最\n 具价值贡献奖”“卓越创新奖”“最佳合作奖”，高工氢电“电导率传感器技术引领奖”，公司品牌\n 影响力与行业地位持续巩固。\n\n\n(二) 行业情况\n\n     1.公司所处行业以及地位\n     公司从事汽车零部件的研发、制造、销售与服务，根据国家统计局发布的《国民经济行业分类》\n （GB/T4754-2017），公司所属行业为汽车零部件及配件制造（行业代码：C3670）。\n     2.报告期内行业发展情况\n     （1）汽车行业发展情况\n     “十四五”期间，我国汽车行业实现跨越式发展，产销规模站稳                               3,000 万辆台阶，营业收入突破\n 10万亿元，出口量跃居世界第一，电动化、智能化、网联化深度融合，形成了较为领先的产业优势。\n 2025 年，行业发展韧性持续彰显，多项指标刷新历史纪录。全年汽车产销分别完成                                      3,453.1 万辆和\n 3,440万辆，同比分别增长           10.4%和 9.4%，产销量再创历史新高，产销量连续                  17 年位居全球第一。其\n 中乘用车市场稳步增长，成为拉动消费的核心力量；商用车市场回                               升向好，产销增速超          10%，重回    400\n 万辆以上规模。新能源汽车产销分别达                   1,662.6 万辆、1,649    万辆，国内新能源新车销量占汽车新车\n 总销量的比例突破         50%。对外贸易再上新台阶，全年汽车出口超                    700万辆，其中新能源汽车出口             261.5\n 万辆，出口结构持续优化，产业国际竞争力显著增强。\n     2025 年，国家继续推出汽车发展积极政策，聚焦稳消费、促升级、强规范，先后推出汽车以旧换\n 新、完善置换补贴、延续新能源汽车车辆购置税免征等政策，研究启动制定更高汽车排放法规标准，\n 实现机动车减污降碳协同，推动汽车产业轻量化、节能化、低碳化。我国汽车产业在“双碳”目标与\n 高质量发展双重引领下，正从量变到质变转型，为中国品牌整车制造企业在全球范围内提高竞争力提\n 供支撑。\n     （2）公司产品汽车燃料系统领域发展\n     公司主要产品常压、高压塑料燃油箱总成，分别应用于传统燃油汽车与新能源插电（含增程式）\n 混合动力汽车。从国内塑料燃油箱市场竞争格局来看，应用于传统燃油车的常压塑料燃油箱目前仍是\n 塑料燃油箱中的主流产品，产品工艺成熟，经过长期的发展和市场竞争，形成了以亚普股份为龙头、\n 其他厂商“多强并列”的竞争格局。应用于插电式混合动力汽车的高压塑料燃油箱作为公司重点新产\n 品，未来发展前景广阔。但由于该产品技术壁垒较高、研发及验证周期较长，目前除亚普股份及部分\n 外资企业外，国内具备高压塑料燃油箱技术研发与规模化量产能力的内资企业数量相对较少，市场参\n 与主体有限。现阶段国内高压塑料燃油箱市场外资参与者主要为邦迪管路、英瑞杰、考泰斯等全球知\n 名汽车零部件企业。\n     近年来，在中国自主品牌整车制造企业市场份额快速提升的趋势下，外资塑料燃油箱生产企业的\n 市场份额呈下降趋势。同时基于国产汽车核心零部件自主可控的发展趋势，公司依托在技术研发、产\n\n                                             14\n",
+      "readable": true,
+      "text_hash": "c59f50de1dcb7ece41f368de0b237d2792a5a09ada6fcb6529b939b5dcf554f4",
+      "extraction_method": "shared-pdf-pypdf-layout.structured-notes.v1",
+      "layout_quality": "usable"
+    },
+    {
+      "page": 17,
+      "text": " 12. 应付票据：报告期末应付票据为                          10,565.45    万元，较上年末增加                 84.31%，主要系随着采购规模的\n 增加，支付供应商货款开具的银行承兑汇票增加所致。\n 13. 应付账款：报告期末应付账款为                          16,798.30    万元，较上年末增加                 48.71%，主要系随着营业收入增\n 长，采购规模相应增加所致。\n 14. 合同负债：报告期末合同负债为                          136.60   万元，较上年末增加                63.21%，主要系预收客户货款增加所\n 致。\n 15. 一年内到期的非流动负债：报告期末一年内到期的非流动负债为                                                      273.36    万元，较上年末减少\n 69.47%，主要系一年内到期的长期借款减少所致。\n 16. 其他流动负债：报告期末其他流动负债为                                 837.59   万元，较上年末增加                37.20%，主要系已背书未终\n 止确认的应收票据增加所致。\n 17. 租赁负债：报告期末租赁负债为                          142.70   万元，较上年末增加                 122.62%，主要系报告期内福州世昌\n 投产使得租赁厂房增加所致。\n 18. 递延收益：报告期末递延收益为                          135.96   万元，较上年末减少                54.52%，主要系对政府补助进行摊销\n 所致。\n 19. 递延所得税负债：报告期末递延所得税负债为                                     17.02  万元，较上年末增加                 43.88%，主要系由于租\n 赁厂房使得使用权资产增加所致。\n 20. 股本：报告期末股本为                   6,032.10    万元，较上年末增加                 42.72%，主要系报告期内发行股票所致。\n 21. 资本公积：报告期末资本公积为                          21,287.63    万元，较上年末增加                269.78%，主要系报告期内发行股\n 票使得股本溢价增加所致。\n 22. 盈余公积：报告期末盈余公积为                          1,908.05    万元，较上年末增加                43.87%，主要系报告期内利润增加\n 所致。\n 23. 少数股东权益：报告期末少数股东权益为                                 225.89   万元，较上年末增加                58.44%，主要系报告期内非\n 全资子公司利润增加所致。\n\n境外资产占比较高的情况\n□适用 √不适用\n\n2.   营业情况分析\n(1)  利润构成\n                                                                                                                 单位：元\n                                          2025  年                                  2024  年\n          项目                       金额               占营业收入                   金额               占营业收入            变动比例%\n                                                      的比重%                                     的比重%\n 营业收入                        667,113,776.81               -           514,858,876.81               -              29.57%\n 营业成本                        518,161,881.57              77.67%       383,684,853.80              74.52%          35.05%\n 毛利率                                    22.33%            -                       25.48%           -                -\n 销售费用                          15,620,276.85               2.34%        13,376,286.90               2.60%         16.78%\n 管理费用                          25,027,305.84               3.75%        20,600,277.18               4.00%         21.49%\n 研发费用                          24,340,906.52               3.65%        18,886,572.19               3.67%         28.88%\n 财务费用                              766,200.75              0.11%         2,116,550.03               0.41%        -63.80%\n 信用减值损失                        -2,708,629.07             -0.41%             314,802.15              0.06%       -960.42%\n 资产减值损失                        -2,691,344.81             -0.40%         -1,375,586.57             -0.27%         -95.65%\n 其他收益                           4,783,836.08               0.72%        10,346,018.39               2.01%        -53.76%\n 投资收益                          -1,137,179.05             -0.17%         -1,528,589.33             -0.30%          25.61%\n 公允价值变动收益                          145,393.32              0.02%             66,316.34              0.01%        119.24%\n 资产处置收益                             13,409.80              0.00%               7,964.61             0.00%         68.37%\n                                                            17\n",
+      "readable": true,
+      "text_hash": "9573042737c1d8c70a898e89029b8e5fa02684f1d873c2e1363aaa384de80eae",
+      "extraction_method": "shared-pdf-pypdf-layout.structured-notes.v1",
+      "layout_quality": "usable"
+    },
+    {
+      "page": 18,
+      "text": " 汇兑收益                                       -               -                     -               -              -\n 营业利润                       78,751,831.62            11.80%        81,645,611.70            15.86%         -3.54%\n 营业外收入                          141,910.86             0.02%            23,026.22            0.00%       516.30%\n 营业外支出                             8,833.23            0.00%            35,267.09            0.01%       -74.95%\n 净利润                        69,704,571.85            10.45%        69,949,274.81            13.59%         -0.35%\n\n项目重大变动原因：\n 1. 营业收入：公司报告期内营业收入为                          66,711.38   万元，同比增长           29.57%，主要系公司以客户需求为\n 导向，不断加大研发投入，与主要客户保持稳定合作关系，持续取得新增定点项目，且                                                           2025  年多个高\n 压塑料燃油箱定点项目开始批量供货，业务开展情况良好，主要产品塑料燃油箱销量增长，使得营业\n 收入保持良好的增长趋势。\n 2. 营业成本：公司报告期内营业成本为                          51,816.19   万元，同比增长           35.05%，主要系随着报告期内营业\n 收入增加，营业成本相应增加。\n 3. 财务费用：公司报告期内财务费用为                          76.62  万元，同比减少           63.80%，主要系报告期内银行借款减少\n 使得利息费用相应减少所致。\n 4. 信用减值损失：公司报告期内信用减值损失为                                 270.86  万元，上年同期为收益                 31.48  万元，主要系\n 报告期内计提的应收账款坏账准备增加所致。\n 5. 资产减值损失：公司报告期内资产减值损失为                                269.13  万元，上年同期损失为                 137.56  万元，主要系\n 报告期内计提存货跌价准备增加所致。\n 6. 其他收益：公司报告期内其他收益为                          478.38  万元，同比减少            53.76%，主要系报告期内确认的政府\n 补助减少所致。\n 7. 公允价值变动收益：公司报告期内公允价值变动收益为                                       14.54  万元，同比增长            119.24%，主要系报\n 告期内交易性金融资产公允价值变动所致。\n 8. 资产处置收益：公司报告期内资产处置收益为                                1.34  万元，同比增长            68.37%，主要系报告期内提前\n 终止租赁合同形成的收益增加所致。\n 9. 营业外收入：公司报告期内营业外收入为                             14.19  万元，同比增长            516.30%，主要系报告期内供应商\n 扣款增加所致。\n 10. 营业外支出：公司报告期内营业外支出为                             0.88  万元，同比减少           74.95%，主要系报告期内固定资产\n 报废损失减少所致。\n\n(2)  收入构成\n                                                                                                         单位：元\n           项目                         2025  年                       2024  年                    变动比例%\n 主营业务收入                               654,239,392.25               511,130,905.91                          28.00%\n 其他业务收入                                 12,874,384.56                 3,727,970.90                       245.35%\n 主营业务成本                               505,696,317.35               380,510,644.54                          32.90%\n 其他业务成本                                 12,465,564.22                 3,174,209.26                       292.71%\n\n按产品分类分析：\n                                                                                                         单位：元\n                                                                        营业收入          营业成本\n   分产品              营业收入                营业成本              毛利率%          比上年同          比上年同           毛利率比上\n                                                                            期             期          年同期增减\n                                                                          增减%           增减%\n 塑料燃油           626,910,726.45      486,746,265.95          22.36%         25.87%         31.53%       减少3.34\n 箱总成                                                                                                    个百分点\n\n                                                        18\n",
+      "readable": true,
+      "text_hash": "795948c4df5acd287f0f0a2e03192f4251fb59acb3e67630bc4d4943841b2e5f",
+      "extraction_method": "shared-pdf-pypdf-layout.structured-notes.v1",
+      "layout_quality": "usable"
+    },
+    {
+      "page": 19,
+      "text": " 配件            12,844,780.89     11,858,211.92         7.68%       51.64%       43.04%      增加   5.55\n                                                                                            个百分点\n 其他            14,483,884.91       7,091,839.48      51.04%       214.72%      228.75%      减少   2.09\n                                                                                            个百分点\n 其他业务          12,874,384.56     12,465,564.22         3.18%      245.35%      292.71%     减少11.67\n 收入                                                                                         个百分点\n    合计        667,113,776.81    518,161,881.57         -            -            -             -\n\n按区域分类分析：\n                                                                                              单位：元\n                                                                营业收入         营业成本\n   分地区           营业收入               营业成本           毛利率%         比上年同         比上年同        毛利率比上\n                                                                   期            期        年同期增减\n                                                                 增减%          增减%\n    境内        667,007,453.64    518,115,544.45       22.32%        29.55%       35.04%      减少3.16\n                                                                                            个百分点\n    境外            106,323.17          46,337.12      56.42%         -            -             不适用\n    合计        667,113,776.81    518,161,881.57         -            -            -             -\n\n收入构成变动的原因：\n 1.按收入构成分析：\n （1）其他业务收入：公司报告期内其他业务收入为1,287.44万元，较上年同期增加914.64万元，同\n 比增长245.35%，主要系报告期内原材料销售增加所致。\n （2）主营业务成本：公司报告期内主营业务成本为50,569.63万元，较上年同期增加12,518.57万\n 元，同比增长32.90%，主要系随着报告期内主营业务收入增加，主营业务成本相应增加所致。\n （3）其他业务成本：公司报告期内其他业务成本为1,246.56万元，较上年同期增加929.14万元，同\n 比增长292.71%，主要系随着报告期内其他业务收入增加，其他业务成本相应增加所致。\n 2.按产品分类分析：\n （1）报告期内，公司塑料燃油箱总成收入为62,691.07万元，较上年同期增加12,885.24万元，同比\n 增长25.87%，主要系公司报告期内常压塑料燃油箱业务保持相对稳定，销售收入略有增长，同时报告\n 期内多个高压塑料燃油箱定点项目开始批量供货，高压塑料燃油箱销量增加，使得高压塑料燃油箱销\n 售收入较上年增加9,086.58万元，同比增长137.43%。在收入增长的情况下，受主要客户价格年降以\n 及销售返利的影响，成本增长的幅度高于收入增长的幅度，塑料燃油箱总成毛利率同比下降。\n （2）报告期内，公司配件收入、成本较上年同期分别增长                                 51.64%、43.04%，主要系随着塑料燃油箱\n 总成销量的增加，根据客户需求，相关配件销量增加所致。\n （3）报告期内，公司主营业务中其他收入、其他成本较上年同期分别                                       增长   214.72%、228.75%，主要\n 系报告期内确认的技术开发合同收入及结转成本增加所致。\n 3.按区域分类分析：\n （1）报告期内，公司在境内实现销售收入                       66,700.75  万元，主要客户以国内排名靠前的自主品牌车企\n 为主，主要产品为塑料燃油箱且绝大部分在国内市场进行生产销售，是公司主要收入来源。\n （2）报告期内，公司首次在境外实现销售收入                         10.63  万元，主要系九昌新能源产品电导率传感器实现\n 出口所致，境外出口产品毛利率高主要系出口产品销售价格较高所致。\n\n(3) 主要客户情况\n                                                  19\n",
+      "readable": true,
+      "text_hash": "c131da766456802b2fa99a24454a8cc582d7e0548cccd21aa7028e22608892a9",
+      "extraction_method": "shared-pdf-pypdf-layout.structured-notes.v1",
+      "layout_quality": "usable"
+    },
+    {
+      "page": 20,
+      "text": "                                                                                                             单位：元\n 序号                客户                        销售金额                       年度销售占比%                  是否存在关联关系\n   1              客户    A                     297,970,630.54                          44.67%              否\n   2              客户    B                     214,124,225.04                          32.10%              否\n   3              客户    C                      67,766,624.78                          10.16%              否\n   4              客户    D                      14,167,639.04                           2.12%              否\n   5              客户    E                      12,625,831.90                           1.89%              否\n               合计                             606,654,951.30                          90.94%               -\n\n(4)  主要供应商情况\n                                                                                                             单位：元\n 序号               供应商                        采购金额                       年度采购占比%                  是否存在关联关系\n   1             供应商     H                     93,272,800.93                          20.06%              否\n   2      宁波洛卡特汽车零部                            70,197,936.10                          15.10%              否\n               件有限公司\n   3             供应商     I                     30,185,280.80                           6.49%              否\n   4             供应商     J                     29,153,814.41                           6.27%              否\n   5             供应商     K                     26,273,991.15                           5.65%              否\n               合计                             249,083,823.39                          53.57%               -\n\n(5)  报告期内公司贸易业务收入占营业收入比例超过                                    10%情况\n □适用 √不适用\n3.   现金流量状况\n                                                                                                             单位：元\n                 项目                               2025  年                      2024  年                 变动比例%\n  经营活动产生的现金流量净额                                    -7,189,648.12               48,748,087.25               -114.75%\n  投资活动产生的现金流量净额                                  -72,934,095.55                -9,727,107.44               -649.80%\n  筹资活动产生的现金流量净额                                  162,263,336.38               -28,469,273.50                 669.96%\n\n现金流量分析：\n 1.报告期内，公司经营活动产生的现金流量净额为-718.96                                       万元，较上年同期减少                 5,593.77   万元，同\n 比下降      114.75%，主要原因系随着采购规模的增加，公司报告期内购买商品、接受劳务支付的现金较\n 上年同期大幅增加              6,248.67   万元，同时由于应收账款余额增加，部分营业收入尚未回款，使得报告期\n 内销售商品、提供劳务收到的现金增加金额较少。此外，公司将信用等级较低的承兑汇票贴现流入计\n 入收到的其他与筹资活动有关的现金科目，2024                                  年度、2025      年度该部分现金流入分别为                     3,555.11   万\n 元、1,984.83      万元，经营活动产生的现金流量净额与该部分票据贴现流入金额合计（即调整后经营活\n 动产生的现金流量净额）分别为                        8,429.92   万元、1,265.87         万元，均为净流入。\n 2.报告期内，公司投资活动产生的现金流量净额为-7,293.41                                       万元，净流出较上年同期增加                      6,320.70\n 万元，主要系报告期内公司使用                        5,000  万元闲置募集资金进行现金管理计入投资支付的现金所致。\n 3.报告期内，公司筹资活动产生的现金流量净额为                                    16,226.33    万元，较上年增加              19,073.26    万元，主\n 要系报告期内公司向不特定合格投资者公开发行股票并上市收到募集资金所致。\n\n\n                                                          20\n",
+      "readable": true,
+      "text_hash": "9a4f3f8ba710c0567e8b6ce88ff534af125697d1f32529b91c131d1d8b41a63c",
+      "extraction_method": "shared-pdf-pypdf-layout.structured-notes.v1",
+      "layout_quality": "usable"
+    },
+    {
+      "page": 21,
+      "text": "(四) 投资状况分析\n\n1、  总体情况\n√适用 □不适用\n                                                                                单位：元\n          报告期投资额                            上年同期投资额                               变动比例%\n         81,389,927.56                       27,781,270.35                         192.97%\n\n2、  报告期内获取的重大的股权投资情况\n□适用 √不适用\n\n3、  报告期内正在进行的重大的非股权投资情况\n√适用 □不适用\n                                                                                               单位：元\n                                                                                      截止报       是否达\n                                                                                      告期末       到计划\n      项目名称             本期投入情况           累计实际投入            资金       项目进      预计收       累计实       进度和\n                                             情况           来源         度         益      现的收       预计收\n                                                                                         益      益的原\n                                                                                                   因\n 浙江星昌汽车科技\n 有限公司年产           60  56,144,410.56     56,144,410.56     募集      42.80% 不适用 不适用 不适用\n 万台新能源高压油                                                 资金\n 箱项目（二期）\n        合计            56,144,410.56 56,144,410.56           -        -             -        -      -\n\n4、 以公允价值计量的金融资产情况\n√适用 □不适用\n                                                                                               单位：元\n                                                        本期                      本期公           计入权\n 金融资                          资金          本期购            出       报告期投           允价值           益的累\n 产类别        初始投资成本            来源          入金额           售金        资收益           变动损           计公允\n                                                         额                        益           价值变\n                                                                                                动\n 债务工                  0.00 募集         30,000,000.00     0.00           0.00          0.00          0.00\n 具投资                         资金\n 权益工           304,815.82 自有                    0.00    0.00 145,393.32 145,393.32                    -\n 具投资                         资金                                                             386,440.14\n   合计          304,815.82       -     30,000,000.00     0.00 145,393.32 145,393.32                    -\n                                                                                            386,440.14\n\n\n                                                   21\n",
+      "readable": true,
+      "text_hash": "e806ae1a399ace7b91d6d5d52239d288ba7c983ad2e2ba96e8a08069b8c1958e",
+      "extraction_method": "shared-pdf-pypdf-layout.structured-notes.v1",
+      "layout_quality": "usable"
+    }
+  ],
+  "accepted_records": [],
+  "evidence": {
+    "schema_version": "company_profile_common_core_evidence.v1",
+    "mapping_version": "company_profile_common_core_mapping.v1",
+    "production_authorization": "not_authorized",
+    "report": {
+      "instrument_id": "920022.BJ",
+      "report_id": "asset_2e5f514bffd07480b7f0b9e0630fff50",
+      "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-25T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "spans": [],
+    "reused_facts": [],
+    "unresolved_field_ids": [],
+    "gaps": [],
+    "prepared_evidence": []
+  },
+  "chapters": [],
+  "completed_scopes": [],
+  "execution": {
+    "schema_version": "company_profile_execution_record.v1",
+    "production_authorization": "not_authorized",
+    "input_identity": {
+      "instrument_id": "920022.BJ",
+      "report_id": "asset_2e5f514bffd07480b7f0b9e0630fff50",
+      "document_version": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+      "report_period": "2025-12-31",
+      "policy_version": "company_profile_common_core_mapping.v2",
+      "processing_identity": {
+        "execution_mode": "provider",
+        "logical_request_timeout_seconds": 2450.0,
+        "max_layout_characters": 500000,
+        "max_section_characters": 160000,
+        "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+        "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+        "prompt_version": "company_profile_workpaper.2026-11-28.subject-relationships.v22",
+        "quality_review_profile": "semantic_extraction__scorpio_grok",
+        "reading_strategy": "chapter_workpaper_v1",
+        "repair_profile": "semantic_extraction__deepseek",
+        "review_max_output_tokens": 16384,
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "semantic_policy": "company_profile_llm_led.v2",
+        "semantic_reuse": false,
+        "source_binding_policy": "company_workpaper_source_literals.column-wrapped-amounts.v8",
+        "workpaper_format_recovery": "local_shape_before_retry.v3",
+        "workpaper_max_output_tokens": 12000,
+        "workpaper_metric_format_policy": "source_metric_unparsed_value_null.v2.raw-null-accounting",
+        "workpaper_metric_limit_policy": "source_review_exact_metric_limits.v1",
+        "workpaper_review_execution": "deferred",
+        "workpaper_review_policy": "company_profile_workpaper_review.v16",
+        "workpaper_subject_scope_limit_policy": "source_review_exact_subject_limits.v1"
+      }
+    },
+    "scope_digests": {},
+    "model_attempts": [],
+    "token_budget": {
+      "total_token_budget": 1000000,
+      "extract_max_output_tokens": 4000,
+      "verify_max_output_tokens": 2000,
+      "tokens_used": 69075,
+      "tokens_remaining": 930925
+    },
+    "scope_token_allocations": {},
+    "transport_retries": 0,
+    "semantic_disputes": [],
+    "predecessor_lineage": []
+  }
+}

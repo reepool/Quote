@@ -1,0 +1,547 @@
+{
+  "task": "6.FY",
+  "role": "B1",
+  "phase": "post-seal common P1 fix 1 of at most 2",
+  "state": "implementation_and_direct_source_validation_complete; A_semantic_acceptance_separate",
+  "authorization": "A explicitly confirmed the 20-company group was sealed before this application edit; 0 real model calls or paid reruns",
+  "policy": {
+    "flag": "workpaper_metric_format_policy",
+    "value": "source_metric_unparsed_value_null.v3.grouped-decimal",
+    "constant": "GROUPED_DECIMAL_METRIC_FORMAT_POLICY",
+    "activation": "Set the existing processing identity flag explicitly to this constant; the identity factory and all frozen plans/operator/config continue to default to v2",
+    "change": "Remove ASCII comma grouping only from a properly grouped value, preserving sign and decimal digits, when unchanged numeric raw_value agrees in the same declared unit. Raw may repeat that exact unit suffix. Keep all other fields.",
+    "pattern": "[+-]?[1-9][0-9]{0,2}(?:,[0-9]{3})+(?:\\.[0-9]+)?",
+    "boundaries": "No rounding, rescaling, sign inference, scientific notation, malformed grouping, joins across lines, broken raw, or percent/points relabelling. Existing typed fields and cited source/monetary-unit checks still execute. This operation does not establish financial meaning or semantic truth.",
+    "notes": "Existing extraction element limitations and repair standardization_notes identify fact ID, original metric index, before/after value and program-only normalization, explicitly not new model review.",
+    "compatibility": "No global WorkpaperMetric validator, wire Schema, response type, optional serialized field or default changed. V1, V2 and no flag retain the previous grouped-value rejection; v3 preserves v2 raw/null, accounting and directional-percent behavior.",
+    "callers": [
+      "extract: run_workpaper -> normalize_workpaper_draft -> normalize_directional_metric_format -> WorkpaperFact and original bind_workpaper_draft/source checks",
+      "repair: review_workpaper -> normalize_directional_metric_format -> WorkpaperFact -> _check_fact_source(check_units=True) -> candidate only; needs own final for adoption"
+    ]
+  },
+  "seal_sha256": "32ee0bbbe60442066025af82af34a13a25a0afa0d1219e6c6e00c45e323f4f6b",
+  "sealed_file_count": 393,
+  "changed_sealed_files": [],
+  "affected": [
+    {
+      "instrument_id": "002463.SZ",
+      "original_first_record": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-ead3d24df2986375eab05f80.json",
+      "original_first_record_sha256": "c85c361c49680b818ec7d42ac986a8ee9f5d9e62b4c6d81223e17ceb4cab467d",
+      "original_first_api": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002463.SZ/run/first-api.json",
+      "original_first_api_sha256": "b6b5845186da58a97c499bd9870baaa0538811d6248d11dfc77d643e4bd7d74c",
+      "extraction_response_sha256": "c2f43b91e5786459dc3ce01785692d45ff629654bb574305827a0e066dfc1dd3",
+      "original_transport_contract": "accepted",
+      "fact_count": 7,
+      "metric_count": 11,
+      "local_candidates_only": true,
+      "source_binding": "All affected facts passed the unchanged typed fact and check_units=True source checks; actual run_workpaper replay reconstructed the same official PDF section packet, preserving original receipts/generation and yielding controlled_fixture/not_reviewed candidates",
+      "transformations": [
+        {
+          "element": "scale_and_mix",
+          "fact_id": "SC-01",
+          "metric_index": 0,
+          "name": "营业收入",
+          "raw_value": "18,945,220,585",
+          "old_value": "18,945,220,585",
+          "local_candidate_value": "18945220585",
+          "unit": "元",
+          "period": "2025年度"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "SC-02",
+          "metric_index": 0,
+          "name": "归属于上市公司股东的净利润",
+          "raw_value": "3,822,306,272",
+          "old_value": "3,822,306,272",
+          "local_candidate_value": "3822306272",
+          "unit": "元",
+          "period": "2025年度"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "SC-03",
+          "metric_index": 0,
+          "name": "印制电路板营业收入",
+          "raw_value": "18,143,308,261",
+          "old_value": "18,143,308,261",
+          "local_candidate_value": "18143308261",
+          "unit": "元",
+          "period": "2025年度"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "SC-03",
+          "metric_index": 3,
+          "name": "印制电路板营业成本",
+          "raw_value": "11,446,118,164",
+          "old_value": "11,446,118,164",
+          "local_candidate_value": "11446118164",
+          "unit": "元",
+          "period": "2025年度"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "SC-04",
+          "metric_index": 0,
+          "name": "其他业务收入",
+          "raw_value": "798,147,594",
+          "old_value": "798,147,594",
+          "local_candidate_value": "798147594",
+          "unit": "元",
+          "period": "2025年度"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "SC-05",
+          "metric_index": 0,
+          "name": "数据通讯应用领域营业收入",
+          "raw_value": "14,656,300,288",
+          "old_value": "14,656,300,288",
+          "local_candidate_value": "14656300288",
+          "unit": "元",
+          "period": "2025年度"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "SC-05",
+          "metric_index": 2,
+          "name": "智能汽车应用领域营业收入",
+          "raw_value": "3,044,579,100",
+          "old_value": "3,044,579,100",
+          "local_candidate_value": "3044579100",
+          "unit": "元",
+          "period": "2025年度"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "SC-05",
+          "metric_index": 4,
+          "name": "工业控制及其他应用领域营业收入",
+          "raw_value": "442,428,873",
+          "old_value": "442,428,873",
+          "local_candidate_value": "442428873",
+          "unit": "元",
+          "period": "2025年度"
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "CC-01",
+          "metric_index": 0,
+          "name": "前五名客户合计销售金额",
+          "raw_value": "10,102,760,452",
+          "old_value": "10,102,760,452",
+          "local_candidate_value": "10102760452",
+          "unit": "元",
+          "period": "2025年度"
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "CC-02",
+          "metric_index": 0,
+          "name": "PCB业务内销营业收入",
+          "raw_value": "2,600,439,801",
+          "old_value": "2,600,439,801",
+          "local_candidate_value": "2600439801",
+          "unit": "元",
+          "period": "2025年度"
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "CC-02",
+          "metric_index": 2,
+          "name": "PCB业务外销营业收入",
+          "raw_value": "15,542,868,460",
+          "old_value": "15,542,868,460",
+          "local_candidate_value": "15542868460",
+          "unit": "元",
+          "period": "2025年度"
+        }
+      ],
+      "existing_automatic_final": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002463.SZ/run/automatic-final-api.json",
+      "existing_automatic_final_sha256": "aef6bd908511e40f195b99fa2d62407634b36d43a7159eb36726c8e455a6a772",
+      "delivery_action": "None: preserve existing source-reviewed final, no merge or duplicate revenue additions"
+    },
+    {
+      "instrument_id": "601098.SH",
+      "original_first_record": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-d6a3fe38614c1779135e0ace.json",
+      "original_first_record_sha256": "eecdda9f364764fc0589d0db2e2fb1c33752e4bd83647339427f018cf692e4de",
+      "original_first_api": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601098.SH/run/first-api.json",
+      "original_first_api_sha256": "f24c5eb2720b2d55880dc96c48fdae5b4b7f65ea681c1145cc6f608ea5acb0aa",
+      "extraction_response_sha256": "fe5ea60d0f2da5e4358d486165c086f74e44b7880cbf879f39b8770eefa706ee",
+      "original_transport_contract": "accepted",
+      "fact_count": 11,
+      "metric_count": 13,
+      "local_candidates_only": true,
+      "source_binding": "All affected facts passed the unchanged typed fact and check_units=True source checks; actual run_workpaper replay reconstructed the same official PDF section packet, preserving original receipts/generation and yielding controlled_fixture/not_reviewed candidates",
+      "transformations": [
+        {
+          "element": "scale_and_mix",
+          "fact_id": "sm-01",
+          "metric_index": 0,
+          "name": "营业收入",
+          "raw_value": "12,601,193,497.11",
+          "old_value": "12,601,193,497.11",
+          "local_candidate_value": "12601193497.11",
+          "unit": "元",
+          "period": "2025年"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "sm-02",
+          "metric_index": 0,
+          "name": "主营业务分行业合计—营业收入",
+          "raw_value": "12,397,176,313.51",
+          "old_value": "12,397,176,313.51",
+          "local_candidate_value": "12397176313.51",
+          "unit": "元",
+          "period": "2025年"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "sm-03",
+          "metric_index": 0,
+          "name": "出版—营业收入",
+          "raw_value": "3,775,095,436.44",
+          "old_value": "3,775,095,436.44",
+          "local_candidate_value": "3775095436.44",
+          "unit": "元",
+          "period": "2025年"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "sm-04",
+          "metric_index": 0,
+          "name": "发行—营业收入",
+          "raw_value": "10,145,727,127.19",
+          "old_value": "10,145,727,127.19",
+          "local_candidate_value": "10145727127.19",
+          "unit": "元",
+          "period": "2025年"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "sm-05",
+          "metric_index": 0,
+          "name": "物资—营业收入",
+          "raw_value": "1,133,977,368.45",
+          "old_value": "1,133,977,368.45",
+          "local_candidate_value": "1133977368.45",
+          "unit": "元",
+          "period": "2025年"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "sm-06",
+          "metric_index": 0,
+          "name": "印刷—营业收入",
+          "raw_value": "1,071,980,853.21",
+          "old_value": "1,071,980,853.21",
+          "local_candidate_value": "1071980853.21",
+          "unit": "元",
+          "period": "2025年"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "sm-07",
+          "metric_index": 0,
+          "name": "媒体—营业收入",
+          "raw_value": "904,380,416.75",
+          "old_value": "904,380,416.75",
+          "local_candidate_value": "904380416.75",
+          "unit": "元",
+          "period": "2025年"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "sm-08",
+          "metric_index": 0,
+          "name": "数字化服务—营业收入",
+          "raw_value": "163,711,756.91",
+          "old_value": "163,711,756.91",
+          "local_candidate_value": "163711756.91",
+          "unit": "元",
+          "period": "2025年"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "sm-09",
+          "metric_index": 0,
+          "name": "金融服务—营业收入",
+          "raw_value": "223,601,231.25",
+          "old_value": "223,601,231.25",
+          "local_candidate_value": "223601231.25",
+          "unit": "元",
+          "period": "2025年"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "sm-10",
+          "metric_index": 0,
+          "name": "内部抵销数—营业收入",
+          "raw_value": "-5,021,297,876.69",
+          "old_value": "-5,021,297,876.69",
+          "local_candidate_value": "-5021297876.69",
+          "unit": "元",
+          "period": "2025年"
+        },
+        {
+          "element": "scale_and_mix",
+          "fact_id": "sm-10",
+          "metric_index": 1,
+          "name": "内部抵销数—营业成本",
+          "raw_value": "-5,112,442,585.44",
+          "old_value": "-5,112,442,585.44",
+          "local_candidate_value": "-5112442585.44",
+          "unit": "元",
+          "period": "2025年"
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "cc-01",
+          "metric_index": 0,
+          "name": "线下销售—营业收入",
+          "raw_value": "8,551,183,450.72",
+          "old_value": "8,551,183,450.72",
+          "local_candidate_value": "8551183450.72",
+          "unit": "元",
+          "period": "2025年"
+        },
+        {
+          "element": "customers_channels_markets",
+          "fact_id": "cc-01",
+          "metric_index": 2,
+          "name": "线上销售—营业收入",
+          "raw_value": "3,845,992,862.79",
+          "old_value": "3,845,992,862.79",
+          "local_candidate_value": "3845992862.79",
+          "unit": "元",
+          "period": "2025年"
+        }
+      ],
+      "existing_automatic_final": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/601098.SH/run/automatic-final-api.json",
+      "existing_automatic_final_sha256": "97225ae203e08239cf2e37d8d2c6fca1d45d96951ddbbd50513a79b8efcae686",
+      "delivery_action": "None: preserve existing source-reviewed final, no merge or duplicate revenue additions"
+    }
+  ],
+  "changed_application_files_vs_original_freeze": {
+    "/home/python/Quote/research/company_profile/workpaper_metric_format.py": {
+      "original_sha256": "99722cd5938818f73ba3bb093e76965c15d1662f27d5f12a4df89152a1896bec",
+      "current_sha256": "cbec8943722bfa05c4bf88a770f1cddba64225fbf2d894471be896a93d755df4"
+    }
+  },
+  "files_sha256": {
+    "research/company_profile/workpaper_metric_format.py": "cbec8943722bfa05c4bf88a770f1cddba64225fbf2d894471be896a93d755df4",
+    "tests/unit/test_research/test_company_profile_grouped_metric_format.py": "28a47e8f22667f055eae465cf80d613e54c129ec808fe2323e0f3642dad8f33a"
+  },
+  "candidate_disposition": {
+    "label": "local controlled replay, not newly source-reviewed/accepted by a model",
+    "affected_facts": 18,
+    "grouped_values": 24,
+    "main_delivery_writes": 0,
+    "current_final_unchanged": true,
+    "no_double_counting": "Existing automatically reviewed finals already restored company/major revenue under their own omission IDs. Do not overlay these old recovered candidates onto the current release or count them as newly gained facts. All local recovered SC-01..05, CC-01..02, sm/cc facts remain unreviewed candidates for independent A inspection.",
+    "original_rejections": "The sealed first-api gaps, original v2 runtime records, raw response_payload/raw_content, receipt hashes and first/post-review scores remain untouched. Original extraction transport contract was accepted, while local fact-level metric validation rejected these grouped values; those are distinct.",
+    "repair_evidence": "No actual repair response in these 20 saved companies contained grouped value strings. The original 002463 repair reply (already plain value, grouped raw) was replayed unmodified as control. A separately labelled controlled variant changed five repair values to their source-native grouped spelling, recomputed that variant's hash and never presented it as original model bytes. Both used the saved original packet/initial-review targets through review_workpaper; no old final was consumed.",
+    "repair_final_guard": "Offline final boundary raises a controlled deadline; source-bound proposals remain verification_failed, rejected ones remain repair_rejected in audit, no corrected_pending_trust/new final model_source_check delivery."
+  },
+  "verification": [
+    {
+      "command": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_grouped_metric_format.py tests/unit/test_research/test_company_profile_metric_format.py tests/unit/test_research/test_company_profile_repair_format_integration.py --basetemp /home/python/Quote/data/QuoteBak/company-profile-6fy-b1-diagnosis-ozuQxOVj/grouped-targeted",
+      "result": "96 passed in 38.20s; exit 0, before adding six extra saved-repair negatives; application SHA256 unchanged afterward",
+      "covers": "Proper grouping/sign/fraction, raw agreement, old policy rejection, malformed value/raw/scientific notation/line joins, typed fields, explicit cited monetary-unit/sign/value/evidence/coordinate checks; both actual source PDFs/packet reconstruction/extraction callers, saved repair and local variant; related v1/v2 extraction/repair compatibility."
+    },
+    {
+      "command": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_grouped_metric_format.py -k saved_real_repair --basetemp /home/python/Quote/data/QuoteBak/company-profile-6fy-b1-diagnosis-ozuQxOVj/repair-negative-corrected",
+      "result": "8 passed, 40 deselected in 9.84s; exit 0 on final test SHA256",
+      "covers": "Exact original repair, controlled grouped variant, and wrong value/sign/unit/group/raw/unknown-evidence variants. Invalid candidates do not reach final; independent valid candidates survive; receipts retained, no old final adoption."
+    },
+    {
+      "result": "102 distinct targeted cases passed across these two checks (2 repair controls overlap), no whole-suite run",
+      "static": "git diff --check passed",
+      "protection": "All 393 files in a-original-run-seal.json match. Among the frozen application's files_sha256, only workpaper_metric_format.py changed."
+    }
+  ],
+  "finite_review": {
+    "status": "complete; no known remaining P0-P3 defect in this mechanical-format change",
+    "scope": "Numeric grammar/raw-unit equivalence, exact sign/precision preservation, v2/no-policy isolation, both caller source checks, unchanged original responses and no borrowing old final.",
+    "test_development_notes": "New tests were corrected to put an explicit monetary header on the same numeric fragment for a definite unit conflict, and to count verification_failed targets rather than rejected revised_fact objects retained for audit. No existing test expectation was changed."
+  },
+  "invariants": {
+    "real_model_calls": 0,
+    "paid_reruns": 0,
+    "sample_reruns": 0,
+    "main_database_or_research_root_writes": 0,
+    "service_changes": 0,
+    "git_mutations": 0,
+    "frozen_operator_config_and_A_B_files": "not edited",
+    "old_dirty20_and_original39": "not edited",
+    "old_scores": "not rescored; original cohort denominators/results remain their original version",
+    "source_refs_and_sealed_execution": "unchanged",
+    "changes_owned": "one application file + new test_company_profile_grouped_metric_format.py + this self-check"
+  },
+  "cleanup": {
+    "prior_roots": "Previous B1 6FX roots already removed; no parallel/unknown root deleted.",
+    "own_root": "/home/python/Quote/data/QuoteBak/company-profile-6fy-b1-diagnosis-ozuQxOVj",
+    "state": "all verification completed; after final file/hash/path checks, removed this exact B1 root and 152 KiB of regenerable pytest intermediate artifacts. No parallel root, source reference, original result, old dirty or production data removed; this self-check is the one retained B1 evidence entry",
+    "shared_caches": "existing valid PDF/tool caches retained; no formal source or reference copy created"
+  },
+  "business_role_review_followup": {
+    "task": "6.FY",
+    "phase": "post-seal common correction 2 of at most 2; final correction in this card",
+    "state": "role_policy_engineering_verified; semantic_effect_unmeasured",
+    "root_cause_authority": "A independently checked 601156 first/final C3 and the actually sent source34 trade table/source32 trade costs/source24 sales network. This is a missed material mixed service/trading business role, not missing source or optional supply-chain detail. B1 did not re-audit the group.",
+    "policy": {
+      "flag": "workpaper_business_role_review_policy",
+      "value": "source_business_roles.v1",
+      "factory_parameter": "business_role_review_policy='source_business_roles.v1'",
+      "example": "workpaper_processing_identity(real=False, review=True, subject_scope_limits=True, business_role_review_policy='source_business_roles.v1')",
+      "direct_identity_alternative": "identity[BUSINESS_ROLE_REVIEW_FLAG] = BUSINESS_ROLE_REVIEW_POLICY",
+      "default": "None; the flag is absent from unflagged identities and from model-authored workpaper/schema fields",
+      "constants": "BUSINESS_ROLE_REVIEW_FLAG, BUSINESS_ROLE_REVIEW_POLICY, WORKPAPER_BUSINESS_ROLE_INSTRUCTIONS in workpaper.py",
+      "behavior": "One shared short instruction is appended only on the explicit flag to actual extraction, initial review, repair and final verification system messages. Selection/source scope and request sequence stay unchanged.",
+      "semantic_contract": "Within already supplied major revenue/cost/trade disclosures, retain material source-explicit product-sale/trading-spread, service-fee, agency/entrusted-operation, investment or other roles and their owning businesses. Service-industry titles do not turn trade into transport. Freight/procurement cost alone does not prove ownership or a trading role. No tail-row, source expansion, extra call or supply-chain requirement.",
+      "scope": "A model semantic policy only: no keyword detection, per-company judgment rule, threshold change or new framework.",
+      "identity": "Runtime _reading_policy includes the exact flag; enabled identities and actual extraction request hashes differ. Main v22/v16 prompt/schema versions are unchanged.",
+      "validation": "Unknown policy values reject before request at the factory and both actual callers."
+    },
+    "sealed_files": 393,
+    "sealed_mismatches": [],
+    "format_fix_files_still_match": true,
+    "source_hashes": {
+      "research/company_profile/workpaper.py": "68a04af9a341506d1af6b451033c004a94686d2a7d131e5a55152575b23edfb3",
+      "research/company_profile/workpaper_llm.py": "10f36927cc84aafb85083eb82baf55ed4b392d08002d65f4353f8420e46fc1ab",
+      "research/company_profile/workpaper_review.py": "56b37e7c4334fe2d99fe5d7e2654b56fb00ae546f183d61c8d80d794db0f92c3",
+      "research/company_profile/runtime.py": "079f398bb0b635e6f927d54be819532653696b330d721162156d9790d69c50c4",
+      "tests/unit/test_research/test_company_profile_business_role_review_policy.py": "91aaa4e344f1cce8f71289a8403727497fe34271c490e643273d25e50b0409c3"
+    },
+    "combined_changed_app_files_vs_original_freeze": {
+      "/home/python/Quote/research/company_profile/runtime.py": "079f398bb0b635e6f927d54be819532653696b330d721162156d9790d69c50c4",
+      "/home/python/Quote/research/company_profile/workpaper.py": "68a04af9a341506d1af6b451033c004a94686d2a7d131e5a55152575b23edfb3",
+      "/home/python/Quote/research/company_profile/workpaper_llm.py": "10f36927cc84aafb85083eb82baf55ed4b392d08002d65f4353f8420e46fc1ab",
+      "/home/python/Quote/research/company_profile/workpaper_metric_format.py": "cbec8943722bfa05c4bf88a770f1cddba64225fbf2d894471be896a93d755df4",
+      "/home/python/Quote/research/company_profile/workpaper_review.py": "56b37e7c4334fe2d99fe5d7e2654b56fb00ae546f183d61c8d80d794db0f92c3"
+    },
+    "legacy_hashes_before_role_edit": {
+      "messages": {
+        "extract": "2683dca2af755f6ea2324ae5e619a744dfa9597c1ab87e11485df10fda59efff",
+        "review": "6db270382eba676ac925d1a2b79759193888b21a1f5240d79019504e83f3155f",
+        "repair": "313d977adc7f758d8f70da4b473daf8de6c14904b69891156a93047d16fb67c9",
+        "final": "16d19666d1d01f66e52bc428c7e5e13c5f5d736387ee073b9564e42e879e522b"
+      },
+      "schemas": {
+        "extract": "199e826933e4cfa6bd7c07745a2cb7f18d148510649cf183f9daef4bf3b7b876",
+        "review": "e233b2cfdac6c81016f717af60acd768d4d0a53b93e875a94fdf39beb4bdb25f",
+        "repair": "53c182ff7bba714b27d74b4f98ace2f52b77096b2fffc88692970ea73434bfa4",
+        "final": "10b47ba18e02e4f236d84a1c1eaa4a0956f318901088d24718e929e4549054e5"
+      },
+      "identity": "e78699adad4b1661010c2ade7985190eaf35be5c320d6cb417739bc2bc94e9a4"
+    },
+    "verification": {
+      "command": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_business_role_review_policy.py tests/unit/test_research/test_company_profile_scope_review_index.py tests/unit/test_research/test_company_profile_model_subject_limits.py -k 'not original_runtime and not configured_original and not official_alias' --basetemp /home/python/Quote/data/QuoteBak/company-profile-6fy-b1-roles-3oA78pI9/role-targeted-final",
+      "result": "64 passed, 16 deselected in 21.67s; exit 0, including all 7 new role-policy cases",
+      "engineering_proof": "A nonempty controlled packet with source-explicit service and industrial-goods trading drives the actual gateway extraction/initial/one repair/final wires. All four get the same opt-in instruction; no A use-review answer, generation history or previous_profile marker is sent. Five physical ScriptedTransport replies include selection; no real request.",
+      "compatibility": "Unflagged default v22/v16 identity hash and all four instruction/schema hashes match the captured pre-edit values. The raw extraction's actual wire embeds its schema in the system message; review/repair/final use response_format. Same controlled responses preserve content/serialized field set and response attribution; enabled extraction has a distinct actual request hash.",
+      "no_semantic_claim": "The controlled repair/acceptance demonstrates wiring only, not that a model newly detected East China Airlines Logistics' missed trade business. No real company was rerun or newly scored.",
+      "static": "git diff --check passed for all four application edits"
+    },
+    "finite_review": {
+      "state": "complete; no known remaining blocking defect in this scoped policy wiring",
+      "code_diff": "4 existing app files, 34 insertions/1 deletion; a new direct-test file. No other business file changed in correction 2.",
+      "corrected_test_assumptions": "Only the new tests were adjusted to inspect the actual schema-in-system raw extraction transport, and to expect a new request hash when system instructions differ. Existing tests were unchanged.",
+      "stop": "This is correction 2/2. No third root cause, broader suite, new company, new model call, terminal-window recovery or platform work will be pursued in this card."
+    },
+    "results_kept_separate": {
+      "correction1": "Saved numeric-format consumption verified locally by the preceding 102 distinct targeted cases; original first-run gaps and scores retained. That implementation/test snapshot is unchanged.",
+      "correction2": "Business-role prompt policy engineering verified; real semantic effect remains unmeasured pending a separately authorized future identity/run.",
+      "current_delivery": "No new release, no overlay of controlled replies or old format candidates, no old-final borrowing and no original20/39 content/score change."
+    },
+    "boundaries": {
+      "real_model_calls": 0,
+      "paid_reruns": 0,
+      "new_companies": 0,
+      "terminal_window_recovery": 0,
+      "main_database_or_research_root_writes": 0,
+      "service_changes": 0,
+      "git_mutations": 0,
+      "frozen_operator_config_A_B_and_old_dirty": "not edited",
+      "sealed_originals": "all 393 original execution/raw files still match the original A seal"
+    },
+    "cleanup": {
+      "own_root": "/home/python/Quote/data/QuoteBak/company-profile-6fy-b1-roles-3oA78pI9",
+      "preflight": "previous grouped-format B1 root was already removed; parallel A/B roots and unknown files were preserved",
+      "state": "all tests/review complete; after final JSON/hash/path checks, removed this exact B1 root and 16 KiB of regenerable test artifacts. No parallel root or source/original/old dirty content removed. This appended section is the only retained role-policy handoff."
+    }
+  },
+  "final_source_semantic_alignment": {
+    "task": "6.FY",
+    "correction": "2/2 final pre-freeze consolidation of the same opt-in policy; not a third correction",
+    "state": "source_semantic_alignment_engineering_verified; real_semantic_effect_unmeasured",
+    "contract": {
+      "flag": "workpaper_business_role_review_policy",
+      "value": "source_business_roles.v1",
+      "field_renamed": false,
+      "factory_parameter": "business_role_review_policy='source_business_roles.v1'",
+      "scope_label": "source semantic alignment (the existing business-role policy now also aligns time, read scope, compound citations and direction)",
+      "versioning": "Same final pre-freeze opt-in version; no v17, schema update, new payload field, priority/index layer or extra call.",
+      "shared_instruction": "WORKPAPER_BUSINESS_ROLE_INSTRUCTIONS is the single appended block in extraction, initial review, repair and final verification. Default/no-flag messages remain byte-identical.",
+      "rules": [
+        "Use already supplied main-business revenue/cost/trade source to retain each material source-explicit earning role and its business; no ownership/trade inference from freight or procurement cost.",
+        "Check fact.period independently of report year and metric.period; preserve actual versus plan/outlook, event time and conditions in both text and structured period.",
+        "Unselected/unfound information is unknown within selected scope; do not assert full-report nondisclosure.",
+        "Every substantive clause of a compound assertion needs its cited source, including governing headers and continuation pages.",
+        "Preserve direction/sign/unit/comparison basis. A positive decrease magnitude must explicitly retain decrease rather than generic unsigned change. If unsafe to normalize, preserve raw, value=null and a specific reason; no guessed sign or known false assertion hidden as unknown."
+      ],
+      "reuse": "The period rule and direction/comparison/read-scope constraints were condensed from the existing FACT_SCOPE_INSTRUCTIONS/REVIEW_INSTRUCTIONS into this one shared block for the low-cost extraction and the three later stages. Those old unflagged instruction constants are unchanged.",
+      "boundary": "No exhaustive tail rows, extra source/read/call, supply-chain completion, program semantic regex, per-company rule or new feature."
+    },
+    "A_supplied_assessment_context": {
+      "attribution": "A's independent completed audit; recorded as context, not recomputed or claimed as B1 validation",
+      "first_correct": 394,
+      "first_audited": 400,
+      "first_support_percent": 98.5,
+      "threshold_percent": 99,
+      "gap_percentage_points": 0.5,
+      "post_review_supported": 417,
+      "post_review_audited": 417,
+      "first_error_categories": "two actual/plan period errors, one missing page for compound citation, two full-report nondisclosure assertions beyond selected source, one lost decline direction",
+      "core_omission": "one East China Airlines Logistics question missed the service + goods-trading earning role",
+      "unchanged": "Original cohort scores/denominators, first/post-review results and sealed sources remain unchanged; no new claim that the policy closes this measured gap."
+    },
+    "latest_source_hashes": {
+      "research/company_profile/workpaper.py": "1fbf42d2239b1b6155001e48a5da76745419880d207484d9365950d70d0004f2",
+      "research/company_profile/workpaper_llm.py": "10f36927cc84aafb85083eb82baf55ed4b392d08002d65f4353f8420e46fc1ab",
+      "research/company_profile/workpaper_review.py": "56b37e7c4334fe2d99fe5d7e2654b56fb00ae546f183d61c8d80d794db0f92c3",
+      "research/company_profile/runtime.py": "079f398bb0b635e6f927d54be819532653696b330d721162156d9790d69c50c4",
+      "tests/unit/test_research/test_company_profile_business_role_review_policy.py": "d016027aa5ba96657f436ed4966f1e14d32f1a4316e3a78d7ca8415002d2035f"
+    },
+    "snapshot_relation": "These are the final authoritative strategy-2 hashes. The earlier role-only source_hashes/64-pass result above describe the pre-consolidation engineering snapshot and are retained as history. Only workpaper.py's new shared block and its new direct-test module changed in this consolidation; llm/review/runtime hooks retain their previous hashes.",
+    "verification": {
+      "command": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_business_role_review_policy.py --basetemp /home/python/Quote/data/QuoteBak/company-profile-6fy-b1-alignment-JWL1KhwI/final-alignment",
+      "result": "7 passed in 5.34s; exit 0 on latest_source_hashes",
+      "actual_wire": "Nonempty controlled packet contains source-native mixed service/trading business, next-year plan and an explicit decline plus two evidence pages. All four actual system messages contain the same complete opt-in instruction. Unknown policy rejects before send; no A answer or previous_profile enters the user payload.",
+      "compatibility": "No-flag v22/v16 four system-message hashes, four wire-schema hashes and default identity hash match pre-policy baseline. Enabled and no-flag variants use identical user payloads/response schemas and five ScriptedTransport calls including unchanged selection. New instruction has its own actual request hash.",
+      "no_new_semantic_measurement": "Same scripted answers exercise the original extraction/review/one repair/final pipeline. They do not prove a model detects these six actual errors or the omitted business role.",
+      "static": "git diff --check passed; no old/frozen tests changed"
+    },
+    "protection": {
+      "original_run_seal_files": 393,
+      "original_run_seal_mismatches": 0,
+      "correction1_format_implementation_and_tests": "exact hashes preserved",
+      "old_dirty20_original39_A_B_operator_configs_and_source_references": "untouched",
+      "real_model_calls": 0,
+      "paid_reruns": 0,
+      "new_company_runs": 0,
+      "terminal_window_recovery": 0,
+      "main_database_or_research_root_writes": 0,
+      "service_changes": 0,
+      "git_mutations": 0
+    },
+    "review": "Focused finite review complete: one short shared model instruction, no contradictory full-report nondisclosure or unsigned-direction allowance, existing schema and opt-in boundaries intact. No known remaining blocker within this wiring change.",
+    "completion": "Strategy 2 is consolidated and ready for A final freeze. No third problem, new feature or broader suite is pursued in this card. Numeric-format consumption remains locally verified; source-semantic policy real effectiveness awaits a future separately authorized run.",
+    "cleanup": {
+      "own_root": "/home/python/Quote/data/QuoteBak/company-profile-6fy-b1-alignment-JWL1KhwI",
+      "state": "direct tests and finite review complete; removed this exact B1 root and 4 KiB of regenerable test artifacts after final JSON/source-hash/path checks. No parallel/unknown root or source/original/dirty content touched; this appended self-check is the sole retained consolidation evidence"
+    }
+  }
+}

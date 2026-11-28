@@ -1,0 +1,185 @@
+{
+  "method": "6FY-20261128.audit-bindings.v1",
+  "seed": "6FY-20261128",
+  "frozen_at_utc": "2026-11-28T10:18:40.095175+00:00",
+  "fixed_company_denominator": 20,
+  "supplement_target_per_company_phase": 20,
+  "supplier_requests": 0,
+  "new20_outputs_read": false,
+  "files": {
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/b-audit-method.md": "6f0bf08b5de3e701c87373f48d1ae9136b96b311c03224769c9420162cd6a38a",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/b-audit-bindings.py": "83855f827e495b4550636b0fffbd86ab55b4c4ce0ef8f3169001ac514fc756ee",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/b2-final20-metadata.json": "59a6ed50cd96b66030d6dccdbd93b392ddb6b9bb7a46e836a44aab25ba51007e",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/company-profile-prospective20-closeout-card.md": "744aad1a147774077e8e4eee8ea82f09178495add77514d30c640aae5537e6d8",
+    "/home/python/Quote/docs/development/company_profile_acceptance_program.md": "6c35d48d747334d591a05771103968f4e9660f5e8a8e9164d61a88d1591f3276",
+    "/home/python/Quote/docs/development/ab_role_development_workflow.md": "6e6e06b2a0d8c6eea99128b712fc41d089cf120fd3039979fa0b1a3de3162ecb",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-version-acceptance-20261125/audit-counts.py": "0c14c98734272af51f2a5ce1c082e817aea259726ed4aeffab9f6ad3c2e99cd7",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-quality-closure-20261127/b-layers.py": "b788681c58710e1f0a1a289085dd9135c841415b4315329f42217da14344595e",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-current-quality-closure-20261127/b-freeze.py": "f192d3cb59c490cc9a5f46db729e158e2a8270618757194ca6bd5dee2a1b0c2d",
+    "/home/python/Quote/research/company_profile/reads.py": "6ae23b97d42ca3eb29ceaecbb1af0f87e0fde0b3b8da9ddd7ab88d5a2b968aee",
+    "/home/python/Quote/research/company_profile/workpaper.py": "66cd72a62391d5899f905385d4853eebd449128f728d2d93d75c2dd3ceba70a8",
+    "/home/python/Quote/research/company_profile/workpaper_delivery.py": "b8067b76ee464352e8041720efdbeed1915cb86ca90ca24d0b0cbd02e26dd066"
+  },
+  "companies": [
+    {
+      "instrument_id": "920022.BJ",
+      "group": "manufacturing",
+      "content_hash": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+      "asset_id": "asset_2e5f514bffd07480b7f0b9e0630fff50",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "汽车"
+    },
+    {
+      "instrument_id": "002050.SZ",
+      "group": "manufacturing",
+      "content_hash": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+      "asset_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "家用电器"
+    },
+    {
+      "instrument_id": "002463.SZ",
+      "group": "manufacturing",
+      "content_hash": "9810736ee50d0fa7f4d8e8370e3965bde8e24c6dbafb86593ae2206b0e2f2f15",
+      "asset_id": "asset_d7a03e75f0f1df7da2aa6c9916df9876",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "电子"
+    },
+    {
+      "instrument_id": "920026.BJ",
+      "group": "manufacturing",
+      "content_hash": "01c7633ee247fcdba006c7007279cf005c92fa90f9638b9ab3e3ed676819aac0",
+      "asset_id": "asset_f4fa41361dd47fbdc06b4440c21ef850",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "机械设备"
+    },
+    {
+      "instrument_id": "603605.SH",
+      "group": "manufacturing",
+      "content_hash": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+      "asset_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "美容护理"
+    },
+    {
+      "instrument_id": "601000.SH",
+      "group": "services",
+      "content_hash": "2a609f967dbcd75e6db696a1aa4ac10a205a5c12c02ca974b55ccedf72f307dc",
+      "asset_id": "asset_05afecec40bdda51a6b46f441d753ea6",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "交通运输"
+    },
+    {
+      "instrument_id": "603128.SH",
+      "group": "services",
+      "content_hash": "0078292f91a3db98fa4775ef034e8c3fed91d1f9cb1cbab10042af459c1b51a9",
+      "asset_id": "asset_7518383adf74a4155a170773687fba8d",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "交通运输"
+    },
+    {
+      "instrument_id": "601098.SH",
+      "group": "services",
+      "content_hash": "fabeb17501c137f39808941adbb18c609d32378680ed48619cd497470b330c31",
+      "asset_id": "asset_f5a0ad28ad8eedb3bbde6cb160e18f32",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "传媒"
+    },
+    {
+      "instrument_id": "601156.SH",
+      "group": "services",
+      "content_hash": "6d08e7c785f8bf5928dbbc836391371f25829c243f3632eb21df8722b8e8ec8f",
+      "asset_id": "asset_68e2aa10f4e8009cd5cab07da39f4fde",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "交通运输"
+    },
+    {
+      "instrument_id": "600717.SH",
+      "group": "services",
+      "content_hash": "3dd77ce66d89bead987859aef3c5603bd1259610088cf333512a2a3d05d86c6b",
+      "asset_id": "asset_838a86dabc181e3338d533cc80309e72",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "交通运输"
+    },
+    {
+      "instrument_id": "600928.SH",
+      "group": "financial",
+      "content_hash": "5e7e3a0dc6c35485036e644301b534063c0ce91135009914c3d3901999086fd3",
+      "asset_id": "asset_783b1cb6e834e3d0f350cb9dfea14f91",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "银行"
+    },
+    {
+      "instrument_id": "601336.SH",
+      "group": "financial",
+      "content_hash": "4a5d6ee54dc0a351acac6d9d3ce1d0eee6d4a388c4c36c1668a35d5ffd35c528",
+      "asset_id": "asset_7dfa55216253948350c368466383da45",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "非银金融"
+    },
+    {
+      "instrument_id": "601108.SH",
+      "group": "financial",
+      "content_hash": "63bb7caf8956deba2fe39f5438621800088899d67457c185a39d6c2246f79695",
+      "asset_id": "asset_0fa677a8678e4005a0235b6e151281d7",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "非银金融"
+    },
+    {
+      "instrument_id": "601665.SH",
+      "group": "financial",
+      "content_hash": "7183e2ae4f91a46501edf0c63ed2f1acc88547a6cdf0123b1b03ec903702e61e",
+      "asset_id": "asset_012924a1b677d39c525c9de7b7543720",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "银行"
+    },
+    {
+      "instrument_id": "002807.SZ",
+      "group": "financial",
+      "content_hash": "bc20e3bc2a713890677446cd6926564cb3de6f01ac36a6866d0f3ac1b91b61b0",
+      "asset_id": "asset_8c79bf64980c9cebac879534a3ffdcb0",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "银行"
+    },
+    {
+      "instrument_id": "002316.SZ",
+      "group": "multiple_businesses",
+      "content_hash": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+      "asset_id": "asset_51dbcb7ce298d116e99386647b1e3e06",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "综合"
+    },
+    {
+      "instrument_id": "002420.SZ",
+      "group": "multiple_businesses",
+      "content_hash": "617bc07cfe9f3dee2312e8e6964c2368850b608fa7418e71826398cbb1903d6c",
+      "asset_id": "asset_ccde43acecd1a42f8e0b148dab51c771",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "综合"
+    },
+    {
+      "instrument_id": "002575.SZ",
+      "group": "multiple_businesses",
+      "content_hash": "e4ab21072b7da70251a833b13da381e215f24f65be67f71a760c815a1a6e7a81",
+      "asset_id": "asset_3abf8b3c8e26653471bfe64b314ee2c7",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "综合"
+    },
+    {
+      "instrument_id": "600673.SH",
+      "group": "multiple_businesses",
+      "content_hash": "a8e2a13be86d3b3cad6dea2ac88b4ecc13e1057547c54621b6b81404f6fbfaad",
+      "asset_id": "asset_4b05523b416316179584e2ec85c78e7b",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "综合"
+    },
+    {
+      "instrument_id": "600881.SH",
+      "group": "multiple_businesses",
+      "content_hash": "e45fee819475041f70b3abf4adadbf4a377318898e4d2d63c249be5051ccb8e9",
+      "asset_id": "asset_563496df61bcae7d8457c1edbd228a5a",
+      "report_period": "2025-12-31",
+      "sw_l1_name": "综合"
+    }
+  ]
+}

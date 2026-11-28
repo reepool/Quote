@@ -1,0 +1,2651 @@
+{
+  "schema_version": "company_profile_research_api.v1",
+  "instrument_id": "601108.SH",
+  "report": {
+    "instrument_id": "601108.SH",
+    "report_id": "asset_8636962f35a032b88c9fc1a170fde9a5",
+    "document_version": "63bb7caf8956deba2fe39f5438621800088899d67457c185a39d6c2246f79695",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-24T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "base_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+  "latest_reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+  "readings": [
+    {
+      "work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "workpaper_sha256": "aa6335f9e8df83a9ad168055a20b379b535d40074f99a77ea8e4e30479717d0e",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_execution": "deferred",
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0051",
+            "section_path": [
+              "第二节 公司简介和主要财务指标",
+              "八、近三年主要会计数据和财务指标"
+            ],
+            "start_page": 26,
+            "end_page": 28,
+            "rationale": "已选六个互不重叠的子节：0051提供近三年主要会计数据和财务指标，给出公司总量规模与盈利概览；0070完整列出财富管理、信用、投行、自营、私募/另类、资管、基金、期货、国际化等业务及服务对象；0082与0086覆盖报告期各业务线经营讨论和实际变化；0099汇总主要经营情况及利润表/收入成本分析；0104提供主营业务分行业收入、成本与毛利构成，用于解释收入来源和业务权重。未选行业泛化、治理、债券、会计报表附注等，因公司层面业务与收入解释已闭合。"
+          },
+          {
+            "section_id": "section-0070",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "一、报告期内公司从事的业务情况"
+            ],
+            "start_page": 37,
+            "end_page": 37,
+            "rationale": "已选六个互不重叠的子节：0051提供近三年主要会计数据和财务指标，给出公司总量规模与盈利概览；0070完整列出财富管理、信用、投行、自营、私募/另类、资管、基金、期货、国际化等业务及服务对象；0082与0086覆盖报告期各业务线经营讨论和实际变化；0099汇总主要经营情况及利润表/收入成本分析；0104提供主营业务分行业收入、成本与毛利构成，用于解释收入来源和业务权重。未选行业泛化、治理、债券、会计报表附注等，因公司层面业务与收入解释已闭合。"
+          },
+          {
+            "section_id": "section-0082",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "三、经营情况讨论与分析"
+            ],
+            "start_page": 37,
+            "end_page": 41,
+            "rationale": "已选六个互不重叠的子节：0051提供近三年主要会计数据和财务指标，给出公司总量规模与盈利概览；0070完整列出财富管理、信用、投行、自营、私募/另类、资管、基金、期货、国际化等业务及服务对象；0082与0086覆盖报告期各业务线经营讨论和实际变化；0099汇总主要经营情况及利润表/收入成本分析；0104提供主营业务分行业收入、成本与毛利构成，用于解释收入来源和业务权重。未选行业泛化、治理、债券、会计报表附注等，因公司层面业务与收入解释已闭合。"
+          },
+          {
+            "section_id": "section-0086",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "37.71 万亿元，证券公司及其子公司私募资产管理产品规模人民币 6.44 万亿元 ( 中国证券基金业协会 )，行业“马太效应”"
+            ],
+            "start_page": 41,
+            "end_page": 42,
+            "rationale": "已选六个互不重叠的子节：0051提供近三年主要会计数据和财务指标，给出公司总量规模与盈利概览；0070完整列出财富管理、信用、投行、自营、私募/另类、资管、基金、期货、国际化等业务及服务对象；0082与0086覆盖报告期各业务线经营讨论和实际变化；0099汇总主要经营情况及利润表/收入成本分析；0104提供主营业务分行业收入、成本与毛利构成，用于解释收入来源和业务权重。未选行业泛化、治理、债券、会计报表附注等，因公司层面业务与收入解释已闭合。"
+          },
+          {
+            "section_id": "section-0099",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "五、报告期内主要经营情况"
+            ],
+            "start_page": 44,
+            "end_page": 45,
+            "rationale": "已选六个互不重叠的子节：0051提供近三年主要会计数据和财务指标，给出公司总量规模与盈利概览；0070完整列出财富管理、信用、投行、自营、私募/另类、资管、基金、期货、国际化等业务及服务对象；0082与0086覆盖报告期各业务线经营讨论和实际变化；0099汇总主要经营情况及利润表/收入成本分析；0104提供主营业务分行业收入、成本与毛利构成，用于解释收入来源和业务权重。未选行业泛化、治理、债券、会计报表附注等，因公司层面业务与收入解释已闭合。"
+          },
+          {
+            "section_id": "section-0104",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "主营业务分行业情况"
+            ],
+            "start_page": 45,
+            "end_page": 46,
+            "rationale": "已选六个互不重叠的子节：0051提供近三年主要会计数据和财务指标，给出公司总量规模与盈利概览；0070完整列出财富管理、信用、投行、自营、私募/另类、资管、基金、期货、国际化等业务及服务对象；0082与0086覆盖报告期各业务线经营讨论和实际变化；0099汇总主要经营情况及利润表/收入成本分析；0104提供主营业务分行业收入、成本与毛利构成，用于解释收入来源和业务权重。未选行业泛化、治理、债券、会计报表附注等，因公司层面业务与收入解释已闭合。"
+          }
+        ],
+        "unread_or_deferred": [
+          "行业格局与宏观背景的泛化描述",
+          "公司治理、董事薪酬、ESG/公益等非经营主线",
+          "债券、可转债及募集资金专题",
+          "财务报表附注中的会计政策与科目明细",
+          "物理页28布局未恢复；选中章节的布局边界为空或顺序异常；仅保留共享原生文本，表格列关系未核定，不猜列、金额或表头对应。",
+          "物理页38布局未恢复；原生文本也不可读，本页未读，不等于未披露。",
+          "物理页40布局未恢复；原生文本也不可读，本页未读，不等于未披露。"
+        ],
+        "selection_rationale": "已选六个互不重叠的子节：0051提供近三年主要会计数据和财务指标，给出公司总量规模与盈利概览；0070完整列出财富管理、信用、投行、自营、私募/另类、资管、基金、期货、国际化等业务及服务对象；0082与0086覆盖报告期各业务线经营讨论和实际变化；0099汇总主要经营情况及利润表/收入成本分析；0104提供主营业务分行业收入、成本与毛利构成，用于解释收入来源和业务权重。未选行业泛化、治理、债券、会计报表附注等，因公司层面业务与收入解释已闭合。",
+        "stop_reason": "已覆盖公司业务结构、产品服务、收入来源与分行业构成、经营规模及本期变化；继续扩展只会进入行业背景、治理、债券或附注细节，边际解释力低，故停止。",
+        "transcription_version": "shared-pdf-layout-with-native-fallback.structured-notes.v3"
+      },
+      "limitations": [
+        "仅基于选定章节；物理页28布局未恢复，物理页38、40原生文本不可读，未读/未获取成功不等于未披露。",
+        "未对未披露客户、供应商或金额作推断；本底稿不构成完整性或审批结论。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-28.subject-relationships.v22",
+        "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-e87eafc5cf10236c1a8b2ae0:workpaper:sections",
+          "request_hash": "37300ae6b26e309c2e6248a7d55f0b60ff669c81f0cce891350b95c7ce15866e",
+          "response_hash": "f41dc8d62d77854e3244fe48917089452526013ba31a6861980d7fe9515eb5af",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 28021,
+            "output_tokens": 6824,
+            "total_tokens": 34845
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 985,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0025",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0031",
+            "section-0032",
+            "section-0033",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0043",
+            "section-0048",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0069",
+            "section-0070",
+            "section-0071",
+            "section-0072",
+            "section-0073",
+            "section-0074",
+            "section-0075",
+            "section-0076",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0080",
+            "section-0081",
+            "section-0082",
+            "section-0083",
+            "section-0084",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0088",
+            "section-0089",
+            "section-0090",
+            "section-0091",
+            "section-0092",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0099",
+            "section-0100",
+            "section-0101",
+            "section-0102",
+            "section-0104",
+            "section-0105",
+            "section-0109",
+            "section-0110",
+            "section-0115",
+            "section-0116",
+            "section-0117",
+            "section-0118",
+            "section-0119",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0134",
+            "section-0135",
+            "section-0136",
+            "section-0137",
+            "section-0138",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0149",
+            "section-0150",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0160",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0209",
+            "section-0210",
+            "section-0211",
+            "section-0212",
+            "section-0213",
+            "section-0214",
+            "section-0215",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0246",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0302",
+            "section-0303",
+            "section-0304",
+            "section-0305",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0310",
+            "section-0311",
+            "section-0312",
+            "section-0313",
+            "section-0314",
+            "section-0315",
+            "section-0316",
+            "section-0317",
+            "section-0318",
+            "section-0319",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0330",
+            "section-0331",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0343",
+            "section-0344",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0365",
+            "section-0366",
+            "section-0367",
+            "section-0368",
+            "section-0369",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0373",
+            "section-0374",
+            "section-0375",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0383",
+            "section-0384",
+            "section-0385",
+            "section-0386",
+            "section-0387",
+            "section-0388",
+            "section-0389",
+            "section-0390",
+            "section-0391",
+            "section-0392",
+            "section-0393",
+            "section-0394",
+            "section-0395",
+            "section-0396",
+            "section-0397",
+            "section-0398",
+            "section-0399",
+            "section-0400",
+            "section-0403",
+            "section-0405",
+            "section-0409",
+            "section-0410",
+            "section-0411",
+            "section-0412",
+            "section-0413",
+            "section-0414",
+            "section-0415",
+            "section-0416",
+            "section-0417",
+            "section-0418",
+            "section-0419",
+            "section-0420",
+            "section-0421",
+            "section-0422",
+            "section-0423",
+            "section-0424",
+            "section-0425",
+            "section-0426",
+            "section-0427",
+            "section-0431",
+            "section-0433",
+            "section-0434",
+            "section-0435",
+            "section-0438",
+            "section-0439",
+            "section-0440",
+            "section-0441",
+            "section-0442",
+            "section-0443",
+            "section-0444",
+            "section-0445",
+            "section-0446",
+            "section-0447",
+            "section-0448",
+            "section-0449",
+            "section-0450",
+            "section-0451",
+            "section-0452",
+            "section-0453",
+            "section-0454",
+            "section-0455",
+            "section-0456",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0461",
+            "section-0462",
+            "section-0463",
+            "section-0464",
+            "section-0465",
+            "section-0472",
+            "section-0473",
+            "section-0474",
+            "section-0475",
+            "section-0476",
+            "section-0477",
+            "section-0478",
+            "section-0479",
+            "section-0480",
+            "section-0481",
+            "section-0482",
+            "section-0483",
+            "section-0484",
+            "section-0485",
+            "section-0486",
+            "section-0487",
+            "section-0488",
+            "section-0489",
+            "section-0490",
+            "section-0491",
+            "section-0492",
+            "section-0493",
+            "section-0494",
+            "section-0495",
+            "section-0496",
+            "section-0497",
+            "section-0498",
+            "section-0499",
+            "section-0500",
+            "section-0501",
+            "section-0502",
+            "section-0503",
+            "section-0504",
+            "section-0505",
+            "section-0506",
+            "section-0507",
+            "section-0508",
+            "section-0509",
+            "section-0510",
+            "section-0511",
+            "section-0512",
+            "section-0513",
+            "section-0514",
+            "section-0515",
+            "section-0516",
+            "section-0517",
+            "section-0518",
+            "section-0519",
+            "section-0520",
+            "section-0521",
+            "section-0522",
+            "section-0523",
+            "section-0524",
+            "section-0525",
+            "section-0526",
+            "section-0527",
+            "section-0528",
+            "section-0529",
+            "section-0530",
+            "section-0531",
+            "section-0532",
+            "section-0533",
+            "section-0534",
+            "section-0535",
+            "section-0536",
+            "section-0537",
+            "section-0538",
+            "section-0539",
+            "section-0540",
+            "section-0541",
+            "section-0542",
+            "section-0543",
+            "section-0544",
+            "section-0545",
+            "section-0546",
+            "section-0547",
+            "section-0548",
+            "section-0549",
+            "section-0550",
+            "section-0551",
+            "section-0552",
+            "section-0553",
+            "section-0554",
+            "section-0555",
+            "section-0556",
+            "section-0557",
+            "section-0558",
+            "section-0559",
+            "section-0560",
+            "section-0561",
+            "section-0562",
+            "section-0563",
+            "section-0564",
+            "section-0565",
+            "section-0566",
+            "section-0567",
+            "section-0568",
+            "section-0569",
+            "section-0570",
+            "section-0571",
+            "section-0572",
+            "section-0573",
+            "section-0574",
+            "section-0575",
+            "section-0576",
+            "section-0577",
+            "section-0578",
+            "section-0579",
+            "section-0580",
+            "section-0581",
+            "section-0582",
+            "section-0583",
+            "section-0584",
+            "section-0585",
+            "section-0586",
+            "section-0587",
+            "section-0588",
+            "section-0589",
+            "section-0590",
+            "section-0591",
+            "section-0592",
+            "section-0593",
+            "section-0594",
+            "section-0595",
+            "section-0596",
+            "section-0597",
+            "section-0598",
+            "section-0599",
+            "section-0600",
+            "section-0601",
+            "section-0602",
+            "section-0603",
+            "section-0604",
+            "section-0605",
+            "section-0606",
+            "section-0607",
+            "section-0608",
+            "section-0609",
+            "section-0610",
+            "section-0611",
+            "section-0612",
+            "section-0613",
+            "section-0614",
+            "section-0615",
+            "section-0616",
+            "section-0617",
+            "section-0618",
+            "section-0619",
+            "section-0620",
+            "section-0621",
+            "section-0622",
+            "section-0623",
+            "section-0624",
+            "section-0625",
+            "section-0626",
+            "section-0629",
+            "section-0634",
+            "section-0635",
+            "section-0636",
+            "section-0637",
+            "section-0648",
+            "section-0649",
+            "section-0650",
+            "section-0651",
+            "section-0654",
+            "section-0657",
+            "section-0659",
+            "section-0661",
+            "section-0665",
+            "section-0667",
+            "section-0671",
+            "section-0672",
+            "section-0673",
+            "section-0676",
+            "section-0677",
+            "section-0678",
+            "section-0679",
+            "section-0680",
+            "section-0685",
+            "section-0686",
+            "section-0687",
+            "section-0688",
+            "section-0689",
+            "section-0692",
+            "section-0693",
+            "section-0694",
+            "section-0697",
+            "section-0698",
+            "section-0702",
+            "section-0705",
+            "section-0706",
+            "section-0707",
+            "section-0708",
+            "section-0709",
+            "section-0710",
+            "section-0711",
+            "section-0712",
+            "section-0715",
+            "section-0718",
+            "section-0719",
+            "section-0720",
+            "section-0721",
+            "section-0722",
+            "section-0723",
+            "section-0724",
+            "section-0725",
+            "section-0726",
+            "section-0727",
+            "section-0728",
+            "section-0729",
+            "section-0730",
+            "section-0731",
+            "section-0732",
+            "section-0733",
+            "section-0739",
+            "section-0740",
+            "section-0744",
+            "section-0749",
+            "section-0750",
+            "section-0753",
+            "section-0754",
+            "section-0755",
+            "section-0758",
+            "section-0760",
+            "section-0761",
+            "section-0763",
+            "section-0765",
+            "section-0766",
+            "section-0767",
+            "section-0771",
+            "section-0774",
+            "section-0775",
+            "section-0776",
+            "section-0777",
+            "section-0779",
+            "section-0782",
+            "section-0783",
+            "section-0784",
+            "section-0785",
+            "section-0787",
+            "section-0790",
+            "section-0791",
+            "section-0792",
+            "section-0793",
+            "section-0796",
+            "section-0798",
+            "section-0799",
+            "section-0800",
+            "section-0804",
+            "section-0807",
+            "section-0808",
+            "section-0809",
+            "section-0810",
+            "section-0812",
+            "section-0815",
+            "section-0816",
+            "section-0817",
+            "section-0818",
+            "section-0820",
+            "section-0822",
+            "section-0823",
+            "section-0824",
+            "section-0825",
+            "section-0830",
+            "section-0835",
+            "section-0837",
+            "section-0838",
+            "section-0839",
+            "section-0840",
+            "section-0841",
+            "section-0842",
+            "section-0843",
+            "section-0844",
+            "section-0846",
+            "section-0848",
+            "section-0849",
+            "section-0850",
+            "section-0851",
+            "section-0853",
+            "section-0855",
+            "section-0856",
+            "section-0857",
+            "section-0858",
+            "section-0860",
+            "section-0862",
+            "section-0863",
+            "section-0864",
+            "section-0868",
+            "section-0871",
+            "section-0872",
+            "section-0873",
+            "section-0874",
+            "section-0876",
+            "section-0879",
+            "section-0880",
+            "section-0881",
+            "section-0882",
+            "section-0884",
+            "section-0886",
+            "section-0887",
+            "section-0888",
+            "section-0889",
+            "section-0891",
+            "section-0892",
+            "section-0893",
+            "section-0894",
+            "section-0895",
+            "section-0896",
+            "section-0897",
+            "section-0898",
+            "section-0899",
+            "section-0900",
+            "section-0901",
+            "section-0902",
+            "section-0903",
+            "section-0904",
+            "section-0905",
+            "section-0906",
+            "section-0907",
+            "section-0908",
+            "section-0911",
+            "section-0917",
+            "section-0921",
+            "section-0924",
+            "section-0925",
+            "section-0926",
+            "section-0927",
+            "section-0928",
+            "section-0929",
+            "section-0932",
+            "section-0933",
+            "section-0934",
+            "section-0938",
+            "section-0943",
+            "section-0944",
+            "section-0945",
+            "section-0946",
+            "section-0947",
+            "section-0948",
+            "section-0950",
+            "section-0951",
+            "section-0952",
+            "section-0953",
+            "section-0955",
+            "section-0956",
+            "section-0957",
+            "section-0958",
+            "section-0959",
+            "section-0960",
+            "section-0961",
+            "section-0963",
+            "section-0964",
+            "section-0965",
+            "section-0966",
+            "section-0967",
+            "section-0970",
+            "section-0973",
+            "section-0974",
+            "section-0975",
+            "section-0977",
+            "section-0978",
+            "section-0981",
+            "section-0982",
+            "section-0983",
+            "section-0984",
+            "section-0987",
+            "section-0988",
+            "section-0989",
+            "section-0990",
+            "section-0991",
+            "section-0992",
+            "section-0993",
+            "section-0994",
+            "section-0995",
+            "section-0996",
+            "section-0997",
+            "section-0998",
+            "section-0999",
+            "section-1000",
+            "section-1001",
+            "section-1002",
+            "section-1003",
+            "section-1005",
+            "section-1006",
+            "section-1007",
+            "section-1008",
+            "section-1009",
+            "section-1010",
+            "section-1011",
+            "section-1012",
+            "section-1013",
+            "section-1014",
+            "section-1017",
+            "section-1018",
+            "section-1021",
+            "section-1022",
+            "section-1023",
+            "section-1024",
+            "section-1025",
+            "section-1026",
+            "section-1027",
+            "section-1028",
+            "section-1029",
+            "section-1030",
+            "section-1031",
+            "section-1032",
+            "section-1033",
+            "section-1036",
+            "section-1037",
+            "section-1041",
+            "section-1044",
+            "section-1046",
+            "section-1050",
+            "section-1051",
+            "section-1052",
+            "section-1055",
+            "section-1056",
+            "section-1057",
+            "section-1058",
+            "section-1061",
+            "section-1065",
+            "section-1066",
+            "section-1067",
+            "section-1068",
+            "section-1069",
+            "section-1070",
+            "section-1071",
+            "section-1072",
+            "section-1073",
+            "section-1074",
+            "section-1075",
+            "section-1076",
+            "section-1081",
+            "section-1082",
+            "section-1091",
+            "section-1092",
+            "section-1093",
+            "section-1094",
+            "section-1095",
+            "section-1096",
+            "section-1097",
+            "section-1098",
+            "section-1099",
+            "section-1102",
+            "section-1106",
+            "section-1107",
+            "section-1111",
+            "section-1112",
+            "section-1113",
+            "section-1114",
+            "section-1118",
+            "section-1119",
+            "section-1120",
+            "section-1121",
+            "section-1122",
+            "section-1125",
+            "section-1128",
+            "section-1129",
+            "section-1130",
+            "section-1131",
+            "section-1132",
+            "section-1133",
+            "section-1134",
+            "section-1135",
+            "section-1136",
+            "section-1137",
+            "section-1138",
+            "section-1139",
+            "section-1140",
+            "section-1141",
+            "section-1142",
+            "section-1143",
+            "section-1144",
+            "section-1145",
+            "section-1146",
+            "section-1147",
+            "section-1148",
+            "section-1149",
+            "section-1150",
+            "section-1151",
+            "section-1152",
+            "section-1153",
+            "section-1154",
+            "section-1155",
+            "section-1156",
+            "section-1157",
+            "section-1166",
+            "section-1170",
+            "section-1171",
+            "section-1172",
+            "section-1173",
+            "section-1176",
+            "section-1177",
+            "section-1178",
+            "section-1179",
+            "section-1180",
+            "section-1181",
+            "section-1182",
+            "section-1183",
+            "section-1186",
+            "section-1187",
+            "section-1188",
+            "section-1189",
+            "section-1190",
+            "section-1191",
+            "section-1193",
+            "section-1194",
+            "section-1197",
+            "section-1198",
+            "section-1201",
+            "section-1202",
+            "section-1203",
+            "section-1214",
+            "section-1215",
+            "section-1216",
+            "section-1217",
+            "section-1218",
+            "section-1219",
+            "section-1220",
+            "section-1222",
+            "section-1224",
+            "section-1225",
+            "section-1226",
+            "section-1227",
+            "section-1228",
+            "section-1230",
+            "section-1231",
+            "section-1232",
+            "section-1233",
+            "section-1234",
+            "section-1238",
+            "section-1241",
+            "section-1242",
+            "section-1244",
+            "section-1249",
+            "section-1251",
+            "section-1252",
+            "section-1253",
+            "section-1254",
+            "section-1256",
+            "section-1257",
+            "section-1258",
+            "section-1259",
+            "section-1260",
+            "section-1261",
+            "section-1262",
+            "section-1264",
+            "section-1265",
+            "section-1266",
+            "section-1267",
+            "section-1268",
+            "section-1270",
+            "section-1271",
+            "section-1272",
+            "section-1273",
+            "section-1274",
+            "section-1275",
+            "section-1276",
+            "section-1277",
+            "section-1278",
+            "section-1279",
+            "section-1282",
+            "section-1285",
+            "section-1286",
+            "section-1287",
+            "section-1288",
+            "section-1289",
+            "section-1290",
+            "section-1291",
+            "section-1292",
+            "section-1293",
+            "section-1294",
+            "section-1295",
+            "section-1296"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-e87eafc5cf10236c1a8b2ae0:workpaper:extract",
+          "request_hash": "b1bbca0ae37ba77def53868c4e4c3cac14359a19a916fd3e01461edf171d8147",
+          "response_hash": "3efd1dfb43c1590e92cb40974ae2a9b1225bfb70e94a75e988b1e2531399d495",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 12942,
+            "output_tokens": 22937,
+            "total_tokens": 35879
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0051",
+            "section-0070",
+            "section-0082",
+            "section-0086",
+            "section-0099",
+            "section-0104"
+          ],
+          "physical_pages": [
+            26,
+            27,
+            28,
+            37,
+            39,
+            41,
+            42,
+            44,
+            45
+          ]
+        }
+      },
+      "review_status": "not_reviewed",
+      "review_follow_up": {
+        "state": "planned",
+        "execution_started": false,
+        "next_purpose": "review_profile_workpaper",
+        "resume_mode": "review_saved_draft",
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 3,
+        "original_draft_sha256": "aa6335f9e8df83a9ad168055a20b379b535d40074f99a77ea8e4e30479717d0e",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_not_started"
+      },
+      "review_calls": [],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "63bb7caf8956deba2fe39f5438621800088899d67457c185a39d6c2246f79695",
+          "section_path": [
+            "第二节 公司简介和主要财务指标",
+            "八、近三年主要会计数据和财务指标"
+          ],
+          "physical_pages": [
+            26
+          ],
+          "source_spans": [
+            {
+              "page": 26,
+              "start": 6700,
+              "end": 12049,
+              "quote": "八、近三年主要会计数据和财务指标\n\n\n（一）主要会计数据\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             单位：元币种：人民币\n\n\n                                                           主要会计数据                                                                                                                              2025    年                                                                                                                     2024    年                                                                              本期比上年同期增减（%）                                                                                              2023    年\n\n\n          营业收入                                                                                                                                                                                                     6,922,252,743.46                                                              6,285,729,757.86                                                                                                               10.13                                                       6,517,340,323.84\n\n          利润总额                                                                                                                                                                                                         3,165,337,524.08                                                               2,771,108,286.69                                                                                                             14.23                                                     2,612,009,762.60\n\n          归属于母公司股东的净利润                                                                         2,632,256,997.26                                                           2,339,779,520.26                                                                                                             12.50                                                      2,252,014,571.30\n\n          归属于母公司股东的扣除非经\n          常性损益的净利润                                                                                                                                        2,592,174,284.50                                                            2,258,593,149.43                                                                                                              14.77                                                          2,174,897,293.76\n\n          经营活动产生的现金流量净额                                                          5,355,977,560.72                                                  13,719,439,516.09                                                                                                       -60.96                                                    -7,460,263,171.95\n\n          其他综合收益                                                                                                                                                                             -111,429,556.40                                                                       145,870,363.60                                                                                                     不适用                                                                          98,890,076.44\n\n\n\n\n\n\n\n\n     2025  年年度报告                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 025"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0002",
+          "document_version": "63bb7caf8956deba2fe39f5438621800088899d67457c185a39d6c2246f79695",
+          "section_path": [
+            "第二节 公司简介和主要财务指标",
+            "八、近三年主要会计数据和财务指标"
+          ],
+          "physical_pages": [
+            27
+          ],
+          "source_spans": [
+            {
+              "page": 27,
+              "start": 0,
+              "end": 16649,
+              "quote": "                                                                                                                                                                                                                                                                                                                                       2025    年末                                                                                                     2024    年末                                                                       本期末比上年同期末增减（%）                                                                       2023    年末\n\n\n             资产总额                                                                                                                                                                                     161,412,446,879.39                                         144,554,584,546.53                                                                                                               11.66                                    133,754,470,545.32\n\n             负债总额                                                                                                                                                                                      123,567,268,835.03                                              108,127,504,252.99                                                                                                             14.28                                                99,126,978,620.19\n\n             归属于母公司股东的权益                                                                                  37,845,178,044.36                                                       36,405,287,877.51                                                                                                                      3.96                                            34,604,875,003.42\n\n             所有者权益总额                                                                                                                                                 37,845,178,044.36                                                    36,427,080,293.54                                                                                                                      3.89                                                  34,627,491,925.13\n\n\n（二）主要财务指标\n\n\n                                                                                                                                                               主要财务指标                                                                                                                                                                   2025    年                                                2024    年                                    本期比上年同期增减（%）                                         2023    年\n\n             基本每股收益（元／股）                                                                                                                                                                                                                                                            0.57                                                                            0.50                                                                                                                                                                                14.00                                                                          0.48\n\n             稀释每股收益（元／股）                                                                                                                                                                                                                                                            0.55                                                                            0.49                                                                                                                                                                                12.24                                                                          0.47\n\n             扣除非经常性损益后的基本每股收益（元／股）                                                                                               0.56                                                                            0.49                                                                                                                                                                                14.29                                                                          0.47\n\n             加权平均净资产收益率（%）                                                                                                                                                                                                                                  7.08                                                                            6.59                                                                                  增加    0.49    个百分点                                                                          6.67\n\n             扣除非经常性损益后的加权平均净资产收益率（%）                                                                     6.98                                                                            6.36                                                                                  增加    0.62    个百分点                                                                          6.44\n\n                                              报告期末公司前三年主要会计数据和财务指标的说明\n\n                                              □适用√不适用\n\n                                              母公司的净资本及风险控制指标\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           单位：元币种：人民币\n\n                                                                                                                                                                          项目                                                                                                                                                                                                                                                          本报告期末                                                                                                                                                                                                                            上年度末\n\n             净资本                                                                                                                                                                                                                                                                                                                                                                                                                                20,232,396,365.01                                                                                                                                                                 22,212,043,348.91\n\n             净资产                                                                                                                                                                                                                                                                                                                                                                                                                                  32,063,489,039.15                                                                                                                                                                       31,155,627,498.53\n\n             风险覆盖率（%）                                                                                                                                                                                                                                                                                                                                                                                                                                      235.55                                                                                                                                                                                                                                                     291.33\n\n             资本杠杆率（%）                                                                                                                                                                                                                                                                                                                                                                                                                                               16.25                                                                                                                                                                                                                                                              16.14\n\n             流动性覆盖率（%）                                                                                                                                                                                                                                                                                                                                                                                                                        234.13                                                                                                                                                                                                                                                   362.20\n\n             净稳定资金率（%）                                                                                                                                                                                                                                                                                                                                                                                                                      134.29                                                                                                                                                                                                                                                    183.76\n\n             净资本    /    净资产（%）                                                                                                                                                                                                                                                                                                                                                                                                                 63.10                                                                                                                                                                                                                                                             71.29\n\n             净资本    /    负债（%）                                                                                                                                                                                                                                                                                                                                                                                                                               23.04                                                                                                                                                                                                                                                            28.04\n\n             净资产    /    负债（%）                                                                                                                                                                                                                                                                                                                                                                                                                               36.52                                                                                                                                                                                                                                                            39.33\n\n             自营权益类证券及其衍生品   /    净资本（%）                                                                                                                                                                                                                                                                  10.98                                                                                                                                                                                                                                                              17.86\n\n             自营非权益类证券及其衍生品   /   净资本（%）                                                                                                                                                                                                                                           322.01                                                                                                                                                                                                                                                    252.75\n\n             融资（含融券）的金额   /    净资本（%）                                                                                                                                                                                                                                                                                         148.79                                                                                                                                                                                                                                                   106.00\n\n\n                                     注：本期末指标值根据中国证监会《证券公司风险控制指标计算标准规定》（【2024】13                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            号）编制，上年度末指标值已按相同\n口径进行了重述。\n\n\n\n\n\n\n\n\n026                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         2025  年年度报告"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "63bb7caf8956deba2fe39f5438621800088899d67457c185a39d6c2246f79695",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "physical_pages": [
+            37
+          ],
+          "source_spans": [
+            {
+              "page": 37,
+              "start": 17,
+              "end": 690,
+              "quote": "一、报告期内公司从事的业务情况\n\n    报告期内公司从事的主要业务分为十大板块，分别是财富管理业务、投资银行业务、证券资产管理业务、自营投资业务、\n证券信用业务、期货业务、国际化业务、基金业务、私募股权投资业务和另类投资业务。\n\n    1、财富管理业务：通过线下线上相结合的方式为客户提供证券经纪及期货    IB、产品销售、投资顾问、基金托管等一揽\n子财富管理服务。\n\n    2、证券信用业务：主要是为客户提供融资融券、股票质押式回购、约定式购回等资金融通服务。\n\n    3、投资银行业务：主要是运用股权融资、债权融资、并购、财务顾问等多种手段为企业和政府客户提供直接融资服务，\n主要包括证券承销与保荐业务、并购及财务顾问业务等。\n\n    4、自营投资业务：指公司以自有资金在价值投资、稳健经营的前提下，从事股票、债券、衍生品等多种自营证券交易\n和做市业务。\n\n    5、私募股权投资业务：从事私募股权投资基金、并购基金、政府产业基金等各类股权投资基金的投资与管理。\n\n    6、另类投资业务：从事《证券公司证券自营投资品种清单》所列品种以外的金融产品等投资。\n\n    7、证券资产管理业务：通过集合计划、专项计划、定向计划以及公募基金为机构和个人客户提供券商资产管理服务。\n\n    8、基金业务：为机构和个人客户提供公募产品、专户产品等资产管理服务。\n\n    9、期货业务：主要是为客户提供期货经纪、财富管理、资产管理、风险管理等服务。\n\n    10、国际化业务：为境内外客户提供跨境投资、融资、理财等综合服务。\n\n\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0005",
+          "document_version": "63bb7caf8956deba2fe39f5438621800088899d67457c185a39d6c2246f79695",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            37
+          ],
+          "source_spans": [
+            {
+              "page": 37,
+              "start": 969,
+              "end": 1408,
+              "quote": "三、经营情况讨论与分析\n\n    2025    年，公司作为浙江省属核心金融机构，坚定“深耕浙江、服务全国、融通世界”的战略布局，主动融入创新浙江\n建设与浙商浙企发展大局，以培育新质生产力、服务共同富裕示范区建设为主线，持续提升金融服务实体经济质效。报告期\n内，公司全面增强综合抗风险能力与核心竞争力，经营业绩创历史新高，业务开拓和创新取得显著成效。\n\n\n\n\n\n\n\n\n\n\n\n\n036                                                                                         2025  年年度报告                                        2025  年年度报告                                                                                             037"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0006",
+          "document_version": "63bb7caf8956deba2fe39f5438621800088899d67457c185a39d6c2246f79695",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "physical_pages": [
+            39
+          ],
+          "source_spans": [
+            {
+              "page": 39,
+              "start": 0,
+              "end": 2312,
+              "quote": "     3.        投资银行业务\n\n     市场环境\n\n     2025    年，资本市场融资活动明显提升。A    股股权融资市场总募资金额为    10,826    亿元，总募资家数    332    家。其中，IPO\n融资规模为    1,318    亿元，IPO    项目数    116    家。债券市场结构持续优化，全国公司债和企业债的发行规模为    4.5    万亿元，较上\n年同期增加    12.5%，科创债、绿色债等创新品种及资产证券化产品发展迅速。\n\n     经营业绩及举措\n\n     2025    年，公司投资银行业务深度融入国家战略与区域发展大局，连续三年为实体经济提供直接融资超千亿元，实现了\n业务规模、创新能力、资质牌照与品牌影响力的全方位跃升。\n\n     债券业务方面，公司省内公司债（企业债）承销规模连续两年位居全省第一。2025  年公司主要债券承销总额  1,132.89  亿元，\n其中公司债（企业债）金额   753.5   亿元，金融债金额   105.45   亿元，资产支持证券（ABS）金额   273.94   亿元，连续三年破千亿。\n做好金融“五篇大文章”，科创债承销金额同比激增近三倍，并成功落地“全国首单专利密集产品信息技术服务业知识产权\nABS”、“上交所央企首单集成电路专项科创债”等多个标杆项目。绿色债券（含    ABS）承销规模同比增长近    75%，主导发\n行了“全国首单清洁能源持有型不动产    ABS”、“浙江省属上市公司首单绿色可续期债等绿色项目”等。中小微企业支持债\n券（含    ABS）承销金额增长近    200%，助力发行“全国首单专项服务共同富裕示范区建设    ABS    项目”。凭借卓越的市场表现，\n公司荣获全景网“年度卓越承销商”、财联社“优秀债券承销商案例”、浙商总会金服会“金点奖”等多项行业大奖。报告\n期内，公司成功获批银行间市场非金融企业债务融资工具一般主承销商资格，综合服务能力进一步增强。\n\n     股权业务方面，公司紧密围绕浙江省“415X”先进制造业集群培育和“315”科技创新体系建设，构建了覆盖企业全生\n命周期的综合服务链。报告期内，公司投行持续督导企业数量位居全国前列、省内第一，当前在审及辅导项目中“专精特新”\n企业占比近    90%。践行全生命周期服务理念，为运达股份、博菲电气、中欣晶圆等企业提供了贯穿上市、再融资、股权激励\n等环节的一体化解决方案。此外，公司紧抓市场机遇，在并购重组领域实现关键突破，助力完成了兆易创新收购赛芯电子等\n具有产业影响力的重大交易项目。\n\n     2026    年展望\n\n     2026    年，公司投行业务将紧密围绕国家“十五五”规划与资本市场深化改革方向，打造科技金融服务新范式。以“投\n资    +    投行    +    投研”三投联动为核心，以北交所及新三板业务为主攻方向，深化对“专精特新”企业的全生命周期服务。同时，\n前瞻布局银行间市场债券融资等新兴业务领域，积极拓展高成长性业务，并全力推进重点并购项目的撮合落地。\n\n\n     4.        自营投资业务\n\n     市场环境\n\n     2025    年，A    股市场回暖向好，盈利预期稳步改善，沪深    300    指数上涨    17.66%，中证    500    指数上涨    30.39%。债券市场\n全年震荡运行，长端利率自历史低位有所上行，债券净价指数多数走低，中债新综合财富指数全年上涨    0.65%。\n\n     经营举措及业绩\n\n     2025   年，公司自营投资业务坚持稳健经营和科技驱动，深化去方向性大类资产配置，在严控风险的前提下，实现了\n投资组合收益的稳步提升。公司构建“大自营”运营格局，有效提升了大类资产配置的灵活性与决策效能。在公司“AI                  IN\nALL”智能化战略引领下，全面运用自主构建的    AI    投研体系，以科技赋能投资决策与全过程风险管控。通过体系化、科技化\n的投资能力建设，自营投资业务的稳健性与竞争力持续增强。截至    2025    年底，自营投资业务规模超    600    亿元，同比涨幅超\n40%。\n\n     2026    年展望\n\n     2026    年，公司将围绕绝对收益目标深化自营投资体系建设，坚持稳中求进，巩固并提升大类资产配置能力，强化宏观\n市场研判与细分资产深度研究，为投资战略布局提供前瞻性、系统化的决策支持。优化资产组合动态管理，平衡收益与风险，\n致力于保障自有资金的稳健增值。同时，持续完善    AI    投研体系，丰富多元化投研策略，构筑面向未来的投资竞争力。\n\n\n\n\n038                                                                                                             2025  年年度报告                                                  2025  年年度报告                                                                                                                   039"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "63bb7caf8956deba2fe39f5438621800088899d67457c185a39d6c2246f79695",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "37.71 万亿元，证券公司及其子公司私募资产管理产品规模人民币 6.44 万亿元 ( 中国证券基金业协会 )，行业“马太效应”"
+          ],
+          "physical_pages": [
+            41
+          ],
+          "source_spans": [
+            {
+              "page": 41,
+              "start": 492,
+              "end": 2515,
+              "quote": "37.71   万亿元，证券公司及其子公司私募资产管理产品规模人民币   6.44   万亿元   (   中国证券基金业协会   )，行业“马太效应”\n进一步强化，头部机构在品牌、渠道与投研上的优势持续扩大。\n\n      经营举措及业绩\n\n      2025    年，财通证券资管依托“一主两翼”业务布局，固收与权益双轮驱动，行业地位持续夯实。截至报告期末，资产\n管理总规模达    3,320    亿元，公募管理规模近    1,200    亿元，其中非货公募管理规模    1,029    亿元，稳居券商资管行业前三。从具\n体业务来看，持续完善“固收    +”产品矩阵，不断丰富策略多样化，打磨投研与资产配置能力。FOF    业务线进一步丰富，覆\n盖养老、债券等多类配置需求。全年发行   ABS   产品合计规模   553.61   亿元，行业排名跃升至第   7   位，创历史新高，成功落地“全\n国首单含数据知识产权的银发经济    ABS”、“全国首单聚焦专利密集产品的知识产权    ABS”等多个标杆项目。公募    REITs    及\n类    REITs    业务实现突破，成功中标庐山西海风景名胜区项目，并成功发行首单类    REITs    产品——“常熟经开工业坊    1    期资产\n支持专项计划（长江经济带）”。此外，财通证券资管于    2025    年获批    QDII    资格并充分展业。\n\n      2026    年展望\n\n      2026    年，财通证券资管将在保持竞争优势的同时强化多元能力，不断优化和丰富产品服务体系。在进一步夯实固收、\n权益等传统优势领域的同时，积极拓展指数量化、FOF    及海外投资等多元策略。充分发挥国有金融机构的资源配置功能，通\n过    ABS、公私募    REITs    等创新载体持续加强投融资服务，更好服务实体经济。\n\n\n      8.        基金业务\n\n      市场环境\n\n      2025    年全行业新成立的公募基金共计    1,553    只，同比增长    35.87%，创下近    4    年发行数量新高。截至    2025    年末，公募\n基金产品数量    13,622    只，公募基金规模    37.71    万亿    ;    私募基金产品数量    138,315    只，私募基金管理规模    22.15    万亿元。\n\n      经营举措及业绩\n\n      公司通过参股公司财通基金开展基金管理业务。截至    2025    年底，财通基金管理规模    1,253    亿元，其中公募规模    849    亿\n元。年内完成    10    只公募产品首发，含权产品销量快速增长，权益类基金业绩表现突出，过去四年    12    次斩获近十年绝对收益\n榜第一，2025    年有    13    只基金（合并份额）年度收益超    70%。财通基金不断强化定增特色优势，2025    年累计中标定增项目\n88   个，投资规模达   132.8   亿元，位列市场第一；同时，当年参与全部   9   家浙商浙企定增项目（不含关联方项目），在上述\n项目中排名首位。（数据来源：国泰海通证券    2026    年    01    月    02    日《基金公司权益及固定收益类资产业绩排行榜》、国泰海\n通证券    2026    年    1    月    1    日《基金业绩排行榜》、财通基金产品定期报告、Wind、Choice。）\n\n      2026    年展望\n\n      2026   年，财通基金将重点围绕以下方向，打造“特色鲜明、多元发展、客户信赖”的资产管理公司：加强权益产品线建设，\n升级固收产品策略，丰富定增等主动管理工具，完善全产品管理体系；强化机构与零售渠道建设，深耕浙商浙企客户，提供\n\n\n\n\n040                                                                                                                          2025  年年度报告                                                         2025  年年度报告                                                                                                                                  041"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0009",
+          "document_version": "63bb7caf8956deba2fe39f5438621800088899d67457c185a39d6c2246f79695",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "37.71 万亿元，证券公司及其子公司私募资产管理产品规模人民币 6.44 万亿元 ( 中国证券基金业协会 )，行业“马太效应”"
+          ],
+          "physical_pages": [
+            42
+          ],
+          "source_spans": [
+            {
+              "page": 42,
+              "start": 0,
+              "end": 6875,
+              "quote": "                                                                                                                                                                         更深度的综合金融服务；持续优化经营与投研团队，壮大专业人才队伍，整合行业资源，全面提升竞争力。\n\n\n                                                                                                                                                                              9.        期货业务\n\n                                                                                                                                                                              市场环境\n\n                                                                                                                                                                              2025   年，按单边计算，全国期货市场累计成交量为   90.74   亿手，累计成交额为   766.25   万亿元，同比分别增长   17.4%\n                                                                                                                                                                         和    23.74%，我国新增    18    个期货、期权品种，覆盖有色金属、能源化工及新能源金属多个板块，产品体系持续完善（中国期\n                                                                                                                                                                         货业协会）。\n\n                                                                                                                                                                              经营举措及业绩\n\n                                                                                                                                                                              公司通过参股公司永安期货开展期货业务。2025    年，永安期货加快建设一流衍生品投行，行业领先地位进一步巩固，\n                                                                                                                                                                         综合化经营特色进一步深化，各项经营指标持续向好，“以客户为中心”重大改革取得明显成效。报告期内，实现营业收入\n                                                                                                                                                                         18.51    亿元，同比增长    17.33%；净利润    6.52    亿元，同比增长    15.10%。\n\n                                                                                                                                                                              2026    年展望\n\n                                                                                                                                                                              2026   年，永安期货将从四大维度系统抓实经营管理举措，全面推动各项业务提质增效：坚持强基固本，抓实经纪、财富、\n                                                                                                                                                                         资管等业务提升举措，增强核心竞争力；强化集团协同，推动境内外子公司做大做强，巩固永安资本行业地位，推动新永安\n                                                                                                                                                                         国际金控发展，提升协同发展力；驱动人才与科技，完善人才评估体系，提升数字化运营效率，激发组织效率与活力；严守\n                                                                                                                                                                         合规风控底线，深化大监督体系建设，压实业务一线主体责任，保障持续稳健经营。\n\n\n                                                                                                                                                                              10.        国际化业务\n\n                                                                                                                                                                              市场环境\n\n                                                                                                                                                                              2025    年，港股市场延续强劲上涨势头，恒生指数全年上涨    27.8%，创下    2017    年以来的最佳年度表现。根据    Wind    资讯\n                                                                                                                                                                         统计数据，2025   年港股市场成交金额港币   47.85   万亿元，同比增加   93.33%;   港股股权融资市场呈现爆发式增长态势，市场\n                                                                                                                                                                         首次招股募资港币    2,869.10    亿元，同比增加    225.49%，上市后募资港币    3,263.67    亿元，同比增加    278.15%。\n\n                                                                                                                                                                              经营举措及业绩\n\n                                                                                                                                                                              财通香港作为公司国际化平台，战略效能持续释放。2025    年，财通国际融资成功以独家保荐人身份助力纽曼思健康食\n                                                                                                                                                                         品控股有限公司登陆港股主板，并全年累计参与    6    单资本市场发行项目。财通国际证券完成境外债券融资规模超    150    亿元，\n                                                                                                                                                                         有力支撑实体企业跨境融资需求。持续推动财富业务转型，全年在港交所交易量排名进入前   15%，离岸基金管理规模突破\n                                                                                                                                                                         260    亿港元。财通国际资管年内成功推出首只银行系固收类基金，旗下基金荣获第三届海外私募新智奖“明星固定收益策略\n                                                                                                                                                                         基金奖”。\n\n                                                                                                                                                                              2026    年展望\n\n                                                                                                                                                                              2026    年，财通香港将持续强化其作为省属综合性海外金融服务平台的战略功能，担当公司国际化发展的关键支点与前\n                                                                                                                                                                         沿平台，推动现有牌照业务转型，精准把握粤港澳大湾区建设深化及境内企业赴港上市等政策机遇，不断丰富跨境服务工具\n                                                                                                                                                                         以增厚收入。同时，依托浙江省“外向型”经济的区位与产业优势，加速布局东南亚等重点海外市场，为“走出去”的浙商\n                                                                                                                                                                         提供专业顾问及私人财富管理服务，巩固并提升“浙商浙企跨境金融服务专家”的品牌专业影响力。\n\n\n\n                                                                                                                                                                         "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0010",
+          "document_version": "63bb7caf8956deba2fe39f5438621800088899d67457c185a39d6c2246f79695",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ],
+          "physical_pages": [
+            44
+          ],
+          "source_spans": [
+            {
+              "page": 44,
+              "start": 8312,
+              "end": 29993,
+              "quote": "五、报告期内主要经营情况\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      截至   2025   年   12   月   31   日，公司总资产为   1,614.12   亿元，较上年末增长   11.66%；归属于母公司股东的权益为   378.45   亿元，\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 较上年末增长    3.96%；营业收入为    69.22    亿元，同比增长    10.13%；利润总额为    31.65    亿元，同比增长    14.23%；归属于母公\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 司股东的净利润    26.32    亿元，同比增长    12.50%。\n\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 （一）主营业务分析\n\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 1、利润表及现金流量表相关科目变动分析表\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     单位：元币种：人民币\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     科目                                                                                                                             本期数                                                                                                 上年同期数                                                              变动比例（%）                                                                                                                          情况说明\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       营业收入                                                                                                                              6,922,252,743.46                                         6,285,729,757.86                                                                                                                     10.13                      /\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       手续费及佣金净收入                                                3,658,008,551.42                                       3,533,536,681.28                                                                                                                            3.52                      /\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       利息净收入                                                                                                                             706,784,808.14                                                  608,059,410.58                                                                                                                   16.24                      /\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       投资收益                                                                                                                              2,893,733,398.04                                        1,831,062,204.84                                                                                                                   58.04\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   主要系金融工具投资实现收益增加\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       公允价值变动收益                                                                       -419,946,577.53                                                     192,424,867.76                                                                                                           不适用\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       其他收益                                                                                                                                                     66,501,958.21                                                           93,854,449.92                                                                                                               -29.14                      /\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       汇兑（损失）/    收益                                                                                                -80,610.42                                                              -1,232,534.37                                                                                                           不适用                      主要系汇率影响\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       其他业务收入                                                                                                                            17,151,163.24                                                                      3,213,190.91                                                                                                           433.77                      主要系租赁收入增加\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       资产处置收益                                                                                                                                         100,052.36                                                            24,811,486.94                                                                                                             -99.60                      主要系使用权资产处置收益减少\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       营业成本                                                                                                                              3,736,530,566.48                                     3,496,504,875.36                                                                                                                            6.86                      /\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       税金及附加                                                                                                                                   52,570,829.64                                                           33,000,906.50                                                                                                                   59.30                      主要系附加税增加\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       业务及管理费                                                                                              3,638,409,962.97                                       3,460,175,392.95                                                                                                                              5.15                      /\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       信用减值损失                                                                                                                      43,755,922.11                                                                     1,403,475.98                                                                                                     3017.68                      主要系融出资金减值损失计提增加\n\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       其他业务成本                                                                                                                                 1,793,851.76                                                                     1,925,099.93                                                                                                                     -6.82                      /\n\n\n\n\n042                                                                                                                                                                                                                                                                                                                                                                                                                               2025  年年度报告                                                                                                                                                                                                                       2025  年年度报告                                                                                                                                                                                                                                                                                                                                                                                                                                                                             043"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0011",
+          "document_version": "63bb7caf8956deba2fe39f5438621800088899d67457c185a39d6c2246f79695",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ],
+          "physical_pages": [
+            45
+          ],
+          "source_spans": [
+            {
+              "page": 45,
+              "start": 0,
+              "end": 3738,
+              "quote": "                                    科目                                                                                                                             本期数                                                                                                 上年同期数                                                              变动比例（%）                                                                                                                          情况说明\n\n      经营活动产生的现金                                                                                                                                                                                                                                                                                                                                                  主要系回购、代理买卖证券、融出\n      流量净额                                                                                                                                 5,355,977,560.72                             13,719,439,516.09                                                                                                             -60.96                                     资金、其他债权投资等业务收到及\n                                                                                                                                                                                                                                                                                                                                                                 支付的现金净额变动影响\n\n      投资活动产生的现金\n      流量净额                                                                                                                                        -117,266,012.11                                -2,591,915,485.29                                                                                                           不适用                      主要系购建固定资产、无形资产和其他长期资产所支付的现金减少\n\n      筹资活动产生的现金\n      流量净额                                                                                                                       -3,070,349,595.98                                      2,283,770,034.98                                                                                                           不适用                      主要系发行债券收到的现金减少\n\n\n                     营业收入变动原因说明：2025    年公司营业收入    69.22    亿元，同比增长    10.13%，主要是由于手续费及佣金净收入、利息\n净收入和投资收益同比增加。其中，手续费及佣金净收入    36.58    亿元，同比增长    3.52%，主要系经纪业务手续费净收入同比\n增加；利息净收入    7.07    亿元，同比增长    16.24%,    主要系融资融券利息收入增加及卖出回购、应付债券等利息支出减少所致；\n投资收益及公允价值变动收益    24.74    亿元，同比增长    22.25%，主要系金融工具投资实现收益同比增加。\n\n                     营业成本变动原因说明：2025    年公司营业支出为    37.37    亿元，同比增长    6.86%，主要是由于本年发生业务及管理费用\n36.38    亿元，同比增长    5.15%。\n\n                     本期公司业务类型、利润构成或利润来源发生重大变动的详细说明\n\n                     □适用√不适用\n\n\n2、收入和成本分析\n\n                     2025    年，公司实现营业收入    69.22    亿元，同比增长    10.13%；营业成本    37.37    亿元，同比增长    6.86%；归属于母公司股\n东的净利润   26.32   亿元，同比增长   12.50%；实现每股收益   0.57   元，同比增长   14.00%；加权平均净资产收益率   7.08%，同\n比增加    0.49    个百分点。\n\n                     （1）主营业务分行业、分产品、分地区、分销售模式情况\n\n                                                                                                                                                                                                                                                                                                                                                                                                      单位    :    元币种    :    人民币\n\n                                                                                                                                                                                                            "
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0012",
+          "document_version": "63bb7caf8956deba2fe39f5438621800088899d67457c185a39d6c2246f79695",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分行业情况"
+          ],
+          "physical_pages": [
+            45
+          ],
+          "source_spans": [
+            {
+              "page": 45,
+              "start": 3738,
+              "end": 8706,
+              "quote": "主营业务分行业情况\n\n                      分行业                                                                                   营业收入                                                                                 营业成本                                                     毛利率                        营业收入比                                                           营业成本比\n                                                                                                                                                                                                                                           （%）                                   上年增减（%）                                                         上年增减（%）            毛利率比上年增减（%）\n\n      财富管理业务                                             2,346,641,027.94                          1,569,629,479.39                                  33.11                                                                                    27.11                                                                                16.90                      增加    5.84    个百分点\n\n      自营投资业务                                                      809,918,698.46                                      180,828,978.72                                   77.67                                                                                  37.64                                                                                  69.11                      减少    4.16    个百分点\n\n      投资银行业务                                                       398,753,292.93                                        318,907,533.92                                20.02                                                                         -22.00                                                                                        5.29                      减少    20.73    个百分点\n\n      资产管理业务                                                1,417,587,810.72                                       746,144,522.82                                   47.37                                                                           -17.52                                                                         -25.47                      增加    5.62    个百分点\n\n      证券信用业务                                                        651,250,335.72                                     118,389,560.66                                  81.82                                                                                23.60                                                                                40.37                      减少    2.17    个百分点\n\n      国际化业务                                                                                 89,957,574.36                                              72,736,289.41                                  19.14                                                                                  74.11                                                                                        4.47                      增加    53.89    个百分点\n\n      总部后台及其他                             1,208,144,003.33                                      729,894,201.56                                39.59                                                                                15.87                                                                                23.95                      减少    3.93    个百分点\n\n      合计                                                                                                         6,922,252,743.46                         3,736,530,566.48                                46.02                                                                                  10.13                                                                                        6.86                      增加    1.65    个百分点\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n044                                                                                                                                                                                                                                                                                                                                                                                                                              2025  年年度报告                                                                                                                                                                                                                       2025  年年度报告                                                                                                                                                                                                                                                                                                                                                                                                                                                                            045"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "BS-01",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "BS-01",
+        "text": "报告期内公司主要业务分为财富管理业务、投资银行业务、证券资产管理业务、自营投资业务、证券信用业务、期货业务、国际化业务、基金业务、私募股权投资业务和另类投资业务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "BS-02",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008",
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "BS-02",
+        "text": "公司通过财通证券资管经营证券资产管理业务，通过参股公司财通基金开展基金业务，通过参股公司永安期货开展期货业务，并以财通香港作为国际化平台。",
+        "subject_scope": "consolidated_group",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0008",
+          "source-0009"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "PS-01",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "PS-01",
+        "text": "财富管理业务通过线下线上相结合的方式为客户提供证券经纪及期货IB、产品销售、投资顾问、基金托管等一揽子财富管理服务；证券信用业务为客户提供融资融券、股票质押式回购、约定式购回等资金融通服务；投资银行业务运用股权融资、债权融资、并购、财务顾问等手段为企业和政府客户提供直接融资服务，主要包括证券承销与保荐、并购及财务顾问等。",
+        "subject_scope": "consolidated_group",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "PS-02",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "PS-02",
+        "text": "自营投资业务以自有资金在价值投资、稳健经营的前提下从事股票、债券、衍生品等多种自营证券交易和做市业务；私募股权投资业务从事私募股权投资基金、并购基金、政府产业基金等各类股权投资基金的投资与管理；另类投资业务从事《证券公司证券自营投资品种清单》所列品种以外的金融产品等投资。",
+        "subject_scope": "consolidated_group",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "PS-03",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "PS-03",
+        "text": "证券资产管理业务通过集合计划、专项计划、定向计划以及公募基金为机构和个人客户提供券商资产管理服务；基金业务为机构和个人客户提供公募产品、专户产品等资产管理服务；期货业务为客户提供期货经纪、财富管理、资产管理、风险管理等服务；国际化业务为境内外客户提供跨境投资、融资、理财等综合服务。",
+        "subject_scope": "consolidated_group",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "RM-01",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "RM-01",
+        "text": "2025年公司营业收入主要构成中，手续费及佣金净收入3,658,008,551.42元，利息净收入706,784,808.14元，投资收益2,893,733,398.04元，公允价值变动收益为-419,946,577.53元；投资收益同比增加主要系金融工具投资实现收益增加。",
+        "subject_scope": "consolidated_group",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [
+          {
+            "name": "手续费及佣金净收入",
+            "raw_value": "3,658,008,551.42",
+            "value": "3658008551.42",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "利息净收入",
+            "raw_value": "706,784,808.14",
+            "value": "706784808.14",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "投资收益",
+            "raw_value": "2,893,733,398.04",
+            "value": "2893733398.04",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "公允价值变动收益",
+            "raw_value": "-419,946,577.53",
+            "value": "-419946577.53",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "SM-01",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "SM-01",
+        "text": "2025年末公司资产总额161,412,446,879.39元，归属于母公司股东的权益37,845,178,044.36元；2025年利润总额3,165,337,524.08元，归属于母公司股东的净利润2,632,256,997.26元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0001",
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "资产总额",
+            "raw_value": "161,412,446,879.39",
+            "value": "161412446879.39",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于母公司股东的权益",
+            "raw_value": "37,845,178,044.36",
+            "value": "37845178044.36",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "利润总额",
+            "raw_value": "3,165,337,524.08",
+            "value": "3165337524.08",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于母公司股东的净利润",
+            "raw_value": "2,632,256,997.26",
+            "value": "2632256997.26",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "SM-02",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0011",
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "SM-02",
+        "text": "2025年主营业务分行业合计营业收入6,922,252,743.46元，营业成本3,736,530,566.48元，毛利率46.02%，营业收入比上年增加10.13%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0011",
+          "source-0012"
+        ],
+        "metrics": [
+          {
+            "name": "主营业务分行业合计营业收入",
+            "raw_value": "6,922,252,743.46",
+            "value": "6922252743.46",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "主营业务分行业合计营业成本",
+            "raw_value": "3,736,530,566.48",
+            "value": "3736530566.48",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "consolidated_group",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "主营业务分行业合计毛利率",
+            "raw_value": "46.02",
+            "value": "46.02",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "主营业务分行业合计营业收入比上年增减",
+            "raw_value": "10.13",
+            "value": "10.13",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "SM-03",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0011",
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "SM-03",
+        "text": "财富管理业务2025年营业收入2,346,641,027.94元。",
+        "subject_scope": "business_segment",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0011",
+          "source-0012"
+        ],
+        "metrics": [
+          {
+            "name": "财富管理业务营业收入",
+            "raw_value": "2,346,641,027.94",
+            "value": "2346641027.94",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "SM-04",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0011",
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "SM-04",
+        "text": "自营投资业务2025年营业收入809,918,698.46元。",
+        "subject_scope": "business_segment",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0011",
+          "source-0012"
+        ],
+        "metrics": [
+          {
+            "name": "自营投资业务营业收入",
+            "raw_value": "809,918,698.46",
+            "value": "809918698.46",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "SM-05",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0011",
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "SM-05",
+        "text": "投资银行业务2025年营业收入398,753,292.93元。",
+        "subject_scope": "business_segment",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0011",
+          "source-0012"
+        ],
+        "metrics": [
+          {
+            "name": "投资银行业务营业收入",
+            "raw_value": "398,753,292.93",
+            "value": "398753292.93",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "SM-06",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0011",
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "SM-06",
+        "text": "资产管理业务2025年营业收入1,417,587,810.72元。",
+        "subject_scope": "business_segment",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0011",
+          "source-0012"
+        ],
+        "metrics": [
+          {
+            "name": "资产管理业务营业收入",
+            "raw_value": "1,417,587,810.72",
+            "value": "1417587810.72",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "SM-07",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0011",
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "SM-07",
+        "text": "证券信用业务2025年营业收入651,250,335.72元。",
+        "subject_scope": "business_segment",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0011",
+          "source-0012"
+        ],
+        "metrics": [
+          {
+            "name": "证券信用业务营业收入",
+            "raw_value": "651,250,335.72",
+            "value": "651250335.72",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "SM-08",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0011",
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "SM-08",
+        "text": "国际化业务2025年营业收入89,957,574.36元。",
+        "subject_scope": "business_segment",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0011",
+          "source-0012"
+        ],
+        "metrics": [
+          {
+            "name": "国际化业务营业收入",
+            "raw_value": "89,957,574.36",
+            "value": "89957574.36",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "SM-09",
+      "element": "scale_and_mix",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "该行为“总部后台及其他”，不是单一经营业务，无法安全归入 consolidated_group 或具体业务分部。"
+      ],
+      "evidence_ids": [
+        "source-0011",
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "SM-09",
+        "text": "分行业表中的“总部后台及其他”2025年营业收入1,208,144,003.33元；该行列示为其他/后台项目，不是单一经营业务。",
+        "subject_scope": "unclear",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0011",
+          "source-0012"
+        ],
+        "metrics": [
+          {
+            "name": "总部后台及其他营业收入",
+            "raw_value": "1,208,144,003.33",
+            "value": "1208144003.33",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "unclear",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": "该行为“总部后台及其他”，不是单一经营业务，无法安全归入 consolidated_group 或具体业务分部。"
+          }
+        ],
+        "uncertainty_reason": "该行为“总部后台及其他”，不是单一经营业务，无法安全归入 consolidated_group 或具体业务分部。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "OI-01",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "fact": {
+        "fact_id": "OI-01",
+        "text": "2025年末母公司净资本20,232,396,365.01元，净资产32,063,489,039.15元；风险覆盖率235.55%，资本杠杆率16.25%。",
+        "subject_scope": "issuer",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0002"
+        ],
+        "metrics": [
+          {
+            "name": "母公司净资本",
+            "raw_value": "20,232,396,365.01",
+            "value": "20232396365.01",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "issuer",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "母公司净资产",
+            "raw_value": "32,063,489,039.15",
+            "value": "32063489039.15",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "人民币",
+            "subject_scope": "issuer",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "风险覆盖率",
+            "raw_value": "235.55",
+            "value": "235.55",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "issuer",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "资本杠杆率",
+            "raw_value": "16.25",
+            "value": "16.25",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "issuer",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "OI-02",
+      "element": "operations_and_inputs",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "保留原文主体、数值或近似限定，不作为确定值使用。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "OI-02",
+        "text": "截至2025年底，公司自营投资业务规模超600亿元，同比涨幅超40%。",
+        "subject_scope": "business_segment",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [
+          {
+            "name": "自营投资业务规模",
+            "raw_value": "超600",
+            "value": "600",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "greater_than",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "自营投资业务规模同比涨幅",
+            "raw_value": "超40",
+            "value": "40",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "greater_than",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "OI-03",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "OI-03",
+        "text": "截至报告期末，财通证券资管资产管理总规模达3,320亿元。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "财通证券资管资产管理总规模",
+            "raw_value": "3,320",
+            "value": "3320",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "人民币",
+            "subject_scope": "named_subsidiary",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "CCM-01",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005",
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "CCM-01",
+        "text": "公司作为浙江省属核心金融机构，战略布局为“深耕浙江、服务全国、融通世界”；财富管理业务通过线下线上相结合服务客户，投资银行业务服务企业和政府客户，证券资产管理业务及基金业务服务机构和个人客户，国际化业务服务境内外客户，期货业务服务期货经纪、财富管理、资产管理、风险管理等客户场景。",
+        "subject_scope": "consolidated_group",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0005",
+          "source-0004"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "OD-01",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "OD-01",
+        "text": "2025年公司投资银行业务主要债券承销总额1,132.89亿元，其中公司债（企业债）753.5亿元、金融债105.45亿元、资产支持证券（ABS）273.94亿元。",
+        "subject_scope": "business_segment",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [
+          {
+            "name": "投资银行业务主要债券承销总额",
+            "raw_value": "1,132.89",
+            "value": "1132.89",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "投资银行业务公司债（企业债）承销金额",
+            "raw_value": "753.5",
+            "value": "753.5",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "投资银行业务金融债承销金额",
+            "raw_value": "105.45",
+            "value": "105.45",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "投资银行业务资产支持证券（ABS）承销金额",
+            "raw_value": "273.94",
+            "value": "273.94",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "人民币",
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "OD-02",
+      "element": "operating_drivers",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "该事实同时涉及财通国际证券和财通香港两个主体，无法归为单一主体范围。"
+      ],
+      "evidence_ids": [
+        "source-0009"
+      ],
+      "fact": {
+        "fact_id": "OD-02",
+        "text": "2025年财通国际证券完成境外债券融资规模超150亿元，财通香港离岸基金管理规模突破260亿港元。",
+        "subject_scope": "unclear",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0009"
+        ],
+        "metrics": [
+          {
+            "name": "境外债券融资规模",
+            "raw_value": "超150",
+            "value": "150",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "人民币",
+            "subject_scope": "named_subsidiary",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "greater_than",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "离岸基金管理规模",
+            "raw_value": "突破260",
+            "value": "260",
+            "unit": "亿港元",
+            "source_unit": "亿港元",
+            "currency": "港元",
+            "subject_scope": "named_subsidiary",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "greater_than",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "该事实同时涉及财通国际证券和财通香港两个主体，无法归为单一主体范围。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "OD-03",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "OD-03",
+        "text": "2025年财通证券资管全年发行ABS产品合计规模553.61亿元。",
+        "subject_scope": "named_subsidiary",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "财通证券资管ABS产品发行规模",
+            "raw_value": "553.61",
+            "value": "553.61",
+            "unit": "亿元",
+            "source_unit": "亿元",
+            "currency": "人民币",
+            "subject_scope": "named_subsidiary",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "MC-01",
+      "element": "material_changes",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "该事实汇总多个业务分部的营业收入同比增速，无法归为单一业务范围。"
+      ],
+      "evidence_ids": [
+        "source-0011",
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "MC-01",
+        "text": "2025年财富管理业务营业收入同比增长27.11%，自营投资业务增长37.64%，证券信用业务增长23.60%，国际化业务增长74.11%。",
+        "subject_scope": "unclear",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0011",
+          "source-0012"
+        ],
+        "metrics": [
+          {
+            "name": "财富管理业务营业收入比上年增减",
+            "raw_value": "27.11",
+            "value": "27.11",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "自营投资业务营业收入比上年增减",
+            "raw_value": "37.64",
+            "value": "37.64",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "证券信用业务营业收入比上年增减",
+            "raw_value": "23.60",
+            "value": "23.60",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "国际化业务营业收入比上年增减",
+            "raw_value": "74.11",
+            "value": "74.11",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "该事实汇总多个业务分部的营业收入同比增速，无法归为单一业务范围。"
+      }
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "fact_id": "MC-02",
+      "element": "material_changes",
+      "state": "limited",
+      "label": "保真限用／待核",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。",
+        "该事实汇总多个业务分部的营业收入同比增速，无法归为单一业务范围。"
+      ],
+      "evidence_ids": [
+        "source-0011",
+        "source-0012"
+      ],
+      "fact": {
+        "fact_id": "MC-02",
+        "text": "2025年投资银行业务营业收入同比下降22.00%，资产管理业务下降17.52%。",
+        "subject_scope": "unclear",
+        "period": "2025",
+        "evidence_ids": [
+          "source-0011",
+          "source-0012"
+        ],
+        "metrics": [
+          {
+            "name": "投资银行业务营业收入比上年增减",
+            "raw_value": "-22.00",
+            "value": "-22.00",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "资产管理业务营业收入比上年增减",
+            "raw_value": "-17.52",
+            "value": "-17.52",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": "该事实汇总多个业务分部的营业收入同比增速，无法归为单一业务范围。"
+      }
+    }
+  ],
+  "information_gaps": [
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "element": "business_structure",
+      "status": "observed",
+      "reasons": [
+        "物理页38、40原生文本不可读，未读；相关业务讨论可能缺失，未获取成功不等于未披露。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "element": "products_services",
+      "status": "observed",
+      "reasons": [
+        "物理页40未读，可能遗漏部分资管、基金等业务细节；未获取成功，不作推断。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "element": "revenue_model",
+      "status": "observed",
+      "reasons": [
+        "收入构成仅为选定章节披露的主要科目，未展开财务报表附注明细。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "物理页28布局未恢复，未用于表格列关系判断。",
+        "“总部后台及其他”行不是单一经营业务，已按来源保留为范围不明。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "物理页38、40未读，自营投资及资管等业务规模细节可能不完整；未获取成功不等于未披露。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "物理页38、40未读，客户与渠道的细分披露可能缺失；未获取成功，不推断具体客户。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "element": "operating_drivers",
+      "status": "observed",
+      "reasons": [
+        "投行、国际化及资管驱动数据来自选定章节，未覆盖全部业务条线；未获取成功不等于未披露。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "element": "material_changes",
+      "status": "observed",
+      "reasons": [
+        "分部收入增速汇总涉及多个业务分部，范围无法归一；仅反映表列可比口径。",
+        "未读取物理页38、40，其他变化可能未覆盖。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    }
+  ],
+  "suggested_acquisitions": [],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "cross_reading_reconciliation": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

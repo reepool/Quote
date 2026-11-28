@@ -1,0 +1,79 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "frozen_at": "2026-11-28T18:09:17+08:00",
+  "instrument_id": "600928.SH",
+  "name": "西安银行",
+  "report": {
+    "content_hash": "5e7e3a0dc6c35485036e644301b534063c0ce91135009914c3d3901999086fd3",
+    "report_period": "2025-12-31",
+    "fiscal_year": 2025,
+    "published_at": "2026-04-22T16:00:00+00:00",
+    "source": "cninfo",
+    "source_announcement_id": "1225151740",
+    "asset_id": "asset_783b1cb6e834e3d0f350cb9dfea14f91",
+    "title": "2025年年度报告",
+    "variant": "original"
+  },
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/5e/5e7e3a0dc6c35485036e644301b534063c0ce91135009914c3d3901999086fd3.pdf",
+  "pdf_sha256": "5e7e3a0dc6c35485036e644301b534063c0ce91135009914c3d3901999086fd3",
+  "document_version": "600928.SH / 2025年年度报告 original / 公告1225151740 / SHA256同pdf_sha256",
+  "source_sections_and_physical_pages": "目录物理3；董事长致辞4；第二节管理层讨论与分析/二、公司主要业务情况20、22、24–26；五、主要经营情况分析/利润表及收入构成30–33。物理页比文内印刷页大1。",
+  "physical_pages_read": [1, 2, 3, 4, 20, 22, 24, 25, 26, 30, 31, 32, 33],
+  "core_conditions": [
+    {
+      "condition_id": "C1",
+      "question": "公司做什么",
+      "expected_source_answer": "立足陕西、服务区域实体经济的商业银行；面向企业、居民、小微及涉农客户提供存贷款、结算与综合金融服务，并经营同业和金融市场资金业务。不能只用某一类贷款概括全部主营。",
+      "source_physical_pages": [20, 22, 24, 25, 26]
+    },
+    {
+      "condition_id": "C2",
+      "question": "主要产品/服务与板块",
+      "expected_source_answer": "实质覆盖公司金融、零售金融、普惠金融和金融市场：对公存贷款/票据/交易及跨境金融；个人存贷款、财富管理代销、信用卡等；小微/农户融资；债券配置交易、同业合作及融资。数字金融是产品渠道和运营支持，不凭其章节标题另造独立收入板块。",
+      "source_physical_pages": [20, 22, 24, 25, 26]
+    },
+    {
+      "condition_id": "C3",
+      "question": "怎么赚钱",
+      "expected_source_answer": "以存款、同业及债券等融资支持贷款和金融投资赚取利息净收入，另取得手续费及佣金、投资收益及公允价值变动等非息损益。2025营业收入主要由利息净收入8,820,172千元及非利息净收入1,145,453千元组成；不能把贷款本金、利息总收入或投资收益单项当营业收入。",
+      "source_physical_pages": [30, 31, 32, 33]
+    }
+  ],
+  "important_numbers": [
+    {"source_name": "营业收入", "raw_value": "9,965,625", "unit": "千元", "period": "2025-01-01/2025-12-31", "source_relation": "本公司主要损益项目总收入", "physical_page": 30},
+    {"source_name": "利息净收入", "raw_value": "8,820,172", "unit": "千元", "period": "2025-01-01/2025-12-31", "source_relation": "营业收入组成", "physical_page": 30},
+    {"source_name": "非利息净收入", "raw_value": "1,145,453", "unit": "千元", "period": "2025-01-01/2025-12-31", "source_relation": "营业收入组成", "physical_page": 30},
+    {"source_name": "归属于母公司股东的净利润", "raw_value": "2,649,947", "unit": "千元", "period": "2025-01-01/2025-12-31", "source_relation": "不同于净利润2,647,184千元", "physical_page": 30},
+    {"source_name": "利息收入", "raw_value": "18,389,005", "unit": "千元", "period": "2025-01-01/2025-12-31", "source_relation": "未扣利息支出9,568,833千元；不等于营业收入", "physical_page": 32},
+    {"source_name": "发放贷款和垫款利息收入", "raw_value": "13,360,197", "unit": "千元", "period": "2025-01-01/2025-12-31", "source_relation": "利息收入组成72.65%", "physical_page": 32},
+    {"source_name": "金融投资利息收入", "raw_value": "4,414,007", "unit": "千元", "period": "2025-01-01/2025-12-31", "source_relation": "利息收入组成24.00%", "physical_page": 32},
+    {"source_name": "手续费及佣金净收入", "raw_value": "351,195", "unit": "千元", "period": "2025-01-01/2025-12-31", "source_relation": "非息净收入组成30.66%", "physical_page": 33},
+    {"source_name": "投资收益", "raw_value": "1,260,568", "unit": "千元", "period": "2025-01-01/2025-12-31", "source_relation": "非息净收入组成110.05%；有负项故可大于合计", "physical_page": 33},
+    {"source_name": "公允价值变动损益", "raw_value": "(476,435)", "unit": "千元", "period": "2025-01-01/2025-12-31", "source_relation": "负值，非息净收入组成(41.59%)", "physical_page": 33},
+    {"source_name": "资产总额", "raw_value": "5,381.66", "unit": "亿元", "period": "2025-12-31", "source_relation": "本公司期末规模，致辞披露近似精度", "physical_page": 4},
+    {"source_name": "贷款和垫款本金总额", "raw_value": "2,978.77", "unit": "亿元", "period": "2025-12-31", "source_relation": "本金口径", "physical_page": 4},
+    {"source_name": "存款本金总额", "raw_value": "3,430.34", "unit": "亿元", "period": "2025-12-31", "source_relation": "本金口径", "physical_page": 4},
+    {"source_name": "公司存款（含保证金）/公司贷款（含票据贴现）", "raw_value": ["1,470.35", "2,237.25"], "unit": "亿元", "period": "2025-12-31", "source_relation": "公司金融业务，不是全公司存贷款", "physical_page": 20},
+    {"source_name": "个人存款/个人贷款", "raw_value": ["1,960.00", "741.51"], "unit": "亿元", "period": "2025-12-31", "source_relation": "零售金融业务", "physical_page": 22}
+  ],
+  "native_pdf_anchors": [
+    {"physical_page": 20, "quote": "（一）公司金融业务", "native_text_start": 389, "native_text_end": 398, "bbox_pdf_points": [125.232, 438.279, 226.115, 449.523]},
+    {"physical_page": 22, "quote": "（二）零售金融业务", "native_text_start": 386, "native_text_end": 395, "bbox_pdf_points": [125.232, 466.01, 226.115, 477.482]},
+    {"physical_page": 24, "quote": "（三）普惠金融条线", "native_text_start": 264, "native_text_end": 273, "bbox_pdf_points": [120.672, 578.198, 221.531, 589.49]},
+    {"physical_page": 25, "quote": "（四）金融市场业务", "native_text_start": 458, "native_text_end": 467, "bbox_pdf_points": [125.232, 410.198, 226.115, 421.442]},
+    {"physical_page": 30, "quote": "营业收入 9,965,625 8,190,241 21.68%", "native_text_start": 185, "native_text_end": 216, "bbox_pdf_points": [81.731, 558.398, 506.856, 568.346]},
+    {"physical_page": 33, "quote": "手续费及佣金净收入 351,195 30.66%", "native_text_start": 423, "native_text_end": 447, "bbox_pdf_points": [81.408, 387.998, 373.997, 397.946]}
+  ],
+  "coordinate_system": "physical_page为1起原PDF页序；native_text为pypdfium2 get_text_range原字符偏移；bbox为PDF points，左下原点；不是重排文本或渲染图坐标。",
+  "qualifications": [
+    "公司金融、零售及普惠是经营条线；其贷款可能存在交叠，不自行加总为互斥分部。",
+    "正文称本公司时保留该名称及经营关系，不凭group/issuer枚举单独认定全公司总额或语义错误。",
+    "利息收入、利息净收入、非利息净收入、投资收益是不同科目；不得重复加总或将非息内部占比作总营收占比。",
+    "2025年损益与2025年末规模、日均生息资产不同；原页31注明日均余额未经审计。",
+    "信用、流动性、市场、银行账簿利率等为原文风险；未来计划不等于已经实现。"
+  ],
+  "basis": "本审核助手以pypdfium2直接亲读上述原PDF页及目录，核SHA256；没有采用旧模型答案或旧画像作为真值。",
+  "reference_sent_to_model": false,
+  "output_assessment": "not_assessed; source-only reference, first/automatic-final objects not received"
+}

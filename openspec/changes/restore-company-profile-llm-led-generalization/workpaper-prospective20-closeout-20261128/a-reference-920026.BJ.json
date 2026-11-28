@@ -1,0 +1,50 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "instrument_id": "920026.BJ",
+  "report": {
+    "content_hash": "01c7633ee247fcdba006c7007279cf005c92fa90f9638b9ab3e3ed676819aac0",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-12T16:00:00+00:00",
+    "source": "cninfo",
+    "source_announcement_id": "1225097995",
+    "asset_id": "asset_f4fa41361dd47fbdc06b4440c21ef850"
+  },
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/01/01c7633ee247fcdba006c7007279cf005c92fa90f9638b9ab3e3ed676819aac0.pdf",
+  "pdf_sha256": "01c7633ee247fcdba006c7007279cf005c92fa90f9638b9ab3e3ed676819aac0",
+  "name": "卓兆点胶",
+  "source_sections_and_physical_pages": "第四节/一、业务概要及二、营业情况分析/收入构成，物理12–13、19–21；年度大事记2核并购时点",
+  "core_conditions": [
+    {
+      "condition_id": "C1",
+      "question": "公司做什么",
+      "expected_source_answer": "高精度智能点胶设备、阀及核心部件、耗材配件的研发生产销售"
+    },
+    {
+      "condition_id": "C2",
+      "question": "主要产品/服务与板块",
+      "expected_source_answer": "智能点胶设备、点胶阀及配件、点胶耗材三类主要收入产品"
+    },
+    {
+      "condition_id": "C3",
+      "question": "怎么赚钱",
+      "expected_source_answer": "标准化模块硬件加定制功能，直接销售为主、少量经贸易商，主业产品销售另有厂租等其他收入"
+    }
+  ],
+  "important_numbers": {
+    "company_revenue_CNY": "378588845.41",
+    "main_business_revenue_CNY": "372004939.24",
+    "equipment_CNY": "78924520.62",
+    "valves_parts_CNY": "185327234.79",
+    "consumables_CNY": "100413711.33"
+  },
+  "qualifications": [
+    "收购广东浦森51%在2025年1月完成，2026年施工合同不能标成2025已完工",
+    "耗材是重要新增收入，不能只写设备/阀",
+    "跨页19–21保本上期、费用与产品表口径，不把其他业务全说成厂租"
+  ],
+  "basis": "exact original PDF/version and existing independent A source reading reused; no model answer used",
+  "prior_source_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/a-prospective-source-reference.json",
+  "prior_source_sha256": "a4e8d1d47431ff07cdddad12cda62b91cfab14194b66cf9bf6a73af28babdb22",
+  "reference_sent_to_model": false
+}

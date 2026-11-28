@@ -1,0 +1,49 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "instrument_id": "002463.SZ",
+  "report": {
+    "content_hash": "9810736ee50d0fa7f4d8e8370e3965bde8e24c6dbafb86593ae2206b0e2f2f15",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-24T16:00:00+00:00",
+    "source": "cninfo",
+    "source_announcement_id": "1225027832",
+    "asset_id": "asset_d7a03e75f0f1df7da2aa6c9916df9876"
+  },
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/98/9810736ee50d0fa7f4d8e8370e3965bde8e24c6dbafb86593ae2206b0e2f2f15.pdf",
+  "pdf_sha256": "9810736ee50d0fa7f4d8e8370e3965bde8e24c6dbafb86593ae2206b0e2f2f15",
+  "name": "沪电股份",
+  "source_sections_and_physical_pages": "第三节/一、主要业务、主营分析/收入与成本，物理10、20（印刷页8/18）",
+  "core_conditions": [
+    {
+      "condition_id": "C1",
+      "question": "公司做什么",
+      "expected_source_answer": "专注PCB印制电路板制造"
+    },
+    {
+      "condition_id": "C2",
+      "question": "主要产品/服务与板块",
+      "expected_source_answer": "以数据通讯、智能汽车应用为核心，辅以工业控制及其他PCB"
+    },
+    {
+      "condition_id": "C3",
+      "question": "怎么赚钱",
+      "expected_source_answer": "研发生产销售PCB并提供售后服务，产品销售为收入主体"
+    }
+  ],
+  "important_numbers": {
+    "company_revenue_CNY": "18945220585",
+    "PCB_revenue_CNY": "18143308261",
+    "data_communications_CNY": "14656300288",
+    "smart_auto_CNY": "3044579100",
+    "industrial_other_CNY": "442428873"
+  },
+  "qualifications": [
+    "房屋销售/物业费/可回收边角料及租赁仍有其他收入，不将非核心收入改成零",
+    "按PCB应用划分与内外销是不同分类轴；名称优化未改变原统计口径"
+  ],
+  "basis": "exact original PDF/version and existing independent A source reading reused; no model answer used",
+  "prior_source_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/a-prospective-source-reference.json",
+  "prior_source_sha256": "a4e8d1d47431ff07cdddad12cda62b91cfab14194b66cf9bf6a73af28babdb22",
+  "reference_sent_to_model": false
+}

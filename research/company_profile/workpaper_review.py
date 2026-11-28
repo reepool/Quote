@@ -24,6 +24,7 @@ from .workpaper import (
     workpaper_elements, workpaper_element_payloads,
     qualify_workpaper_display, workpaper_fact_hash,
     WORKPAPER_SUBJECT_INSTRUCTIONS,
+    BUSINESS_ROLE_REVIEW_FLAG, BUSINESS_ROLE_REVIEW_POLICY, WORKPAPER_BUSINESS_ROLE_INSTRUCTIONS,
     WorkpaperUseReview, _Model,
 )
 from .models import ReportIdentity
@@ -963,6 +964,9 @@ def review_workpaper(
     verify_id = f"{work_id}:workpaper:repair-verify"
     call_ids = {review_id, repair_id, verify_id}
     real = identity.get("execution_mode") == "provider"
+    role_policy = identity.get(BUSINESS_ROLE_REVIEW_FLAG)
+    if role_policy not in (None, BUSINESS_ROLE_REVIEW_POLICY):
+        raise ValueError("unknown workpaper business role review policy")
     metric_limits_enabled = identity.get("workpaper_metric_limit_policy") == METRIC_LIMIT_POLICY
     subject_policy = (resume or identity).get(SUBJECT_LIMIT_FLAG)
     subject_limits_enabled = subject_policy == SUBJECT_LIMIT_POLICY
@@ -1052,6 +1056,8 @@ def review_workpaper(
                 "Assess omissions only against targeted_reading questions. Deliberately unread "
                 "non-target elements are not omissions to repair. Check every asserted fact for "
                 "source correctness; preserve honest uncertainty and remaining target gaps.")
+        if role_policy == BUSINESS_ROLE_REVIEW_POLICY:
+            instructions += "\n" + WORKPAPER_BUSINESS_ROLE_INSTRUCTIONS
         result = provider.workpaper_request(
             request_id=request_id, purpose=purpose, report=paper.report,
             payload={"report": paper.report.model_dump(mode="json"),

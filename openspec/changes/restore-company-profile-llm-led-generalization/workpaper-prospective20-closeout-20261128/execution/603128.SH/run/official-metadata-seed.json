@@ -1,0 +1,12 @@
+{
+  "instrument_id": "603128.SH",
+  "asset_id": "asset_7518383adf74a4155a170773687fba8d",
+  "document_version": "0078292f91a3db98fa4775ef034e8c3fed91d1f9cb1cbab10042af459c1b51a9",
+  "frontier_status": "pending",
+  "metadata_only": true,
+  "frozen_asset_id": "asset_7518383adf74a4155a170773687fba8d",
+  "resolved_asset_id": "asset_7518383adf74a4155a170773687fba8d",
+  "same_document_asset_alias": false,
+  "binding_basis": "exact stock/fiscal_year/report_period/announcement/published_at/document_hash",
+  "owner": "register_business_profile_shared_annual_report_asset"
+}

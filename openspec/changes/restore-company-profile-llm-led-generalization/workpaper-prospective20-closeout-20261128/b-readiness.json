@@ -1,0 +1,69 @@
+{
+  "state": "engineering_ready_pending_A_whole_group_freeze",
+  "supplier_sends": 0,
+  "new20_attempts": 0,
+  "main39_writes": 0,
+  "services": 0,
+  "git_mutations": 0,
+  "operator_sha256": "d8e4aea0f1a933881d20de56bf9bb426f2b0de03bb292aa0836c80e6993ad962",
+  "test_file_sha256": "e69e617d102e7b8db20b6cccf9b036fed79e42cf3d40fd57faf8c09f8d120e01",
+  "scope": "Only thin-adapter changes verified; no new company business read for prompt tuning and no semantic self-scoring.",
+  "direct_tests": {
+    "command": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_6fy_shared_phases.py --basetemp=<dedicated QuoteBak root>/tests --disable-warnings --tb=short",
+    "result": "3 passed in61.43s; exit0",
+    "supplier_transmissions": 0,
+    "scripted_transmissions": 3,
+    "normal_nonempty_path": {
+      "owner": "unchanged6.FN original_phases -> original TaskService",
+      "first_read_visible_facts": 3,
+      "first_read_review_status": "not_reviewed",
+      "automatic_final_visible_facts": 3,
+      "final_review_status": "completed",
+      "client_instances": 1,
+      "budget_same_instance": true,
+      "absolute_deadline_unchanged": true,
+      "physical_after_first": 2,
+      "physical_after_review": 3,
+      "synthetic_tokens_after_first": 200,
+      "synthetic_tokens_after_review": 300,
+      "identity": "v22/v16 explicit subject_scope_limits=True"
+    },
+    "other_cases": [
+      "partial company failures do not globally stop; two same typed root with no first draft stop new dispatch only",
+      "missing/partial reference waits with no started marker/client/budget/attempt"
+    ]
+  },
+  "reused": {
+    "sixFX_frozen_code_config_files_match": 62,
+    "previous_self_check_path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/self-check.json",
+    "previous_self_check_sha256": "b168836d4f52daab1969b86c137e5a1526b6514186790fa5fd13f2be5e6561d6",
+    "existing_results": "67 direct checks plus2 B2 outer cases reused; no broad rerun"
+  },
+  "source_readiness": {
+    "fixed_companies": 20,
+    "metadata_owner": "a-sample-manifest.json",
+    "official_cutoff": "2026-11-25",
+    "metadata_and_pdf_hashes_verified": true,
+    "formal_execution_date": "2026-11-28",
+    "source_reference_semantics": "A-owned, never sent to model"
+  },
+  "protections": {
+    "head": "a7f6a93f75cae45122f5b4981aef432a292e6a1f",
+    "original_research_files": 411,
+    "hashes_equal": true,
+    "existing_dirty_files": 20,
+    "B_edits_to_existing_dirty": false,
+    "previous_sixFX_roots_absent": true
+  },
+  "snapshots": {
+    "output": "raw20/",
+    "checkpoint": "execution/<stock>/",
+    "phase_evidence": "execution/<stock>/run/",
+    "first": "first-api.json",
+    "after_first_budget": "budget-after-first.json",
+    "automatic_final": "automatic-final-api.json",
+    "wires": "wires/",
+    "ledger": "budget.json"
+  },
+  "actual_run": "A method + unified freeze required; each a-reference-stock.json must be source_frozen_before_new_model_input before dispatch; no model call from prepare/preflight"
+}

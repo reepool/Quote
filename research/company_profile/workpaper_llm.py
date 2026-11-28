@@ -17,6 +17,7 @@ from .workpaper import (
     WorkpaperFormatNormalization, WorkpaperGenerationMetadata,
     WorkpaperModelCall, bind_workpaper_draft, normalize_workpaper_draft,
     WORKPAPER_SUBJECT_INSTRUCTIONS,
+    BUSINESS_ROLE_REVIEW_FLAG, BUSINESS_ROLE_REVIEW_POLICY, WORKPAPER_BUSINESS_ROLE_INSTRUCTIONS,
 )
 from .workpaper_sections import (
     SectionPacket, SectionSelection, build_section_packet,
@@ -48,7 +49,10 @@ def workpaper_processing_identity(
     *, real: bool = True, review: bool = False, review_profile: str | None = None,
     defer_review: bool = False,
     subject_scope_limits: bool = False,
+    business_role_review_policy: str | None = None,
 ) -> dict[str, Any]:
+    if business_role_review_policy not in (None, BUSINESS_ROLE_REVIEW_POLICY):
+        raise ValueError("unknown workpaper business role review policy")
     if defer_review and not review:
         raise ValueError("deferred workpaper review requires an enabled review policy")
     if subject_scope_limits and not review:
@@ -70,6 +74,8 @@ def workpaper_processing_identity(
         "workpaper_max_output_tokens": 12_000,
         "logical_request_timeout_seconds": 620,
     }
+    if business_role_review_policy is not None:
+        identity[BUSINESS_ROLE_REVIEW_FLAG] = business_role_review_policy
     if review:
         from .workpaper_review import REVIEW_POLICY, METRIC_LIMIT_POLICY, SUBJECT_REVIEW_POLICY, SUBJECT_LIMIT_POLICY, SUBJECT_LIMIT_FLAG
 
@@ -372,6 +378,9 @@ def run_workpaper(
     extraction_resume: Mapping[str, Any] | None = None,
 ) -> WorkpaperRun:
     """One selection and one company extraction, never eight per-element loops."""
+    role_policy = processing_identity.get(BUSINESS_ROLE_REVIEW_FLAG)
+    if role_policy not in (None, BUSINESS_ROLE_REVIEW_POLICY):
+        raise ValueError("unknown workpaper business role review policy")
     metric_format_policy = processing_identity.get(METRIC_FORMAT_FLAG)
     if metric_format_policy not in (None, *METRIC_FORMAT_POLICIES):
         raise ValueError(f"unknown workpaper metric format policy: {metric_format_policy!r}")
@@ -544,7 +553,8 @@ def run_workpaper(
                     **recovery_content,
                     **reading_targets,
                 },
-                instructions=EXTRACTION_INSTRUCTIONS + ("\n" + METRIC_FORMAT_INSTRUCTIONS if metric_format_policy else "") + ("\nThis is a supplemental reading: answer only targeted_reading questions from these original sections. Do not regenerate unrelated profile content. Keep required element keys; non-target elements have no facts and an explicit not-read-for-this-task limitation. Retain any remaining uncertainty; an answer does not establish exhaustive coverage." if enrichment else ""), response_model=WorkpaperDraftResponse,
+                instructions=EXTRACTION_INSTRUCTIONS + ("\n" + METRIC_FORMAT_INSTRUCTIONS if metric_format_policy else "") + ("\nThis is a supplemental reading: answer only targeted_reading questions from these original sections. Do not regenerate unrelated profile content. Keep required element keys; non-target elements have no facts and an explicit not-read-for-this-task limitation. Retain any remaining uncertainty; an answer does not establish exhaustive coverage." if enrichment else "")
+                + ("\n" + WORKPAPER_BUSINESS_ROLE_INSTRUCTIONS if role_policy == BUSINESS_ROLE_REVIEW_POLICY else ""), response_model=WorkpaperDraftResponse,
                 max_output_tokens=int(processing_identity.get("workpaper_max_output_tokens", 12_000)),
                 timeout_seconds=timeout,
                 **({"local_format_recovery": True} if automatic_format else {}),

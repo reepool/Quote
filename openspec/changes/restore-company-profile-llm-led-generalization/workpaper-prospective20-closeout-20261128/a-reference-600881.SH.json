@@ -1,0 +1,49 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "instrument_id": "600881.SH",
+  "name": "亚泰集团",
+  "report": {"content_hash": "e45fee819475041f70b3abf4adadbf4a377318898e4d2d63c249be5051ccb8e9", "report_period": "2025-12-31", "fiscal_year": 2025, "published_at": "2026-04-28T16:00:00+00:00", "source": "cninfo", "source_announcement_id": "1225246600", "asset_id": "asset_563496df61bcae7d8457c1edbd228a5a", "title": "2025年年度报告", "variant": "original"},
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/e4/e45fee819475041f70b3abf4adadbf4a377318898e4d2d63c249be5051ccb8e9.pdf",
+  "pdf_sha256": "e45fee819475041f70b3abf4adadbf4a377318898e4d2d63c249be5051ccb8e9",
+  "document_version": "600881.SH / 2025年年度报告 original / 公告1225246600 / SHA256同pdf_sha256",
+  "source_sections_and_physical_pages": "目录物理3；主要会计数据5；第三节主要业务7–8、经营讨论8–9；主要经营情况/利润表9、主营收入构成10–11。物理页与印刷页一致。",
+  "physical_pages_read": [1, 3, 5, 7, 8, 9, 10, 11, 12],
+  "core_conditions": [
+    {"condition_id": "C1", "question": "公司做什么", "expected_source_answer": "以建材、地产、医药为主并涉足文旅、金融投资的多产业集团；主营收入表还明列煤炭、商贸和其他，不可仅凭开篇三大主业完全隐藏这些实际经营收入。", "source_physical_pages": [7, 8, 9, 10]},
+    {"condition_id": "C2", "question": "主要产品/服务与板块", "expected_source_answer": "建材生产销售水泥、熟料、骨料、混凝土及水泥制品/矿渣微粉；地产含开发、建筑施工、预制装配及物业；医药涵盖研发制造、流通药房、医疗器械和健康管理等；兼有商贸/酒店文旅、煤炭及金融股权投资。保原产业与收入表分类关系，不擅把所有商贸其他金额都归某具体酒店或地产。", "source_physical_pages": [7, 8, 9, 10, 11]},
+    {"condition_id": "C3", "question": "怎么赚钱", "expected_source_answer": "生产销售建材及药品、医药流通零售，开发销售房地产并提供工程/物业等服务，经营商贸文旅及煤炭产品，并通过金融股权持有获取投资收益。主要收入表建材2,578,982,024.32元、医药1,769,576,941.62元、地产721,389,602.25元，另商贸339,497,631.16元、其他438,810,532.01元及煤炭214,313,450.64元；主营合计6,062,570,182元与公司营业收入6,360,654,304.04元分列，不能把减亏写成已盈利。", "source_physical_pages": [8, 9, 10, 11]}
+  ],
+  "important_numbers": [
+    {"source_name": "营业收入", "raw_value": "6,360,654,304.04", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 5, "source_relation": "公司主要会计数据及利润表；同比-11.84%"},
+    {"source_name": "主营业务分行业收入合计", "raw_value": "6,062,570,182.00", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 10, "source_relation": "不同于公司全部营业收入；同比-12.36%"},
+    {"source_name": "建材行业", "raw_value": "2,578,982,024.32", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 10, "source_relation": "主营收入，毛利率13.07%"},
+    {"source_name": "房地产业", "raw_value": "721,389,602.25", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 10, "source_relation": "主营收入，毛利率16.44%"},
+    {"source_name": "医药行业", "raw_value": "1,769,576,941.62", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 10, "source_relation": "主营收入，毛利率43.44%"},
+    {"source_name": "煤炭行业", "raw_value": "214,313,450.64", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 10, "source_relation": "主营收入，毛利率1.00%"},
+    {"source_name": "商贸行业", "raw_value": "339,497,631.16", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 10, "source_relation": "主营收入，毛利率29.15%"},
+    {"source_name": "其他行业", "raw_value": "438,810,532.01", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 10, "source_relation": "主营收入，毛利率7.91%；不擅自指定单业务"},
+    {"source_name": "归属于上市公司股东的净利润", "raw_value": "-2,040,411,054.21", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 5, "source_relation": "仍亏损；表列同比30.07%表示减亏，非利润变正"},
+    {"source_name": "总资产/归属于上市公司股东的净资产", "raw_value": ["40,168,872,758.09", "618,985,612.77"], "unit": "元", "period": "2025-12-31", "physical_page": 5},
+    {"source_name": "熟料生产量/销售量", "raw_value": ["695.22", "166.47"], "unit": "万吨", "period": "2025-01-01/2025-12-31", "physical_page": 11},
+    {"source_name": "水泥生产量/销售量", "raw_value": ["681.97", "666.15"], "unit": "万吨", "period": "2025-01-01/2025-12-31", "physical_page": 11},
+    {"source_name": "持有东北证券/吉林银行股权", "raw_value": ["30.81%", "6.55%"], "unit": "%", "period": "原文目前", "physical_page": 9, "source_relation": "股权投资比例，不是营业收入份额或全部被投主体资产产权"}
+  ],
+  "native_pdf_anchors": [
+    {"physical_page": 7, "quote": "亚泰集团现已形成以建材、地产、医药为主，涉足文旅和金融投资的产业格局。", "native_text_start": 1081, "native_text_end": 1116, "bbox_pdf_points": [111.371, 139.761, 471.619, 149.667]},
+    {"physical_page": 9, "quote": "营业收入 6,360,654,304.04 7,214,631,554.39 -11.84", "native_text_start": 1408, "native_text_end": 1453, "bbox_pdf_points": [90.329, 226.675, 538.414, 237.104]},
+    {"physical_page": 10, "quote": "合计 6,062,570,182.00 4,702,223,787.80 22.44", "native_text_start": 1119, "native_text_end": 1161, "bbox_pdf_points": [105.329, 195.038, 436.534, 204.871]}
+  ],
+  "coordinate_system": "原PDF物理页1起；pypdfium2原文本字符偏移；bbox为PDF points左下原点。",
+  "qualifications": [
+    "主营产业文字与收入类别粒度不同，按完整叙述和表头关系判断，不能用一个group/segment标签认定全公司总额或错误。",
+    "公司营业收入63.61亿元与主营表60.63亿元不能互换；各行业/产品/地区是同一主营收入交叉分类，不重复加总。",
+    "建材减亏但仍亏损，地产市场及资产/商誉减值等影响总体；毛利为正不意味着公司或相应板块净利润为正。",
+    "公司持有金融机构股权不等于亲自经营全部银行和证券服务；金融投资收益不与营业收入板块不加区别混算。",
+    "熟料可能再用于水泥，产销与存货不可仅凭同单位加总；全国水泥16.93亿吨、东北降幅9.1%是行业数据，非公司规模。",
+    "公司研发/健康管理/文旅转型的展望与当期已实现分别保留；特色补充不强求全量，已输出仍须有源。"
+  ],
+  "basis": "本审核助手直接亲读指定原PDF及目录定位，逐份核SHA256；无旧模型答案/画像真值输入。",
+  "reference_sent_to_model": false,
+  "output_assessment": "not_assessed; source-only, awaiting first/automatic-final consumer objects"
+}

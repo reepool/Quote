@@ -58,6 +58,28 @@ WORKPAPER_SUBJECT_INSTRUCTIONS = SUBJECT_SCOPE_DESCRIPTION + (
     "express them, use unclear with a specific reason. Unclear/unknown cannot excuse "
     "known wrong narrative, period or citations. Metrics keep their own source scope."
 )
+BUSINESS_ROLE_REVIEW_FLAG = "workpaper_business_role_review_policy"
+BUSINESS_ROLE_REVIEW_POLICY = "source_business_roles.v1"
+WORKPAPER_BUSINESS_ROLE_INSTRUCTIONS = """[source_business_roles.v1]
+Align every assertion with the ORIGINAL source already supplied in extraction,
+initial review, targeted repair and final verification. Preserve each material
+earning role and its owning business: buying/reselling goods for a trading spread
+or product sales, charging service fees, operating for others or acting as an agent,
+investment or another explicitly disclosed role. A service-industry title does not
+turn goods trading into transport. Freight or procurement cost alone proves neither
+ownership nor a trading role. Check fact.period independently of the report year
+and every metric.period; preserve actual versus plan/outlook, event time and conditions
+in both text and period. Unselected or unfound information is unknown in the selected
+scope, not 'the report did not disclose'; do not claim full-report nondisclosure.
+For a compound assertion cite support for EVERY substantive clause, including its
+governing headers and continuation pages; one supported clause does not support all.
+Preserve source direction/sign, unit and comparison basis in narrative and metrics;
+a positive decrease magnitude must explicitly retain decrease, never an unsigned
+generic change. If unsafe to normalize, retain raw_value, value=null and a specific
+uncertainty_reason; do not guess a sign or excuse a known false assertion as unknown.
+This is model semantic judgment. Do not require every tail row, additional source,
+extra call or supply-chain detail; optional gaps may remain.
+"""
 Status = Literal[
     "observed", "not_disclosed", "not_applicable", "extraction_failed", "unclear"
 ]

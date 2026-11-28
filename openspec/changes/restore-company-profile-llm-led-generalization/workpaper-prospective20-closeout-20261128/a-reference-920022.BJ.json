@@ -1,0 +1,48 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "instrument_id": "920022.BJ",
+  "report": {
+    "content_hash": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-25T16:00:00+00:00",
+    "source": "cninfo",
+    "source_announcement_id": "1225036979",
+    "asset_id": "asset_2e5f514bffd07480b7f0b9e0630fff50"
+  },
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/9d/9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a.pdf",
+  "pdf_sha256": "9d8e1a28ba3086875d62b83d5bbafca75bab73c8c254ee1d5134e9e1c9d5601a",
+  "name": "世昌股份",
+  "source_sections_and_physical_pages": "第四节/一、业务概要及二、经营回顾/营业情况分析，物理12–13、17–19；封面2/提示4另核身份",
+  "core_conditions": [
+    {
+      "condition_id": "C1",
+      "question": "公司做什么",
+      "expected_source_answer": "汽车燃料系统研发制造销售服务，热管理子业务仍在初期"
+    },
+    {
+      "condition_id": "C2",
+      "question": "主要产品/服务与板块",
+      "expected_source_answer": "常压/高压塑料燃油箱总成，辅以配件及热管理产品"
+    },
+    {
+      "condition_id": "C3",
+      "question": "怎么赚钱",
+      "expected_source_answer": "以销定产、以产定购，对整车厂/系统集成商直销，项目定点后量产交付"
+    }
+  ],
+  "important_numbers": {
+    "company_revenue_CNY": "667113776.81",
+    "fuel_tank_revenue_CNY": "626910726.45",
+    "main_business_revenue_CNY": "654239392.25"
+  },
+  "qualifications": [
+    "热管理规模较小不能冒称主业收入",
+    "跨页18–19产品表延续原表头/元；境内外分类不是独立经营分部",
+    "客户代称豁免披露，不能猜全称"
+  ],
+  "basis": "exact original PDF/version and existing independent A source reading reused; no model answer used",
+  "prior_source_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/a-prospective-source-reference.json",
+  "prior_source_sha256": "a4e8d1d47431ff07cdddad12cda62b91cfab14194b66cf9bf6a73af28babdb22",
+  "reference_sent_to_model": false
+}

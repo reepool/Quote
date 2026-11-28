@@ -1,0 +1,19 @@
+{
+  "task": "6.FY",
+  "actual_api_base": "http://192.168.188.66:8000/api/v1",
+  "read_requests": 3,
+  "execution_tasks_submitted": 0,
+  "catalog_companies": 59,
+  "batch_full_content_equal_expected": true,
+  "east_full_content_equal_expected_and_trade_gap_visible": true,
+  "response_statuses": [
+    200,
+    200,
+    200
+  ],
+  "elapsed_seconds": 9.186503023986006,
+  "expected_response_sha256": "2174c69d75592fc880c2a744606d882634ece5a7cf8b430834b05d2ddaacfde3",
+  "models_constructed_or_called": false,
+  "service_restarted": false,
+  "shared_configuration_changed": false
+}

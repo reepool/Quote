@@ -1,0 +1,47 @@
+{
+  "task": "6.FY",
+  "version": "mechanical-index.v5.postrun-read-compatibility",
+  "base_script_sha256": "075ca212dcd6133a4ab310d387203ab621e97dfc8628c038ca6a984c4925c7de",
+  "prior_script_sha256": "463ae5dc1c215faf1a3dbe7c927c91554328e3e33e49af7378b02f56dd09102f",
+  "script_sha256": "292ebffa3191e1fc8acce99645152ed02b4cea9b812a1292c798fe53e1e47d93",
+  "reason": "Final A authority is complete. Previous index retained duplicate exclusion flags but omitted duplicate targets/reasons and aggregate coverage/duplicate/narrative denominators; complete the requested mechanical output and preserve source overrides via exact pointers, without changing A semantics or the frozen sampling method.",
+  "changes": [
+    "Accept original companies pointers or frozen b-plan sources/audit_snapshots/roots without copying payloads",
+    "While automatic phase is pending, reference stable budget-after-first.json rather than the live budget ledger",
+    "Record script version and input-resolution provenance in mechanical results",
+    "Consume repeated --review-inputs main/side files without merging or rewriting A source judgments",
+    "Bind main metric_checks.metric_index and side metrics.consumer_metric_index/original_metric_index to current consumer metrics and original positions",
+    "Carry A narrative/metric/standardized statuses separately, preserve source judgment pointers, and expose exact mechanical review-binding diagnostics",
+    "Retain A semantic_duplicate_of/reason and root source-audit hashes/override pointers, without changing original source audits",
+    "Report exact object/narrative/metric fractions, pending counts, review coverage, mandatory/supplement union, duplicate totals and structural versus A-reviewed standardized coverage at company/stratum/cohort level",
+    "Verify original-run seal and reject stale audit-file bindings before publishing counts",
+    "Allow the exact three post-run workpaper prompt constants only after verifying all original AST declarations against the matching frozen Git blob; never revert or edit the parallel application",
+    "Represent undelivered human_safe as not_assessed with null quality/usable rates; do not affect first/final denominators"
+  ],
+  "validation": {
+    "601000.SH_actual_first_api_and_raw_pointer_resolution": "passed",
+    "002316.SZ_actual_first_api_and_raw_pointer_resolution": "passed",
+    "ruff": "passed",
+    "main_actual_both_phases_920022": "24 objects /42 metric checks bound per phase; all supplied statuses preserved",
+    "main_actual_both_phases_601000": "20 objects /28 metric checks bound per phase; all supplied statuses preserved",
+    "side_actual_both_phases_600928": "23 first /24 final objects with explicit metric positions bound; all supplied statuses preserved",
+    "final_A_all40phases": "all object sets, supplied statuses and original metric positions bind exactly; no incomplete metric checks",
+    "final_count_fixtures": "first394/400 and final417/417 unique objects, 4 semantic duplicates per layer, both59/60 core and19/20 usable, no unassessed objects/narratives/metrics",
+    "frozen_sampling_actual_small_populations": "first326 mandatory+74/74 supplement; final337 mandatory+80/80 supplement; all20 companies at most20 actual supplement per layer"
+  },
+  "method_changed": false,
+  "postrun_read_dependency_compatibility": {
+    "path": "/home/python/Quote/research/company_profile/workpaper.py",
+    "current_sha256": "68a04af9a341506d1af6b451033c004a94686d2a7d131e5a55152575b23edfb3",
+    "added_string_constants": [
+      "BUSINESS_ROLE_REVIEW_FLAG",
+      "BUSINESS_ROLE_REVIEW_POLICY",
+      "WORKPAPER_BUSINESS_ROLE_INSTRUCTIONS"
+    ],
+    "constraint": "frozen source hash must match a7f6a93f Git blob; current AST after removing these three plain-string assignments must equal the original full AST"
+  },
+  "source_references_changed": false,
+  "B_app_or_plan_changed": false,
+  "supplier_requests": 0,
+  "semantic_verdict": null
+}

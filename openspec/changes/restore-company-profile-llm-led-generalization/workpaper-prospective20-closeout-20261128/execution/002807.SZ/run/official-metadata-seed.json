@@ -1,0 +1,12 @@
+{
+  "instrument_id": "002807.SZ",
+  "asset_id": "asset_8c79bf64980c9cebac879534a3ffdcb0",
+  "document_version": "bc20e3bc2a713890677446cd6926564cb3de6f01ac36a6866d0f3ac1b91b61b0",
+  "frontier_status": "pending",
+  "metadata_only": true,
+  "frozen_asset_id": "asset_8c79bf64980c9cebac879534a3ffdcb0",
+  "resolved_asset_id": "asset_8c79bf64980c9cebac879534a3ffdcb0",
+  "same_document_asset_alias": false,
+  "binding_basis": "exact stock/fiscal_year/report_period/announcement/published_at/document_hash",
+  "owner": "register_business_profile_shared_annual_report_asset"
+}

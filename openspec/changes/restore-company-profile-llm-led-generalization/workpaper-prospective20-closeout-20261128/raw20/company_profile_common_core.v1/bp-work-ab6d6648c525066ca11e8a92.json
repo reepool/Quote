@@ -1,0 +1,2336 @@
+{
+  "schema_version": "company_profile_common_core_runtime.v3",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "production_authorization": "not_authorized",
+  "work_id": "bp-work-ab6d6648c525066ca11e8a92",
+  "report": {
+    "instrument_id": "002316.SZ",
+    "report_id": "asset_51dbcb7ce298d116e99386647b1e3e06",
+    "document_version": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-10T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "assessment": {
+    "mapping_version": "company_profile_common_core_mapping.v1",
+    "production_authorization": "not_authorized",
+    "report": {
+      "instrument_id": "002316.SZ",
+      "report_id": "asset_51dbcb7ce298d116e99386647b1e3e06",
+      "document_version": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-10T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "principal_business": {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "products_services": {
+      "dimension_id": "products_services",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "revenue_model": {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "core_complete": false
+  },
+  "activated_chapters": [],
+  "evidence_gap_codes": [],
+  "provider_calls": [
+    "select_profile_sections",
+    "extract_profile_workpaper",
+    "review_profile_workpaper"
+  ],
+  "provider_blocked": false,
+  "execution": {
+    "schema_version": "company_profile_execution_record.v1",
+    "production_authorization": "not_authorized",
+    "input_identity": {
+      "instrument_id": "002316.SZ",
+      "report_id": "asset_51dbcb7ce298d116e99386647b1e3e06",
+      "document_version": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+      "report_period": "2025-12-31",
+      "policy_version": "company_profile_common_core_mapping.v2",
+      "processing_identity": {
+        "execution_mode": "provider",
+        "logical_request_timeout_seconds": 2450.0,
+        "max_layout_characters": 500000,
+        "max_section_characters": 160000,
+        "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+        "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+        "prompt_version": "company_profile_workpaper.2026-11-28.subject-relationships.v22",
+        "quality_review_profile": "semantic_extraction__scorpio_grok",
+        "reading_strategy": "chapter_workpaper_v1",
+        "repair_profile": "semantic_extraction__deepseek",
+        "review_existing_draft_hash": "cacb68de3010adb0c8e74690a3c6598248729ef71f0ff6356718273750ba4802",
+        "review_max_output_tokens": 16384,
+        "review_seed_receipts_hash": "133aee2f6b94db0a2103841b028eb28cb052273170ec3285316d8b4641db15ae",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "semantic_policy": "company_profile_llm_led.v2",
+        "semantic_reuse": false,
+        "source_binding_policy": "company_workpaper_source_literals.column-wrapped-amounts.v8",
+        "workpaper_format_recovery": "local_shape_before_retry.v3",
+        "workpaper_max_output_tokens": 12000,
+        "workpaper_metric_format_policy": "source_metric_unparsed_value_null.v2.raw-null-accounting",
+        "workpaper_metric_limit_policy": "source_review_exact_metric_limits.v1",
+        "workpaper_review_policy": "company_profile_workpaper_review.v16",
+        "workpaper_review_recovery": {
+          "base_work_id": "bp-work-27af25647bf58c8005c1b75a",
+          "base_workpaper_sha256": "cacb68de3010adb0c8e74690a3c6598248729ef71f0ff6356718273750ba4802",
+          "plan_sha256": "d1fc99da98ba7aa0b5fc9d0c867e8a93d29e638ed52fdfbc41c24e1a81202c11",
+          "prior_use_review": null,
+          "report": {
+            "document_type": "annual_report",
+            "document_version": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+            "instrument_id": "002316.SZ",
+            "published_at": "2026-03-10T16:00:00+00:00",
+            "report_id": "asset_51dbcb7ce298d116e99386647b1e3e06",
+            "report_period": "2025-12-31"
+          },
+          "request_id": "6fn-review-002316-SZ"
+        },
+        "workpaper_subject_scope_limit_policy": "source_review_exact_subject_limits.v1"
+      }
+    },
+    "scope_digests": {},
+    "model_attempts": [],
+    "token_budget": {
+      "total_token_budget": 1000000,
+      "extract_max_output_tokens": 4000,
+      "verify_max_output_tokens": 2000,
+      "tokens_used": 97161,
+      "tokens_remaining": 902839
+    },
+    "scope_token_allocations": {},
+    "transport_retries": 0,
+    "semantic_disputes": [],
+    "predecessor_lineage": []
+  },
+  "legacy_writers_invoked": [],
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "llm_generated",
+    "report": {
+      "instrument_id": "002316.SZ",
+      "report_id": "asset_51dbcb7ce298d116e99386647b1e3e06",
+      "document_version": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-10T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0020",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的主要业务"
+          ],
+          "start_page": 10,
+          "end_page": 12,
+          "rationale": "选择section-0020，因其完整覆盖公司主要业务、主要产品及用途、经营模式与主要业绩驱动因素；选择section-0054、section-0055、section-0056，分别覆盖智慧专网、生物纤维素基材、农牧领域经营情况，其中section-0056包含“收入与成本”子节，可解释收入构成、业务权重及本期经营变化。未选行业背景、核心竞争力、治理、财务附注等，因属次要或与上述范围重复。"
+        },
+        {
+          "section_id": "section-0054",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "①智慧专网领域经营情况"
+          ],
+          "start_page": 14,
+          "end_page": 15,
+          "rationale": "选择section-0020，因其完整覆盖公司主要业务、主要产品及用途、经营模式与主要业绩驱动因素；选择section-0054、section-0055、section-0056，分别覆盖智慧专网、生物纤维素基材、农牧领域经营情况，其中section-0056包含“收入与成本”子节，可解释收入构成、业务权重及本期经营变化。未选行业背景、核心竞争力、治理、财务附注等，因属次要或与上述范围重复。"
+        },
+        {
+          "section_id": "section-0055",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "②生物纤维素基材领域经营情况"
+          ],
+          "start_page": 15,
+          "end_page": 15,
+          "rationale": "选择section-0020，因其完整覆盖公司主要业务、主要产品及用途、经营模式与主要业绩驱动因素；选择section-0054、section-0055、section-0056，分别覆盖智慧专网、生物纤维素基材、农牧领域经营情况，其中section-0056包含“收入与成本”子节，可解释收入构成、业务权重及本期经营变化。未选行业背景、核心竞争力、治理、财务附注等，因属次要或与上述范围重复。"
+        },
+        {
+          "section_id": "section-0056",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "③农牧领域经营情况"
+          ],
+          "start_page": 15,
+          "end_page": 19,
+          "rationale": "选择section-0020，因其完整覆盖公司主要业务、主要产品及用途、经营模式与主要业绩驱动因素；选择section-0054、section-0055、section-0056，分别覆盖智慧专网、生物纤维素基材、农牧领域经营情况，其中section-0056包含“收入与成本”子节，可解释收入构成、业务权重及本期经营变化。未选行业背景、核心竞争力、治理、财务附注等，因属次要或与上述范围重复。"
+        }
+      ],
+      "unread_or_deferred": [
+        "行业情况与核心竞争力等背景性内容：对解释公司业务结构、收入来源和本期经营变化非必要",
+        "公司治理、董监高薪酬、内控与员工等治理章节：与经营和收入分析关系较弱",
+        "财务报表附注及分部信息：主营业务和收入成本章节已提供主要收入构成，暂不扩读",
+        "客户/供应商及未来计划、风险章节：属可选补充或计划性信息，当前范围可停止"
+      ],
+      "selection_rationale": "选择section-0020，因其完整覆盖公司主要业务、主要产品及用途、经营模式与主要业绩驱动因素；选择section-0054、section-0055、section-0056，分别覆盖智慧专网、生物纤维素基材、农牧领域经营情况，其中section-0056包含“收入与成本”子节，可解释收入构成、业务权重及本期经营变化。未选行业背景、核心竞争力、治理、财务附注等，因属次要或与上述范围重复。",
+      "stop_reason": "已覆盖业务/产品用途/经营模式、各业务板块经营情况、收入与成本及主要业绩驱动，足以回答公司做什么、如何赚钱、收入权重和本期经营变化；继续扩读行业背景、治理和附注边际收益低。",
+      "transcription_version": "shared-pdf-pypdf-layout.structured-notes.v1"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "bs-1",
+            "text": "报告期内，公司主要从事智慧专网、生物纤维素基材及农牧领域业务；智慧专网定位为专网通信技术整体解决方案服务商，聚焦智慧电网、智慧交通，为电力、交通等行业提供信息通信技术解决方案，生物纤维素基材从事研究、生产及销售，农牧领域从事农产品贸易及仓储服务。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "products_services": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "ps-1",
+            "text": "智慧专网领域为电力、交通行业提供信息通信技术解决方案：智慧电网为输变电、配电等环节提供通信网络架构设计、设备集成及系统部署，为光伏、风电场等新能源场站提供通信接入、数据传输与远程监控集成，并提供7×24小时运维保障；智慧交通面向高速公路及城市智能交通基础设施新建与改扩建，提供高速公路机电系统、城市道路监控、交通信号控制、电子警察、交通信息统计等整体解决方案，轨道交通方面提供专用、警用通信系统解决方案及运维服务。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0001",
+              "source-0005"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ps-2",
+            "text": "生物纤维素基材具有纳米三维网状结构、透气性、持水能力和生物相容性，以食品级原料发酵，可降解；产品主要应用于护肤品贴、膜类产品及医疗器械类敷料，妆字号可提供面膜、眼膜、鼻膜等定制化基材，械字号提供二类医疗器械用生物纤维素基材，用于医疗敷料、冷敷贴等。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ps-3",
+            "text": "农牧领域主营小麦、玉米等农产品品种，从事农产品贸易及仓储服务，通过整合内外部资源完成农产品采购到销售一体化服务，并利用自有仓库开展仓储及粮食保管业务。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "revenue_model": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "rm-1",
+            "text": "智慧专网业务通过参与国家电网、南方电网及各地交通主管部门等组织的公开招标、竞争性谈判等市场化采购获取项目，收入来自信息通信技术解决方案、系统集成、设备交付及运维服务；智慧交通业务还包括高速公路机电系统、城市智能交通系统等项目实施。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0001",
+              "source-0005"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "rm-2",
+            "text": "生物纤维素基材业务以研究、生产及销售获得收入，采取以销定产及定制化生产，向化妆品、医疗器械品牌商提供定制开发、技术解决方案及供应链保障。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "rm-3",
+            "text": "农牧业务通过农产品贸易购销价差及仓储、粮食保管服务获得收入；农产品贸易主要参与政府储备粮轮换相关业务，并开展市场化贸易。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0002",
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "scale_and_mix": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "sm-1",
+            "text": "2025年公司营业收入合计586,442,724.54元，同比下降3.45%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入合计",
+                "raw_value": "586,442,724.54",
+                "value": "586442724.54",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入合计同比增减",
+                "raw_value": "-3.45%",
+                "value": "-3.45",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-2",
+            "text": "2025年公司智慧专网业务领域实现主营业务收入46,691.55万元，同比下降5.17%。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "智慧专网业务领域主营业务收入",
+                "raw_value": "46,691.55",
+                "value": "46691.55",
+                "unit": "万元",
+                "source_unit": "万元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "智慧专网业务领域主营业务收入同比增减",
+                "raw_value": "同比下降5.17%",
+                "value": null,
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": "源文以‘同比下降5.17%’表述，未给出带符号数值；未将方向词转换为负号。"
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-3",
+            "text": "2025年交通工程系统集成营业收入248,213,693.90元，占营业收入42.33%，同比下降2.70%。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0007",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "交通工程系统集成营业收入",
+                "raw_value": "248,213,693.90",
+                "value": "248213693.90",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "交通工程系统集成占营业收入比重",
+                "raw_value": "42.33%",
+                "value": "42.33",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "占营业收入比重",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "交通工程系统集成营业收入同比增减",
+                "raw_value": "-2.70%",
+                "value": "-2.70",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-4",
+            "text": "2025年专网通信解决方案营业收入218,701,838.59元，占营业收入37.29%，同比下降7.82%。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0007",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "专网通信解决方案营业收入",
+                "raw_value": "218,701,838.59",
+                "value": "218701838.59",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "专网通信解决方案占营业收入比重",
+                "raw_value": "37.29%",
+                "value": "37.29",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "占营业收入比重",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "专网通信解决方案营业收入同比增减",
+                "raw_value": "-7.82%",
+                "value": "-7.82",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-5",
+            "text": "2025年生物纤维素基材营业收入42,401,719.94元，占营业收入7.23%，同比下降6.24%。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0007",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "生物纤维素基材营业收入",
+                "raw_value": "42,401,719.94",
+                "value": "42401719.94",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "生物纤维素基材占营业收入比重",
+                "raw_value": "7.23%",
+                "value": "7.23",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "占营业收入比重",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "生物纤维素基材营业收入同比增减",
+                "raw_value": "-6.24%",
+                "value": "-6.24",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-6",
+            "text": "2025年农产品贸易营业收入75,843,172.91元，占营业收入12.93%，同比增长22.49%。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0007",
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "农产品贸易营业收入",
+                "raw_value": "75,843,172.91",
+                "value": "75843172.91",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "农产品贸易占营业收入比重",
+                "raw_value": "12.93%",
+                "value": "12.93",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "占营业收入比重",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "农产品贸易营业收入同比增减",
+                "raw_value": "22.49%",
+                "value": "22.49",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "收入构成表“其他”类别金额小且未细分，未纳入主要构成单列；分地区、分销售模式明细未逐项展开。"
+        ]
+      },
+      "operations_and_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "oi-1",
+            "text": "智慧专网业务以招投标为核心项目获取方式，通过公开招标、竞争性谈判等市场化采购程序获取订单；智慧电网项目覆盖输变电、配电、新能源场站通信接入、变电站智能化改造等，并提供规划—建设—运维全生命周期服务。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0001",
+              "source-0005"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "oi-2",
+            "text": "生物纤维素基材采取以销定产及定制化生产模式，依托自有现代化工厂，根据客户对产品规格、性能指标的特定需求调整工艺及参数；各生产环节执行医疗器械质量管理体系及化妆品相关生产规范。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "oi-3",
+            "text": "农牧业务采购采取集中采购与动态采购相结合，在主要粮食产区直接向大型农户、合作社或贸易商采购，并根据市场行情和客户订单灵活进行市场化采购；同时利用自有仓库开展仓储及粮食保管。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "customers_channels_markets": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "cc-1",
+            "text": "智慧电网客户包括国家电网、南方电网及下辖各省市电力公司等，并为光伏电站、风电场等新能源场站及各类电力客户提供服务，销售网络覆盖华中、西北、西南、华南、华东等核心区域并延伸至全国二十多个省、自治区、直辖市；智慧交通客户主要为各地交通主管部门、高速公路集团、城建投资平台等业主单位，业务覆盖江苏、上海、广东、广西、安徽等地，并通过控股子公司南京凌云执行项目。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0001",
+              "source-0005"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "cc-2",
+            "text": "生物纤维素基材客户面向国内外知名化妆品、医疗器械品牌商，公司以服务并深度绑定核心品牌客户为重点，同时开拓海外市场及新兴应用市场。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "cc-3",
+            "text": "农牧业务销售以直接销售为主，主要面向大型食品加工企业、饲料生产企业、粮食深加工企业等终端客户及部分贸易商。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "operating_drivers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "od-1",
+            "text": "智慧专网领域受‘双碳’目标、新型电力系统建设及交通基础设施高质量发展等国家战略推动，电力与交通行业数字化、智能化投资保持较高景气；国家电网、南方电网推进配电网升级、新能源并网通信配套，各地加大高速公路智能化改造、城市交通治理投入，为公司创造市场空间。公司凭借长期行业服务经验与项目履约能力巩固核心客户合作，聚焦电力与交通高壁垒行业，形成‘专业方案+量身定制+高效交付’差异化优势，项目复购率和客户黏性提升。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0002"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "od-2",
+            "text": "生物纤维素基材领域受合成生物学技术研发、下游护肤品功效性/安全性需求提升及医疗器械高端敷料需求增长牵引；公司通过定制化生产服务提升客户价值与粘性。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "od-3",
+            "text": "农牧领域通过整合内外部资源构建从采购、仓储到销售的一体化服务体系，依托政府储备粮轮换业务与市场化贸易业务互补，并基于市场行情研判灵活调整采购与销售策略，以优化购销价差、应对价格波动。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "material_changes": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "mc-1",
+            "text": "报告期内，农牧领域主营业务收入有所增长，但受业务周期及市场价格波动等因素影响，农产品贸易业务毛利率较上年同期降幅较大；自有粮库出租率不及预期，仓容空置导致相关折旧等成本未能有效覆盖，农牧领域业务较上年同期出现较大幅度亏损。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "mc-2",
+            "text": "报告期内合并范围发生变化：公司原子公司吉林亚联农牧科技有限公司已于2025年04月07日注销，原子公司键桥数字已于2025年12月完成减资及转让，二者本报告期均不再纳入公司合并报表范围。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        "physical_pages": [
+          10
+        ],
+        "source_spans": [
+          {
+            "page": 10,
+            "start": 157,
+            "end": 2130,
+            "quote": "一、报告期内公司从事的主要业务\n\n\n   （一）报告期内公司从事的主要业务、主要产品及用途、经营模式\n   报告期内，公司主要从事智慧专网、生物纤维素基材及农牧领域业务，智慧专网方面，持续发力智慧电网、智慧交\n通，促进所服务行业数字化、智慧化水平的提升；生物纤维素基材领域，主要从事生物纤维素基材领域的研究、生产及\n销售业务；农牧领域方面，主要从事农产品贸易及仓储服务。具体情况如下：\n   1、智慧专网领域\n   公司智慧专网领域主要为电力、交通等行业提供信息通信技术解决方案。报告期内，公司作为国内率先从事专网通\n信领域业务的高新技术企业，始终坚持专网通信技术整体解决方案服务商的定位，密切结合行业特点，突出专用性和个\n性化服务，通过不断引入先进技术成果，为电力、交通等行业内客户提供包括软硬件产品研发与服务在内的信息通信技\n术解决方案，持续推进电力、交通产业生态圈的数字化、智慧化革新升级和平台管理升级。\n   （1）智慧电网领域\n   报告期内，公司主要为包括国家电网有限公司（以下简称“国家电网”）、中国南方电网有限责任公司（以下简称\n“南方电网”）及下辖各省市电力公司等提供通信信息技术解决方案与服务；为光伏电站和风电场等新能源场站提供通\n信集成服务；为电力客户提供通信系统运维服务。公司深耕智慧电网领域二十余年，是电力行业优秀的信息通信技术整\n体解决方案服务商，提供覆盖“规划—建设—运维”全生命周期的专业化通信信息技术解决方案。在传统电网方面，公\n司为输变电、配电等环节提供高可靠、高安全的通信网络架构设计、设备集成及系统部署服务，为智能变电站、配电自\n动化等核心业务系统的稳定运行提供有力支撑。在新能源方面，公司积极把握“双碳”战略发展机遇，为集中式及分布\n式光伏电站、风电场等新能源场站提供定制化通信接入、数据传输与远程监控集成服务，助力新能源高效并网与智能化\n管理。此外，公司为各类电力客户提供                 7×24 小时通信系统运维保障服务，确保电力通信网络持续畅通、安全可控，为\n电力系统安全稳定运行提供坚实保障。凭借深厚的技术积累、丰富的项目经验以及“量身定制、专业高效”的服务理念，\n公司已成为电力行业值得信赖的数字化合作伙伴，持续为构建安全、绿色、智能、高效的现代能源体系贡献力量。\n   公司智慧电网领域业务经营模式具体如下：\n   公司以招投标为核心的项目获取方式，通过参与国家电网、南方电网及其下属省市级电力公司组织的公开招标、竞\n争性谈判等市场化采购程序获取订单，凭借在专网通信领域的技术实力、成功案例及服务体系，在电力系统通信设备、\n新能源场站集成、智能化改造等细分标段中持续保持较强竞争力。在销售网络布局上，公司已建立覆盖华中、西北、西\n南、华南、华东等核心区域的销售大区体系，服务网络延伸至全国二十多个省、自治区、直辖市，各销售大区配备本地\n化商务、技术及交付团队，形成“总部统筹+区域深耕”的协同作战机制，能够快速响应客户需求、精准把握区域市场动\n态，高效推进项目落地。同时，公司始终秉持客户导向的全周期服务理念，从需求对接、方案设计到交付运维提供全生\n命周期价值传递，通过专业化的定制化解决方案和高质量的项目履约能力，不断提升客户满意度与复购率。\n   （2）智慧交通领域\n   报告期内，公司主要在高速公路及城市智能交通业务领域开展基础设施新建与改扩建相关业务，为客户提供高速公\n路机电系统、城市道路监控系统、路口交通信号控制系统、电子警察系统、交通信息统计系统等整体解决方案。公司控\n股子公司南京凌云持续提升项目执行能力、工程服务水平以及客户满意度，并在以工程总包为主的传统集成业务的基础\n上，向产品与技术开发方向进行重点战略布局。目前，公司在智慧交通相关领域的业务已经覆盖江苏、上海、广东、广\n西、安徽等地，凭借专业的解决方案、优质的项目交付能力和完善的售后服务网络，获得业主广泛认可。轨道交通业务\n方面，公司提供轨道交通专用、警用通信系统解决方案，并为轨道交通客户提供优质的运维服务。\n   公司智慧交通领域业务经营模式具体如下：\n   公司以招投标为核心的项目获取方式，通过参与各地交通主管部门、高速公路集团、城建投资平台等业主单位组织\n的公开招标或竞争性磋商等市场化采购程序承接项目。公司依托专业化团队，能够快速响应区域政策导向与市场项目机\n会，高效推进项目落地，并积极拓展市场区域，推动业务由点及面，稳步发展。在业务升级方面，公司正加速从传统集\n\n\n                                                                                                        10"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        "physical_pages": [
+          11
+        ],
+        "source_spans": [
+          {
+            "page": 11,
+            "start": 0,
+            "end": 2000,
+            "quote": "                                                            吉林亚联发展科技股份有限公司              2025 年年度报告全文\n\n\n成商向“解决方案提供商+自有产品供应商”转型，持续加大在交通信号控制、视频监控、数据采集分析等核心子系统的\n自主研发投入，推动标准化、模块化自主产品在项目中的应用。同时，公司构建了覆盖设计、实施、验收、运维的全生\n命周期服务体系，增强客户粘性，促进客户复购与长期合作。\n    2、生物纤维素基材领域\n    公司主要从事生物纤维素基材的研究、生产及销售业务。生物纤维素基材具有独特的纳米三维网状结构，具有良好\n的透气性、极高的持水能力和高生物相容性，并具有良好的机械韧性和强度。同时，由于其使用食品级原料发酵而来，\n安全性高，并可降解，符合当前环保和可持续发展的趋势。公司以合成生物学为驱动，致力于通过创新研发，深耕生物\n技术的探索与应用，为客户提供高效、安全、环保的生物纤维素基材产品。公司产品目前主要应用于护肤品贴、膜类产\n品及医疗器械类敷料产品领域，其中，妆字号生物纤维素基材可提供妆字号生物纤维面膜及眼膜、鼻膜等其他部位膜基\n材定制化解决方案；械字号生物纤维素基材可提供二类械字号生物纤维素基材，用于医疗敷料、冷敷贴等领域。公司凭\n借产品优良的性能，在市场具有较高的品牌认可度，合作客户涵盖多家知名品牌企业。\n    公司生物纤维素基材领域业务经营模式具体如下：\n    生产方面，公司采取以销定产及定制化生产模式，依托自有现代化工厂，根据客户对产品规格、性能指标的特定需\n求，灵活调整工艺及参数，实现定制化生产。各生产环节均严格执行医疗器械质量管理体系及化妆品相关生产规范，确\n保产品质量持续稳定可靠。销售方面，公司以服务并深度绑定核心品牌客户为重点，同时积极开拓海外市场及新兴应用\n市场，面向国内外知名的化妆品、医疗器械品牌商，由专业销售与技术支持团队提供包括产品定制开发、技术解决方案\n及稳定供应链保障等深度服务，不断提升客户粘性与市场竞争力。\n    3、农牧领域\n    公司农牧领域主要从事农产品贸易及仓储服务，主营小麦、玉米等农产品品种，公司充分利用自身资源优势推动农\n牧领域业务开展，通过整合公司内部优势和外部合作伙伴的资源，完成农产品采购到销售一体化服务。同时，利用自有\n仓库，开展仓储及粮食保管业务。\n    农牧领域经营模式具体如下：\n    农产品贸易主要参与政府储备粮轮换的相关业务。采购方面，公司依托长期建立的资源网络与供应商合作关系，采\n取集中采购与动态采购相结合的策略，在主要粮食产区直接向大型农户、合作社或贸易商进行采购，根据市场行情分析\n和客户订单需求，灵活进行市场化采购，以优化成本并保障货源稳定。销售方面，公司销售以直接销售为主，主要面向\n大型食品加工企业、饲料生产企业、粮食深加工企业等终端客户及部分贸易商。公司通过提供稳定的粮源供应、可靠的\n品质保证以及基于市场信息的购销建议，与客户建立长期合作关系。\n    （二）主要的业绩驱动因素\n    报告期内，公司整体经营业绩保持稳健态势，在智慧专网、生物纤维素基材、农牧领域业务协同共进、多点布局下，\n依托政策持续赋能、产品技术创新、核心客户深耕、服务体系完善四大核心支撑，共同实现公司稳步发展。\n    1、智慧专网领域\n    （1）国家战略与行业政策持续赋能\n    在“双碳”目标、“新型电力系统”建设及交通基础设施高质量发展等国家战略推动下，电力与交通行业数字化、\n智能化投资保持高景气度。国家电网、南方电网加速推进配电网升级、新能源并网通信配套；各地政府加大高速公路智\n能化改造、城市交通治理投入，为公司智慧专网业务创造了广阔的市场空间。\n    （2）核心客户合作深化，项目执行高效顺畅\n    公司凭借长期行业服务经验与优质项目履约能力，持续巩固与核心客户的长期稳定合作关系，严格把控项目进度、\n质量与成本，项目执行高效顺畅、履约口碑良好，为业务收入稳步增长提供了有力支撑。\n    （3）垂直行业深耕优势显现，解决方案竞争力提升\n    公司聚焦电力与交通两大高壁垒行业，依托二十余年行业积淀，形成“专业方案+量身定制+高效交付”的差异化竞\n争优势。在新能源场站通信集成、高速公路机电系统、城市智能信号控制等细分场景中，公司解决方案的专业性、适配\n性与可靠性获得客户高度认可，项目复购率和客户黏性稳步提升。\n    （4）区域化营销与服务体系效能释放\n\n\n\n\n                                                                                                         11"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的主要业务"
+        ],
+        "physical_pages": [
+          12
+        ],
+        "source_spans": [
+          {
+            "page": 12,
+            "start": 0,
+            "end": 825,
+            "quote": "                                                             吉林亚联发展科技股份有限公司               2025年年度报告全文\n\n\n    公司已建立覆盖重点区域的销售与技术服务网络，能够快速响应地方项目需求，精准把握招投标机会，本地化团队\n在项目周期提供全方位服务，显著提升项目中标率与客户满意度，进一步强化区域市场优势。\n    2、生物纤维素基材领域\n    （1）技术研发驱动，巩固核心竞争优势\n    公司持续围绕合成生物学技术及材料应用进行研发投入，不断巩固技术优势，推动产品升级。\n    （2）下游需求牵引，拓展市场应用空间\n    随着消费者对护肤品功效性、安全性要求的提升，以及医疗器械行业对高端敷料需求的增长，公司产品凭借独特的\n纳米三维网状结构、优异的透气性、持水性和生物相容性，在下游应用市场中获得持续认可，市场空间稳步拓展。\n    （3）定制化生产服务，提升客户价值与粘性\n    公司依托定制化生产能力，深度贴合下游客户需求，为客户提供差异化、功能化的生物纤维素基材解决方案。定制\n化生产服务不仅有效增强了客户粘性，更通过提升产品附加值优化了盈利结构，形成了与客户共同成长、互利共赢的良\n性发展格局。\n    3、农牧领域\n    （1）产业链协同整合，提升运营效率\n    公司整合内外部资源，构建从采购、仓储到销售的一体化服务体系，通过各环节高效协同提升整体运营效率。同时，\n依托政府储备粮轮换业务与市场化贸易业务的互补优势，业务结构更加稳健，整体抗风险能力持续增强。\n    （2）市场行情研判，把握经营节奏\n    公司具有专业化的市场运营团队，基于对农产品市场行情的深入分析和预判，灵活调整采购与销售策略，精准把握\n市场窗口期，持续优化购销价差水平，有效规避市场价格大幅波动带来的经营风险，在复杂多变的市场环境中实现稳健\n经营。\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "①智慧专网领域经营情况"
+        ],
+        "physical_pages": [
+          14
+        ],
+        "source_spans": [
+          {
+            "page": 14,
+            "start": 1926,
+            "end": 2201,
+            "quote": "①智慧专网领域经营情况\n    智慧电网领域，在国家电网、南方电网加快数字化转型的关键时期，公司持续加强国家电网、南方电网集中采购项\n目竞标，不断挖掘下属各省市级电力公司的实际应用和项目需求，报告期内累计签订销售合同约                                            2.45亿元（不含键桥数\n\n                                                                                                          14"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "①智慧专网领域经营情况"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 0,
+            "end": 1024,
+            "quote": "                                                                 吉林亚联发展科技股份有限公司                 2025 年年度报告全文\n\n\n字）。在     2025 年度国家电网集中采购项目中，公司中标国家电网                          2025 年第八批采购（输变电项目第一次变电设备（含\n电缆）招标采购）项目和             2025 年第六十批采购（输变电项目第四次变电设备（含电缆）招标采购）项目，累计中标金额\n约 7,789.68  万元。同时积极拓展各省市电力公司市场，在信息通信系统、配电网自动化、新能源场站通信接入、变电站\n智能化改造等实现项目落地，业务覆盖华中、华南、西北、西南等二十余个省市。依托定制化解决方案与高效交付能力，\n公司在网内市场份额稳步提升，客户黏性不断增强。\n    智慧交通领域，公司主要在高速公路及城市智能交通业务领域开展基础设施新建或改扩建业务，为客户提供高速公\n路机电系统、城市道路监控系统、路口交通信号控制系统、电子警察系统、交通信息统计系统等整体解决方案，报告期\n内累计签订销售合同约            2.27 亿元。公司控股子公司南京凌云中标江苏沿江高速公路有限公司沪武高速公路太仓至常州段\n扩建机电工程监控（分）中心系统项目，中铁二局集团有限公司安罗高速项目                                        K30+100-K47+000  机电工程专业分包合同\n项目，江苏省高速公路经营管理中心                   2025 年度高管中心外场监控视频加密项目-宁通处、通启处、崇启大桥处外场监控\n加密项目，中铁九局集团有限公司焦作至唐河高速公路方城至唐河段项目                                      FTTZHHR-3 标段机电      2标项目等，有效拓展市\n场区域的同时，布局从传统集成商向“解决方案提供商+自有产品供应商”的转型。轨道交通业务领域，公司继续执行前\n期中标项目并完成部分历史项目回款。\n    2025 年，公司智慧专网业务领域实现主营业务收入                        46,691.55 万元，同比下降         5.17%。\n    "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "②生物纤维素基材领域经营情况"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 1024,
+            "end": 1604,
+            "quote": "②生物纤维素基材领域经营情况\n    报告期内，公司积极拓展市场，充分挖掘国内及海外客户资源，结合客户销售能力、渠道布局及经营特点，定制化\n产品价格与激励政策，成功实现客户数量稳步增长。同时，团队深入研究客户需求，从产品研发、生产制造到终端销售，\n全程跟踪客户业务全链条，提升客户粘性与合作稳定性。除销售端持续发力外，公司高度重视技术创新能力提升，与知\n名高校深度开展“产学研”协同合作，成功获评高新技术企业，不断推动产品技术更新与进步，为市场拓展与业务增长\n提供坚实技术支撑。在监管趋严与消费升级的双重驱动下，公司始终将产品品质置于发展首位，2025                                                  年公司顺利通过绿\n色环保企业管理体系认证，标志着公司生产运营全面契合“低碳、高效、可持续”的行业发展要求，同时取得二类械字\n号医疗器械生产许可，布局医用敷料领域，开辟了新的高附加值赛道。随着公司在技术创新、产品线延伸及市场拓展的\n持续深耕，公司在该领域的市场份额有望进一步扩大，从而为公司的长期稳定发展奠定坚实的基础。\n    2025 年，公司在生物纤维素基材领域实现主营业务收入                          4,240.17  万元，同比下降         6.24%。\n    "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "③农牧领域经营情况"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 1604,
+            "end": 2895,
+            "quote": "③农牧领域经营情况\n    报告期内，国内粮食价格整体保持稳定，价格水平总体处于历史中位区间，年内价格波动幅度有所加大。下游需求\n呈现结构性分化，饲料行业需求稳步增长，但深加工行业复苏相对缓慢，市场购销活跃度提升有限，农产品贸易业务经\n营压力加大，行业整体仍处于去库存周期。面对复杂的市场环境，公司农牧领域经营团队积极采取各项应对措施，主营\n业务收入有所增长，但受业务周期及市场价格波动等因素影响，农产品贸易业务毛利率较上年同期降幅较大；同时，自\n有粮库出租率不及预期，仓容空置导致相关折旧等成本未能有效覆盖，上述因素共同导致报告期内公司农牧领域业务较\n上年同期出现较大幅度亏损。\n    2025 年，公司在农牧领域实现主营业务收入                     7,584.32 万元，同比增长         22.49%。\n\n2、收入与成本\n\n（1）    营业收入构成\n\n\n                                                                                                          单位：元\n                                           2025 年                                 2024年                  同比增减\n                                   金额            占营业收入比重                 金额            占营业收入比重\n营业收入合计                         586,442,724.54                100%   607,428,715.28                100%     -3.45%\n分行业\n交通行业                           248,213,693.90              42.33%   255,105,029.44              42.00%     -2.70%\n电力行业                           218,701,838.59              37.29%   237,243,526.41              39.06%     -7.82%\n生物纤维素基材行业                       42,401,719.94               7.23%    45,223,912.79               7.44%     -6.24%\n\n\n                                                                                                                  15"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "③农牧领域经营情况"
+        ],
+        "physical_pages": [
+          16
+        ],
+        "source_spans": [
+          {
+            "page": 16,
+            "start": 0,
+            "end": 6434,
+            "quote": "                                                                                                吉林亚联发展科技股份有限公司                                2025    年年度报告全文\n\n\n农牧行业                                           75,843,172.91                           12.93%         61,916,420.19                           10.19%           22.49%\n其他行业                                             1,282,299.20                           0.22%           7,939,826.45                           1.31%         -83.85%\n分产品\n交通工程系统集成                                      248,213,693.90                           42.33%        255,105,029.44                           42.00%           -2.70%\n专网通信解决方案                                      218,701,838.59                           37.29%        237,243,526.41                           39.06%           -7.82%\n生物纤维素基材                                        42,401,719.94                            7.23%         45,223,912.79                            7.44%           -6.24%\n农产品贸易                                          75,843,172.91                           12.93%         61,916,420.19                           10.19%           22.49%\n其他                                               1,282,299.20                           0.22%           7,939,826.45                           1.31%         -83.85%\n分地区\n东北                                             77,720,777.72                           13.25%        107,877,915.21                           17.76%         -27.95%\n华北                                             41,590,408.14                            7.09%         18,737,865.95                            3.08%         121.96%\n华东                                            215,858,787.35                           36.81%        159,916,605.73                           26.33%           34.98%\n华南                                             35,546,995.46                            6.06%         67,731,558.36                           11.15%         -47.52%\n华中                                             79,858,545.39                           13.62%        116,176,454.72                           19.13%         -31.26%\n西北                                             32,967,968.15                            5.62%         40,279,608.85                            6.63%         -18.15%\n西南                                             93,186,257.85                           15.89%         92,113,321.29                           15.16%            1.16%\n港澳台                                              8,996,698.97                           1.54%           3,318,394.37                           0.55%         171.12%\n海外                                                  716,285.51                          0.12%           1,276,990.80                           0.21%         -43.91%\n分销售模式\n经销业务                                          542,758,705.40                           92.55%        554,264,976.04                           91.25%           -2.08%\n直销业务                                           42,401,719.94                            7.23%         45,223,912.79                            7.44%           -6.24%\n其他                                               1,282,299.20                           0.22%           7,939,826.45                           1.31%         -83.85%\n公司需遵守《深圳证券交易所上市公司自律监管指引第                                                      3 号——行业信息披露》中软件与信息技术服务业的披露要求\n\n                                                                                                                                                            单位：元\n\n                                                 2025   年度                                                                   2024   年度\n                     第一季度              第二季度               第三季度                第四季度               第一季度               第二季度               第三季度               第四季度\n营业收入                 104,953,          180,380,1          157,399,8          143,709,2          83,293,23           168,992,6          172,534,1          182,608,7\n                        421.29               94.91              51.97               56.37               5.75              22.38              05.56              51.59\n归属于上市                3,415,36          2,763,179                       -     363,375.7          1,601,995           2,908,536          6,300,367                       -\n公司股东的                       0.16                .17       375,491.7                       2               .22                .34                .76       855,382.2\n净利润                                                                    5                                                                                               2\n\n说明经营季节性（或周期性）发生的原因及波动风险\n\n\n无。\n\n\n（2）      占公司营业收入或营业利润                            10%以上的行业、产品、地区、销售模式的情况\n\n\n适用       □不适用\n公司需遵守《深圳证券交易所上市公司自律监管指引第                                                      3 号——行业信息披露》中软件与信息技术服务业的披露要求\n\n                                                                                                                                                            单位：元\n\n                                       营业收入                       营业成本                   毛利率           营业收入比上                  营业成本比上                  毛利率比上\n                                                                                                         年同期增减                   年同期增减                 年同期增减\n分客户所处行业\n交通行业                               248,213,693.90             227,889,373.70               8.19%                 -2.70%                  -2.86%                 0.15%\n电力行业                               218,701,838.59             189,040,400.81             13.56%                  -7.82%                  -8.63%                 0.77%\n生物纤维素基材行业                           42,401,719.94              17,211,313.65             59.41%                  -6.24%                  -6.57%                 0.14%\n农牧行业                                75,843,172.91              74,594,403.99               1.65%                 22.49%                  27.73%                -4.03%\n分产品\n交通工程系统集成                           248,213,693.90             227,889,373.70               8.19%                 -2.70%                  -2.86%                 0.15%\n\n\n                                                                                                                                                                         16"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "③农牧领域经营情况"
+        ],
+        "physical_pages": [
+          17
+        ],
+        "source_spans": [
+          {
+            "page": 17,
+            "start": 0,
+            "end": 4535,
+            "quote": "                                                                                       吉林亚联发展科技股份有限公司                           2025   年年度报告全文\n\n\n专网通信解决方案                       218,701,838.59           189,040,400.81          13.56%                -7.82%               -8.63%                0.77%\n生物纤维素基材                          42,401,719.94           17,211,313.65          59.41%                -6.24%               -6.57%                0.14%\n农产品贸易                            75,843,172.91           74,594,403.99            1.65%               22.49%               27.73%              -4.03%\n分地区\n东北                               77,720,777.72           78,526,892.80          -1.04%               -27.95%               -1.57%             -27.09%\n华东                             215,858,787.35           175,004,407.61          18.93%                34.98%               26.71%                5.30%\n华中                               79,858,545.39           70,737,961.89          11.42%               -31.26%              -31.68%                0.54%\n西南                               93,186,257.85           87,296,544.88            6.32%                 1.16%                7.50%             -5.52%\n分销售模式\n经销业务                           542,758,705.40           491,524,178.50            9.44%               -2.08%               -1.68%              -0.37%\n公司主营业务数据统计口径在报告期发生调整的情况下，公司最近                                                        1 年按报告期末口径调整后的主营业务数据\n□适用       不适用\n\n\n（3）     公司实物销售收入是否大于劳务收入\n\n\n是    □否\n\n         行业分类                           项目                     单位                   2025  年                   2024  年                  同比增减\n                                 销售量                     万元                                  22.00                4,334.03                    -99.49%\n交通行业                             库存量                     万元                             1,008.85                  1,019.51                     -1.05%\n\n电力行业                             销售量                     万元                            16,367.04                 17,565.74                     -6.86%\n                                 库存量                     万元                             6,923.06                  5,604.69                     23.52%\n                                 销售量                     万元                             1,677.95                  1,830.51                     -8.33%\n生物纤维素基材行业                        生产量                     万元                             1,740.83                  1,873.27                     -7.07%\n                                 库存量                     万元                                125.84                      74.88                   68.06%\n农牧行业                             销售量                     万元                             7,234.08                  5,749.08                     25.83%\n\n相关数据同比发生变动                   30%以上的原因说明\n适用      □不适用\n\n     ①交通行业销售量较去年同期下降                              99.49%，主要系公司本报告期交通行业轨道业务仅执行前期中标项目且处于收尾\n阶段，导致销售量较去年同期减少。\n     ②生物纤维素基材行业库存量较去年同期增加                                       68.06%，主要系本期末为新渠道铺货，增加部分产品的库存储备所致。\n\n\n（4）     公司已签订的重大销售合同、重大采购合同截至本报告期的履行情况\n\n\n□适用       不适用\n\n\n（5）     营业成本构成\n\n\n行业和产品分类\n\n                                                                                                                                             单位：元\n\n                                                                      2025  年                                    2024   年                       同比\n       行业分类                           项目                      金额               占营业成本                      金额               占营业成本                增减\n                                                                                    比重                                          比重\n电力行业                          硬件成本                     163,670,354.56                 31.93%       175,657,391.15                33.50%        -6.82%\n电力行业                          服务费成本                      18,655,040.66                 3.64%         19,338,621.90                 3.69%       -3.53%\n电力行业                          工程成本                        6,715,005.59                 1.31%         11,907,259.39                 2.27%      -43.61%\n交通行业                          硬件成本                           220,037.02                0.04%         43,340,342.99                 8.27%      -99.49%\n\n\n                                                                                                                                                        17"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0010",
+        "document_version": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "③农牧领域经营情况"
+        ],
+        "physical_pages": [
+          18
+        ],
+        "source_spans": [
+          {
+            "page": 18,
+            "start": 0,
+            "end": 6235,
+            "quote": "                                                                                           吉林亚联发展科技股份有限公司                              2025   年年度报告全文\n\n\n交通行业                            工程成本                      225,827,020.24                  44.05%        186,541,559.04                  35.57%        21.06%\n交通行业                            服务费成本                        1,842,316.44                  0.36%           4,718,550.78                  0.90%       -60.96%\n生物纤维素基材行业                       直接材料                         7,515,689.29                  1.47%         10,602,588.69                   2.02%       -29.11%\n生物纤维素基材行业                       直接人工                         5,899,981.61                  1.15%           5,205,097.72                  0.99%        13.35%\n生物纤维素基材行业                       制造费用及其他                      3,795,642.75                  0.74%           2,613,483.30                  0.50%        45.23%\n农牧行业                            农产品成本                      74,594,403.99                  14.55%         58,400,654.46                  11.14%        27.73%\n其他                              服务费成本等                       3,882,363.72                  0.76%           6,042,893.70                  1.15%       -35.75%\n合计                                                        512,617,855.87                100.00%         524,368,443.12                100.00%         -2.24%\n\n                                                                                                                                                    单位：元\n\n                                                                       2025   年                                      2024   年\n      产品分类                          项目                         金额                 占营业成本                       金额                  占营业成             同比增减\n                                                                                      比重                                           本比重\n交通工程系统集成                    硬件成本                               220,037.02                 0.04%          43,340,342.99                 8.27%         -99.49%\n交通工程系统集成                    工程成本                        225,827,020.24                  44.05%          186,541,559.04                35.57%          21.06%\n交通工程系统集成                    服务费成本                           1,842,316.44                  0.36%            4,718,550.78                0.90%         -60.96%\n专网通信解决方案                    硬件成本                        163,670,354.56                  31.93%          175,657,391.15                33.50%          -6.82%\n专网通信解决方案                    服务费成本                         18,655,040.66                   3.64%          19,338,621.90                 3.69%          -3.53%\n专网通信解决方案                    工程成本                            6,715,005.59                  1.31%          11,907,259.39                 2.27%         -43.61%\n生物纤维素基材                     直接材料                            7,515,689.29                  1.47%          10,602,588.69                 2.02%         -29.11%\n生物纤维素基材                     直接人工                            5,899,981.61                  1.15%            5,205,097.72                0.99%          13.35%\n生物纤维素基材                     制造费用及其他                         3,795,642.75                  0.74%            2,613,483.30                0.50%          45.23%\n农产品贸易                       农产品成本                         74,594,403.99                 14.55%           58,400,654.46                11.14%          27.73%\n其他                          服务费成本等                          3,882,363.72                  0.76%            6,042,893.70                1.15%         -35.75%\n合计                                                      512,617,855.87                 100.00%          524,368,443.12              100.00%           -2.24%\n公司需遵守《深圳证券交易所上市公司自律监管指引第                                                  3 号——行业信息披露》中软件与信息技术服务业的披露要求\n主营业务成本构成\n\n                                                                                                                                                    单位：元\n\n                                                                本报告期                                           上年同期\n                 成本构成                                    金额                占营业成本                       金额                  占营业成本                 同比增减\n                                                                                比重                                              比重\n硬件成本                                              163,890,391.58                  31.97%         218,997,734.14                    41.76%            -25.16%\n工程成本                                              232,542,025.83                  45.36%         198,448,818.43                    37.85%             17.18%\n服务费成本                                              20,497,357.10                   4.00%          24,057,172.68                     4.59%            -14.80%\n生物纤维素基材-直接材料                                         7,515,689.29                  1.47%          10,602,588.69                     2.02%            -29.11%\n生物纤维素基材-直接人工                                         5,899,981.61                  1.15%            5,205,097.72                    0.99%             13.35%\n生物纤维素基材-制造费用及其他                                      3,795,642.75                  0.74%            2,613,483.30                    0.50%             45.23%\n农产品成本                                              74,594,403.99                  14.55%          58,400,654.46                    11.14%             27.73%\n合计                                                508,735,492.15                  99.24%         518,325,549.42                    98.85%             -1.85%\n\n\n（6）      报告期内合并范围是否发生变动\n\n\n是     □否\n\n\n1、公司原子公司吉林亚联农牧科技有限公司已于                                            2025   年   04 月   07  日注销，本报告期不再纳入公司合并报表范围。\n\n\n2、公司原子公司键桥数字已于                            2025  年   12  月完成减资及转让，本报告期不再纳入公司合并报表范围。\n\n\n（7）      公司报告期内业务、产品或服务发生重大变化或调整有关情况\n\n\n□适用       不适用\n\n\n                                                                                                                                                                18"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0011",
+        "document_version": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "③农牧领域经营情况"
+        ],
+        "physical_pages": [
+          19
+        ],
+        "source_spans": [
+          {
+            "page": 19,
+            "start": 0,
+            "end": 156,
+            "quote": "                                                                               吉林亚联发展科技股份有限公司                       2025  年年度报告全文\n\n\n（8）    主要销售客户和主要供应商情况\n\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "limitations": [
+      "本工作底稿仅依据选定章节，未扩读行业背景、核心竞争力、治理、财务附注、客户/供应商明细及未来计划。",
+      "分地区、分销售模式明细未逐项展开；收入构成表“其他”类别未单列。"
+    ],
+    "supply_chain": null,
+    "generation": {
+      "prompt_version": "company_profile_workpaper.2026-11-28.subject-relationships.v22",
+      "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+      "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+      "selection": {
+        "purpose": "select_profile_sections",
+        "request_id": "bp-work-27af25647bf58c8005c1b75a:workpaper:sections",
+        "request_hash": "5912b11113ef3721a0cee7482651e069deffe0b39f862784f0cb746ba5a61455",
+        "response_hash": "f9170f462b840e4a1c0f5603d8a40e5469aabaef3a50035e80222f514f97b05d",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 15839,
+          "output_tokens": 5534,
+          "total_tokens": 21373
+        },
+        "scope_kind": "report_heading_index",
+        "heading_count": 614,
+        "section_ids": [
+          "section-0001",
+          "section-0002",
+          "section-0003",
+          "section-0004",
+          "section-0005",
+          "section-0006",
+          "section-0007",
+          "section-0008",
+          "section-0009",
+          "section-0010",
+          "section-0011",
+          "section-0012",
+          "section-0013",
+          "section-0014",
+          "section-0015",
+          "section-0016",
+          "section-0017",
+          "section-0018",
+          "section-0019",
+          "section-0020",
+          "section-0021",
+          "section-0022",
+          "section-0025",
+          "section-0026",
+          "section-0027",
+          "section-0028",
+          "section-0033",
+          "section-0037",
+          "section-0040",
+          "section-0041",
+          "section-0042",
+          "section-0043",
+          "section-0044",
+          "section-0045",
+          "section-0046",
+          "section-0047",
+          "section-0048",
+          "section-0049",
+          "section-0050",
+          "section-0051",
+          "section-0054",
+          "section-0055",
+          "section-0056",
+          "section-0057",
+          "section-0064",
+          "section-0065",
+          "section-0068",
+          "section-0069",
+          "section-0070",
+          "section-0071",
+          "section-0075",
+          "section-0076",
+          "section-0077",
+          "section-0078",
+          "section-0082",
+          "section-0083",
+          "section-0084",
+          "section-0085",
+          "section-0086",
+          "section-0087",
+          "section-0088",
+          "section-0089",
+          "section-0090",
+          "section-0091",
+          "section-0092",
+          "section-0093",
+          "section-0094",
+          "section-0097",
+          "section-0098",
+          "section-0099",
+          "section-0100",
+          "section-0101",
+          "section-0102",
+          "section-0103",
+          "section-0104",
+          "section-0105",
+          "section-0106",
+          "section-0107",
+          "section-0108",
+          "section-0109",
+          "section-0110",
+          "section-0111",
+          "section-0112",
+          "section-0113",
+          "section-0114",
+          "section-0115",
+          "section-0116",
+          "section-0117",
+          "section-0118",
+          "section-0119",
+          "section-0120",
+          "section-0121",
+          "section-0122",
+          "section-0123",
+          "section-0124",
+          "section-0125",
+          "section-0126",
+          "section-0127",
+          "section-0128",
+          "section-0129",
+          "section-0130",
+          "section-0131",
+          "section-0132",
+          "section-0133",
+          "section-0134",
+          "section-0135",
+          "section-0136",
+          "section-0137",
+          "section-0138",
+          "section-0139",
+          "section-0142",
+          "section-0143",
+          "section-0144",
+          "section-0145",
+          "section-0146",
+          "section-0147",
+          "section-0151",
+          "section-0152",
+          "section-0153",
+          "section-0154",
+          "section-0155",
+          "section-0156",
+          "section-0157",
+          "section-0158",
+          "section-0159",
+          "section-0160",
+          "section-0161",
+          "section-0162",
+          "section-0163",
+          "section-0164",
+          "section-0169",
+          "section-0170",
+          "section-0171",
+          "section-0172",
+          "section-0173",
+          "section-0174",
+          "section-0175",
+          "section-0176",
+          "section-0177",
+          "section-0178",
+          "section-0179",
+          "section-0180",
+          "section-0193",
+          "section-0194",
+          "section-0195",
+          "section-0196",
+          "section-0197",
+          "section-0198",
+          "section-0199",
+          "section-0200",
+          "section-0201",
+          "section-0202",
+          "section-0203",
+          "section-0204",
+          "section-0205",
+          "section-0206",
+          "section-0207",
+          "section-0208",
+          "section-0209",
+          "section-0210",
+          "section-0211",
+          "section-0212",
+          "section-0213",
+          "section-0214",
+          "section-0215",
+          "section-0216",
+          "section-0217",
+          "section-0218",
+          "section-0219",
+          "section-0220",
+          "section-0221",
+          "section-0222",
+          "section-0223",
+          "section-0224",
+          "section-0225",
+          "section-0226",
+          "section-0227",
+          "section-0228",
+          "section-0229",
+          "section-0230",
+          "section-0231",
+          "section-0232",
+          "section-0233",
+          "section-0237",
+          "section-0238",
+          "section-0239",
+          "section-0240",
+          "section-0243",
+          "section-0244",
+          "section-0245",
+          "section-0246",
+          "section-0247",
+          "section-0248",
+          "section-0249",
+          "section-0250",
+          "section-0251",
+          "section-0252",
+          "section-0253",
+          "section-0254",
+          "section-0255",
+          "section-0256",
+          "section-0257",
+          "section-0258",
+          "section-0259",
+          "section-0260",
+          "section-0261",
+          "section-0262",
+          "section-0263",
+          "section-0264",
+          "section-0265",
+          "section-0266",
+          "section-0267",
+          "section-0268",
+          "section-0269",
+          "section-0270",
+          "section-0271",
+          "section-0272",
+          "section-0273",
+          "section-0274",
+          "section-0275",
+          "section-0276",
+          "section-0277",
+          "section-0278",
+          "section-0279",
+          "section-0280",
+          "section-0281",
+          "section-0282",
+          "section-0283",
+          "section-0284",
+          "section-0285",
+          "section-0286",
+          "section-0287",
+          "section-0288",
+          "section-0289",
+          "section-0290",
+          "section-0291",
+          "section-0292",
+          "section-0293",
+          "section-0294",
+          "section-0301",
+          "section-0302",
+          "section-0303",
+          "section-0309",
+          "section-0310",
+          "section-0311",
+          "section-0312",
+          "section-0313",
+          "section-0314",
+          "section-0315",
+          "section-0316",
+          "section-0317",
+          "section-0318",
+          "section-0319",
+          "section-0320",
+          "section-0321",
+          "section-0322",
+          "section-0323",
+          "section-0324",
+          "section-0325",
+          "section-0326",
+          "section-0327",
+          "section-0328",
+          "section-0329",
+          "section-0330",
+          "section-0331",
+          "section-0332",
+          "section-0333",
+          "section-0334",
+          "section-0335",
+          "section-0336",
+          "section-0337",
+          "section-0338",
+          "section-0339",
+          "section-0340",
+          "section-0341",
+          "section-0342",
+          "section-0343",
+          "section-0344",
+          "section-0345",
+          "section-0346",
+          "section-0347",
+          "section-0348",
+          "section-0349",
+          "section-0350",
+          "section-0351",
+          "section-0352",
+          "section-0353",
+          "section-0354",
+          "section-0355",
+          "section-0356",
+          "section-0357",
+          "section-0358",
+          "section-0359",
+          "section-0360",
+          "section-0361",
+          "section-0362",
+          "section-0363",
+          "section-0364",
+          "section-0365",
+          "section-0366",
+          "section-0367",
+          "section-0368",
+          "section-0369",
+          "section-0370",
+          "section-0371",
+          "section-0372",
+          "section-0373",
+          "section-0374",
+          "section-0375",
+          "section-0376",
+          "section-0377",
+          "section-0378",
+          "section-0379",
+          "section-0380",
+          "section-0381",
+          "section-0382",
+          "section-0383",
+          "section-0384",
+          "section-0385",
+          "section-0386",
+          "section-0387",
+          "section-0388",
+          "section-0389",
+          "section-0390",
+          "section-0391",
+          "section-0392",
+          "section-0393",
+          "section-0394",
+          "section-0395",
+          "section-0396",
+          "section-0397",
+          "section-0398",
+          "section-0399",
+          "section-0400",
+          "section-0401",
+          "section-0402",
+          "section-0403",
+          "section-0404",
+          "section-0405",
+          "section-0406",
+          "section-0407",
+          "section-0408",
+          "section-0409",
+          "section-0410",
+          "section-0411",
+          "section-0412",
+          "section-0413",
+          "section-0414",
+          "section-0419",
+          "section-0423",
+          "section-0424",
+          "section-0425",
+          "section-0428",
+          "section-0429",
+          "section-0432",
+          "section-0440",
+          "section-0441",
+          "section-0442",
+          "section-0443",
+          "section-0444",
+          "section-0445",
+          "section-0448",
+          "section-0451",
+          "section-0457",
+          "section-0458",
+          "section-0461",
+          "section-0462",
+          "section-0467",
+          "section-0472",
+          "section-0475",
+          "section-0476",
+          "section-0479",
+          "section-0480",
+          "section-0485",
+          "section-0488",
+          "section-0494",
+          "section-0497",
+          "section-0498",
+          "section-0503",
+          "section-0507",
+          "section-0511",
+          "section-0514",
+          "section-0517",
+          "section-0521",
+          "section-0522",
+          "section-0523",
+          "section-0530",
+          "section-0531",
+          "section-0532",
+          "section-0533",
+          "section-0538",
+          "section-0541",
+          "section-0544",
+          "section-0548",
+          "section-0551",
+          "section-0553",
+          "section-0554",
+          "section-0555",
+          "section-0558",
+          "section-0561",
+          "section-0562",
+          "section-0563",
+          "section-0564",
+          "section-0565",
+          "section-0566",
+          "section-0568",
+          "section-0569",
+          "section-0570",
+          "section-0574",
+          "section-0577",
+          "section-0578",
+          "section-0579",
+          "section-0580",
+          "section-0582",
+          "section-0585",
+          "section-0586",
+          "section-0587",
+          "section-0588",
+          "section-0590",
+          "section-0593",
+          "section-0594",
+          "section-0595",
+          "section-0596",
+          "section-0599",
+          "section-0601",
+          "section-0602",
+          "section-0603",
+          "section-0604",
+          "section-0606",
+          "section-0607",
+          "section-0608",
+          "section-0609",
+          "section-0610",
+          "section-0612",
+          "section-0613",
+          "section-0614",
+          "section-0615",
+          "section-0616",
+          "section-0617",
+          "section-0618",
+          "section-0619",
+          "section-0620",
+          "section-0624",
+          "section-0626",
+          "section-0627",
+          "section-0628",
+          "section-0630",
+          "section-0633",
+          "section-0634",
+          "section-0635",
+          "section-0636",
+          "section-0638",
+          "section-0641",
+          "section-0642",
+          "section-0643",
+          "section-0644",
+          "section-0646",
+          "section-0648",
+          "section-0649",
+          "section-0650",
+          "section-0651",
+          "section-0653",
+          "section-0655",
+          "section-0656",
+          "section-0657",
+          "section-0661",
+          "section-0663",
+          "section-0664",
+          "section-0665",
+          "section-0666",
+          "section-0668",
+          "section-0670",
+          "section-0671",
+          "section-0672",
+          "section-0673",
+          "section-0675",
+          "section-0677",
+          "section-0678",
+          "section-0679",
+          "section-0680",
+          "section-0683",
+          "section-0688",
+          "section-0690",
+          "section-0691",
+          "section-0697",
+          "section-0698",
+          "section-0699",
+          "section-0703",
+          "section-0705",
+          "section-0706",
+          "section-0710",
+          "section-0713",
+          "section-0714",
+          "section-0716",
+          "section-0717",
+          "section-0718",
+          "section-0720",
+          "section-0721",
+          "section-0722",
+          "section-0723",
+          "section-0724",
+          "section-0725",
+          "section-0727",
+          "section-0728",
+          "section-0729",
+          "section-0730",
+          "section-0731",
+          "section-0732",
+          "section-0733",
+          "section-0734",
+          "section-0735",
+          "section-0736",
+          "section-0737",
+          "section-0738",
+          "section-0739",
+          "section-0740",
+          "section-0741",
+          "section-0742",
+          "section-0743",
+          "section-0744",
+          "section-0745",
+          "section-0746",
+          "section-0747",
+          "section-0748",
+          "section-0749",
+          "section-0750",
+          "section-0751",
+          "section-0752",
+          "section-0753",
+          "section-0754",
+          "section-0755",
+          "section-0758",
+          "section-0759",
+          "section-0763",
+          "section-0764",
+          "section-0766",
+          "section-0767",
+          "section-0768",
+          "section-0772",
+          "section-0773",
+          "section-0775",
+          "section-0778",
+          "section-0782",
+          "section-0783",
+          "section-0784",
+          "section-0785",
+          "section-0786",
+          "section-0787",
+          "section-0791",
+          "section-0793",
+          "section-0794",
+          "section-0795",
+          "section-0796",
+          "section-0797",
+          "section-0798",
+          "section-0802",
+          "section-0806",
+          "section-0807",
+          "section-0808",
+          "section-0809",
+          "section-0810",
+          "section-0812",
+          "section-0813",
+          "section-0814",
+          "section-0815",
+          "section-0816",
+          "section-0817",
+          "section-0818",
+          "section-0819",
+          "section-0820",
+          "section-0821",
+          "section-0822",
+          "section-0823",
+          "section-0824",
+          "section-0825",
+          "section-0826",
+          "section-0827",
+          "section-0833",
+          "section-0835",
+          "section-0836",
+          "section-0837",
+          "section-0840",
+          "section-0841",
+          "section-0842",
+          "section-0843",
+          "section-0846",
+          "section-0847",
+          "section-0848",
+          "section-0849",
+          "section-0850",
+          "section-0851",
+          "section-0852",
+          "section-0853",
+          "section-0854",
+          "section-0855",
+          "section-0856",
+          "section-0857",
+          "section-0859",
+          "section-0861",
+          "section-0862",
+          "section-0865",
+          "section-0866",
+          "section-0869",
+          "section-0872",
+          "section-0873",
+          "section-0874",
+          "section-0875",
+          "section-0878",
+          "section-0879",
+          "section-0881",
+          "section-0882",
+          "section-0883",
+          "section-0884",
+          "section-0885"
+        ],
+        "physical_pages": []
+      },
+      "extraction": {
+        "purpose": "extract_profile_workpaper",
+        "request_id": "bp-work-27af25647bf58c8005c1b75a:workpaper:extract",
+        "request_hash": "112b3b6eeeb18322d366153daab504fbb5ff5a21e0aa0fcdc2640b05d39b0de4",
+        "response_hash": "1435a28598e435a0480685d0797a3a0888565608ef1525c706a3377af501127f",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 12795,
+          "output_tokens": 32945,
+          "total_tokens": 45740
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0020",
+          "section-0054",
+          "section-0055",
+          "section-0056"
+        ],
+        "physical_pages": [
+          10,
+          11,
+          12,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ]
+      }
+    },
+    "quality_review": {
+      "status": "completed",
+      "policy_version": "company_profile_workpaper_review.v16",
+      "original_draft_hash": "cacb68de3010adb0c8e74690a3c6598248729ef71f0ff6356718273750ba4802",
+      "findings": [],
+      "checked_fact_ids": [
+        "bs-1",
+        "ps-1",
+        "ps-2",
+        "ps-3",
+        "rm-1",
+        "rm-2",
+        "rm-3",
+        "sm-1",
+        "sm-2",
+        "sm-3",
+        "sm-4",
+        "sm-5",
+        "sm-6",
+        "oi-1",
+        "oi-2",
+        "oi-3",
+        "cc-1",
+        "cc-2",
+        "cc-3",
+        "od-1",
+        "od-2",
+        "od-3",
+        "mc-1",
+        "mc-2"
+      ],
+      "calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-ab6d6648c525066ca11e8a92:workpaper:review",
+          "request_hash": "b9112532b8cc5469c5826b177fade57c569fcabfa20ed416f8584b7db8aed40a",
+          "response_hash": "c2df91296250a9b726a9cfa3e8c0527464003bf963e2945bfe23a6bc4c6ca300",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 19117,
+            "output_tokens": 109,
+            "total_tokens": 30048
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0020",
+            "section-0054",
+            "section-0055",
+            "section-0056"
+          ],
+          "physical_pages": [
+            10,
+            11,
+            12,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ]
+        }
+      ],
+      "retained_request_ids": [],
+      "locally_revalidated_request_ids": [],
+      "error": null,
+      "checked_fact_hashes": {
+        "bs-1": "b44b47e54f8433086cf976e18e63c2427dad05dc99f1a364cca8678cb373e343",
+        "ps-1": "0eb2f44bba5166987dc0a066670e9b23fe12e0d1fbbdc50fb24579c5c96d4cbb",
+        "ps-2": "d3d09dc8f01da32e779ba7aac31119a33f1e55dc14624150d84d1b26f5e2c005",
+        "ps-3": "5c9e7e98d6fea6eeebb03b4cd3d0d9710b4157844ec30af564d99ad2f2ead990",
+        "rm-1": "e81d82331ff11812b5d72c3890adebfb6972083b86a362614a99368283053f35",
+        "rm-2": "5bef87ec63772b2ad83c5e1ed259ff5c0693611397657dc88b89a1e78737a414",
+        "rm-3": "d4d43f8d453494e6bd054224702a53ef84866f8a82a59821275bbc5c3c71578e",
+        "sm-1": "6aec40174f7b279f4f45961d3ba605706e9538aa9c834bc4e99f1c8f7f129ca6",
+        "sm-2": "eedacec39a6ad5fefbef046b08c03ebb606cb11445f39771bd3b853da0cf8dcc",
+        "sm-3": "a8bf1d909c90fd9505fe498ebd278ccd08b86ba1681ab5f4e94d543f24c14887",
+        "sm-4": "2d9339c2367f219bc87827007b46685b61256fbe91eeda34833e850ff3c798fe",
+        "sm-5": "694e063d58c30605db21b7538586b96315e2752fa70e317ff32dd978ef80b45e",
+        "sm-6": "a61726f451abc8074e2cb07d702dd0298e122503c4e028595ba7839ad1941bfe",
+        "oi-1": "b885043bb58632f4984fbfff0f5702d012bdbe93ddae3ddbb65f256b4fc2cae2",
+        "oi-2": "bb8758238fc3aec41fc681a4cd40aa86204e8483c53d4e33ad09f7daf51f3884",
+        "oi-3": "cb4b6206e21c810524eb4ee89160147c904be74ac1962b3d9670968111e16dbe",
+        "cc-1": "51e1c7e89451c4c31d906e428a61ee3dc233ad23e9887366eba2e1798289b560",
+        "cc-2": "88d5ab30e4ba3997b7580b6e42427ea4b9ec61296f84c18fffbcac3573b4ff44",
+        "cc-3": "5f68796ac5ff1a17837bee3a3b771c68febceb8b9bd047305bbc906441a6e6cd",
+        "od-1": "72b0fb322ac86e85791b560b48b5a605627679adca2eba29944e624b4b7cf29b",
+        "od-2": "b35fd4802f16dfea5ce18b2b7613c61a4dac083ea2971ee7bdab0a33e1ec88fe",
+        "od-3": "942eb29abc170f845db19873a1f423d32e859dbaf4ab3abfe2ed4b99d0818957",
+        "mc-1": "5115f186428fc235c97241d06824eb9491ef93d0d74750dd9f1bdfe285f4b3a0",
+        "mc-2": "706f8a9ef313030ca14b79b4820e030bd2d1fda758bdb9c759c02340f05ddca2"
+      },
+      "metric_limit_policy": "source_review_exact_metric_limits.v1",
+      "subject_scope_limit_policy": "source_review_exact_subject_limits.v1"
+    },
+    "standardization_notes": []
+  },
+  "workpaper_receipts": [
+    {
+      "request_id": "bp-work-27af25647bf58c8005c1b75a:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "5912b11113ef3721a0cee7482651e069deffe0b39f862784f0cb746ba5a61455",
+      "response_hash": "f9170f462b840e4a1c0f5603d8a40e5469aabaef3a50035e80222f514f97b05d",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0020\",\"section-0054\",\"section-0055\",\"section-0056\"],\"rationale\":\"选择section-0020，因其完整覆盖公司主要业务、主要产品及用途、经营模式与主要业绩驱动因素；选择section-0054、section-0055、section-0056，分别覆盖智慧专网、生物纤维素基材、农牧领域经营情况，其中section-0056包含“收入与成本”子节，可解释收入构成、业务权重及本期经营变化。未选行业背景、核心竞争力、治理、财务附注等，因属次要或与上述范围重复。\",\"deferred\":[\"行业情况与核心竞争力等背景性内容：对解释公司业务结构、收入来源和本期经营变化非必要\",\"公司治理、董监高薪酬、内控与员工等治理章节：与经营和收入分析关系较弱\",\"财务报表附注及分部信息：主营业务和收入成本章节已提供主要收入构成，暂不扩读\",\"客户/供应商及未来计划、风险章节：属可选补充或计划性信息，当前范围可停止\"],\"stop_reason\":\"已覆盖业务/产品用途/经营模式、各业务板块经营情况、收入与成本及主要业绩驱动，足以回答公司做什么、如何赚钱、收入权重和本期经营变化；继续扩读行业背景、治理和附注边际收益低。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0020",
+          "section-0054",
+          "section-0055",
+          "section-0056"
+        ],
+        "rationale": "选择section-0020，因其完整覆盖公司主要业务、主要产品及用途、经营模式与主要业绩驱动因素；选择section-0054、section-0055、section-0056，分别覆盖智慧专网、生物纤维素基材、农牧领域经营情况，其中section-0056包含“收入与成本”子节，可解释收入构成、业务权重及本期经营变化。未选行业背景、核心竞争力、治理、财务附注等，因属次要或与上述范围重复。",
+        "deferred": [
+          "行业情况与核心竞争力等背景性内容：对解释公司业务结构、收入来源和本期经营变化非必要",
+          "公司治理、董监高薪酬、内控与员工等治理章节：与经营和收入分析关系较弱",
+          "财务报表附注及分部信息：主营业务和收入成本章节已提供主要收入构成，暂不扩读",
+          "客户/供应商及未来计划、风险章节：属可选补充或计划性信息，当前范围可停止"
+        ],
+        "stop_reason": "已覆盖业务/产品用途/经营模式、各业务板块经营情况、收入与成本及主要业绩驱动，足以回答公司做什么、如何赚钱、收入权重和本期经营变化；继续扩读行业背景、治理和附注边际收益低。"
+      },
+      "usage": {
+        "input_tokens": 15839,
+        "output_tokens": 5534,
+        "total_tokens": 21373
+      },
+      "receipt_origin": "retained_receipt"
+    },
+    {
+      "request_id": "bp-work-27af25647bf58c8005c1b75a:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "112b3b6eeeb18322d366153daab504fbb5ff5a21e0aa0fcdc2640b05d39b0de4",
+      "response_hash": "1435a28598e435a0480685d0797a3a0888565608ef1525c706a3377af501127f",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\n  \"schema_version\": \"company_profile_workpaper_draft.v1\",\n  \"elements\": {\n    \"business_structure\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"bs-1\",\n          \"text\": \"报告期内，公司主要从事智慧专网、生物纤维素基材及农牧领域业务；智慧专网定位为专网通信技术整体解决方案服务商，聚焦智慧电网、智慧交通，为电力、交通等行业提供信息通信技术解决方案，生物纤维素基材从事研究、生产及销售，农牧领域从事农产品贸易及仓储服务。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0001\"\n          ]\n        }\n      ],\n      \"limitations\": []\n    },\n    \"products_services\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"ps-1\",\n          \"text\": \"智慧专网领域为电力、交通行业提供信息通信技术解决方案：智慧电网为输变电、配电等环节提供通信网络架构设计、设备集成及系统部署，为光伏、风电场等新能源场站提供通信接入、数据传输与远程监控集成，并提供7×24小时运维保障；智慧交通面向高速公路及城市智能交通基础设施新建与改扩建，提供高速公路机电系统、城市道路监控、交通信号控制、电子警察、交通信息统计等整体解决方案，轨道交通方面提供专用、警用通信系统解决方案及运维服务。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0001\",\n            \"source-0005\"\n          ]\n        },\n        {\n          \"fact_id\": \"ps-2\",\n          \"text\": \"生物纤维素基材具有纳米三维网状结构、透气性、持水能力和生物相容性，以食品级原料发酵，可降解；产品主要应用于护肤品贴、膜类产品及医疗器械类敷料，妆字号可提供面膜、眼膜、鼻膜等定制化基材，械字号提供二类医疗器械用生物纤维素基材，用于医疗敷料、冷敷贴等。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0002\"\n          ]\n        },\n        {\n          \"fact_id\": \"ps-3\",\n          \"text\": \"农牧领域主营小麦、玉米等农产品品种，从事农产品贸易及仓储服务，通过整合内外部资源完成农产品采购到销售一体化服务，并利用自有仓库开展仓储及粮食保管业务。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0002\"\n          ]\n        }\n      ],\n      \"limitations\": []\n    },\n    \"revenue_model\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"rm-1\",\n          \"text\": \"智慧专网业务通过参与国家电网、南方电网及各地交通主管部门等组织的公开招标、竞争性谈判等市场化采购获取项目，收入来自信息通信技术解决方案、系统集成、设备交付及运维服务；智慧交通业务还包括高速公路机电系统、城市智能交通系统等项目实施。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0001\",\n            \"source-0005\"\n          ]\n        },\n        {\n          \"fact_id\": \"rm-2\",\n          \"text\": \"生物纤维素基材业务以研究、生产及销售获得收入，采取以销定产及定制化生产，向化妆品、医疗器械品牌商提供定制开发、技术解决方案及供应链保障。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0002\"\n          ]\n        },\n        {\n          \"fact_id\": \"rm-3\",\n          \"text\": \"农牧业务通过农产品贸易购销价差及仓储、粮食保管服务获得收入；农产品贸易主要参与政府储备粮轮换相关业务，并开展市场化贸易。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0002\",\n            \"source-0003\"\n          ]\n        }\n      ],\n      \"limitations\": []\n    },\n    \"scale_and_mix\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"sm-1\",\n          \"text\": \"2025年公司营业收入合计586,442,724.54元，同比下降3.45%。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0007\"\n          ],\n          \"metrics\": [\n            {\n              \"name\": \"营业收入合计\",\n              \"raw_value\": \"586,442,724.54\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年\",\n              \"qualifier\": \"exact\",\n              \"currency\": \"CNY\",\n              \"unit\": \"元\",\n              \"value\": \"586442724.54\",\n              \"source_unit\": \"元\"\n            },\n            {\n              \"name\": \"营业收入合计同比增减\",\n              \"raw_value\": \"-3.45%\",\n              \"subject_scope\": \"consolidated_group\",\n              \"period\": \"2025年\",\n              \"qualifier\": \"exact\",\n              \"currency\": null,\n              \"unit\": \"%\",\n              \"value\": \"-3.45\",\n              \"source_unit\": \"%\",\n              \"comparison_basis\": \"同比\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"sm-2\",\n          \"text\": \"2025年公司智慧专网业务领域实现主营业务收入46,691.55万元，同比下降5.17%。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0005\"\n          ],\n          \"metrics\": [\n            {\n              \"name\": \"智慧专网业务领域主营业务收入\",\n              \"raw_value\": \"46,691.55\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年\",\n              \"qualifier\": \"exact\",\n              \"currency\": \"CNY\",\n              \"unit\": \"万元\",\n              \"value\": \"46691.55\",\n              \"source_unit\": \"万元\"\n            },\n            {\n              \"name\": \"智慧专网业务领域主营业务收入同比增减\",\n              \"raw_value\": \"同比下降5.17%\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年\",\n              \"qualifier\": \"exact\",\n              \"currency\": null,\n              \"unit\": \"%\",\n              \"value\": null,\n              \"source_unit\": \"%\",\n              \"comparison_basis\": \"同比\",\n              \"uncertainty_reason\": \"源文以‘同比下降5.17%’表述，未给出带符号数值；未将方向词转换为负号。\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"sm-3\",\n          \"text\": \"2025年交通工程系统集成营业收入248,213,693.90元，占营业收入42.33%，同比下降2.70%。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0007\",\n            \"source-0008\"\n          ],\n          \"metrics\": [\n            {\n              \"name\": \"交通工程系统集成营业收入\",\n              \"raw_value\": \"248,213,693.90\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年\",\n              \"qualifier\": \"exact\",\n              \"currency\": \"CNY\",\n              \"unit\": \"元\",\n              \"value\": \"248213693.90\",\n              \"source_unit\": \"元\"\n            },\n            {\n              \"name\": \"交通工程系统集成占营业收入比重\",\n              \"raw_value\": \"42.33%\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年\",\n              \"qualifier\": \"exact\",\n              \"currency\": null,\n              \"unit\": \"%\",\n              \"value\": \"42.33\",\n              \"source_unit\": \"%\",\n              \"comparison_basis\": \"占营业收入比重\"\n            },\n            {\n              \"name\": \"交通工程系统集成营业收入同比增减\",\n              \"raw_value\": \"-2.70%\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年\",\n              \"qualifier\": \"exact\",\n              \"currency\": null,\n              \"unit\": \"%\",\n              \"value\": \"-2.70\",\n              \"source_unit\": \"%\",\n              \"comparison_basis\": \"同比\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"sm-4\",\n          \"text\": \"2025年专网通信解决方案营业收入218,701,838.59元，占营业收入37.29%，同比下降7.82%。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0007\",\n            \"source-0008\"\n          ],\n          \"metrics\": [\n            {\n              \"name\": \"专网通信解决方案营业收入\",\n              \"raw_value\": \"218,701,838.59\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年\",\n              \"qualifier\": \"exact\",\n              \"currency\": \"CNY\",\n              \"unit\": \"元\",\n              \"value\": \"218701838.59\",\n              \"source_unit\": \"元\"\n            },\n            {\n              \"name\": \"专网通信解决方案占营业收入比重\",\n              \"raw_value\": \"37.29%\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年\",\n              \"qualifier\": \"exact\",\n              \"currency\": null,\n              \"unit\": \"%\",\n              \"value\": \"37.29\",\n              \"source_unit\": \"%\",\n              \"comparison_basis\": \"占营业收入比重\"\n            },\n            {\n              \"name\": \"专网通信解决方案营业收入同比增减\",\n              \"raw_value\": \"-7.82%\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年\",\n              \"qualifier\": \"exact\",\n              \"currency\": null,\n              \"unit\": \"%\",\n              \"value\": \"-7.82\",\n              \"source_unit\": \"%\",\n              \"comparison_basis\": \"同比\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"sm-5\",\n          \"text\": \"2025年生物纤维素基材营业收入42,401,719.94元，占营业收入7.23%，同比下降6.24%。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0007\",\n            \"source-0008\"\n          ],\n          \"metrics\": [\n            {\n              \"name\": \"生物纤维素基材营业收入\",\n              \"raw_value\": \"42,401,719.94\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年\",\n              \"qualifier\": \"exact\",\n              \"currency\": \"CNY\",\n              \"unit\": \"元\",\n              \"value\": \"42401719.94\",\n              \"source_unit\": \"元\"\n            },\n            {\n              \"name\": \"生物纤维素基材占营业收入比重\",\n              \"raw_value\": \"7.23%\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年\",\n              \"qualifier\": \"exact\",\n              \"currency\": null,\n              \"unit\": \"%\",\n              \"value\": \"7.23\",\n              \"source_unit\": \"%\",\n              \"comparison_basis\": \"占营业收入比重\"\n            },\n            {\n              \"name\": \"生物纤维素基材营业收入同比增减\",\n              \"raw_value\": \"-6.24%\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年\",\n              \"qualifier\": \"exact\",\n              \"currency\": null,\n              \"unit\": \"%\",\n              \"value\": \"-6.24\",\n              \"source_unit\": \"%\",\n              \"comparison_basis\": \"同比\"\n            }\n          ]\n        },\n        {\n          \"fact_id\": \"sm-6\",\n          \"text\": \"2025年农产品贸易营业收入75,843,172.91元，占营业收入12.93%，同比增长22.49%。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0007\",\n            \"source-0008\"\n          ],\n          \"metrics\": [\n            {\n              \"name\": \"农产品贸易营业收入\",\n              \"raw_value\": \"75,843,172.91\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年\",\n              \"qualifier\": \"exact\",\n              \"currency\": \"CNY\",\n              \"unit\": \"元\",\n              \"value\": \"75843172.91\",\n              \"source_unit\": \"元\"\n            },\n            {\n              \"name\": \"农产品贸易占营业收入比重\",\n              \"raw_value\": \"12.93%\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年\",\n              \"qualifier\": \"exact\",\n              \"currency\": null,\n              \"unit\": \"%\",\n              \"value\": \"12.93\",\n              \"source_unit\": \"%\",\n              \"comparison_basis\": \"占营业收入比重\"\n            },\n            {\n              \"name\": \"农产品贸易营业收入同比增减\",\n              \"raw_value\": \"22.49%\",\n              \"subject_scope\": \"business_segment\",\n              \"period\": \"2025年\",\n              \"qualifier\": \"exact\",\n              \"currency\": null,\n              \"unit\": \"%\",\n              \"value\": \"22.49\",\n              \"source_unit\": \"%\",\n              \"comparison_basis\": \"同比\"\n            }\n          ]\n        }\n      ],\n      \"limitations\": [\n        \"收入构成表“其他”类别金额小且未细分，未纳入主要构成单列；分地区、分销售模式明细未逐项展开。\"\n      ]\n    },\n    \"operations_and_inputs\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"oi-1\",\n          \"text\": \"智慧专网业务以招投标为核心项目获取方式，通过公开招标、竞争性谈判等市场化采购程序获取订单；智慧电网项目覆盖输变电、配电、新能源场站通信接入、变电站智能化改造等，并提供规划—建设—运维全生命周期服务。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0001\",\n            \"source-0005\"\n          ]\n        },\n        {\n          \"fact_id\": \"oi-2\",\n          \"text\": \"生物纤维素基材采取以销定产及定制化生产模式，依托自有现代化工厂，根据客户对产品规格、性能指标的特定需求调整工艺及参数；各生产环节执行医疗器械质量管理体系及化妆品相关生产规范。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0002\"\n          ]\n        },\n        {\n          \"fact_id\": \"oi-3\",\n          \"text\": \"农牧业务采购采取集中采购与动态采购相结合，在主要粮食产区直接向大型农户、合作社或贸易商采购，并根据市场行情和客户订单灵活进行市场化采购；同时利用自有仓库开展仓储及粮食保管。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0002\"\n          ]\n        }\n      ],\n      \"limitations\": []\n    },\n    \"customers_channels_markets\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"cc-1\",\n          \"text\": \"智慧电网客户包括国家电网、南方电网及下辖各省市电力公司等，并为光伏电站、风电场等新能源场站及各类电力客户提供服务，销售网络覆盖华中、西北、西南、华南、华东等核心区域并延伸至全国二十多个省、自治区、直辖市；智慧交通客户主要为各地交通主管部门、高速公路集团、城建投资平台等业主单位，业务覆盖江苏、上海、广东、广西、安徽等地，并通过控股子公司南京凌云执行项目。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0001\",\n            \"source-0005\"\n          ]\n        },\n        {\n          \"fact_id\": \"cc-2\",\n          \"text\": \"生物纤维素基材客户面向国内外知名化妆品、医疗器械品牌商，公司以服务并深度绑定核心品牌客户为重点，同时开拓海外市场及新兴应用市场。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0002\"\n          ]\n        },\n        {\n          \"fact_id\": \"cc-3\",\n          \"text\": \"农牧业务销售以直接销售为主，主要面向大型食品加工企业、饲料生产企业、粮食深加工企业等终端客户及部分贸易商。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0002\"\n          ]\n        }\n      ],\n      \"limitations\": []\n    },\n    \"operating_drivers\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"od-1\",\n          \"text\": \"智慧专网领域受‘双碳’目标、新型电力系统建设及交通基础设施高质量发展等国家战略推动，电力与交通行业数字化、智能化投资保持较高景气；国家电网、南方电网推进配电网升级、新能源并网通信配套，各地加大高速公路智能化改造、城市交通治理投入，为公司创造市场空间。公司凭借长期行业服务经验与项目履约能力巩固核心客户合作，聚焦电力与交通高壁垒行业，形成‘专业方案+量身定制+高效交付’差异化优势，项目复购率和客户黏性提升。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0002\"\n          ]\n        },\n        {\n          \"fact_id\": \"od-2\",\n          \"text\": \"生物纤维素基材领域受合成生物学技术研发、下游护肤品功效性/安全性需求提升及医疗器械高端敷料需求增长牵引；公司通过定制化生产服务提升客户价值与粘性。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0003\"\n          ]\n        },\n        {\n          \"fact_id\": \"od-3\",\n          \"text\": \"农牧领域通过整合内外部资源构建从采购、仓储到销售的一体化服务体系，依托政府储备粮轮换业务与市场化贸易业务互补，并基于市场行情研判灵活调整采购与销售策略，以优化购销价差、应对价格波动。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0003\"\n          ]\n        }\n      ],\n      \"limitations\": []\n    },\n    \"material_changes\": {\n      \"status\": \"observed\",\n      \"facts\": [\n        {\n          \"fact_id\": \"mc-1\",\n          \"text\": \"报告期内，农牧领域主营业务收入有所增长，但受业务周期及市场价格波动等因素影响，农产品贸易业务毛利率较上年同期降幅较大；自有粮库出租率不及预期，仓容空置导致相关折旧等成本未能有效覆盖，农牧领域业务较上年同期出现较大幅度亏损。\",\n          \"subject_scope\": \"business_segment\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0007\"\n          ]\n        },\n        {\n          \"fact_id\": \"mc-2\",\n          \"text\": \"报告期内合并范围发生变化：公司原子公司吉林亚联农牧科技有限公司已于2025年04月07日注销，原子公司键桥数字已于2025年12月完成减资及转让，二者本报告期均不再纳入公司合并报表范围。\",\n          \"subject_scope\": \"consolidated_group\",\n          \"period\": \"2025年\",\n          \"evidence_ids\": [\n            \"source-0010\"\n          ]\n        }\n      ],\n      \"limitations\": []\n    }\n  },\n  \"limitations\": [\n    \"本工作底稿仅依据选定章节，未扩读行业背景、核心竞争力、治理、财务附注、客户/供应商明细及未来计划。\",\n    \"分地区、分销售模式明细未逐项展开；收入构成表“其他”类别未单列。\"\n  ]\n}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "bs-1",
+                "text": "报告期内，公司主要从事智慧专网、生物纤维素基材及农牧领域业务；智慧专网定位为专网通信技术整体解决方案服务商，聚焦智慧电网、智慧交通，为电力、交通等行业提供信息通信技术解决方案，生物纤维素基材从事研究、生产及销售，农牧领域从事农产品贸易及仓储服务。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "ps-1",
+                "text": "智慧专网领域为电力、交通行业提供信息通信技术解决方案：智慧电网为输变电、配电等环节提供通信网络架构设计、设备集成及系统部署，为光伏、风电场等新能源场站提供通信接入、数据传输与远程监控集成，并提供7×24小时运维保障；智慧交通面向高速公路及城市智能交通基础设施新建与改扩建，提供高速公路机电系统、城市道路监控、交通信号控制、电子警察、交通信息统计等整体解决方案，轨道交通方面提供专用、警用通信系统解决方案及运维服务。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "ps-2",
+                "text": "生物纤维素基材具有纳米三维网状结构、透气性、持水能力和生物相容性，以食品级原料发酵，可降解；产品主要应用于护肤品贴、膜类产品及医疗器械类敷料，妆字号可提供面膜、眼膜、鼻膜等定制化基材，械字号提供二类医疗器械用生物纤维素基材，用于医疗敷料、冷敷贴等。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "ps-3",
+                "text": "农牧领域主营小麦、玉米等农产品品种，从事农产品贸易及仓储服务，通过整合内外部资源完成农产品采购到销售一体化服务，并利用自有仓库开展仓储及粮食保管业务。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "rm-1",
+                "text": "智慧专网业务通过参与国家电网、南方电网及各地交通主管部门等组织的公开招标、竞争性谈判等市场化采购获取项目，收入来自信息通信技术解决方案、系统集成、设备交付及运维服务；智慧交通业务还包括高速公路机电系统、城市智能交通系统等项目实施。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "rm-2",
+                "text": "生物纤维素基材业务以研究、生产及销售获得收入，采取以销定产及定制化生产，向化妆品、医疗器械品牌商提供定制开发、技术解决方案及供应链保障。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "rm-3",
+                "text": "农牧业务通过农产品贸易购销价差及仓储、粮食保管服务获得收入；农产品贸易主要参与政府储备粮轮换相关业务，并开展市场化贸易。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0002",
+                  "source-0003"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "sm-1",
+                "text": "2025年公司营业收入合计586,442,724.54元，同比下降3.45%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入合计",
+                    "raw_value": "586,442,724.54",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年",
+                    "qualifier": "exact",
+                    "currency": "CNY",
+                    "unit": "元",
+                    "value": "586442724.54",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "营业收入合计同比增减",
+                    "raw_value": "-3.45%",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年",
+                    "qualifier": "exact",
+                    "currency": null,
+                    "unit": "%",
+                    "value": "-3.45",
+                    "source_unit": "%",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-2",
+                "text": "2025年公司智慧专网业务领域实现主营业务收入46,691.55万元，同比下降5.17%。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": [
+                  {
+                    "name": "智慧专网业务领域主营业务收入",
+                    "raw_value": "46,691.55",
+                    "subject_scope": "business_segment",
+                    "period": "2025年",
+                    "qualifier": "exact",
+                    "currency": "CNY",
+                    "unit": "万元",
+                    "value": "46691.55",
+                    "source_unit": "万元"
+                  },
+                  {
+                    "name": "智慧专网业务领域主营业务收入同比增减",
+                    "raw_value": "同比下降5.17%",
+                    "subject_scope": "business_segment",
+                    "period": "2025年",
+                    "qualifier": "exact",
+                    "currency": null,
+                    "unit": "%",
+                    "value": null,
+                    "source_unit": "%",
+                    "comparison_basis": "同比",
+                    "uncertainty_reason": "源文以‘同比下降5.17%’表述，未给出带符号数值；未将方向词转换为负号。"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-3",
+                "text": "2025年交通工程系统集成营业收入248,213,693.90元，占营业收入42.33%，同比下降2.70%。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0007",
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "交通工程系统集成营业收入",
+                    "raw_value": "248,213,693.90",
+                    "subject_scope": "business_segment",
+                    "period": "2025年",
+                    "qualifier": "exact",
+                    "currency": "CNY",
+                    "unit": "元",
+                    "value": "248213693.90",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "交通工程系统集成占营业收入比重",
+                    "raw_value": "42.33%",
+                    "subject_scope": "business_segment",
+                    "period": "2025年",
+                    "qualifier": "exact",
+                    "currency": null,
+                    "unit": "%",
+                    "value": "42.33",
+                    "source_unit": "%",
+                    "comparison_basis": "占营业收入比重"
+                  },
+                  {
+                    "name": "交通工程系统集成营业收入同比增减",
+                    "raw_value": "-2.70%",
+                    "subject_scope": "business_segment",
+                    "period": "2025年",
+                    "qualifier": "exact",
+                    "currency": null,
+                    "unit": "%",
+                    "value": "-2.70",
+                    "source_unit": "%",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-4",
+                "text": "2025年专网通信解决方案营业收入218,701,838.59元，占营业收入37.29%，同比下降7.82%。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0007",
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "专网通信解决方案营业收入",
+                    "raw_value": "218,701,838.59",
+                    "subject_scope": "business_segment",
+                    "period": "2025年",
+                    "qualifier": "exact",
+                    "currency": "CNY",
+                    "unit": "元",
+                    "value": "218701838.59",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "专网通信解决方案占营业收入比重",
+                    "raw_value": "37.29%",
+                    "subject_scope": "business_segment",
+                    "period": "2025年",
+                    "qualifier": "exact",
+                    "currency": null,
+                    "unit": "%",
+                    "value": "37.29",
+                    "source_unit": "%",
+                    "comparison_basis": "占营业收入比重"
+                  },
+                  {
+                    "name": "专网通信解决方案营业收入同比增减",
+                    "raw_value": "-7.82%",
+                    "subject_scope": "business_segment",
+                    "period": "2025年",
+                    "qualifier": "exact",
+                    "currency": null,
+                    "unit": "%",
+                    "value": "-7.82",
+                    "source_unit": "%",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-5",
+                "text": "2025年生物纤维素基材营业收入42,401,719.94元，占营业收入7.23%，同比下降6.24%。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0007",
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "生物纤维素基材营业收入",
+                    "raw_value": "42,401,719.94",
+                    "subject_scope": "business_segment",
+                    "period": "2025年",
+                    "qualifier": "exact",
+                    "currency": "CNY",
+                    "unit": "元",
+                    "value": "42401719.94",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "生物纤维素基材占营业收入比重",
+                    "raw_value": "7.23%",
+                    "subject_scope": "business_segment",
+                    "period": "2025年",
+                    "qualifier": "exact",
+                    "currency": null,
+                    "unit": "%",
+                    "value": "7.23",
+                    "source_unit": "%",
+                    "comparison_basis": "占营业收入比重"
+                  },
+                  {
+                    "name": "生物纤维素基材营业收入同比增减",
+                    "raw_value": "-6.24%",
+                    "subject_scope": "business_segment",
+                    "period": "2025年",
+                    "qualifier": "exact",
+                    "currency": null,
+                    "unit": "%",
+                    "value": "-6.24",
+                    "source_unit": "%",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-6",
+                "text": "2025年农产品贸易营业收入75,843,172.91元，占营业收入12.93%，同比增长22.49%。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0007",
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "农产品贸易营业收入",
+                    "raw_value": "75,843,172.91",
+                    "subject_scope": "business_segment",
+                    "period": "2025年",
+                    "qualifier": "exact",
+                    "currency": "CNY",
+                    "unit": "元",
+                    "value": "75843172.91",
+                    "source_unit": "元"
+                  },
+                  {
+                    "name": "农产品贸易占营业收入比重",
+                    "raw_value": "12.93%",
+                    "subject_scope": "business_segment",
+                    "period": "2025年",
+                    "qualifier": "exact",
+                    "currency": null,
+                    "unit": "%",
+                    "value": "12.93",
+                    "source_unit": "%",
+                    "comparison_basis": "占营业收入比重"
+                  },
+                  {
+                    "name": "农产品贸易营业收入同比增减",
+                    "raw_value": "22.49%",
+                    "subject_scope": "business_segment",
+                    "period": "2025年",
+                    "qualifier": "exact",
+                    "currency": null,
+                    "unit": "%",
+                    "value": "22.49",
+                    "source_unit": "%",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "收入构成表“其他”类别金额小且未细分，未纳入主要构成单列；分地区、分销售模式明细未逐项展开。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "oi-1",
+                "text": "智慧专网业务以招投标为核心项目获取方式，通过公开招标、竞争性谈判等市场化采购程序获取订单；智慧电网项目覆盖输变电、配电、新能源场站通信接入、变电站智能化改造等，并提供规划—建设—运维全生命周期服务。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "oi-2",
+                "text": "生物纤维素基材采取以销定产及定制化生产模式，依托自有现代化工厂，根据客户对产品规格、性能指标的特定需求调整工艺及参数；各生产环节执行医疗器械质量管理体系及化妆品相关生产规范。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "oi-3",
+                "text": "农牧业务采购采取集中采购与动态采购相结合，在主要粮食产区直接向大型农户、合作社或贸易商采购，并根据市场行情和客户订单灵活进行市场化采购；同时利用自有仓库开展仓储及粮食保管。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "cc-1",
+                "text": "智慧电网客户包括国家电网、南方电网及下辖各省市电力公司等，并为光伏电站、风电场等新能源场站及各类电力客户提供服务，销售网络覆盖华中、西北、西南、华南、华东等核心区域并延伸至全国二十多个省、自治区、直辖市；智慧交通客户主要为各地交通主管部门、高速公路集团、城建投资平台等业主单位，业务覆盖江苏、上海、广东、广西、安徽等地，并通过控股子公司南京凌云执行项目。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "cc-2",
+                "text": "生物纤维素基材客户面向国内外知名化妆品、医疗器械品牌商，公司以服务并深度绑定核心品牌客户为重点，同时开拓海外市场及新兴应用市场。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "cc-3",
+                "text": "农牧业务销售以直接销售为主，主要面向大型食品加工企业、饲料生产企业、粮食深加工企业等终端客户及部分贸易商。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "od-1",
+                "text": "智慧专网领域受‘双碳’目标、新型电力系统建设及交通基础设施高质量发展等国家战略推动，电力与交通行业数字化、智能化投资保持较高景气；国家电网、南方电网推进配电网升级、新能源并网通信配套，各地加大高速公路智能化改造、城市交通治理投入，为公司创造市场空间。公司凭借长期行业服务经验与项目履约能力巩固核心客户合作，聚焦电力与交通高壁垒行业，形成‘专业方案+量身定制+高效交付’差异化优势，项目复购率和客户黏性提升。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "od-2",
+                "text": "生物纤维素基材领域受合成生物学技术研发、下游护肤品功效性/安全性需求提升及医疗器械高端敷料需求增长牵引；公司通过定制化生产服务提升客户价值与粘性。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              },
+              {
+                "fact_id": "od-3",
+                "text": "农牧领域通过整合内外部资源构建从采购、仓储到销售的一体化服务体系，依托政府储备粮轮换业务与市场化贸易业务互补，并基于市场行情研判灵活调整采购与销售策略，以优化购销价差、应对价格波动。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "mc-1",
+                "text": "报告期内，农牧领域主营业务收入有所增长，但受业务周期及市场价格波动等因素影响，农产品贸易业务毛利率较上年同期降幅较大；自有粮库出租率不及预期，仓容空置导致相关折旧等成本未能有效覆盖，农牧领域业务较上年同期出现较大幅度亏损。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "mc-2",
+                "text": "报告期内合并范围发生变化：公司原子公司吉林亚联农牧科技有限公司已于2025年04月07日注销，原子公司键桥数字已于2025年12月完成减资及转让，二者本报告期均不再纳入公司合并报表范围。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0010"
+                ]
+              }
+            ],
+            "limitations": []
+          }
+        },
+        "limitations": [
+          "本工作底稿仅依据选定章节，未扩读行业背景、核心竞争力、治理、财务附注、客户/供应商明细及未来计划。",
+          "分地区、分销售模式明细未逐项展开；收入构成表“其他”类别未单列。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 12795,
+        "output_tokens": 32945,
+        "total_tokens": 45740
+      },
+      "receipt_origin": "retained_receipt"
+    },
+    {
+      "request_id": "bp-work-ab6d6648c525066ca11e8a92:workpaper:review",
+      "purpose": "review_profile_workpaper",
+      "request_hash": "b9112532b8cc5469c5826b177fade57c569fcabfa20ed416f8584b7db8aed40a",
+      "response_hash": "c2df91296250a9b726a9cfa3e8c0527464003bf963e2945bfe23a6bc4c6ca300",
+      "finish_reason": "stop",
+      "source_label": "scorpio:grok-4.7",
+      "model": "grok-4.7",
+      "selected_profile": "semantic_extraction__scorpio_grok",
+      "logical_profile": "semantic_extraction__scorpio_grok",
+      "reasoning_effort": "high",
+      "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+      "contract_status": "accepted",
+      "raw_content": "{\"findings\":[],\"reviewed_fact_ids\":[\"bs-1\",\"ps-1\",\"ps-2\",\"ps-3\",\"rm-1\",\"rm-2\",\"rm-3\",\"sm-1\",\"sm-2\",\"sm-3\",\"sm-4\",\"sm-5\",\"sm-6\",\"oi-1\",\"oi-2\",\"oi-3\",\"cc-1\",\"cc-2\",\"cc-3\",\"od-1\",\"od-2\",\"od-3\",\"mc-1\",\"mc-2\"]}",
+      "response_payload": {
+        "findings": [],
+        "reviewed_fact_ids": [
+          "bs-1",
+          "ps-1",
+          "ps-2",
+          "ps-3",
+          "rm-1",
+          "rm-2",
+          "rm-3",
+          "sm-1",
+          "sm-2",
+          "sm-3",
+          "sm-4",
+          "sm-5",
+          "sm-6",
+          "oi-1",
+          "oi-2",
+          "oi-3",
+          "cc-1",
+          "cc-2",
+          "cc-3",
+          "od-1",
+          "od-2",
+          "od-3",
+          "mc-1",
+          "mc-2"
+        ]
+      },
+      "usage": {
+        "input_tokens": 19117,
+        "output_tokens": 109,
+        "total_tokens": 30048
+      }
+    }
+  ]
+}

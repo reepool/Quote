@@ -1,0 +1,49 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "instrument_id": "601108.SH",
+  "name": "财通证券",
+  "report": {"content_hash": "63bb7caf8956deba2fe39f5438621800088899d67457c185a39d6c2246f79695", "report_period": "2025-12-31", "fiscal_year": 2025, "published_at": "2026-04-24T16:00:00+00:00", "source": "cninfo", "source_announcement_id": "1225190278", "asset_id": "asset_0fa677a8678e4005a0235b6e151281d7", "title": "2025年年度报告", "variant": "original"},
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/63/63bb7caf8956deba2fe39f5438621800088899d67457c185a39d6c2246f79695.pdf",
+  "pdf_sha256": "63bb7caf8956deba2fe39f5438621800088899d67457c185a39d6c2246f79695",
+  "document_version": "601108.SH / 2025年年度报告 original / 公告1225190278 / SHA256同pdf_sha256",
+  "source_sections_and_physical_pages": "目录物理3；第三节管理层讨论与分析/业务情况37、经营讨论38–39；五、主要经营情况/利润表44、分行业收入45–46；资产负债49。阅读按PDF页序，非跨页页眉数字。",
+  "physical_pages_read": [1, 2, 3, 4, 37, 38, 39, 44, 45, 46, 47, 48, 49],
+  "core_conditions": [
+    {"condition_id": "C1", "question": "公司做什么", "expected_source_answer": "综合证券金融服务机构，深耕浙江、服务全国并开展跨境业务，向个人/机构提供财富与资管、企业政府直接融资及信用服务，也以自有资金投资；不能以证券经纪一种业务概括全部。", "source_physical_pages": [37, 38, 39]},
+    {"condition_id": "C2", "question": "主要产品/服务与板块", "expected_source_answer": "实质覆盖十大业务：财富管理（证券经纪、期货IB、产品销售、投顾、托管）、证券信用（两融、股票质押/约定购回）、投资银行（承销保荐、并购财顾）、自营投资及做市、证券资产管理、基金、期货、国际化、私募股权基金投资管理和另类投资。收入表另分财富、自营、投行、资管、信用、国际化、总部后台及其他，不机械要求十大板块各有一行收入。", "source_physical_pages": [37, 45, 46]},
+    {"condition_id": "C3", "question": "怎么赚钱", "expected_source_answer": "经纪/产品销售/投顾、承销保荐财顾和资管等取得手续费佣金；两融等资金融通形成利息净收入；自营及股权等投资取得投资收益并受公允价值变动影响。主要收入来源须兼顾财富、资管、信用、投行、自营和总部后台及其他等，不能只列最大经纪业务或把所有投资收益等同自营分部。", "source_physical_pages": [37, 44, 45, 46]}
+  ],
+  "important_numbers": [
+    {"source_name": "营业收入", "raw_value": "6,922,252,743.46", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 44, "source_relation": "利润表总额，分行业表合计相同；同比10.13%"},
+    {"source_name": "手续费及佣金净收入", "raw_value": "3,658,008,551.42", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 44},
+    {"source_name": "利息净收入", "raw_value": "706,784,808.14", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 44},
+    {"source_name": "投资收益/公允价值变动收益", "raw_value": ["2,893,733,398.04", "-419,946,577.53"], "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 44, "source_relation": "利润表科目，不等于自营分部营业收入"},
+    {"source_name": "财富管理业务", "raw_value": "2,346,641,027.94", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 45, "source_relation": "分行业营业收入"},
+    {"source_name": "自营投资业务", "raw_value": "809,918,698.46", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 45, "source_relation": "分行业营业收入"},
+    {"source_name": "投资银行业务", "raw_value": "398,753,292.93", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 45, "source_relation": "分行业营业收入"},
+    {"source_name": "资产管理业务", "raw_value": "1,417,587,810.72", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 45, "source_relation": "分行业营业收入；不因业务文字有证券资管/基金等多项擅拆此总额"},
+    {"source_name": "证券信用业务", "raw_value": "651,250,335.72", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 45, "source_relation": "分行业营业收入"},
+    {"source_name": "国际化业务", "raw_value": "89,957,574.36", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 45, "source_relation": "分行业营业收入"},
+    {"source_name": "总部后台及其他", "raw_value": "1,208,144,003.33", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 45, "source_relation": "分行业剩余主要分类，不能改称未知某单项业务"},
+    {"source_name": "公司总资产/归母权益", "raw_value": ["1,614.12", "378.45"], "unit": "亿元", "period": "2025-12-31", "physical_page": 44},
+    {"source_name": "归属于母公司股东的净利润", "raw_value": "26.32", "unit": "亿元", "period": "2025-01-01/2025-12-31", "physical_page": 44},
+    {"source_name": "服务居民资产规模", "raw_value": "突破1万亿元", "unit": "原文限定", "period": "2025-12-31", "physical_page": 38, "source_relation": "不含子公司及参股公司；非公司自有资产"}
+  ],
+  "native_pdf_anchors": [
+    {"physical_page": 37, "quote": "报告期内公司从事的主要业务分为十大板块", "native_text_start": 62, "native_text_end": 81, "bbox_pdf_points": [91.125, 650.805, 249.208, 658.685]},
+    {"physical_page": 44, "quote": "营业收入 6,922,252,743.46 6,285,729,757.86 10.13", "native_text_start": 875, "native_text_end": 919, "bbox_pdf_points": [76.801, 326.467, 387.753, 334.259]},
+    {"physical_page": 45, "quote": "主营业务分行业情况", "native_text_start": 911, "native_text_end": 920, "bbox_pdf_points": [261.014, 332.535, 334.374, 340.087]}
+  ],
+  "coordinate_system": "原PDF物理页1起；pypdfium2原文本字符偏移；bbox为PDF points左下原点。",
+  "qualifications": [
+    "十大业务是服务与经营分类，七类收入是报表汇总；保原名/关系，不将粒度差异本身判为错误。",
+    "投资收益含不同来源，不能仅按字段名绑定为自营板块；总部后台及其他占实质收入，不用已列最大业务代表全表。",
+    "全市场融资融券25,406.82亿元是行业数，公司两融余额为280亿元；承销总额1,132.89亿元是承销规模，非收入。",
+    "服务客户资产、资管规模和自营资产各有产权与管理关系，不能只凭group/issuer标签当公司总资产。",
+    "2026展望保未来限定；市场与信用风险、金融工具估值波动不可抹去。"
+  ],
+  "basis": "本审核助手直接亲读指定原PDF及目录定位，逐份核SHA256；无旧模型答案/画像真值输入。",
+  "reference_sent_to_model": false,
+  "output_assessment": "not_assessed; source-only, awaiting first/automatic-final consumer objects"
+}

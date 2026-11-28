@@ -1,5 +1,9 @@
 # 公司画像首读、复核与按需精读：日常命令
 
+当前统一研究根仍为`/home/python/Quote/data/research/company_profile_research_v1_20261123`。6.FY新增20家已审研究交付后，原reader提供59家公司、1523条可读内容及2330指标，原39家完整内容保持。新增20家的[完整人读版](../../data/research/company_profile_research_v1_20261123/twenty-reviewed-current-6fy-20261128.md)与[JSON](../../data/research/company_profile_research_v1_20261123/twenty-reviewed-current-6fy-20261128.json)保留原文来源、实际模型、审查与缺项。东航物流601156的货品购销赚钱方式未获取成功，可从`information_gaps`读取原因及补读建议；缺项不是GET失败或全报告未披露。6.FY首读98.5%未过99%，审后417/417对象支持仅属本组已审范围，不将研究交付称为正式S3/生产通过。下方早期20股等段落保留各自历史版本，不再代表统一根当前总数。
+
+现有只读API可直接使用：`GET /api/v1/research/company/annual-profiles`发现画像，`GET /api/v1/research/company/601156.SH/annual-profile`读单股，或`POST /api/v1/research/company/annual-profiles/query`以`{"instrument_ids":["601156.SH","600881.SH"]}`批量查询。读取不发送模型；按股补读仍先以具体研究问题生成计划，再在明确运行授权内执行，不自动补满全部缺项。
+
 当前为研究用途。使用原`company_profile_common_core`任务和原队列/writer；不需要写Python操作脚本，也不会自动新增调度。真实新调用须有对应的明确有限授权，示例是未授权模板，不复活历史窗口。联网执行遵循项目获准联网环境要求，开发命令先加载统一环境：
 
 ```bash

@@ -1,0 +1,2084 @@
+{
+  "schema_version": "company_profile_research_api.v1",
+  "instrument_id": "002575.SZ",
+  "report": {
+    "instrument_id": "002575.SZ",
+    "report_id": "asset_3abf8b3c8e26653471bfe64b314ee2c7",
+    "document_version": "e4ab21072b7da70251a833b13da381e215f24f65be67f71a760c815a1a6e7a81",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-27T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "base_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+  "latest_reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+  "readings": [
+    {
+      "work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "workpaper_sha256": "cfffe3ff0b94c148848386650e3e4e404a9c21d16bd0a4e8b8287d34df60c6e1",
+      "enrichment": null,
+      "origin": "llm_generated",
+      "review_execution": "deferred",
+      "reading_scope": {
+        "sections": [
+          {
+            "section_id": "section-0010",
+            "section_path": [
+              "第二节 公司简介和主要财务指标",
+              "六、主要会计数据和财务指标"
+            ],
+            "start_page": 7,
+            "end_page": 8,
+            "rationale": "选择围绕公司业务结构与收入拆解：0010提供报告期营业收入、利润等总量指标；0018完整覆盖酒类销售、智算、物业租赁与物业管理三大业务的经营内容、产品/服务与商业模式；0036为营业收入与成本构成分析，能回答收入来源、业务权重和成本变化；0050延续营业成本/费用、研发投入与现金流等经营投入和现金创造信息（供应商部分仅作辅助）；0077补充2026年经营计划与主要风险，用于理解战略调整和经营驱动。未选行业背景、核心竞争力、资产变动、治理和财务报表附注，因它们对当前业务/收入回答非必需，且可在需要时定向核验。"
+          },
+          {
+            "section_id": "section-0018",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "一、报告期内公司从事的主要业务"
+            ],
+            "start_page": 11,
+            "end_page": 11,
+            "rationale": "选择围绕公司业务结构与收入拆解：0010提供报告期营业收入、利润等总量指标；0018完整覆盖酒类销售、智算、物业租赁与物业管理三大业务的经营内容、产品/服务与商业模式；0036为营业收入与成本构成分析，能回答收入来源、业务权重和成本变化；0050延续营业成本/费用、研发投入与现金流等经营投入和现金创造信息（供应商部分仅作辅助）；0077补充2026年经营计划与主要风险，用于理解战略调整和经营驱动。未选行业背景、核心竞争力、资产变动、治理和财务报表附注，因它们对当前业务/收入回答非必需，且可在需要时定向核验。"
+          },
+          {
+            "section_id": "section-0036",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "四、主营业务分析"
+            ],
+            "start_page": 13,
+            "end_page": 14,
+            "rationale": "选择围绕公司业务结构与收入拆解：0010提供报告期营业收入、利润等总量指标；0018完整覆盖酒类销售、智算、物业租赁与物业管理三大业务的经营内容、产品/服务与商业模式；0036为营业收入与成本构成分析，能回答收入来源、业务权重和成本变化；0050延续营业成本/费用、研发投入与现金流等经营投入和现金创造信息（供应商部分仅作辅助）；0077补充2026年经营计划与主要风险，用于理解战略调整和经营驱动。未选行业背景、核心竞争力、资产变动、治理和财务报表附注，因它们对当前业务/收入回答非必需，且可在需要时定向核验。"
+          },
+          {
+            "section_id": "section-0050",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "公司主要供应商情况"
+            ],
+            "start_page": 15,
+            "end_page": 17,
+            "rationale": "选择围绕公司业务结构与收入拆解：0010提供报告期营业收入、利润等总量指标；0018完整覆盖酒类销售、智算、物业租赁与物业管理三大业务的经营内容、产品/服务与商业模式；0036为营业收入与成本构成分析，能回答收入来源、业务权重和成本变化；0050延续营业成本/费用、研发投入与现金流等经营投入和现金创造信息（供应商部分仅作辅助）；0077补充2026年经营计划与主要风险，用于理解战略调整和经营驱动。未选行业背景、核心竞争力、资产变动、治理和财务报表附注，因它们对当前业务/收入回答非必需，且可在需要时定向核验。"
+          },
+          {
+            "section_id": "section-0077",
+            "section_path": [
+              "第三节 管理层讨论与分析",
+              "十一、公司未来发展的展望"
+            ],
+            "start_page": 21,
+            "end_page": 23,
+            "rationale": "选择围绕公司业务结构与收入拆解：0010提供报告期营业收入、利润等总量指标；0018完整覆盖酒类销售、智算、物业租赁与物业管理三大业务的经营内容、产品/服务与商业模式；0036为营业收入与成本构成分析，能回答收入来源、业务权重和成本变化；0050延续营业成本/费用、研发投入与现金流等经营投入和现金创造信息（供应商部分仅作辅助）；0077补充2026年经营计划与主要风险，用于理解战略调整和经营驱动。未选行业背景、核心竞争力、资产变动、治理和财务报表附注，因它们对当前业务/收入回答非必需，且可在需要时定向核验。"
+          }
+        ],
+        "unread_or_deferred": [
+          "section-0022",
+          "section-0028",
+          "section-0055",
+          "section-0098",
+          "section-0263"
+        ],
+        "selection_rationale": "选择围绕公司业务结构与收入拆解：0010提供报告期营业收入、利润等总量指标；0018完整覆盖酒类销售、智算、物业租赁与物业管理三大业务的经营内容、产品/服务与商业模式；0036为营业收入与成本构成分析，能回答收入来源、业务权重和成本变化；0050延续营业成本/费用、研发投入与现金流等经营投入和现金创造信息（供应商部分仅作辅助）；0077补充2026年经营计划与主要风险，用于理解战略调整和经营驱动。未选行业背景、核心竞争力、资产变动、治理和财务报表附注，因它们对当前业务/收入回答非必需，且可在需要时定向核验。",
+        "stop_reason": "已覆盖业务结构、产品/服务、收入与成本构成、经营投入/现金流及战略风险等核心范围；行业背景、治理、资产明细和财务报表附注留作定向补充即可停止，不声称覆盖全报告。",
+        "transcription_version": "shared-pdf-pypdf-layout.structured-notes.v1"
+      },
+      "limitations": [
+        "仅依据选定章节整理，未覆盖全报告；未选章节留作定向补充。"
+      ],
+      "generation": {
+        "prompt_version": "company_profile_workpaper.2026-11-28.subject-relationships.v22",
+        "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "selection": {
+          "purpose": "select_profile_sections",
+          "request_id": "bp-work-42af67a5c4e56eaaf01a9ef9:workpaper:sections",
+          "request_hash": "f382f2a4f9dc5cee5b7cd1969a0bcc40e07abc480af0fa6176a5e0d41f55bf4f",
+          "response_hash": "4cc0f09e2a3fb7ce31ebaa784d66d4795f6149e4e5b5e30de14b22dec94db360",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 14724,
+            "output_tokens": 7270,
+            "total_tokens": 21994
+          },
+          "scope_kind": "report_heading_index",
+          "heading_count": 546,
+          "section_ids": [
+            "section-0001",
+            "section-0002",
+            "section-0003",
+            "section-0004",
+            "section-0005",
+            "section-0006",
+            "section-0007",
+            "section-0008",
+            "section-0009",
+            "section-0010",
+            "section-0011",
+            "section-0012",
+            "section-0013",
+            "section-0014",
+            "section-0015",
+            "section-0016",
+            "section-0017",
+            "section-0018",
+            "section-0019",
+            "section-0020",
+            "section-0021",
+            "section-0022",
+            "section-0023",
+            "section-0024",
+            "section-0026",
+            "section-0027",
+            "section-0028",
+            "section-0029",
+            "section-0030",
+            "section-0034",
+            "section-0035",
+            "section-0036",
+            "section-0037",
+            "section-0038",
+            "section-0043",
+            "section-0044",
+            "section-0049",
+            "section-0050",
+            "section-0051",
+            "section-0052",
+            "section-0053",
+            "section-0054",
+            "section-0055",
+            "section-0056",
+            "section-0057",
+            "section-0058",
+            "section-0059",
+            "section-0060",
+            "section-0061",
+            "section-0062",
+            "section-0063",
+            "section-0064",
+            "section-0065",
+            "section-0066",
+            "section-0067",
+            "section-0068",
+            "section-0071",
+            "section-0072",
+            "section-0073",
+            "section-0074",
+            "section-0075",
+            "section-0076",
+            "section-0077",
+            "section-0078",
+            "section-0079",
+            "section-0080",
+            "section-0085",
+            "section-0086",
+            "section-0087",
+            "section-0088",
+            "section-0093",
+            "section-0094",
+            "section-0095",
+            "section-0096",
+            "section-0097",
+            "section-0098",
+            "section-0099",
+            "section-0105",
+            "section-0106",
+            "section-0107",
+            "section-0108",
+            "section-0109",
+            "section-0110",
+            "section-0111",
+            "section-0112",
+            "section-0113",
+            "section-0114",
+            "section-0115",
+            "section-0116",
+            "section-0119",
+            "section-0120",
+            "section-0121",
+            "section-0122",
+            "section-0123",
+            "section-0124",
+            "section-0125",
+            "section-0126",
+            "section-0127",
+            "section-0128",
+            "section-0129",
+            "section-0130",
+            "section-0131",
+            "section-0132",
+            "section-0133",
+            "section-0134",
+            "section-0135",
+            "section-0136",
+            "section-0137",
+            "section-0138",
+            "section-0139",
+            "section-0140",
+            "section-0141",
+            "section-0142",
+            "section-0143",
+            "section-0144",
+            "section-0145",
+            "section-0146",
+            "section-0147",
+            "section-0148",
+            "section-0151",
+            "section-0152",
+            "section-0153",
+            "section-0154",
+            "section-0155",
+            "section-0156",
+            "section-0157",
+            "section-0158",
+            "section-0159",
+            "section-0160",
+            "section-0161",
+            "section-0162",
+            "section-0163",
+            "section-0164",
+            "section-0165",
+            "section-0166",
+            "section-0167",
+            "section-0168",
+            "section-0169",
+            "section-0170",
+            "section-0171",
+            "section-0172",
+            "section-0173",
+            "section-0174",
+            "section-0175",
+            "section-0176",
+            "section-0177",
+            "section-0178",
+            "section-0179",
+            "section-0180",
+            "section-0181",
+            "section-0182",
+            "section-0183",
+            "section-0184",
+            "section-0185",
+            "section-0186",
+            "section-0187",
+            "section-0188",
+            "section-0189",
+            "section-0190",
+            "section-0191",
+            "section-0192",
+            "section-0193",
+            "section-0194",
+            "section-0195",
+            "section-0196",
+            "section-0197",
+            "section-0198",
+            "section-0199",
+            "section-0200",
+            "section-0201",
+            "section-0202",
+            "section-0203",
+            "section-0204",
+            "section-0205",
+            "section-0206",
+            "section-0207",
+            "section-0208",
+            "section-0212",
+            "section-0213",
+            "section-0216",
+            "section-0217",
+            "section-0218",
+            "section-0219",
+            "section-0220",
+            "section-0221",
+            "section-0222",
+            "section-0223",
+            "section-0224",
+            "section-0225",
+            "section-0226",
+            "section-0227",
+            "section-0228",
+            "section-0229",
+            "section-0230",
+            "section-0231",
+            "section-0232",
+            "section-0233",
+            "section-0234",
+            "section-0235",
+            "section-0236",
+            "section-0237",
+            "section-0238",
+            "section-0239",
+            "section-0240",
+            "section-0241",
+            "section-0242",
+            "section-0243",
+            "section-0244",
+            "section-0245",
+            "section-0247",
+            "section-0248",
+            "section-0249",
+            "section-0250",
+            "section-0251",
+            "section-0252",
+            "section-0253",
+            "section-0254",
+            "section-0255",
+            "section-0256",
+            "section-0257",
+            "section-0258",
+            "section-0259",
+            "section-0260",
+            "section-0261",
+            "section-0262",
+            "section-0263",
+            "section-0264",
+            "section-0265",
+            "section-0266",
+            "section-0267",
+            "section-0268",
+            "section-0269",
+            "section-0270",
+            "section-0271",
+            "section-0272",
+            "section-0273",
+            "section-0274",
+            "section-0275",
+            "section-0276",
+            "section-0277",
+            "section-0278",
+            "section-0279",
+            "section-0280",
+            "section-0281",
+            "section-0282",
+            "section-0283",
+            "section-0284",
+            "section-0285",
+            "section-0286",
+            "section-0287",
+            "section-0288",
+            "section-0289",
+            "section-0290",
+            "section-0291",
+            "section-0292",
+            "section-0293",
+            "section-0294",
+            "section-0295",
+            "section-0296",
+            "section-0297",
+            "section-0298",
+            "section-0299",
+            "section-0300",
+            "section-0301",
+            "section-0302",
+            "section-0303",
+            "section-0304",
+            "section-0305",
+            "section-0306",
+            "section-0307",
+            "section-0308",
+            "section-0309",
+            "section-0310",
+            "section-0311",
+            "section-0312",
+            "section-0313",
+            "section-0314",
+            "section-0315",
+            "section-0316",
+            "section-0317",
+            "section-0318",
+            "section-0319",
+            "section-0320",
+            "section-0321",
+            "section-0322",
+            "section-0323",
+            "section-0324",
+            "section-0325",
+            "section-0326",
+            "section-0327",
+            "section-0328",
+            "section-0329",
+            "section-0330",
+            "section-0331",
+            "section-0332",
+            "section-0333",
+            "section-0334",
+            "section-0335",
+            "section-0336",
+            "section-0337",
+            "section-0338",
+            "section-0339",
+            "section-0340",
+            "section-0341",
+            "section-0342",
+            "section-0343",
+            "section-0344",
+            "section-0345",
+            "section-0346",
+            "section-0347",
+            "section-0348",
+            "section-0349",
+            "section-0350",
+            "section-0351",
+            "section-0352",
+            "section-0353",
+            "section-0354",
+            "section-0355",
+            "section-0356",
+            "section-0357",
+            "section-0358",
+            "section-0359",
+            "section-0360",
+            "section-0361",
+            "section-0362",
+            "section-0363",
+            "section-0364",
+            "section-0367",
+            "section-0370",
+            "section-0371",
+            "section-0372",
+            "section-0376",
+            "section-0377",
+            "section-0378",
+            "section-0379",
+            "section-0380",
+            "section-0381",
+            "section-0382",
+            "section-0388",
+            "section-0393",
+            "section-0396",
+            "section-0397",
+            "section-0399",
+            "section-0400",
+            "section-0401",
+            "section-0403",
+            "section-0404",
+            "section-0405",
+            "section-0406",
+            "section-0408",
+            "section-0409",
+            "section-0412",
+            "section-0421",
+            "section-0422",
+            "section-0427",
+            "section-0429",
+            "section-0430",
+            "section-0434",
+            "section-0435",
+            "section-0436",
+            "section-0437",
+            "section-0438",
+            "section-0439",
+            "section-0440",
+            "section-0445",
+            "section-0447",
+            "section-0448",
+            "section-0451",
+            "section-0454",
+            "section-0455",
+            "section-0457",
+            "section-0458",
+            "section-0459",
+            "section-0460",
+            "section-0463",
+            "section-0464",
+            "section-0465",
+            "section-0466",
+            "section-0468",
+            "section-0469",
+            "section-0470",
+            "section-0474",
+            "section-0476",
+            "section-0477",
+            "section-0478",
+            "section-0479",
+            "section-0481",
+            "section-0483",
+            "section-0484",
+            "section-0485",
+            "section-0486",
+            "section-0488",
+            "section-0490",
+            "section-0491",
+            "section-0492",
+            "section-0493",
+            "section-0494",
+            "section-0496",
+            "section-0497",
+            "section-0498",
+            "section-0499",
+            "section-0500",
+            "section-0501",
+            "section-0502",
+            "section-0503",
+            "section-0505",
+            "section-0507",
+            "section-0508",
+            "section-0509",
+            "section-0510",
+            "section-0512",
+            "section-0514",
+            "section-0515",
+            "section-0516",
+            "section-0517",
+            "section-0518",
+            "section-0520",
+            "section-0521",
+            "section-0522",
+            "section-0526",
+            "section-0528",
+            "section-0529",
+            "section-0530",
+            "section-0531",
+            "section-0533",
+            "section-0535",
+            "section-0536",
+            "section-0537",
+            "section-0538",
+            "section-0540",
+            "section-0542",
+            "section-0543",
+            "section-0544",
+            "section-0545",
+            "section-0546",
+            "section-0552",
+            "section-0553",
+            "section-0559",
+            "section-0560",
+            "section-0562",
+            "section-0565",
+            "section-0567",
+            "section-0569",
+            "section-0571",
+            "section-0572",
+            "section-0573",
+            "section-0575",
+            "section-0576",
+            "section-0577",
+            "section-0578",
+            "section-0579",
+            "section-0581",
+            "section-0582",
+            "section-0583",
+            "section-0584",
+            "section-0585",
+            "section-0586",
+            "section-0587",
+            "section-0588",
+            "section-0589",
+            "section-0590",
+            "section-0591",
+            "section-0592",
+            "section-0593",
+            "section-0594",
+            "section-0595",
+            "section-0596",
+            "section-0597",
+            "section-0598",
+            "section-0599",
+            "section-0600",
+            "section-0601",
+            "section-0602",
+            "section-0603",
+            "section-0604",
+            "section-0605",
+            "section-0606",
+            "section-0607",
+            "section-0608",
+            "section-0609",
+            "section-0610",
+            "section-0611",
+            "section-0614",
+            "section-0615",
+            "section-0617",
+            "section-0618",
+            "section-0620",
+            "section-0621",
+            "section-0622",
+            "section-0624",
+            "section-0625",
+            "section-0626",
+            "section-0629",
+            "section-0631",
+            "section-0634",
+            "section-0635",
+            "section-0636",
+            "section-0637",
+            "section-0641",
+            "section-0642",
+            "section-0646",
+            "section-0647",
+            "section-0648",
+            "section-0649",
+            "section-0650",
+            "section-0651",
+            "section-0652",
+            "section-0653",
+            "section-0654",
+            "section-0655",
+            "section-0656",
+            "section-0657",
+            "section-0658",
+            "section-0659",
+            "section-0660",
+            "section-0661",
+            "section-0662",
+            "section-0663",
+            "section-0664",
+            "section-0665",
+            "section-0666",
+            "section-0667",
+            "section-0671",
+            "section-0673",
+            "section-0674",
+            "section-0675",
+            "section-0676",
+            "section-0677",
+            "section-0678",
+            "section-0681",
+            "section-0682",
+            "section-0683",
+            "section-0685",
+            "section-0686",
+            "section-0687",
+            "section-0688",
+            "section-0693",
+            "section-0695",
+            "section-0696",
+            "section-0698",
+            "section-0699",
+            "section-0700",
+            "section-0701",
+            "section-0702",
+            "section-0703",
+            "section-0707"
+          ],
+          "physical_pages": []
+        },
+        "extraction": {
+          "purpose": "extract_profile_workpaper",
+          "request_id": "bp-work-42af67a5c4e56eaaf01a9ef9:workpaper:extract",
+          "request_hash": "d5698c11361b11adbfc690110f2331f76fb627f1212c81a1b720c0a71920e83a",
+          "response_hash": "98f3362ad12769cf64ac5b1203fbec850b80d926afad06409e74947d3f7f3674",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 10777,
+            "output_tokens": 32265,
+            "total_tokens": 43042
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0010",
+            "section-0018",
+            "section-0036",
+            "section-0050",
+            "section-0077"
+          ],
+          "physical_pages": [
+            7,
+            8,
+            11,
+            13,
+            14,
+            15,
+            16,
+            17,
+            21,
+            22,
+            23
+          ]
+        }
+      },
+      "review_status": "not_reviewed",
+      "review_follow_up": {
+        "state": "planned",
+        "execution_started": false,
+        "next_purpose": "review_profile_workpaper",
+        "resume_mode": "review_saved_draft",
+        "retained_stages": [],
+        "candidate_ids": [],
+        "max_new_logical_requests": 3,
+        "original_draft_sha256": "cfffe3ff0b94c148848386650e3e4e404a9c21d16bd0a4e8b8287d34df60c6e1",
+        "binding_status": "required_before_execution",
+        "requires": [
+          "original_draft_and_source_binding",
+          "preserve_current_use_restrictions",
+          "explicit_model_and_finite_budget",
+          "publication_write_permission"
+        ],
+        "reason": "review_not_started"
+      },
+      "review_calls": [],
+      "evidence": [
+        {
+          "evidence_id": "source-0001",
+          "document_version": "e4ab21072b7da70251a833b13da381e215f24f65be67f71a760c815a1a6e7a81",
+          "section_path": [
+            "第二节 公司简介和主要财务指标",
+            "六、主要会计数据和财务指标"
+          ],
+          "physical_pages": [
+            7
+          ],
+          "source_spans": [
+            {
+              "page": 7,
+              "start": 2491,
+              "end": 3419,
+              "quote": "六、主要会计数据和财务指标\n\n\n公司是否需追溯调整或重述以前年度会计数据\n□是   否\n\n                                2025 年                   2024 年              本年比上年增减                     2023 年\n 营业收入（元）                         470,470,092.30          369,524,068.58                  27.32%            62,283,031.07\n 归属于上市公司股东                       -26,403,923.49          -18,395,061.93                 -43.54%             9,171,479.63\n 的净利润（元）\n 归属于上市公司股东\n 的扣除非经常性损益                       -26,723,475.09          -24,007,065.35                 -11.32%             4,599,155.22\n 的净利润（元）\n 经营活动产生的现金                        94,169,993.81          -71,978,882.54                230.83%             19,073,578.29\n 流量净额（元）\n 基本每股收益（元/                                -0.04                   -0.03                 -33.33%                     0.02\n 股）\n\n\n                                                                                                                        7"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0003",
+          "document_version": "e4ab21072b7da70251a833b13da381e215f24f65be67f71a760c815a1a6e7a81",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的主要业务"
+          ],
+          "physical_pages": [
+            11
+          ],
+          "source_spans": [
+            {
+              "page": 11,
+              "start": 158,
+              "end": 1595,
+              "quote": "一、报告期内公司从事的主要业务\n\n\n    报告期内，公司继续采用内生式与外延式发展相结合的模式，加快公司各项业务发展的步伐，同时加速推进战略布局。\n公司从事的主要业务涵盖酒类销售、智算业务、物业管理及物业租赁，构建了兼具稳定性与成长性的业务体系。\n    1、酒类销售业务\n    酒类销售业务主要采用线上和线下融合的运营模式。公司自搭建“线上电商（含直播平台）+线下团购批发”的渠道营\n销体系以来，借助电商平台与社交媒体平台开展精准营销，进一步提高了品牌知名度与市场份额。报告期内，公司聚焦中\n高端白酒市场，酒类销售业务实现收入                  38,397.52万元，同比增长了        13.82%；同时公司注重产品品质，严格把控采购、仓\n储、物流等各个环节，确保消费者能够享受到高品质的酒类产品。\n    2、智算业务\n    2024年，公司完成了智算中心总体建设，正式切入智能算力服务赛道。凭借自建的合规高性能智算资源以及专业且完\n整的智算技术团队，专注于为下游行业客户，提供高效且灵活智算业务服务，致力于满足各行业客户在高性能计算、网络、\n存储等方面的资源需求，为客户提供                GPU  算力租赁服务。报告期内，公司积极拓展智算业务，持续优化智算服务的性能和\n效率。通过技术创新，能够实现对跨域异构协同设备的管理与调度，为客户提供                                    7×24小时的技术支持，为算力中心资源管\n理、数据管理及模型训练提供全流程解决方案，确保客户能够顺利开展业务。与此同时，公司智算业务团队凭借出色的市\n场拓展能力以及过硬的技术实力，持续进行资源整合与优化，积极发掘潜在客户资源，最终获得了互联网行业某头部客户\n的认可，并达成了战略合作，为业务增长注入了新的动力。这进一步提升了公司的核心竞争力，为公司的长远发展奠定了\n坚实基础。      报告期内，公司智算业务实现收入为                5,336.84万元。\n    未来，公司将继续深化智算业务的拓展，不断探索新的应用场景和商业模式，为客户提供更加优质、高效的智算服务。\n    3、物业租赁与物业管理\n    在物业租赁与物业管理服务领域，公司依托自有物业所在的汕头市澄海工业区的区位优势和产业集群优势，为制造业\n企业提供物业租赁服务；与此同时，公司专注于为商住类客户提供专业的物业管理服务，深度拓展经济发达的长三角地区，\n在杭州地区的多个高端物业管理项目中实现稳健运营。报告期内，公司物业租赁与物业管理业务实现营业收入                                                  3,312.65万\n元，同比增长      2.96%。\n    未来，在物业租赁领域，公司将持续关注该行业的发展趋势。在契合公司战略规划的前提下，依托市场需求和政策支\n持的背景，寻求灵活的租赁形式与规则，以适配不同产业企业的需求，提高企业长期租赁的稳定性；在物业管理方面，公\n司持续优化服务品质，提升客户满意度，持续优化先进的管理理念，提高物业管理效率。\n    公司将持续优化业务布局、提升运营效率，不断强化核心竞争力，深耕细分领域、打造优质业务板块，致力于为客户\n提供高品质产品与全方位服务，实现可持续发展与价值共创，做值得信赖的多元化协同发展的优质企业。\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0004",
+          "document_version": "e4ab21072b7da70251a833b13da381e215f24f65be67f71a760c815a1a6e7a81",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            13
+          ],
+          "source_spans": [
+            {
+              "page": 13,
+              "start": 449,
+              "end": 3652,
+              "quote": "四、主营业务分析\n\n1、概述\n\n\n参见本章节“一、报告期内公司从事的主要业务”相关内容。\n\n2、收入与成本\n\n（1）      营业收入构成\n\n\n                                                                                                                                       单位：元\n                                             2025  年                                           2024  年                             同比增减\n                                  金额                占营业收入比重                         金额                占营业收入比重\n 营业收入合计                     470,470,092.30                         100%       369,524,068.58                         100%                  27.32%\n 分行业\n 酒类销售                         383,975,161.20                    81.62%          337,350,463.22                    91.29%                   13.82%\n 物业租赁及物业                        33,126,534.86                     7.04%           32,173,605.36                    8.71%                    2.96%\n 管理服务\n 智算业务                           53,368,396.24                   11.34%                       0.00                  0.00%                  100.00%\n 分产品\n 酒                            383,975,161.20                    81.62%          337,350,463.22                    91.29%                   13.82%\n 物业租赁及物业                        33,126,534.86                     7.04%           32,173,605.36                    8.71%                    2.96%\n 管理服务\n 智算业务                           53,368,396.24                   11.34%                       0.00                  0.00%                  100.00%\n 分地区\n 国内                           470,470,092.30                   100.00%          369,524,068.58                   100.00%                   27.32%\n 分销售模式\n 直接销售                         470,470,092.30                   100.00%          369,524,068.58                   100.00%                   27.32%\n\n\n（2）     占公司营业收入或营业利润                      10%以上的行业、产品、地区、销售模式的情况\n\n\n适用      □不适用\n                                                                                                                                       单位：元\n                           营业收入                     营业成本                 毛利率           营业收入比上                营业成本比上               毛利率比上年\n                                                                                         年同期增减                年同期增减                  同期增减\n 分行业\n 酒类销售                     383,975,161.20          373,517,363.47            2.72%               13.82%                12.08%                1.50%\n 物业租赁及物                    33,126,534.86            13,085,221.56          60.50%                 2.96%                1.13%                0.72%\n 业管理服务\n 智算业务                      53,368,396.24            68,375,219.40         -28.12%              100.00%              947.95%                71.88%\n 分产品\n 酒                      383,975,161.20          373,517,363.47              2.72%               13.82%                12.08%                 1.50%\n 物业租赁及物                    33,126,534.86            13,085,221.56          60.50%                 2.96%                1.13%                0.72%\n\n                                                                                                                                                   13"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0005",
+          "document_version": "e4ab21072b7da70251a833b13da381e215f24f65be67f71a760c815a1a6e7a81",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "四、主营业务分析"
+          ],
+          "physical_pages": [
+            14
+          ],
+          "source_spans": [
+            {
+              "page": 14,
+              "start": 0,
+              "end": 1336,
+              "quote": "                                                                               广东群兴玩具股份有限公司                  2025年年度报告全文\n\n\n 业管理服务\n 智算业务                   53,368,396.24         68,375,219.40      -28.12%            100.00%            947.95%             71.88%\n 分地区\n 国内                    470,470,092.30        454,977,804.43        3.29%             27.58%             28.99%              -1.26%\n 分销售模式\n 直接销售                  470,470,092.30        454,977,804.43        3.29%             27.58%             28.99%              -1.26%\n公司主营业务数据统计口径在报告期发生调整的情况下，公司最近                                           1 年按报告期末口径调整后的主营业务数据\n□适用     不适用\n\n\n（3）    公司实物销售收入是否大于劳务收入\n\n\n是   □否\n\n      行业分类                    项目                    单位                   2025 年                2024年                同比增减\n                       销售量                   升                             294,381.13             281,854.30                4.44%\n         酒             生产量                   升\n                       库存量                   升                               18,242.38             59,588.30              -69.39%\n\n相关数据同比发生变动               30%以上的原因说明\n适用     □不适用\n\n\n      报告期末酒类产品库存量较去年同期减少                           69.39%，主要因为受市场供需、政策及行业环境等多重因素影响，酒类\n产品价格波动较为频繁，为有效规避库存积压及价格下跌风险，公司主动减少备货。\n\n\n（4）    公司已签订的重大销售合同、重大采购合同截至本报告期的履行情况\n\n\n适用     □不适用\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0006",
+          "document_version": "e4ab21072b7da70251a833b13da381e215f24f65be67f71a760c815a1a6e7a81",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "公司主要供应商情况"
+          ],
+          "physical_pages": [
+            15
+          ],
+          "source_spans": [
+            {
+              "page": 15,
+              "start": 2612,
+              "end": 3166,
+              "quote": "公司主要供应商情况\n 前五名供应商合计采购金额（元）                                                                                                        212,673,863.28\n 前五名供应商合计采购金额占年度采购总额比例                                                                                                          57.16%\n 前五名供应商采购额中关联方采购额占年度采购总额比例                                                                                                       0.00%\n\n\n                                                                                                                                       15"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0007",
+          "document_version": "e4ab21072b7da70251a833b13da381e215f24f65be67f71a760c815a1a6e7a81",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "公司主要供应商情况"
+          ],
+          "physical_pages": [
+            16
+          ],
+          "source_spans": [
+            {
+              "page": 16,
+              "start": 0,
+              "end": 4480,
+              "quote": "                                                                                           广东群兴玩具股份有限公司                        2025年年度报告全文\n\n\n公司前      5 名供应商资料\n                序号                                供应商名称                                采购额（元）                            占年度采购总额比例\n                  1                       供应商一                                                  76,469,469.03                                 20.55%\n                  2                       供应商二                                                  44,336,283.19                                 11.92%\n                  3                       供应商三                                                  41,256,637.17                                 11.09%\n                  4                       供应商四                                                  25,717,739.38                                   6.91%\n                  5                       供应商五                                                  24,893,734.51                                   6.69%\n                合计                                      --                                     212,673,863.28                                 57.16%\n\n主要供应商其他情况说明\n□适用       不适用\n报告期内公司贸易业务收入占营业收入比例超过                                       10%\n适用      □不适用\n贸易业务中公司前               5 大客户资料\n                      序号                                              客户名称                                             销售额（元）\n                        1                              客户一                                                                           182,054,595.38\n                        2                              客户二                                                                             64,005,876.10\n                        3                              客户三                                                                             62,882,123.89\n                        4                              客户四                                                                             13,380,530.97\n                        5                              客户五                                                                             12,105,849.20\n                      合计                                                   --                                                        334,428,975.54\n贸易业务中公司前               5 大供应商资料\n                      序号                                             供应商名称                                             采购额（元）\n                        1                              供应商一                                                                            76,469,469.03\n                        2                              供应商二                                                                            44,336,283.19\n                        3                              供应商三                                                                            41,256,637.17\n                        4                              供应商四                                                                            25,717,739.38\n                        5                              供应商五                                                                            24,893,734.51\n                      合计                                                   --                                                        212,673,863.28\n\n3、费用\n\n\n                                                                                                                                          单位：元\n                                     2025  年                2024   年            同比增减                               重大变动说明\n                                                                                                 主要系为开拓市场支付的咨询顾问费以及为\n 销售费用                              10,893,029.45            3,505,047.93           210.78%       拓展电商业务加大的平台投流等业务宣传费\n                                                                                                 用。\n 管理费用                              34,546,243.18           39,240,914.96           -11.96%       主要系限制性股票激励费用减少所致。\n 财务费用                                 477,980.57              381,864.42            25.17%       主要系利息收入减少所致。\n 研发费用                                         0.00                    0.00\n\n4、研发投入\n\n\n□适用       不适用\n\n\n\n\n                                                                                                                                                      16"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0008",
+          "document_version": "e4ab21072b7da70251a833b13da381e215f24f65be67f71a760c815a1a6e7a81",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "公司主要供应商情况"
+          ],
+          "physical_pages": [
+            17
+          ],
+          "source_spans": [
+            {
+              "page": 17,
+              "start": 0,
+              "end": 2065,
+              "quote": "                                                                                    广东群兴玩具股份有限公司                    2025年年度报告全文\n\n\n5、现金流\n\n\n                                                                                                                               单位：元\n              项目                                2025  年                            2024  年                           同比增减\n 经营活动现金流入小计                                         555,288,538.26                     373,761,874.99                             48.57%\n 经营活动现金流出小计                                         461,118,544.45                     445,740,757.53                               3.45%\n 经营活动产生的现金流量净                                        94,169,993.81                     -71,978,882.54                            230.83%\n 额\n 投资活动现金流入小计                                         305,176,362.48                   1,383,234,462.80                             -77.94%\n 投资活动现金流出小计                                         389,608,795.52                   1,047,453,128.49                             -62.80%\n 投资活动产生的现金流量净                                       -84,432,433.04                     335,781,334.31                           -125.15%\n 额\n 筹资活动现金流入小计                                          20,000,000.00                      10,490,000.00                             90.66%\n 筹资活动现金流出小计                                          11,067,669.32                     266,073,136.01                             -95.84%\n 筹资活动产生的现金流量净                                         8,932,330.68                    -255,583,136.01                            103.49%\n 额\n 现金及现金等价物净增加额                                        18,664,764.53                        8,222,845.62                           126.99%\n\n相关数据同比发生重大变动的主要影响因素说明\n适用     □不适用\n\n报告期内，经营活动现金流量净额大幅增加，主要系本期酒类销售业务增长、智算业务落地，销售商品、提供劳务收到\n的现金增长所致。\n报告期内，投资活动产生的现金流量净额大幅减少，主要系本期末购买理财产品所致。\n报告期内，筹资活动现金流量净额大幅增加，主要系上期支付算力租赁款项。\n\n报告期内公司经营活动产生的现金净流量与本年度净利润存在重大差异的原因说明\n适用     □不适用\n\n公司经营活动产生的现金流量净额为正，但本年度净利润为负数，主要系报告期内计提了智算业务使用权资产累计折旧、\n固定资产累计折旧。\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0010",
+          "document_version": "e4ab21072b7da70251a833b13da381e215f24f65be67f71a760c815a1a6e7a81",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "十一、公司未来发展的展望"
+          ],
+          "physical_pages": [
+            22
+          ],
+          "source_spans": [
+            {
+              "page": 22,
+              "start": 0,
+              "end": 2468,
+              "quote": "                                                                 广东群兴玩具股份有限公司             2025年年度报告全文\n\n\n    公司始终秉持创新驱动、多元布局的发展战略，立足自身资源优势，通过内生式和外延式发展相结合的模式，加快推\n进公司各业务板块发展，同时不断尝试在新业务领域的转型发展。通过公司在各项业务市场的持续发展，把握客户需求变\n化，致力于为客户提供高品质产品与全方位服务，实现可持续发展与价值共创，努力成为多元化协同发展的优质企业。\n    （二）2026年度经营计划\n    回顾  2025 年经营工作，公司实现营业收入               47,047.01万元，同比增长       27.32%；其中酒类业务营业收入实现了                38,397.52\n万元，同比增加了         13.82%；公司物业租赁与物业管理业务实现营业收入                      3,312.65万元，同比增长       2.96%；此外，本年度智\n算业务成功落地，为业务增长注入新动能，智算业务实现收入为                             5,336.84万元。\n    公司  2026 年将围绕稳增长、提效益、拓市场、强管理的总体思路，结合公司各业务行业发展趋势与自身实际经营情况，\n细化业务举措，强化风险防控，确保完成既定的营收目标，以进一步提升公司整体经营能力，实现可持续健康发展。\n    1、业务开展方面：\n    (1)酒类业务：一是深耕现有市场与客户，做好老客户维护与服务升级，提高复购率与合作深度；二是持续丰富酒类产\n品的品类，完善产品结构；三是“十五五”开局之年，在国家政策推动经济高质量发展、提振消费的背景下，重点将加大\n电商、直播等线上销售力度，挖掘“新零售”合作机会，促进线上线下融合发展。\n    (2)智算业务：一是夯实基础运维，确保系统稳定可靠，严格执行日常巡检、监控预警、故障处置等制度，重点保障业\n务平台持续稳定；二是优化运维流程，提升响应效率；三是主动强化运维与预防管理；四是不断提升技术人员专业能力，\n提升服务质量，增强业务支撑能力。同时积极探索布局智算新业务，通过智算云平台                                       MASS解决方案持续整合算力资源、客\n户资源、代理资源，构建完善的业务运营体系，实现智算业务从“卖算力”向“卖模型能力”的延伸、升级。\n    (3)物业管理与物业租赁：在契合公司战略规划的前提下，依托市场需求和政策支持的背景，寻求灵活的租赁形式与规\n则，以适配不同产业企业的需求，提高企业长期租赁的稳定性；在物业管理方面，公司持续优化服务品质，提升客户满意\n度，持续优化先进的管理理念，提高物业管理效率。\n    (4)引入优质资产：公司根据自身战略需求、资源状况和市场环境，在各项条件成熟时，积极寻求商业模式清晰、发展\n方向稳定、盈利前景良好的投资与资产收购机会，引入优质资产并进行资源整合，通过科学规划、严谨执行和有效整合，\n实现业务转型升级和可持续发展。\n    2、内控管理方面：持续加强成本管控和财务管理工作，严格做好费用审核与回款管理，确保现金流的稳定；优化业务\n流程，削减冗余环节，提升运营效率。\n    3、风险防控方面：密切关注市场变化、行业政策以及竞争态势，及时对经营策略进行调整，强化客户信用管理，降低\n回款风险，规范经营流程，防范运营管理风险，制定应对预案，确保企业经营稳步推进，实现高质量发展目标。\n    （三）可能面对的风险\n    1、业务风险\n    公司在业务拓展过程中会受到国内外经济形势、市场波动及市场竞争影响：\n    （1）国内外经济形势变化和市场波动致使消费者习惯以及市场消费需求不断变化。\n    （2）白酒行业供给过剩与需求放缓并存，头部企业为控量稳价可能调整产品投放节奏，导致流通环节采购价格波动，\n市场格局变化显著，行业集中度提升，竞争加剧，酒类产品采购与销售价格均可能出现一定幅度的波动。\n    （3）产业园区租赁市场正处于从规模扩张向质量提升转型的关键时期。作为支撑实体经济发展的重要载体，产业园区\n租赁市场规模虽持续扩张，但增速明显放缓，整体空置率进一步升高。地区的经济活力、企业状况以及产业聚集程度等诸\n多要素，影响着租赁行业的持续发展。此外，公司物业租赁业务客户较为单一，如果单一客户的经营业绩发生重大不利变\n化或合作关系发生变化，公司将面临营业收入及利润下降的风险。\n    （4）人工智能带动算力需求爆发性增长，但随着政策推动传统产业数字化、智能化升级加速，智算业务面临市场竞争、\n技术、政策体制以及算力租赁价格波动等风险。同时，公司智算业务销售较为集中，如果某一客户的采购政策发生重大变\n化或经营环境发生重大不利变化，公司将面临无法及时调整客户结构而在短期内营业收入及利润下降的风险。\n    公司在现有算力业务基础上拓展新业务，业务的延伸与升级受行业环境、技术迭代、市场需求及运营落地等多种因素\n影响，后续发展存在一定的不确定性，整体推进节奏与落地实施面临潜在风险。\n    2、并购风险\n    为拓展公司业务、提升盈利能力，公司通过外延并购等方式寻求业务拓展，但可能因资产特性、监管规定要求等多种\n内外部因素导致并购受阻。公司将审慎开展业务拓展，依据自身诉求筛选新业务，充分调研新业务的盈利能力、行业特性\n及监管要求，确保优质资产顺利、快速、高质量引入，实现新业务拓展。\n\n\n                                                                                                           22"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        },
+        {
+          "evidence_id": "source-0011",
+          "document_version": "e4ab21072b7da70251a833b13da381e215f24f65be67f71a760c815a1a6e7a81",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "十一、公司未来发展的展望"
+          ],
+          "physical_pages": [
+            23
+          ],
+          "source_spans": [
+            {
+              "page": 23,
+              "start": 0,
+              "end": 273,
+              "quote": "                                                            广东群兴玩具股份有限公司            2025年年度报告全文\n\n\n   3、人才引进风险\n   随着公司智算业务的落地及持续开展，尤其是业务拓展、科技创新及与业务转型升级匹配的专业人才，对公司未来发\n展至关重要。虽然公司已建立规范的人力资源管理体系，但激励机制与科技创新环境建设若不能与时俱进，将影响技术和\n管理人才的积极性与创造性，可能会面临人才吸引、储备和发展的风险，进而影响公司业务的推进和战略目标的实现。\n\n"
+            }
+          ],
+          "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F001",
+      "element": "business_structure",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F001",
+        "text": "公司采用内生式与外延式发展相结合的模式，报告期内主要业务涵盖酒类销售、智算业务、物业管理及物业租赁，形成多元业务体系。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F002",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F002",
+        "text": "酒类销售业务聚焦中高端白酒市场，公司严格把控采购、仓储、物流等环节以保证产品品质。",
+        "subject_scope": "business_segment",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F003",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F003",
+        "text": "智算业务提供GPU算力租赁服务，依托自建合规高性能智算资源及技术团队，支持跨域异构协同设备管理与调度，并提供7×24小时技术支持，面向下游行业客户。",
+        "subject_scope": "business_segment",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F004",
+      "element": "products_services",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F004",
+        "text": "物业租赁与物业管理业务依托汕头市澄海工业区自有物业向制造业企业提供租赁服务，并在长三角杭州地区多个高端物业管理项目中为商住类客户提供物业管理服务。",
+        "subject_scope": "business_segment",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F005",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F005",
+        "text": "酒类销售业务2025年实现营业收入383,975,161.20元，占营业收入81.62%，同比增长13.82%；营业成本373,517,363.47元，毛利率2.72%，毛利率同比增加1.50个百分点。",
+        "subject_scope": "business_segment",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入",
+            "raw_value": "383,975,161.20",
+            "value": "383975161.20",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "占营业收入比重",
+            "raw_value": "81.62%",
+            "value": "81.62",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业收入同比增减",
+            "raw_value": "13.82%",
+            "value": "13.82",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": "2024年",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业成本",
+            "raw_value": "373,517,363.47",
+            "value": "373517363.47",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "毛利率",
+            "raw_value": "2.72%",
+            "value": "2.72",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "毛利率比上年同期增减",
+            "raw_value": "1.50%",
+            "value": "1.50",
+            "unit": "百分点",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": "2024年",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F006",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F006",
+        "text": "物业租赁及物业管理服务2025年实现营业收入33,126,534.86元，占营业收入7.04%，同比增长2.96%；营业成本13,085,221.56元，毛利率60.50%，毛利率同比增加0.72个百分点。",
+        "subject_scope": "business_segment",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入",
+            "raw_value": "33,126,534.86",
+            "value": "33126534.86",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "占营业收入比重",
+            "raw_value": "7.04%",
+            "value": "7.04",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业收入同比增减",
+            "raw_value": "2.96%",
+            "value": "2.96",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": "2024年",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业成本",
+            "raw_value": "13,085,221.56",
+            "value": "13085221.56",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "毛利率",
+            "raw_value": "60.50%",
+            "value": "60.50",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "毛利率比上年同期增减",
+            "raw_value": "0.72%",
+            "value": "0.72",
+            "unit": "百分点",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": "2024年",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F007",
+      "element": "revenue_model",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F007",
+        "text": "智算业务2025年实现营业收入53,368,396.24元，占营业收入11.34%，同比增长100.00%（上年同期营业收入0.00元）；营业成本68,375,219.40元，毛利率-28.12%，毛利率同比增加71.88个百分点。",
+        "subject_scope": "business_segment",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入",
+            "raw_value": "53,368,396.24",
+            "value": "53368396.24",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "占营业收入比重",
+            "raw_value": "11.34%",
+            "value": "11.34",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业收入同比增减",
+            "raw_value": "100.00%",
+            "value": "100.00",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": "2024年",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业收入（2024年）",
+            "raw_value": "0.00",
+            "value": "0.00",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2024年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业成本",
+            "raw_value": "68,375,219.40",
+            "value": "68375219.40",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "毛利率",
+            "raw_value": "-28.12%",
+            "value": "-28.12",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "毛利率比上年同期增减",
+            "raw_value": "71.88%",
+            "value": "71.88",
+            "unit": "百分点",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": "2024年",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F008",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F008",
+        "text": "2025年公司实现营业收入470,470,092.30元，同比增长27.32%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [
+          {
+            "name": "营业收入",
+            "raw_value": "470,470,092.30",
+            "value": "470470092.30",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "营业收入同比增减",
+            "raw_value": "27.32%",
+            "value": "27.32",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "comparison_basis": "2024年",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F009",
+      "element": "scale_and_mix",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "fact": {
+        "fact_id": "F009",
+        "text": "2025年归属于上市公司股东的净利润为-26,403,923.49元，同比下降43.54%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0001"
+        ],
+        "metrics": [
+          {
+            "name": "归属于上市公司股东的净利润",
+            "raw_value": "-26,403,923.49",
+            "value": "-26403923.49",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "归属于上市公司股东的净利润同比增减",
+            "raw_value": "-43.54%",
+            "value": "-43.54",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "comparison_basis": "2024年",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F010",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0005"
+      ],
+      "fact": {
+        "fact_id": "F010",
+        "text": "报告期内酒类产品销售量294,381.13升，同比增长4.44%；期末库存量18,242.38升，同比减少69.39%，主要系酒类价格波动频繁，公司主动减少备货以规避库存积压及价格下跌风险。",
+        "subject_scope": "business_segment",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0005"
+        ],
+        "metrics": [
+          {
+            "name": "销售量",
+            "raw_value": "294,381.13",
+            "value": "294381.13",
+            "unit": "升",
+            "source_unit": "升",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "销售量同比增减",
+            "raw_value": "4.44%",
+            "value": "4.44",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": "2024年",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "库存量",
+            "raw_value": "18,242.38",
+            "value": "18242.38",
+            "unit": "升",
+            "source_unit": "升",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "库存量同比增减",
+            "raw_value": "-69.39%",
+            "value": "-69.39",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "comparison_basis": "2024年",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F011",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "fact": {
+        "fact_id": "F011",
+        "text": "2025年前五名供应商合计采购金额212,673,863.28元，占年度采购总额57.16%，其中关联方采购额占年度采购总额0.00%。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0006"
+        ],
+        "metrics": [
+          {
+            "name": "前五名供应商合计采购金额",
+            "raw_value": "212,673,863.28",
+            "value": "212673863.28",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "前五名供应商合计采购金额占年度采购总额比例",
+            "raw_value": "57.16%",
+            "value": "57.16",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "前五名供应商采购额中关联方采购额占年度采购总额比例",
+            "raw_value": "0.00%",
+            "value": "0.00",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F012",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "fact": {
+        "fact_id": "F012",
+        "text": "2025年销售费用10,893,029.45元，同比增长210.78%，主要系为开拓市场支付的咨询顾问费以及为拓展电商业务加大的平台投流等业务宣传费用；研发费用0.00元。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0007"
+        ],
+        "metrics": [
+          {
+            "name": "销售费用",
+            "raw_value": "10,893,029.45",
+            "value": "10893029.45",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "销售费用同比增减",
+            "raw_value": "210.78%",
+            "value": "210.78",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "comparison_basis": "2024年",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "研发费用",
+            "raw_value": "0.00",
+            "value": "0.00",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F013",
+      "element": "operations_and_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F013",
+        "text": "2025年经营活动产生的现金流量净额为94,169,993.81元，同比增长230.83%，主要系酒类销售业务增长、智算业务落地，销售商品、提供劳务收到的现金增长。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [
+          {
+            "name": "经营活动产生的现金流量净额",
+            "raw_value": "94,169,993.81",
+            "value": "94169993.81",
+            "unit": "元",
+            "source_unit": "元",
+            "currency": "CNY",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "经营活动产生的现金流量净额同比增减",
+            "raw_value": "230.83%",
+            "value": "230.83",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "comparison_basis": "2024年",
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F015",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F015",
+        "text": "酒类销售采用线上电商（含直播平台）与线下团购批发融合的渠道营销体系，并借助电商平台与社交媒体开展精准营销。",
+        "subject_scope": "business_segment",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F016",
+      "element": "customers_channels_markets",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "fact": {
+        "fact_id": "F016",
+        "text": "2025年公司营业收入全部来自国内，销售模式为直接销售。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0004"
+        ],
+        "metrics": [
+          {
+            "name": "国内收入占营业收入比重",
+            "raw_value": "100.00%",
+            "value": "100.00",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          },
+          {
+            "name": "直接销售收入占营业收入比重",
+            "raw_value": "100.00%",
+            "value": "100.00",
+            "unit": "%",
+            "source_unit": "%",
+            "currency": null,
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "comparison_basis": null,
+            "qualifier": "exact",
+            "uncertainty_reason": null
+          }
+        ],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F014",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "fact": {
+        "fact_id": "F014",
+        "text": "公司经营活动现金流量净额为正而净利润为负，主要系报告期内计提智算业务使用权资产累计折旧、固定资产累计折旧。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0008"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F018",
+      "element": "operating_drivers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F018",
+        "text": "智算业务在报告期内获得互联网行业某头部客户认可并达成战略合作，公司称其为业务增长注入动力。",
+        "subject_scope": "business_segment",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F019",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "fact": {
+        "fact_id": "F019",
+        "text": "公司2026年经营计划提出稳增长、提效益、拓市场、强管理；酒类业务将丰富品类并加大电商、直播等线上销售，智算业务探索MASS解决方案、从“卖算力”向“卖模型能力”延伸，物业业务寻求灵活租赁，并在条件成熟时引入优质资产。",
+        "subject_scope": "consolidated_group",
+        "period": "2026年计划",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F020",
+      "element": "material_changes",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0010",
+        "source-0011"
+      ],
+      "fact": {
+        "fact_id": "F020",
+        "text": "公司提示：白酒行业供给过剩与需求放缓并存、价格波动；产业园区租赁空置率升高且物业租赁客户较为单一；智算业务面临竞争、技术、政策及算力租赁价格波动风险，且销售较为集中；并购和人才引进亦存在不确定性。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0010",
+          "source-0011"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F021",
+      "element": "position",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F021",
+        "text": "公司处于酒类流通销售、智算算力服务及物业租赁/物业管理运营环节：酒类为线上线下一体化销售，智算为GPU算力租赁服务，物业为自有物业租赁及商住物业管理。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F022",
+      "element": "upstream_inputs",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F022",
+        "text": "酒类销售业务需采购酒类产品并对采购、仓储、物流环节进行品质管控；智算业务依托自建合规高性能智算资源；物业租赁业务依托自有物业。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "fact_id": "F023",
+      "element": "downstream_customers",
+      "state": "pending",
+      "label": "待核（无其他限用）",
+      "review_basis": "not_reviewed",
+      "model_review_stage": null,
+      "reasons": [
+        "尚未源复核。"
+      ],
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "fact": {
+        "fact_id": "F023",
+        "text": "酒类通过线上电商（含直播）及线下团购批发面向消费者；智算面向下游行业客户并提供7×24小时支持；物业租赁面向制造业企业，物业管理面向商住类客户。",
+        "subject_scope": "consolidated_group",
+        "period": "2025年",
+        "evidence_ids": [
+          "source-0003"
+        ],
+        "metrics": [],
+        "uncertainty_reason": null
+      }
+    }
+  ],
+  "information_gaps": [
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "element": "business_structure",
+      "status": "observed",
+      "reasons": [
+        "选定章节未展开各业务板块对应的法人主体、股权层级及内部交易安排。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "element": "products_services",
+      "status": "observed",
+      "reasons": [
+        "选定章节未披露酒类具体品牌、产品品类结构及物业项目明细；仅按业务板块归纳。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "element": "revenue_model",
+      "status": "observed",
+      "reasons": [
+        "分地区表中“国内”营业收入同比与营业收入合计同比存在差异，已按原表保留，未作换算；选定章节未提供更细分产品收入，贸易业务与分行业收入项目的对应关系未明确。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "element": "scale_and_mix",
+      "status": "observed",
+      "reasons": [
+        "未将贸易业务、分地区及销售模式等口径与主营业务分行业口径强制合并。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "element": "operations_and_inputs",
+      "status": "observed",
+      "reasons": [
+        "酒类生产量栏未列示数据，未据此推断为零；供应商以匿名列示，未披露具体采购物料。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "element": "customers_channels_markets",
+      "status": "observed",
+      "reasons": [
+        "智算业务仅披露互联网行业某头部客户，未披露客户名称；物业租赁客户较为单一但未披露单一客户名称及占比；贸易业务与酒类销售等业务的关系未明确。",
+        "指标格式隔离：事实F017未作为结论采用；metrics.0: Value error, metric values must be decimal strings；原内容保留在模型回执。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "element": "operating_drivers",
+      "status": "observed",
+      "reasons": [
+        "智算业务单一客户占比及折旧对利润的具体影响金额未在选定章节拆解。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "element": "material_changes",
+      "status": "observed",
+      "reasons": [
+        "2026年经营计划为前瞻性表述，不代表当前已实现；风险事项未量化。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "element": "upstream_inputs",
+      "status": "observed",
+      "reasons": [
+        "选定章节未披露智算业务GPU等具体采购来源，供应商名称亦以匿名列示。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    },
+    {
+      "reading_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "element": "downstream_customers",
+      "status": "observed",
+      "reasons": [
+        "未披露具体客户名称及销售占比，下游客户仅能按客户类型/行业归纳。"
+      ],
+      "supplemental_reading_work_ids": [],
+      "follow_up_state": "no_supplement_yet"
+    }
+  ],
+  "suggested_acquisitions": [],
+  "coverage_assessment": "selected_scope_only",
+  "full_report_completeness": "not_assessed",
+  "cross_reading_reconciliation": "not_assessed",
+  "research_only": true,
+  "production_authorization": "not_authorized"
+}

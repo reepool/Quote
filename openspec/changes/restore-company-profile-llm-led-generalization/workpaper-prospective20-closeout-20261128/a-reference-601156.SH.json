@@ -1,0 +1,48 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "instrument_id": "601156.SH",
+  "name": "东航物流",
+  "report": {
+    "content_hash": "6d08e7c785f8bf5928dbbc836391371f25829c243f3632eb21df8722b8e8ec8f",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-27T16:00:00+00:00",
+    "source": "cninfo",
+    "source_announcement_id": "1225048375",
+    "asset_id": "asset_68e2aa10f4e8009cd5cab07da39f4fde"
+  },
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/6d/6d08e7c785f8bf5928dbbc836391371f25829c243f3632eb21df8722b8e8ec8f.pdf",
+  "pdf_sha256": "6d08e7c785f8bf5928dbbc836391371f25829c243f3632eb21df8722b8e8ec8f",
+  "source_sections_and_physical_pages": "第三节/一、业务物理11–12及必要续段；三、经营讨论19–20/表3主营收入",
+  "core_conditions": [
+    {
+      "condition_id": "C1",
+      "question": "公司做什么",
+      "expected_source_answer": "航空物流集团，航空速运、地面综合服务、综合物流解决方案三大业务"
+    },
+    {
+      "condition_id": "C2",
+      "question": "主要产品/服务与板块",
+      "expected_source_answer": "全货机和客机腹舱运输，货站/多式联运/仓储，以及跨境电商、产地直达和定制供应链方案"
+    },
+    {
+      "condition_id": "C3",
+      "question": "怎么赚钱",
+      "expected_source_answer": "依托自有及外采运力、货站仓储等资源提供运输与物流作业/综合服务取得收入，三板块都保"
+    }
+  ],
+  "important_numbers": {
+    "company_revenue_raw": "242.64亿元",
+    "main_business_total_10000_CNY": "2423253.02",
+    "air_express_10000_CNY": "1091381.64",
+    "ground_services_10000_CNY": "267114.08",
+    "integrated_solutions_10000_CNY": "1064757.29"
+  },
+  "qualifications": [
+    "18全货机+800客机腹舱+N外采为运力体系，不把全部800当公司自有货机",
+    "三板块占比45.04/11.02/43.94%分母为主营，不误当另一口径",
+    "冷链货量/全球行业温控复增率不是全部公司业绩，计划与实际服务分开"
+  ],
+  "basis": "A direct original PDF reading before new20 model sends, with exact earlier original-source reading reused where unchanged",
+  "reference_sent_to_model": false
+}

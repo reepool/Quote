@@ -1,0 +1,45 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "instrument_id": "002420.SZ",
+  "name": "毅昌科技",
+  "report": {"content_hash": "617bc07cfe9f3dee2312e8e6964c2368850b608fa7418e71826398cbb1903d6c", "report_period": "2025-12-31", "fiscal_year": 2025, "published_at": "2026-04-24T16:00:00+00:00", "source": "cninfo", "source_announcement_id": "1225186994", "asset_id": "asset_ccde43acecd1a42f8e0b148dab51c771", "title": "2025年年度报告", "variant": "original"},
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/61/617bc07cfe9f3dee2312e8e6964c2368850b608fa7418e71826398cbb1903d6c.pdf",
+  "pdf_sha256": "617bc07cfe9f3dee2312e8e6964c2368850b608fa7418e71826398cbb1903d6c",
+  "document_version": "002420.SZ / 2025年年度报告 original / 公告1225186994 / SHA256同pdf_sha256",
+  "source_sections_and_physical_pages": "目录物理4；第三节管理层讨论与分析/主要业务12、经营模式13；主营业务分析/收入与成本20–21。物理页比印刷页大1。",
+  "physical_pages_read": [1, 3, 4, 8, 12, 13, 20, 21],
+  "core_conditions": [
+    {"condition_id": "C1", "question": "公司做什么", "expected_source_answer": "汽车、新能源、医疗健康和家电等领域零部件及总成的研发、生产和销售企业，正在向汽车与新能源转型；家电仍是重要收入，医疗虽占比较小仍为明示主业。不能当作整车厂或只保留新能源业务。", "source_physical_pages": [12, 20]},
+    {"condition_id": "C2", "question": "主要产品/服务与板块", "expected_source_answer": "汽车内外饰/轻量化部件、总成及模具；动力电池液冷板等热管理零部件和储能PACK/箱体结构件；医疗IVD零部件与耗材/模具器械；冰箱、空调、洗衣机等家电结构件。机器人为轻量化结构件及外观覆盖件布局，原文仍称量产交付前准备，不冒称成熟量产收入板块。", "source_physical_pages": [12, 20]},
+    {"condition_id": "C3", "question": "怎么赚钱", "expected_source_answer": "按大客户订单研发制造定制化模具、零部件及总成，主要以销定购、以销定产并直接销售，客户验收/交付形成收入；服务汽车、新能源、家电及医疗客户。2025汽车约36.89%、新能源31.92%、家电25.50%，医疗0.92%，其他4.77%，不能只按最大业务解释收入。", "source_physical_pages": [13, 20]}
+  ],
+  "important_numbers": [
+    {"source_name": "营业收入合计", "raw_value": "2,973,995,271.65", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 20, "source_relation": "公司合计，同比增长10.83%"},
+    {"source_name": "汽车行业", "raw_value": "1,097,234,045.03", "unit": "元", "period": "2025-01-01/2025-12-31", "revenue_share_raw": "36.89%", "physical_page": 20},
+    {"source_name": "新能源行业", "raw_value": "949,311,086.82", "unit": "元", "period": "2025-01-01/2025-12-31", "revenue_share_raw": "31.92%", "physical_page": 20},
+    {"source_name": "家电行业", "raw_value": "758,246,552.37", "unit": "元", "period": "2025-01-01/2025-12-31", "revenue_share_raw": "25.50%", "physical_page": 20},
+    {"source_name": "医疗健康行业", "raw_value": "27,390,719.51", "unit": "元", "period": "2025-01-01/2025-12-31", "revenue_share_raw": "0.92%", "physical_page": 20},
+    {"source_name": "其他（分行业）", "raw_value": "141,812,867.92", "unit": "元", "period": "2025-01-01/2025-12-31", "revenue_share_raw": "4.77%", "physical_page": 20, "source_relation": "分行业尾项，不同于分产品其他"},
+    {"source_name": "零部件（分产品）", "raw_value": "2,720,027,108.26", "unit": "元", "period": "2025-01-01/2025-12-31", "revenue_share_raw": "91.46%", "physical_page": 20, "source_relation": "跨行业产品汇总，不能再和各行业收入相加"},
+    {"source_name": "其他（分产品）", "raw_value": "253,968,163.39", "unit": "元", "period": "2025-01-01/2025-12-31", "revenue_share_raw": "8.54%", "physical_page": 20},
+    {"source_name": "家用/商用整机", "raw_value": "0.00", "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 20, "source_relation": "原文明示零，不等于全部家电零收入"},
+    {"source_name": "国内销售/国外销售", "raw_value": ["2,917,145,132.41", "56,850,139.24"], "unit": "元", "period": "2025-01-01/2025-12-31", "physical_page": 20, "source_relation": "98.09%及1.91%；收入均直销，不是按地区独立法人"},
+    {"source_name": "汽车/新能源/家电行业毛利率", "raw_value": ["11.35%", "14.53%", "7.17%"], "unit": "%", "period": "2025-01-01/2025-12-31", "physical_page": 21}
+  ],
+  "native_pdf_anchors": [
+    {"physical_page": 12, "quote": "（一）主营业务", "native_text_start": 114, "native_text_end": 121, "bbox_pdf_points": [79.734, 644.601, 137.217, 653.034]},
+    {"physical_page": 20, "quote": "营业收入合计 2,973,995,271.65 100%", "native_text_start": 240, "native_text_end": 268, "bbox_pdf_points": [57.27, 387.576, 292.074, 396.474]}
+  ],
+  "coordinate_system": "原PDF物理页1起；pypdfium2原文本字符偏移；bbox为PDF points左下原点。",
+  "qualifications": [
+    "汽车、新能源、医疗、家电是行业服务领域，零部件是跨行业产品；单个segment/group标签不能替代关系判断。",
+    "机器人产品仍处量产交付前准备，不能把头部客户合作/联合研发变成已规模销售或擅设收入。",
+    "医疗不足5%仍是原文明示主营，需有实质覆盖，不因小额直接省略；其他尾项不要求编造产品归属。",
+    "产品定制且部分材料供应商由客户指定；供应链细节为可选，不能推为所有原材料均由客户供应。",
+    "物理3不分红理由涉及母公司未分配利润为负，不能写成公司当年合并净利润为负。"
+  ],
+  "basis": "本审核助手直接亲读指定原PDF及目录定位，逐份核SHA256；无旧模型答案/画像真值输入。",
+  "reference_sent_to_model": false,
+  "output_assessment": "not_assessed; source-only, awaiting first/automatic-final consumer objects"
+}

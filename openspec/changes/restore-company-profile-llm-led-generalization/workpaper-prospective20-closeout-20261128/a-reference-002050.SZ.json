@@ -1,0 +1,50 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "instrument_id": "002050.SZ",
+  "report": {
+    "content_hash": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-23T16:00:00+00:00",
+    "source": "cninfo",
+    "source_announcement_id": "1225026522",
+    "asset_id": "asset_878b16917fd94a5a55903f419e91e3b6"
+  },
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/f2/f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626.pdf",
+  "pdf_sha256": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+  "name": "三花智控",
+  "source_sections_and_physical_pages": "第三节/一、主要业务、三、主营分析/收入与成本，物理10、15–16",
+  "core_conditions": [
+    {
+      "condition_id": "C1",
+      "question": "公司做什么",
+      "expected_source_answer": "围绕热管理/热泵技术，制冷空调电器零部件与汽车零部件两大业务"
+    },
+    {
+      "condition_id": "C2",
+      "question": "主要产品/服务与板块",
+      "expected_source_answer": "阀/换热器/泵/控制器传感器及汽车热管理控制部件，面向暖通家电和汽车应用"
+    },
+    {
+      "condition_id": "C3",
+      "question": "怎么赚钱",
+      "expected_source_answer": "研发制造销售零部件及解决方案，以直销为主，主收入两板块均需描述"
+    }
+  ],
+  "important_numbers": {
+    "company_revenue_CNY": "31011744510.27",
+    "refrigeration_revenue_CNY": "18584743718.09",
+    "automotive_revenue_CNY": "12427000792.18",
+    "refrigeration_share": "59.93%",
+    "automotive_share": "40.07%"
+  },
+  "qualifications": [
+    "整车制造不适用不等于没有汽车零部件业务",
+    "仿生机器人执行器为新兴拓展，不编造独立收入",
+    "区域/销售模式分类与产品表不同轴，不重复加总"
+  ],
+  "basis": "exact original PDF/version and existing independent A source reading reused; no model answer used",
+  "prior_source_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/a-prospective-source-reference.json",
+  "prior_source_sha256": "a4e8d1d47431ff07cdddad12cda62b91cfab14194b66cf9bf6a73af28babdb22",
+  "reference_sent_to_model": false
+}

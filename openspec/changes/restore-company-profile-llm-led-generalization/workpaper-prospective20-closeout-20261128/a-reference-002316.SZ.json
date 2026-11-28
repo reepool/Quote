@@ -1,0 +1,72 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "frozen_at": "2026-11-28T18:09:17+08:00",
+  "instrument_id": "002316.SZ",
+  "name": "亚联发展",
+  "report": {
+    "content_hash": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+    "report_period": "2025-12-31",
+    "fiscal_year": 2025,
+    "published_at": "2026-03-10T16:00:00+00:00",
+    "source": "cninfo",
+    "source_announcement_id": "1225003661",
+    "asset_id": "asset_51dbcb7ce298d116e99386647b1e3e06",
+    "title": "2025年年度报告",
+    "variant": "original"
+  },
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/bb/bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a.pdf",
+  "pdf_sha256": "bb3eb3836b6ae1f1c5731e66af3b88ed8577b2b867b8b706206fd06774eb731a",
+  "document_version": "002316.SZ / 2025年年度报告 original / 公告1225003661 / SHA256同pdf_sha256",
+  "source_sections_and_physical_pages": "目录物理3；第三节管理层讨论与分析/一、主要业务、产品用途、经营模式10–11；经营情况及收入成本/营业收入构成15–16。物理页与印刷页一致。",
+  "physical_pages_read": [1, 3, 4, 10, 11, 15, 16],
+  "core_conditions": [
+    {
+      "condition_id": "C1",
+      "question": "公司做什么",
+      "expected_source_answer": "2025年从事智慧专网、生物纤维素基材及农牧三领域业务；前者面向电力和交通提供信息通信解决方案，后两者分别是材料研发生产销售与农产品贸易/仓储。不能以历史第三方支付业务替代当期主业。",
+      "source_physical_pages": [10, 11]
+    },
+    {
+      "condition_id": "C2",
+      "question": "主要产品/服务与板块",
+      "expected_source_answer": "完整覆盖交通工程系统集成（高速公路、城市及轨道交通相关系统）、电力专网通信解决方案/新能源场站通信集成与运维、生物纤维素基材（护肤贴膜及医疗敷料等用途）、农产品贸易（小麦、玉米等）及自有粮库仓储保管。生物纤维素虽比重较小，仍是明确主要业务。",
+      "source_physical_pages": [10, 11, 15, 16]
+    },
+    {
+      "condition_id": "C3",
+      "question": "怎么赚钱",
+      "expected_source_answer": "电力/交通以招投标承接解决方案、软硬件及系统集成/工程和运维项目；生物纤维素以销定产、定制生产，向化妆品和医疗器械品牌商销售基材；农牧采购后直销粮食给加工/饲料企业及贸易商，并利用自有仓库提供仓储保管。收入主要分项为交通248,213,693.90元、电力218,701,838.59元、生物纤维素42,401,719.94元、农牧75,843,172.91元，不能仅解释最大两项的变现。",
+      "source_physical_pages": [10, 11, 15, 16]
+    }
+  ],
+  "important_numbers": [
+    {"source_name": "营业收入合计", "raw_value": "586,442,724.54", "unit": "元", "period": "2025-01-01/2025-12-31", "source_relation": "营业收入构成表合计；2024比较607,428,715.28元，同比-3.45%", "physical_page": 15},
+    {"source_name": "交通行业 / 交通工程系统集成", "raw_value": "248,213,693.90", "unit": "元", "period": "2025-01-01/2025-12-31", "revenue_share_raw": "42.33%", "source_relation": "分行业及分产品同一业务两种分类，不重复相加", "physical_page": 15, "product_physical_page": 16},
+    {"source_name": "电力行业 / 专网通信解决方案", "raw_value": "218,701,838.59", "unit": "元", "period": "2025-01-01/2025-12-31", "revenue_share_raw": "37.29%", "source_relation": "分行业及分产品的对应行，不扩大为全部智慧专网收入", "physical_page": 15, "product_physical_page": 16},
+    {"source_name": "生物纤维素基材行业 / 生物纤维素基材", "raw_value": "42,401,719.94", "unit": "元", "period": "2025-01-01/2025-12-31", "revenue_share_raw": "7.23%", "source_relation": "分行业及分产品对应行", "physical_page": 15, "product_physical_page": 16},
+    {"source_name": "农牧行业 / 农产品贸易", "raw_value": "75,843,172.91", "unit": "元", "period": "2025-01-01/2025-12-31", "revenue_share_raw": "12.93%", "source_relation": "原表名称有行业/产品差异，保留，不另推仓储独立收入", "physical_page": 16},
+    {"source_name": "其他行业 / 其他", "raw_value": "1,282,299.20", "unit": "元", "period": "2025-01-01/2025-12-31", "revenue_share_raw": "0.22%", "source_relation": "尾项，可补充，不单独设基础拒绝条件", "physical_page": 16},
+    {"source_name": "智慧专网业务主营业务收入", "raw_value": "46,691.55", "unit": "万元", "period": "2025-01-01/2025-12-31", "source_relation": "经营综述；交通和电力合并近似披露精度，不等于仅专网通信产品行", "physical_page": 15},
+    {"source_name": "交通/电力/生物纤维素/农牧毛利率", "raw_value": ["8.19%", "13.56%", "59.41%", "1.65%"], "unit": "%", "period": "2025-01-01/2025-12-31", "source_relation": "原营业收入/成本表相应行业行，不是公司整体净利率", "physical_page": 16},
+    {"source_name": "智慧交通累计签订销售合同", "raw_value": "约2.27", "unit": "亿元", "period": "2025-01-01/2025-12-31", "source_relation": "新签合同，近似值，不等于本年确认收入", "physical_page": 15}
+  ],
+  "native_pdf_anchors": [
+    {"physical_page": 10, "quote": "报告期内，公司主要从事智慧专网、生物纤维素基材及农牧领域业务", "native_text_start": 95, "native_text_end": 125, "bbox_pdf_points": [74.919, 656.118, 344.217, 664.614]},
+    {"physical_page": 11, "quote": "3、农牧领域", "native_text_start": 815, "native_text_end": 821, "bbox_pdf_points": [75.171, 492.714, 123.813, 501.138]},
+    {"physical_page": 15, "quote": "营业收入合计 586,442,724.54 100%", "native_text_start": 1674, "native_text_end": 1700, "bbox_pdf_points": [57.27, 138.246, 326.733, 146.814]},
+    {"physical_page": 16, "quote": "农产品贸易 75,843,172.91 12.93%", "native_text_start": 323, "native_text_end": 349, "bbox_pdf_points": [56.991, 681.486, 326.733, 690.018]}
+  ],
+  "coordinate_system": "physical_page为1起原PDF页序；native_text为pypdfium2 get_text_range原字符偏移；bbox为PDF points，左下原点；不是重排文本或渲染图坐标。",
+  "qualifications": [
+    "智慧专网经营综述聚合了电力与交通；不能把单项专网通信解决方案行误作智慧专网全部收入。",
+    "分行业、分产品、分地区、分销售模式是交叉分类；同数重复行不构成不同收入，不可跨维度加总。",
+    "业务叙述称生物纤维素面向品牌客户直销，收入构成表另列经销业务542,758,705.40元/92.55%、直销业务42,401,719.94元/7.23%；保原表分类，不仅凭表标签否定工程招投标/粮贸直销的实际经营叙述。",
+    "农牧收入增加不代表利润改善；原文说明贸易毛利下降及自有粮库空置导致该领域较大幅度亏损。",
+    "生物纤维素医用领域布局/潜在增长须保计划和展望限定，不把将来市场份额写成已经实现。",
+    "所有重要业务是否覆盖按完整断言和关系判断；group/issuer/segment单标签差异不单独推出错主体或全业务错误。"
+  ],
+  "basis": "本审核助手以pypdfium2直接亲读上述原PDF页及目录，核SHA256；没有采用旧模型答案或旧画像作为真值。",
+  "reference_sent_to_model": false,
+  "output_assessment": "not_assessed; source-only reference, first/automatic-final objects not received"
+}

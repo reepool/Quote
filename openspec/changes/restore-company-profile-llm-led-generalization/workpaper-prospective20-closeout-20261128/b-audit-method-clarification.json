@@ -1,0 +1,42 @@
+{
+  "task": "6.FY",
+  "kind": "explicit_user_core60_and_standby_clarification",
+  "original_freeze_sha256": "4a41851bc3c871e9c787a80944003f90e61775eed4106d396a049a1976e2401b",
+  "original_freeze_preserved": true,
+  "seed": "6FY-20261128",
+  "sampling_order_and_method_changed": false,
+  "fixed_company_denominator": 20,
+  "fixed_core_per_company_per_phase": 3,
+  "fixed_core_denominator_per_phase": 60,
+  "source_answer_policy": "expected_source_answer is substantive reference for three business questions; its numbers/subitems do not become additional hard conditions",
+  "supplement_policy": "up to20 actual unique supplemental objects per company/phase; audit all if fewer; no forced400 outputs",
+  "standby_input": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/b-audit-inputs.json",
+  "operator_artifact_layout": "company evidence/first-api.json, automatic-final-api.json and original raw roots; follow B pointers after formal delivery",
+  "source_references": "user confirms all20 ready; mechanical assistant does not interpret them as truth",
+  "independent_review_owners": {
+    "manufacturing_and_services10": "Main A",
+    "financial_and_multiple_businesses10": "Franklin",
+    "all_core_and_major_amount_suspicions": "Main A"
+  },
+  "uncertainty_policy": "carry A explicit assessment_kind; label granularity, faithful limited use and unavailable standardization do not automatically become business-error",
+  "standardized_computability_coverage": "report separately from semantic accuracy and research usability",
+  "files": {
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/b-audit-bindings.py": "075ca212dcd6133a4ab310d387203ab621e97dfc8628c038ca6a984c4925c7de",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/b-audit-method.md": "9a799b2f77adcb7002c2f41158c0a65cca1d565b7d08b4654bc3013ff8435266"
+  },
+  "direct_validation": {
+    "scope": "in-memory synthetic count fixtures only; no app import, old4 replay, formal cohort or semantic scoring",
+    "fixed_three": true,
+    "fixed_sixty_failed_not_started": true,
+    "extra_reference_items_do_not_expand_core_denominator": true,
+    "unbound_source_never_counts_correct": true,
+    "separate_phase_denominators": true,
+    "one_company3_supported_plus19_not_delivered_macro_and_micro": 0.05,
+    "ruff": "passed"
+  },
+  "formal_mapping_executed": false,
+  "new20_outputs_read": false,
+  "supplier_requests": 0,
+  "temporary_payloads_or_databases_created": 0,
+  "semantic_scores": null
+}

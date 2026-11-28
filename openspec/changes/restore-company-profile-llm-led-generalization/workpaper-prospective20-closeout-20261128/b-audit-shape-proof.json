@@ -1,0 +1,58 @@
+{
+  "task": "6.FY",
+  "scope": "old 6.FX four shape only; no new cohort or semantic score",
+  "original_projection": "project_workpaper_delivery + 6.FS.entry_content",
+  "stocks": [
+    {
+      "instrument_id": "600350.SH",
+      "visible_objects": 26,
+      "in_memory_mapper_objects": 26
+    },
+    {
+      "instrument_id": "601328.SH",
+      "visible_objects": 24,
+      "in_memory_mapper_objects": 24
+    },
+    {
+      "instrument_id": "920006.BJ",
+      "visible_objects": 24,
+      "in_memory_mapper_objects": 24
+    },
+    {
+      "instrument_id": "000039.SZ",
+      "visible_objects": 21,
+      "in_memory_mapper_objects": 21
+    }
+  ],
+  "reader_delivered": 0,
+  "reader_limit": "isolated review-successor directory has no first-read parent chain; not an API proof",
+  "visible_objects": 95,
+  "visible_metrics": 135,
+  "evidence_references": 161,
+  "call_count": 18,
+  "receipt_hash_matched_calls": 18,
+  "direct_checks": [
+    "nonempty old4 original projection/raw metric positions",
+    "in-memory old4 mapper exact report/fact/metric/evidence bindings",
+    "A-absent stays not_assessed",
+    "stable seeded stratified maximum20",
+    "small supplement population all selected",
+    "explicit A semantic dedup and core/suspect union",
+    "no-delivery fixed20 recall0 and accuracy null"
+  ],
+  "source_records": {
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-0265278312fe929f77b71ae4.json": "6b0dd8285ca5697e36dcf397dfeee88d217fd6cd64fb8ae7eeb9436c7f4f1d8b",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-6bee35aa007675221a3f0124.json": "39548be6932e77ead616187260f057b1606d7030b342d00ec9d5ec4eec0771bd",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-923127a5eb05a33c2b988507.json": "4e8a99a44a0c1d02f6f5e5184f6e88f28fc63e28fd99231c7de371f889f61136",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/four-output/company_profile_common_core.v1/bp-work-c9d017b96a4eaeda3021a128.json": "23437a1845499dca10df3011a53baf72197e8d5560c8500024912e724516f73a"
+  },
+  "supplier_requests": 0,
+  "new20_outputs_read": false,
+  "semantic_scores": null,
+  "temporary_cleanup": {
+    "owned_root": "/home/python/Quote/data/QuoteBak/company-profile-6fy-audit-a8gz0uzz",
+    "removed": true,
+    "bytes": 484,
+    "contents": "import logs/cache only; no database/payload copies"
+  }
+}

@@ -1,0 +1,4417 @@
+{
+  "task": "6.FY",
+  "instrument_id": "002050.SZ",
+  "group": "manufacturing",
+  "industry": "家用电器",
+  "execution_state": "completed",
+  "method_freeze": {
+    "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/b-audit-method-freeze.json",
+    "sha256": "4a41851bc3c871e9c787a80944003f90e61775eed4106d396a049a1976e2401b",
+    "json_pointer": ""
+  },
+  "method_clarification": {
+    "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/b-audit-method-clarification.json",
+    "sha256": "dcdf70c6fccd0dffdd5c0850b277715ae62d9e4a06aac082efc20992e246e19b",
+    "json_pointer": ""
+  },
+  "operator_inputs": {
+    "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/b-observed-inputs.json",
+    "sha256": "3e73c1239a2a7e07b30a3f12dc5a24ccf0e2b586307671e14c47faa777f4d56e",
+    "json_pointer": ""
+  },
+  "A_review_inputs": [
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-audit-final.json",
+      "sha256": "96efe13aada4523fda78c24097588de2399a90c0fb0b41432920892924de3336",
+      "json_pointer": ""
+    }
+  ],
+  "input_resolution": "B_explicit_company_pointers",
+  "A_review_provenance": {
+    "authority": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-audit-final.json",
+      "sha256": "96efe13aada4523fda78c24097588de2399a90c0fb0b41432920892924de3336",
+      "json_pointer": ""
+    },
+    "auditor": "main A final source adjudication with independent A-side original-PDF reviewers",
+    "source_audits": [
+      {
+        "source": {
+          "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-audit-main.json",
+          "sha256": "902240dfc0869a751022b303e4bf1d62654c249b390404877e0e9a568ba38a4c",
+          "json_pointer": ""
+        },
+        "declared_sha256": "902240dfc0869a751022b303e4bf1d62654c249b390404877e0e9a568ba38a4c",
+        "exact_hash_match": true
+      },
+      {
+        "source": {
+          "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-audit-side.json",
+          "sha256": "a02adfac275ac3758cd760cbb740aff21a8a9bed48572d96f70c519b46723eb5",
+          "json_pointer": ""
+        },
+        "declared_sha256": "a02adfac275ac3758cd760cbb740aff21a8a9bed48572d96f70c519b46723eb5",
+        "exact_hash_match": true
+      },
+      {
+        "source": {
+          "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-audit-services.json",
+          "sha256": "f45d7fdd640bba3f2c447a8d1ba9e1fde0c8a8817a99e09f353d873eaf5abf34",
+          "json_pointer": ""
+        },
+        "declared_sha256": "f45d7fdd640bba3f2c447a8d1ba9e1fde0c8a8817a99e09f353d873eaf5abf34",
+        "exact_hash_match": true
+      }
+    ],
+    "dispute_adjudication_pointers": [],
+    "original_side_audits_preserved": true
+  },
+  "postrun_read_dependency_compatibility": [
+    {
+      "path": "/home/python/Quote/research/company_profile/workpaper.py",
+      "frozen_sha256": "66cd72a62391d5899f905385d4853eebd449128f728d2d93d75c2dd3ceba70a8",
+      "current_sha256": "68a04af9a341506d1af6b451033c004a94686d2a7d131e5a55152575b23edfb3",
+      "verification": "all original AST declarations exact; only three added string constants",
+      "application_edited_by_this_tool": false
+    }
+  ],
+  "mechanical_script_version": {
+    "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/b-audit-script-version.json",
+    "sha256": "f22d600cb11baf0af15bef1997fd6322cc6607ffc66f95b1f1eaca26c5829b5b",
+    "json_pointer": ""
+  },
+  "official_pdf": {
+    "path": "/home/python/Quote/data/filings/announcements/blobs/f2/f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626.pdf",
+    "expected_sha256": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+    "read_by_this_tool": false
+  },
+  "source_files": {
+    "budget": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002050.SZ/run/budget.json",
+      "sha256": "c11470d09c3d4594359bc123cf7a359285063c3e8cef2aed9b1c15500df60f30",
+      "json_pointer": ""
+    },
+    "source_reference": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-002050.SZ.json",
+      "sha256": "72aced4c252482852f59380ce9613a932c8d7f66bb6e9b5dd20478dda3d60a41",
+      "json_pointer": ""
+    }
+  },
+  "wires": [
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002050.SZ/run/wires/001.json",
+      "sha256": "055dc9c496fb6e3e8d81e88366a950d60a09f6710b259943ec166311095e8a03",
+      "json_pointer": ""
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002050.SZ/run/wires/002.json",
+      "sha256": "7c927aeea56e3a0a91b9a195022679573fb6bef4fa279a250e90086482d62126",
+      "json_pointer": ""
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002050.SZ/run/wires/003.json",
+      "sha256": "2af2a30f906325b46cb3a0c202ed0f73ca411af4cf34ffc30710911c0d71857d",
+      "json_pointer": ""
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002050.SZ/run/wires/004.json",
+      "sha256": "67ae86c5e3896f968add725bca2331d277a20e910c50d2fb22f29834c7565d6b",
+      "json_pointer": ""
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002050.SZ/run/wires/005.json",
+      "sha256": "429674e5cdc83ef080502e3c800a59d79cdae1b2aab45aac97259922db41b922",
+      "json_pointer": ""
+    }
+  ],
+  "wire_to_call_binding": "not_assessed; retained receipt hashes are checked separately",
+  "author_attribution_scope": "actual record call/receipt identities; no inference that every unchanged or revised fact has the same author",
+  "phases": {
+    "first": {
+      "state": "delivered",
+      "api": {
+        "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002050.SZ/run/first-api.json",
+        "sha256": "d584e711c47e8af6d1682391bbd2b03477837d0de6799bfb368f53f80ef4dff5",
+        "json_pointer": ""
+      },
+      "report": {
+        "instrument_id": "002050.SZ",
+        "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+        "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-23T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "objects": [
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F01",
+          "consumer_fact_sha256": "8dcb5cfc3e26b936c4267a4b7510cb25b76f0a34f3dbdd8d3a471484390d7932",
+          "consumer_pointer": "/facts/0",
+          "fact": {
+            "fact_id": "F01",
+            "text": "公司以热泵技术和热管理系统的研发与应用为核心，业务横跨制冷空调电器零部件和汽车零部件两大板块，并基于长期技术积累向仿生机器人机电执行器等新兴领域拓展。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0003",
+              "record_pointer": "/workpaper/evidence/2",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "physical_pages": [
+                10
+              ],
+              "spans": [
+                {
+                  "page": 10,
+                  "start": 162,
+                  "end": 1165,
+                  "quote_sha256": "69067991385ae17084fdb75e56ffa280b04ada0e001b151880dc6d2b1cd5931d",
+                  "quote_pointer": "/workpaper/evidence/2/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "0e014a4753b2b41c11ea94e1adad86b308613906c4e4f45afa7e39aed6d6c81a",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/business_structure/facts/0",
+          "raw_fact_sha256": "8dcb5cfc3e26b936c4267a4b7510cb25b76f0a34f3dbdd8d3a471484390d7932",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "core"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/0",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F02",
+          "consumer_fact_sha256": "2d9d72284b3b003e8204c8c4d2caebbf5fef38248195cfd626667166e07e8d16",
+          "consumer_pointer": "/facts/1",
+          "fact": {
+            "fact_id": "F02",
+            "text": "制冷空调电器零部件业务提供控制元器件、子系统和技术解决方案，关键产品包括电子膨胀阀、四通换向阀、截止阀、电磁阀、球阀等阀类，以及微通道换热器、Omega泵和控制器；产品用于空调、冰箱、工业制冷、冷链运输、热泵采暖及洗衣机等领域。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0003",
+              "record_pointer": "/workpaper/evidence/2",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "physical_pages": [
+                10
+              ],
+              "spans": [
+                {
+                  "page": 10,
+                  "start": 162,
+                  "end": 1165,
+                  "quote_sha256": "69067991385ae17084fdb75e56ffa280b04ada0e001b151880dc6d2b1cd5931d",
+                  "quote_pointer": "/workpaper/evidence/2/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "e431eacc5fb050c49ca7983991779eb061d70be3f32e183d8efea640d5285465",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/products_services/facts/0",
+          "raw_fact_sha256": "2d9d72284b3b003e8204c8c4d2caebbf5fef38248195cfd626667166e07e8d16",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "core"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/1",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F03",
+          "consumer_fact_sha256": "1cd971afad0a887bdc32a1ef8ff5e76e865c5aca01648640abc23de0e40fa89f",
+          "consumer_pointer": "/facts/2",
+          "fact": {
+            "fact_id": "F03",
+            "text": "汽车零部件业务为新能源汽车及传统燃油车提供热管理控制解决方案，产品包括电子膨胀阀、电子水泵、电子水阀、板式换热器和集成组件，覆盖座舱热管理、电池热管理及电机/电控系统热管理。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0003",
+              "record_pointer": "/workpaper/evidence/2",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "physical_pages": [
+                10
+              ],
+              "spans": [
+                {
+                  "page": 10,
+                  "start": 162,
+                  "end": 1165,
+                  "quote_sha256": "69067991385ae17084fdb75e56ffa280b04ada0e001b151880dc6d2b1cd5931d",
+                  "quote_pointer": "/workpaper/evidence/2/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "cd75c8052225909eafefbcf3672b0925f1cd3de30fc1ea5c7b7ab1b447259c61",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/products_services/facts/1",
+          "raw_fact_sha256": "1cd971afad0a887bdc32a1ef8ff5e76e865c5aca01648640abc23de0e40fa89f",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "core"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/2",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F04",
+          "consumer_fact_sha256": "25a4a728595a38345cbba181c64427efcc57dfaa4241cfe2231d5ae0d7d03074",
+          "consumer_pointer": "/facts/3",
+          "fact": {
+            "fact_id": "F04",
+            "text": "战略新兴业务包括仿生机器人机电执行器，属于公司基于技术积累拓展的新兴领域。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0003",
+              "record_pointer": "/workpaper/evidence/2",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "physical_pages": [
+                10
+              ],
+              "spans": [
+                {
+                  "page": 10,
+                  "start": 162,
+                  "end": 1165,
+                  "quote_sha256": "69067991385ae17084fdb75e56ffa280b04ada0e001b151880dc6d2b1cd5931d",
+                  "quote_pointer": "/workpaper/evidence/2/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "c390ae665c0f1339d2449f41591252143ec636088172f7c52ee765c1f56f7cad",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/products_services/facts/2",
+          "raw_fact_sha256": "25a4a728595a38345cbba181c64427efcc57dfaa4241cfe2231d5ae0d7d03074",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [],
+          "A_semantic_duplicate_excluded": true,
+          "A_semantic_duplicate_of": {
+            "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+            "fact_id": "F01",
+            "consumer_fact_sha256": "8dcb5cfc3e26b936c4267a4b7510cb25b76f0a34f3dbdd8d3a471484390d7932"
+          },
+          "A_duplicate_reason": "A比较完整经济断言后确认该可选条只重复已有主营/用途断言，没有新增数值或关系；准确率按唯一对象去重，原展示不重写。",
+          "selected": false,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/3",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F05",
+          "consumer_fact_sha256": "375cd3c9aa8ba2823a004cd4484942885bb537d61493ea3725c24af32bda06fe",
+          "consumer_pointer": "/facts/4",
+          "fact": {
+            "fact_id": "F05",
+            "text": "公司通过销售制冷空调电器零部件、汽车零部件等产品取得收入，销售模式以直销为主；2025年直销收入占营业收入98.64%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "直销收入占营业收入比重",
+                "raw_value": "98.64%",
+                "value": "98.64",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "销售模式为收入渠道口径，非业务板块或公司整体；保留原文直销占比。"
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "state": "limited",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。",
+            "保留原文主体、数值或近似限定，不作为确定值使用。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0005",
+              "record_pointer": "/workpaper/evidence/4",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                15
+              ],
+              "spans": [
+                {
+                  "page": 15,
+                  "start": 0,
+                  "end": 4436,
+                  "quote_sha256": "fde6abeff3de7e922ffa47a1fb4d4a5124377e61743c7fd8072263ff711d216c",
+                  "quote_pointer": "/workpaper/evidence/4/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "measurement",
+          "sampling_sha256": "283a64f0ee80e0de2bd0529952f8188e8193610e4f0a9a06be46c2e85efa7414",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/revenue_model/facts/0",
+          "raw_fact_sha256": "375cd3c9aa8ba2823a004cd4484942885bb537d61493ea3725c24af32bda06fe",
+          "visible_metric_original_indices": [
+            0
+          ],
+          "raw_metric_count": 1,
+          "audit_groups": [
+            "core",
+            "important"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/4",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [
+            {
+              "consumer_metric_index": 0,
+              "original_metric_index": 0,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/4/metric_checks/0"
+            }
+          ],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F06",
+          "consumer_fact_sha256": "c15d78d46cbe5205d293c56bc5155afb2e837cccec92299799030eafea8825f8",
+          "consumer_pointer": "/facts/5",
+          "fact": {
+            "fact_id": "F06",
+            "text": "2025年公司实现营业收入31,011,744,510.27元，同比增长10.97%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入",
+                "raw_value": "31,011,744,510.27",
+                "value": "31011744510.27",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入同比增减",
+                "raw_value": "10.97%",
+                "value": "10.97",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "record_pointer": "/workpaper/evidence/0",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第二节 公司简介和主要财务指标",
+                "六、主要会计数据和财务指标"
+              ],
+              "physical_pages": [
+                7
+              ],
+              "spans": [
+                {
+                  "page": 7,
+                  "start": 900,
+                  "end": 2734,
+                  "quote_sha256": "54df3850fea83159bc9d83fdcfba1a2ad82da2c94eb5c592341dd79bdff98956",
+                  "quote_pointer": "/workpaper/evidence/0/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "measurement",
+          "sampling_sha256": "2b93bf9fe556284a122e2ddec412e8e40e684626fcec29da3111ca7a13075c77",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/scale_and_mix/facts/0",
+          "raw_fact_sha256": "c15d78d46cbe5205d293c56bc5155afb2e837cccec92299799030eafea8825f8",
+          "visible_metric_original_indices": [
+            0,
+            1
+          ],
+          "raw_metric_count": 2,
+          "audit_groups": [
+            "important"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/5",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [
+            {
+              "consumer_metric_index": 0,
+              "original_metric_index": 0,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/5/metric_checks/0"
+            },
+            {
+              "consumer_metric_index": 1,
+              "original_metric_index": 1,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/5/metric_checks/1"
+            }
+          ],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F07",
+          "consumer_fact_sha256": "a5182c6e849b5b9cf978a2f6d15a47079c13318612e796dbd5b39c836c85e00d",
+          "consumer_pointer": "/facts/6",
+          "fact": {
+            "fact_id": "F07",
+            "text": "2025年归属于上市公司股东的净利润4,062,891,412.10元，同比增长31.10%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [
+              {
+                "name": "归属于上市公司股东的净利润",
+                "raw_value": "4,062,891,412.10",
+                "value": "4062891412.10",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "归属于上市公司股东的净利润同比增减",
+                "raw_value": "31.10%",
+                "value": "31.10",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "record_pointer": "/workpaper/evidence/0",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第二节 公司简介和主要财务指标",
+                "六、主要会计数据和财务指标"
+              ],
+              "physical_pages": [
+                7
+              ],
+              "spans": [
+                {
+                  "page": 7,
+                  "start": 900,
+                  "end": 2734,
+                  "quote_sha256": "54df3850fea83159bc9d83fdcfba1a2ad82da2c94eb5c592341dd79bdff98956",
+                  "quote_pointer": "/workpaper/evidence/0/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "measurement",
+          "sampling_sha256": "d11455498b782eeaf47d21f6482143976febdcaef9a5ec8b9e3fc84adee5e853",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/scale_and_mix/facts/1",
+          "raw_fact_sha256": "a5182c6e849b5b9cf978a2f6d15a47079c13318612e796dbd5b39c836c85e00d",
+          "visible_metric_original_indices": [
+            0,
+            1
+          ],
+          "raw_metric_count": 2,
+          "audit_groups": [
+            "important"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/6",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [
+            {
+              "consumer_metric_index": 0,
+              "original_metric_index": 0,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/6/metric_checks/0"
+            },
+            {
+              "consumer_metric_index": 1,
+              "original_metric_index": 1,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/6/metric_checks/1"
+            }
+          ],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F08",
+          "consumer_fact_sha256": "ca7a52d5e6b60119729cd56719e0a724e2199092c363440fa853feaca5004ac3",
+          "consumer_pointer": "/facts/7",
+          "fact": {
+            "fact_id": "F08",
+            "text": "制冷空调电器零部件业务2025年营业收入18,584,743,718.09元，占营业收入59.93%，同比增长12.22%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "制冷空调电器零部件营业收入",
+                "raw_value": "18,584,743,718.09",
+                "value": "18584743718.09",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "制冷空调电器零部件营业收入占营业收入比重",
+                "raw_value": "59.93%",
+                "value": "59.93",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "制冷空调电器零部件营业收入同比增减",
+                "raw_value": "12.22%",
+                "value": "12.22",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0005",
+              "record_pointer": "/workpaper/evidence/4",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                15
+              ],
+              "spans": [
+                {
+                  "page": 15,
+                  "start": 0,
+                  "end": 4436,
+                  "quote_sha256": "fde6abeff3de7e922ffa47a1fb4d4a5124377e61743c7fd8072263ff711d216c",
+                  "quote_pointer": "/workpaper/evidence/4/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "measurement",
+          "sampling_sha256": "e3e26a1e091b4ede2097267b218097dc0d4e68604da038b46887cb140564e7cb",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/scale_and_mix/facts/2",
+          "raw_fact_sha256": "ca7a52d5e6b60119729cd56719e0a724e2199092c363440fa853feaca5004ac3",
+          "visible_metric_original_indices": [
+            0,
+            1,
+            2
+          ],
+          "raw_metric_count": 3,
+          "audit_groups": [
+            "core",
+            "important"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/7",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [
+            {
+              "consumer_metric_index": 0,
+              "original_metric_index": 0,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/7/metric_checks/0"
+            },
+            {
+              "consumer_metric_index": 1,
+              "original_metric_index": 1,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/7/metric_checks/1"
+            },
+            {
+              "consumer_metric_index": 2,
+              "original_metric_index": 2,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/7/metric_checks/2"
+            }
+          ],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F09",
+          "consumer_fact_sha256": "e60f59dd4215912585722a75f67280e42a2eebed8e5f4996cd4d61e196292452",
+          "consumer_pointer": "/facts/8",
+          "fact": {
+            "fact_id": "F09",
+            "text": "汽车零部件业务2025年营业收入12,427,000,792.18元，占营业收入40.07%，同比增长9.14%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "汽车零部件营业收入",
+                "raw_value": "12,427,000,792.18",
+                "value": "12427000792.18",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "汽车零部件营业收入占营业收入比重",
+                "raw_value": "40.07%",
+                "value": "40.07",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "汽车零部件营业收入同比增减",
+                "raw_value": "9.14%",
+                "value": "9.14",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0005",
+              "record_pointer": "/workpaper/evidence/4",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                15
+              ],
+              "spans": [
+                {
+                  "page": 15,
+                  "start": 0,
+                  "end": 4436,
+                  "quote_sha256": "fde6abeff3de7e922ffa47a1fb4d4a5124377e61743c7fd8072263ff711d216c",
+                  "quote_pointer": "/workpaper/evidence/4/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "measurement",
+          "sampling_sha256": "db7b31dc8149ce7901f1977b30465d230fc3a00e37b3060c436b3d7476932ac1",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/scale_and_mix/facts/3",
+          "raw_fact_sha256": "e60f59dd4215912585722a75f67280e42a2eebed8e5f4996cd4d61e196292452",
+          "visible_metric_original_indices": [
+            0,
+            1,
+            2
+          ],
+          "raw_metric_count": 3,
+          "audit_groups": [
+            "core",
+            "important"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/8",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [
+            {
+              "consumer_metric_index": 0,
+              "original_metric_index": 0,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/8/metric_checks/0"
+            },
+            {
+              "consumer_metric_index": 1,
+              "original_metric_index": 1,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/8/metric_checks/1"
+            },
+            {
+              "consumer_metric_index": 2,
+              "original_metric_index": 2,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/8/metric_checks/2"
+            }
+          ],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F11",
+          "consumer_fact_sha256": "2d44931bf71a1bf686c6cc97cc18fb831d0b1b0ebe90a476db638610ed0a1a9a",
+          "consumer_pointer": "/facts/9",
+          "fact": {
+            "fact_id": "F11",
+            "text": "2025年国内销售营业收入17,688,255,578.87元，占营业收入57.04%；国外销售营业收入13,323,488,931.40元，占42.96%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "国内销售营业收入",
+                "raw_value": "17,688,255,578.87",
+                "value": "17688255578.87",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "地区销售为集团营业收入按地区拆分，枚举无地区维度；保留国内销售口径。"
+              },
+              {
+                "name": "国内销售营业收入占营业收入比重",
+                "raw_value": "57.04%",
+                "value": "57.04",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "地区销售为集团营业收入按地区拆分，枚举无地区维度；保留国内销售口径。"
+              },
+              {
+                "name": "国外销售营业收入",
+                "raw_value": "13,323,488,931.40",
+                "value": "13323488931.40",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "地区销售为集团营业收入按地区拆分，枚举无地区维度；保留国外销售口径。"
+              },
+              {
+                "name": "国外销售营业收入占营业收入比重",
+                "raw_value": "42.96%",
+                "value": "42.96",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "地区销售为集团营业收入按地区拆分，枚举无地区维度；保留国外销售口径。"
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "state": "limited",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。",
+            "保留原文主体、数值或近似限定，不作为确定值使用。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0005",
+              "record_pointer": "/workpaper/evidence/4",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                15
+              ],
+              "spans": [
+                {
+                  "page": 15,
+                  "start": 0,
+                  "end": 4436,
+                  "quote_sha256": "fde6abeff3de7e922ffa47a1fb4d4a5124377e61743c7fd8072263ff711d216c",
+                  "quote_pointer": "/workpaper/evidence/4/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "measurement",
+          "sampling_sha256": "abcd723be00bd059a773603a0955392b874c3ac59e454f4563e4714c0aeb3056",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/customers_channels_markets/facts/0",
+          "raw_fact_sha256": "2d44931bf71a1bf686c6cc97cc18fb831d0b1b0ebe90a476db638610ed0a1a9a",
+          "visible_metric_original_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "raw_metric_count": 4,
+          "audit_groups": [
+            "important"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/9",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [
+            {
+              "consumer_metric_index": 0,
+              "original_metric_index": 0,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/9/metric_checks/0"
+            },
+            {
+              "consumer_metric_index": 1,
+              "original_metric_index": 1,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/9/metric_checks/1"
+            },
+            {
+              "consumer_metric_index": 2,
+              "original_metric_index": 2,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/9/metric_checks/2"
+            },
+            {
+              "consumer_metric_index": 3,
+              "original_metric_index": 3,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/9/metric_checks/3"
+            }
+          ],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F12",
+          "consumer_fact_sha256": "249cf1379b323f872f96a9309915b2a1eef487bb02eaaeb5b679d487cbc98eb9",
+          "consumer_pointer": "/facts/10",
+          "fact": {
+            "fact_id": "F12",
+            "text": "2025年前五名客户合计销售金额9,971,542,582.30元，占年度销售总额32.14%；前五名客户销售额中关联方销售额占年度销售总额0.00%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "前五名客户合计销售金额",
+                "raw_value": "9,971,542,582.30",
+                "value": "9971542582.30",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "前五名客户合计销售金额占年度销售总额比例",
+                "raw_value": "32.14%",
+                "value": "32.14",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "前五名客户销售额中关联方销售额占年度销售总额比例",
+                "raw_value": "0.00%",
+                "value": "0.00",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0008",
+              "record_pointer": "/workpaper/evidence/7",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "公司主要销售客户情况"
+              ],
+              "physical_pages": [
+                17
+              ],
+              "spans": [
+                {
+                  "page": 17,
+                  "start": 3363,
+                  "end": 3982,
+                  "quote_sha256": "fd4c4e0bf2e41b19a2e56d2fa60da84b8da1c9a8d0e6776063e4de15544b4633",
+                  "quote_pointer": "/workpaper/evidence/7/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "measurement",
+          "sampling_sha256": "25c2e5431c383c4a22fd156fd8bbd01bd67238bd2510364575b50667fd30009b",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/customers_channels_markets/facts/1",
+          "raw_fact_sha256": "249cf1379b323f872f96a9309915b2a1eef487bb02eaaeb5b679d487cbc98eb9",
+          "visible_metric_original_indices": [
+            0,
+            1,
+            2
+          ],
+          "raw_metric_count": 3,
+          "audit_groups": [
+            "important"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/10",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [
+            {
+              "consumer_metric_index": 0,
+              "original_metric_index": 0,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/10/metric_checks/0"
+            },
+            {
+              "consumer_metric_index": 1,
+              "original_metric_index": 1,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/10/metric_checks/1"
+            },
+            {
+              "consumer_metric_index": 2,
+              "original_metric_index": 2,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/10/metric_checks/2"
+            }
+          ],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F13",
+          "consumer_fact_sha256": "84454e9a9b290a9578a0f8905367840ed25a1d1613601b60d5e4d1dcb83c0cdb",
+          "consumer_pointer": "/facts/11",
+          "fact": {
+            "fact_id": "F13",
+            "text": "制冷空调电器零部件业务是全球家用空调、商用空调、商用制冷、工业制冷和小家电设备等市场的关键供应商；汽车零部件业务多款产品已进入大部分头部新能源汽车企业供应链批量供应。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0003",
+              "record_pointer": "/workpaper/evidence/2",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "physical_pages": [
+                10
+              ],
+              "spans": [
+                {
+                  "page": 10,
+                  "start": 162,
+                  "end": 1165,
+                  "quote_sha256": "69067991385ae17084fdb75e56ffa280b04ada0e001b151880dc6d2b1cd5931d",
+                  "quote_pointer": "/workpaper/evidence/2/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "9480802ab688310cb079761cb84ac9528cd00b76640e60c39e5c201f1e28cfc0",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/customers_channels_markets/facts/2",
+          "raw_fact_sha256": "84454e9a9b290a9578a0f8905367840ed25a1d1613601b60d5e4d1dcb83c0cdb",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "supplement"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/11",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F14",
+          "consumer_fact_sha256": "58a7c3e293a67aafac64bb32945adcd9ff4d7714c9feabb867f5e222cfb87851",
+          "consumer_pointer": "/facts/12",
+          "fact": {
+            "fact_id": "F14",
+            "text": "2025年制冷空调电器零部件业务聚焦核心客户和主导产品，推进新产品及迭代产品市场化、数据中心领域项目、阀类产品迭代切换和降本增效，以提升市场份额与产品竞争力。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0004",
+              "record_pointer": "/workpaper/evidence/3",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                14
+              ],
+              "spans": [
+                {
+                  "page": 14,
+                  "start": 359,
+                  "end": 1609,
+                  "quote_sha256": "a1133f9ae0c011d6508b365332cf5bbdcbe15b02fcc8ee3559c84ba927347b3b",
+                  "quote_pointer": "/workpaper/evidence/3/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "f0342766f2993de611f80e72dab08d19bd3cf7c32230ce610011aacde5e0d6e6",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/operating_drivers/facts/0",
+          "raw_fact_sha256": "58a7c3e293a67aafac64bb32945adcd9ff4d7714c9feabb867f5e222cfb87851",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "supplement"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/12",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F15",
+          "consumer_fact_sha256": "db3af16c78fefa78c219518fe977b176edef6504be1cc6c2a2ef05c6c5ad2091",
+          "consumer_pointer": "/facts/13",
+          "fact": {
+            "fact_id": "F15",
+            "text": "2025年汽车零部件业务从“跑马圈地”转向“精耕细作”，继续开拓全球业务，改善海外工厂运营，推进目标成本、综合降成、组织优化、产品研发、数智化及全球供应链和采购降成。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0004",
+              "record_pointer": "/workpaper/evidence/3",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                14
+              ],
+              "spans": [
+                {
+                  "page": 14,
+                  "start": 359,
+                  "end": 1609,
+                  "quote_sha256": "a1133f9ae0c011d6508b365332cf5bbdcbe15b02fcc8ee3559c84ba927347b3b",
+                  "quote_pointer": "/workpaper/evidence/3/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "780526928e8038e92189a8f05b4ede4a08045402022793cacb2b0af1e80282a4",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/operating_drivers/facts/1",
+          "raw_fact_sha256": "db3af16c78fefa78c219518fe977b176edef6504be1cc6c2a2ef05c6c5ad2091",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "supplement"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/13",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F16",
+          "consumer_fact_sha256": "1a9042340042f8046e12c11c59400e3bed4501c03d14a9fc45d4ab980c678a2f",
+          "consumer_pointer": "/facts/14",
+          "fact": {
+            "fact_id": "F16",
+            "text": "2025年战略新兴业务聚焦多款关键型号产品开展技术改进，配合客户进行研发、试制、迭代和送样，获得客户高度评价，并形成围绕现有产品的创新成果。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0005",
+              "record_pointer": "/workpaper/evidence/4",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                15
+              ],
+              "spans": [
+                {
+                  "page": 15,
+                  "start": 0,
+                  "end": 4436,
+                  "quote_sha256": "fde6abeff3de7e922ffa47a1fb4d4a5124377e61743c7fd8072263ff711d216c",
+                  "quote_pointer": "/workpaper/evidence/4/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "0048e6dc18e61c34e08d81999e375ae033211182543475e9d79e32f3f207f28a",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/operating_drivers/facts/2",
+          "raw_fact_sha256": "1a9042340042f8046e12c11c59400e3bed4501c03d14a9fc45d4ab980c678a2f",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "supplement"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/14",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F17",
+          "consumer_fact_sha256": "9a680011e253d901c41474f8b36f4ed12a549ac141f4bbbe470cc094a9c139d1",
+          "consumer_pointer": "/facts/15",
+          "fact": {
+            "fact_id": "F17",
+            "text": "报告期内公司合并范围发生变动：新增绍兴三花智能装备有限公司、香港三花有限公司、浙江三花商用制冷部件贸易有限公司等子公司；减少Sanhua Automotive USA INC、珠海恒途电子有限公司（注销）及绍兴三花新能源汽车部件有限公司（吸收合并）。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                17
+              ],
+              "spans": [
+                {
+                  "page": 17,
+                  "start": 0,
+                  "end": 3363,
+                  "quote_sha256": "50648405c266245b2ab22fac501350b347966429e1b17ebca129f48d11348a2e",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "7e3e71847d090db97b44613b2b9760a24516573aae19a16f5b881432690467d9",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/material_changes/facts/0",
+          "raw_fact_sha256": "9a680011e253d901c41474f8b36f4ed12a549ac141f4bbbe470cc094a9c139d1",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "supplement"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/15",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        }
+      ],
+      "excluded_objects": [],
+      "records": [
+        {
+          "work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-bbf1d6652ff60cfb2e9310ba.json",
+            "sha256": "8dcb252555b00963a58d73bd13920e8a296228bbe5e1583601b56644ed00d369",
+            "json_pointer": ""
+          },
+          "processing_identity": {
+            "execution_mode": "provider",
+            "logical_request_timeout_seconds": 2450.0,
+            "max_layout_characters": 500000,
+            "max_section_characters": 160000,
+            "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+            "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+            "prompt_version": "company_profile_workpaper.2026-11-28.subject-relationships.v22",
+            "quality_review_profile": "semantic_extraction__scorpio_grok",
+            "reading_strategy": "chapter_workpaper_v1",
+            "repair_profile": "semantic_extraction__deepseek",
+            "review_max_output_tokens": 16384,
+            "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+            "semantic_policy": "company_profile_llm_led.v2",
+            "semantic_reuse": false,
+            "source_binding_policy": "company_workpaper_source_literals.column-wrapped-amounts.v8",
+            "workpaper_format_recovery": "local_shape_before_retry.v3",
+            "workpaper_max_output_tokens": 12000,
+            "workpaper_metric_format_policy": "source_metric_unparsed_value_null.v2.raw-null-accounting",
+            "workpaper_metric_limit_policy": "source_review_exact_metric_limits.v1",
+            "workpaper_review_execution": "deferred",
+            "workpaper_review_policy": "company_profile_workpaper_review.v16",
+            "workpaper_subject_scope_limit_policy": "source_review_exact_subject_limits.v1"
+          },
+          "human_restrictions_present": false,
+          "calls": [
+            {
+              "call_pointer": "/workpaper/generation/selection",
+              "purpose": "select_profile_sections",
+              "request_id": "bp-work-bbf1d6652ff60cfb2e9310ba:workpaper:sections",
+              "request_hash": "c26af0e054cc9dea5faa4760ed8760268ba3f031bf4eac8712a6daecd49908ce",
+              "response_hash": "1b283d03c08194ce193ec9a400835111f8e478eb01a8b6b3e89fa479c4274701",
+              "model": "deepseek-flash",
+              "source_label": "deepseek:deepseek-flash",
+              "finish_reason": "stop",
+              "receipt_binding": "matched_exact",
+              "receipt_pointers": [
+                "/workpaper_receipts/0"
+              ]
+            },
+            {
+              "call_pointer": "/workpaper/generation/extraction",
+              "purpose": "extract_profile_workpaper",
+              "request_id": "bp-work-bbf1d6652ff60cfb2e9310ba:workpaper:extract",
+              "request_hash": "180f338a6a616805609c920cf3cb56a1364eb7682903cf4798b4d8c43698c84a",
+              "response_hash": "0e5187b9c0be114838cfb70e03a0719e2db9b36efe48c07996233d8a816f7eed",
+              "model": "deepseek-flash",
+              "source_label": "deepseek:deepseek-flash",
+              "finish_reason": "stop",
+              "receipt_binding": "matched_exact",
+              "receipt_pointers": [
+                "/workpaper_receipts/1"
+              ]
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "state": "final",
+        "supplement_target": 20,
+        "supplement_universe": 5,
+        "mandatory_unique_objects": 10,
+        "selected_unique_union": 15,
+        "selected_supplement": 5,
+        "semantic_duplicates": 1,
+        "unique_objects": 15,
+        "verification_errors": []
+      },
+      "verification_errors": [],
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "element": "products_services",
+          "status": "observed",
+          "reasons": [
+            "所选章节未披露战略新兴业务的收入金额，故未纳入收入构成。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "element": "operations_and_inputs",
+          "status": "unclear",
+          "reasons": [
+            "所选章节仅披露成本构成，未披露具体原材料品种或供应商。",
+            "事实F10已隔离，未作为结论采用：metric number is absent from cited source: 通用设备制造业营业成本中材料金额"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "element": "customers_channels_markets",
+          "status": "observed",
+          "reasons": [
+            "未披露前五名客户的具体名称，仅列示第一名至第五名，故不推断具体客户。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "element": "material_changes",
+          "status": "observed",
+          "reasons": [
+            "未在所选章节展开各合并范围变动对收入或利润的影响。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "metric_gaps": [],
+      "suggested_acquisitions": [],
+      "A_core_conditions": [
+        {
+          "condition_id": "C1",
+          "view": "company_profile",
+          "supported": true,
+          "supporting_fact_ids": [
+            "F01"
+          ],
+          "reason": "A按原文与实际可读基础描述核实主营/产品应用/变现三问，重要业务实质覆盖；局部可隔离经营尾项错误不一票否决公司，准确率仍逐对象计错。"
+        },
+        {
+          "condition_id": "C2",
+          "view": "company_profile",
+          "supported": true,
+          "supporting_fact_ids": [
+            "F02",
+            "F03"
+          ],
+          "reason": "A按原文与实际可读基础描述核实主营/产品应用/变现三问，重要业务实质覆盖；局部可隔离经营尾项错误不一票否决公司，准确率仍逐对象计错。"
+        },
+        {
+          "condition_id": "C3",
+          "view": "company_profile",
+          "supported": true,
+          "supporting_fact_ids": [
+            "F05",
+            "F08",
+            "F09"
+          ],
+          "reason": "A按原文与实际可读基础描述核实主营/产品应用/变现三问，重要业务实质覆盖；局部可隔离经营尾项错误不一票否决公司，准确率仍逐对象计错。"
+        }
+      ],
+      "independent_review_source": {
+        "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-audit-final.json",
+        "sha256": "96efe13aada4523fda78c24097588de2399a90c0fb0b41432920892924de3336",
+        "json_pointer": "/companies/2/phases/first"
+      },
+      "A_usable": true,
+      "A_source_reference_sha256": "72aced4c252482852f59380ce9613a932c8d7f66bb6e9b5dd20478dda3d60a41"
+    },
+    "automatic_final": {
+      "state": "delivered",
+      "api": {
+        "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/002050.SZ/run/automatic-final-api.json",
+        "sha256": "ed3945c989776b2692461a59f77095302ff3df7c7a61f9ec2cd8d2c679ffb420",
+        "json_pointer": ""
+      },
+      "report": {
+        "instrument_id": "002050.SZ",
+        "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+        "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-23T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "objects": [
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "fact_id": "F01",
+          "consumer_fact_sha256": "8dcb5cfc3e26b936c4267a4b7510cb25b76f0a34f3dbdd8d3a471484390d7932",
+          "consumer_pointer": "/facts/16",
+          "fact": {
+            "fact_id": "F01",
+            "text": "公司以热泵技术和热管理系统的研发与应用为核心，业务横跨制冷空调电器零部件和汽车零部件两大板块，并基于长期技术积累向仿生机器人机电执行器等新兴领域拓展。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0003",
+              "record_pointer": "/workpaper/evidence/2",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "physical_pages": [
+                10
+              ],
+              "spans": [
+                {
+                  "page": 10,
+                  "start": 162,
+                  "end": 1165,
+                  "quote_sha256": "69067991385ae17084fdb75e56ffa280b04ada0e001b151880dc6d2b1cd5931d",
+                  "quote_pointer": "/workpaper/evidence/2/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "aa480acb67966ec694daf476eb13b6472be543859114cdb54939868f2c82f674",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+            "sha256": "1c7a555c38d7a7300cc52fabc5d464c8d2d420af3e96444167c04f76d7f0561a",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/business_structure/facts/0",
+          "raw_fact_sha256": "8dcb5cfc3e26b936c4267a4b7510cb25b76f0a34f3dbdd8d3a471484390d7932",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "core"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/0",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "fact_id": "F02",
+          "consumer_fact_sha256": "2d9d72284b3b003e8204c8c4d2caebbf5fef38248195cfd626667166e07e8d16",
+          "consumer_pointer": "/facts/17",
+          "fact": {
+            "fact_id": "F02",
+            "text": "制冷空调电器零部件业务提供控制元器件、子系统和技术解决方案，关键产品包括电子膨胀阀、四通换向阀、截止阀、电磁阀、球阀等阀类，以及微通道换热器、Omega泵和控制器；产品用于空调、冰箱、工业制冷、冷链运输、热泵采暖及洗衣机等领域。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0003",
+              "record_pointer": "/workpaper/evidence/2",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "physical_pages": [
+                10
+              ],
+              "spans": [
+                {
+                  "page": 10,
+                  "start": 162,
+                  "end": 1165,
+                  "quote_sha256": "69067991385ae17084fdb75e56ffa280b04ada0e001b151880dc6d2b1cd5931d",
+                  "quote_pointer": "/workpaper/evidence/2/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "fb55c0760c7b4441d3680d4e03fb923f5d68935ad1ec7ebfcc4528da82fb5334",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+            "sha256": "1c7a555c38d7a7300cc52fabc5d464c8d2d420af3e96444167c04f76d7f0561a",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/products_services/facts/0",
+          "raw_fact_sha256": "2d9d72284b3b003e8204c8c4d2caebbf5fef38248195cfd626667166e07e8d16",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "core"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/1",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "fact_id": "F03",
+          "consumer_fact_sha256": "1cd971afad0a887bdc32a1ef8ff5e76e865c5aca01648640abc23de0e40fa89f",
+          "consumer_pointer": "/facts/18",
+          "fact": {
+            "fact_id": "F03",
+            "text": "汽车零部件业务为新能源汽车及传统燃油车提供热管理控制解决方案，产品包括电子膨胀阀、电子水泵、电子水阀、板式换热器和集成组件，覆盖座舱热管理、电池热管理及电机/电控系统热管理。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0003",
+              "record_pointer": "/workpaper/evidence/2",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "physical_pages": [
+                10
+              ],
+              "spans": [
+                {
+                  "page": 10,
+                  "start": 162,
+                  "end": 1165,
+                  "quote_sha256": "69067991385ae17084fdb75e56ffa280b04ada0e001b151880dc6d2b1cd5931d",
+                  "quote_pointer": "/workpaper/evidence/2/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "7b7ae6d279f90581b0cb244b8c89f125842057cdbdbbccb0d82edb5f1b3264c4",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+            "sha256": "1c7a555c38d7a7300cc52fabc5d464c8d2d420af3e96444167c04f76d7f0561a",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/products_services/facts/1",
+          "raw_fact_sha256": "1cd971afad0a887bdc32a1ef8ff5e76e865c5aca01648640abc23de0e40fa89f",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "core"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/2",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "fact_id": "F05",
+          "consumer_fact_sha256": "375cd3c9aa8ba2823a004cd4484942885bb537d61493ea3725c24af32bda06fe",
+          "consumer_pointer": "/facts/19",
+          "fact": {
+            "fact_id": "F05",
+            "text": "公司通过销售制冷空调电器零部件、汽车零部件等产品取得收入，销售模式以直销为主；2025年直销收入占营业收入98.64%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "直销收入占营业收入比重",
+                "raw_value": "98.64%",
+                "value": "98.64",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "销售模式为收入渠道口径，非业务板块或公司整体；保留原文直销占比。"
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "state": "limited",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [
+            "保留原文主体、数值或近似限定，不作为确定值使用。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0005",
+              "record_pointer": "/workpaper/evidence/4",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                15
+              ],
+              "spans": [
+                {
+                  "page": 15,
+                  "start": 0,
+                  "end": 4436,
+                  "quote_sha256": "fde6abeff3de7e922ffa47a1fb4d4a5124377e61743c7fd8072263ff711d216c",
+                  "quote_pointer": "/workpaper/evidence/4/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "measurement",
+          "sampling_sha256": "4570dfef882a7c96637c0c1b88bc7a7b1a1efd4456f2d2cc8a608e27406a77e7",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+            "sha256": "1c7a555c38d7a7300cc52fabc5d464c8d2d420af3e96444167c04f76d7f0561a",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/revenue_model/facts/0",
+          "raw_fact_sha256": "375cd3c9aa8ba2823a004cd4484942885bb537d61493ea3725c24af32bda06fe",
+          "visible_metric_original_indices": [
+            0
+          ],
+          "raw_metric_count": 1,
+          "audit_groups": [
+            "core",
+            "important"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/3",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [
+            {
+              "consumer_metric_index": 0,
+              "original_metric_index": 0,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/3/metric_checks/0"
+            }
+          ],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "fact_id": "F06",
+          "consumer_fact_sha256": "c15d78d46cbe5205d293c56bc5155afb2e837cccec92299799030eafea8825f8",
+          "consumer_pointer": "/facts/20",
+          "fact": {
+            "fact_id": "F06",
+            "text": "2025年公司实现营业收入31,011,744,510.27元，同比增长10.97%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入",
+                "raw_value": "31,011,744,510.27",
+                "value": "31011744510.27",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入同比增减",
+                "raw_value": "10.97%",
+                "value": "10.97",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "record_pointer": "/workpaper/evidence/0",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第二节 公司简介和主要财务指标",
+                "六、主要会计数据和财务指标"
+              ],
+              "physical_pages": [
+                7
+              ],
+              "spans": [
+                {
+                  "page": 7,
+                  "start": 900,
+                  "end": 2734,
+                  "quote_sha256": "54df3850fea83159bc9d83fdcfba1a2ad82da2c94eb5c592341dd79bdff98956",
+                  "quote_pointer": "/workpaper/evidence/0/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "measurement",
+          "sampling_sha256": "85af51af6409696cdac174afbccddce393db64833069b88eaa4dd4317011c7d4",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+            "sha256": "1c7a555c38d7a7300cc52fabc5d464c8d2d420af3e96444167c04f76d7f0561a",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/scale_and_mix/facts/0",
+          "raw_fact_sha256": "c15d78d46cbe5205d293c56bc5155afb2e837cccec92299799030eafea8825f8",
+          "visible_metric_original_indices": [
+            0,
+            1
+          ],
+          "raw_metric_count": 2,
+          "audit_groups": [
+            "important"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/4",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [
+            {
+              "consumer_metric_index": 0,
+              "original_metric_index": 0,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/4/metric_checks/0"
+            },
+            {
+              "consumer_metric_index": 1,
+              "original_metric_index": 1,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/4/metric_checks/1"
+            }
+          ],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "fact_id": "F07",
+          "consumer_fact_sha256": "a5182c6e849b5b9cf978a2f6d15a47079c13318612e796dbd5b39c836c85e00d",
+          "consumer_pointer": "/facts/21",
+          "fact": {
+            "fact_id": "F07",
+            "text": "2025年归属于上市公司股东的净利润4,062,891,412.10元，同比增长31.10%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [
+              {
+                "name": "归属于上市公司股东的净利润",
+                "raw_value": "4,062,891,412.10",
+                "value": "4062891412.10",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "归属于上市公司股东的净利润同比增减",
+                "raw_value": "31.10%",
+                "value": "31.10",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "record_pointer": "/workpaper/evidence/0",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第二节 公司简介和主要财务指标",
+                "六、主要会计数据和财务指标"
+              ],
+              "physical_pages": [
+                7
+              ],
+              "spans": [
+                {
+                  "page": 7,
+                  "start": 900,
+                  "end": 2734,
+                  "quote_sha256": "54df3850fea83159bc9d83fdcfba1a2ad82da2c94eb5c592341dd79bdff98956",
+                  "quote_pointer": "/workpaper/evidence/0/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "measurement",
+          "sampling_sha256": "585a7c5c878cd349abc3b997ea7a177516e06176fdf6e34e840ebfaa8fda3c66",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+            "sha256": "1c7a555c38d7a7300cc52fabc5d464c8d2d420af3e96444167c04f76d7f0561a",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/scale_and_mix/facts/1",
+          "raw_fact_sha256": "a5182c6e849b5b9cf978a2f6d15a47079c13318612e796dbd5b39c836c85e00d",
+          "visible_metric_original_indices": [
+            0,
+            1
+          ],
+          "raw_metric_count": 2,
+          "audit_groups": [
+            "important"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/5",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [
+            {
+              "consumer_metric_index": 0,
+              "original_metric_index": 0,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/5/metric_checks/0"
+            },
+            {
+              "consumer_metric_index": 1,
+              "original_metric_index": 1,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/5/metric_checks/1"
+            }
+          ],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "fact_id": "F08",
+          "consumer_fact_sha256": "ca7a52d5e6b60119729cd56719e0a724e2199092c363440fa853feaca5004ac3",
+          "consumer_pointer": "/facts/22",
+          "fact": {
+            "fact_id": "F08",
+            "text": "制冷空调电器零部件业务2025年营业收入18,584,743,718.09元，占营业收入59.93%，同比增长12.22%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "制冷空调电器零部件营业收入",
+                "raw_value": "18,584,743,718.09",
+                "value": "18584743718.09",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "制冷空调电器零部件营业收入占营业收入比重",
+                "raw_value": "59.93%",
+                "value": "59.93",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "制冷空调电器零部件营业收入同比增减",
+                "raw_value": "12.22%",
+                "value": "12.22",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0005",
+              "record_pointer": "/workpaper/evidence/4",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                15
+              ],
+              "spans": [
+                {
+                  "page": 15,
+                  "start": 0,
+                  "end": 4436,
+                  "quote_sha256": "fde6abeff3de7e922ffa47a1fb4d4a5124377e61743c7fd8072263ff711d216c",
+                  "quote_pointer": "/workpaper/evidence/4/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "measurement",
+          "sampling_sha256": "b1a32661c7ac848baab8cc15092d6570c718521f186adee251dc376899bb66bb",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+            "sha256": "1c7a555c38d7a7300cc52fabc5d464c8d2d420af3e96444167c04f76d7f0561a",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/scale_and_mix/facts/2",
+          "raw_fact_sha256": "ca7a52d5e6b60119729cd56719e0a724e2199092c363440fa853feaca5004ac3",
+          "visible_metric_original_indices": [
+            0,
+            1,
+            2
+          ],
+          "raw_metric_count": 3,
+          "audit_groups": [
+            "core",
+            "important"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/6",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [
+            {
+              "consumer_metric_index": 0,
+              "original_metric_index": 0,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/6/metric_checks/0"
+            },
+            {
+              "consumer_metric_index": 1,
+              "original_metric_index": 1,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/6/metric_checks/1"
+            },
+            {
+              "consumer_metric_index": 2,
+              "original_metric_index": 2,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/6/metric_checks/2"
+            }
+          ],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "fact_id": "F09",
+          "consumer_fact_sha256": "e60f59dd4215912585722a75f67280e42a2eebed8e5f4996cd4d61e196292452",
+          "consumer_pointer": "/facts/23",
+          "fact": {
+            "fact_id": "F09",
+            "text": "汽车零部件业务2025年营业收入12,427,000,792.18元，占营业收入40.07%，同比增长9.14%。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "汽车零部件营业收入",
+                "raw_value": "12,427,000,792.18",
+                "value": "12427000792.18",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "汽车零部件营业收入占营业收入比重",
+                "raw_value": "40.07%",
+                "value": "40.07",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "汽车零部件营业收入同比增减",
+                "raw_value": "9.14%",
+                "value": "9.14",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0005",
+              "record_pointer": "/workpaper/evidence/4",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                15
+              ],
+              "spans": [
+                {
+                  "page": 15,
+                  "start": 0,
+                  "end": 4436,
+                  "quote_sha256": "fde6abeff3de7e922ffa47a1fb4d4a5124377e61743c7fd8072263ff711d216c",
+                  "quote_pointer": "/workpaper/evidence/4/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "measurement",
+          "sampling_sha256": "8ae23f01540373fce1ae547bc6e198d5392ac694b0a98148516777e1bdeb93d1",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+            "sha256": "1c7a555c38d7a7300cc52fabc5d464c8d2d420af3e96444167c04f76d7f0561a",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/scale_and_mix/facts/3",
+          "raw_fact_sha256": "e60f59dd4215912585722a75f67280e42a2eebed8e5f4996cd4d61e196292452",
+          "visible_metric_original_indices": [
+            0,
+            1,
+            2
+          ],
+          "raw_metric_count": 3,
+          "audit_groups": [
+            "core",
+            "important"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/7",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [
+            {
+              "consumer_metric_index": 0,
+              "original_metric_index": 0,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/7/metric_checks/0"
+            },
+            {
+              "consumer_metric_index": 1,
+              "original_metric_index": 1,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/7/metric_checks/1"
+            },
+            {
+              "consumer_metric_index": 2,
+              "original_metric_index": 2,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/7/metric_checks/2"
+            }
+          ],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "fact_id": "F11",
+          "consumer_fact_sha256": "2d44931bf71a1bf686c6cc97cc18fb831d0b1b0ebe90a476db638610ed0a1a9a",
+          "consumer_pointer": "/facts/24",
+          "fact": {
+            "fact_id": "F11",
+            "text": "2025年国内销售营业收入17,688,255,578.87元，占营业收入57.04%；国外销售营业收入13,323,488,931.40元，占42.96%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "国内销售营业收入",
+                "raw_value": "17,688,255,578.87",
+                "value": "17688255578.87",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "地区销售为集团营业收入按地区拆分，枚举无地区维度；保留国内销售口径。"
+              },
+              {
+                "name": "国内销售营业收入占营业收入比重",
+                "raw_value": "57.04%",
+                "value": "57.04",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "地区销售为集团营业收入按地区拆分，枚举无地区维度；保留国内销售口径。"
+              },
+              {
+                "name": "国外销售营业收入",
+                "raw_value": "13,323,488,931.40",
+                "value": "13323488931.40",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "地区销售为集团营业收入按地区拆分，枚举无地区维度；保留国外销售口径。"
+              },
+              {
+                "name": "国外销售营业收入占营业收入比重",
+                "raw_value": "42.96%",
+                "value": "42.96",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "unclear",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": "地区销售为集团营业收入按地区拆分，枚举无地区维度；保留国外销售口径。"
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "state": "limited",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [
+            "保留原文主体、数值或近似限定，不作为确定值使用。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0005",
+              "record_pointer": "/workpaper/evidence/4",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                15
+              ],
+              "spans": [
+                {
+                  "page": 15,
+                  "start": 0,
+                  "end": 4436,
+                  "quote_sha256": "fde6abeff3de7e922ffa47a1fb4d4a5124377e61743c7fd8072263ff711d216c",
+                  "quote_pointer": "/workpaper/evidence/4/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "measurement",
+          "sampling_sha256": "b451e36fe0c0a8574e24d2a23c9ee4ea828cfbd8814af5f4ce1f7d214e4627a0",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+            "sha256": "1c7a555c38d7a7300cc52fabc5d464c8d2d420af3e96444167c04f76d7f0561a",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/customers_channels_markets/facts/0",
+          "raw_fact_sha256": "2d44931bf71a1bf686c6cc97cc18fb831d0b1b0ebe90a476db638610ed0a1a9a",
+          "visible_metric_original_indices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "raw_metric_count": 4,
+          "audit_groups": [
+            "important"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/8",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [
+            {
+              "consumer_metric_index": 0,
+              "original_metric_index": 0,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/8/metric_checks/0"
+            },
+            {
+              "consumer_metric_index": 1,
+              "original_metric_index": 1,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/8/metric_checks/1"
+            },
+            {
+              "consumer_metric_index": 2,
+              "original_metric_index": 2,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/8/metric_checks/2"
+            },
+            {
+              "consumer_metric_index": 3,
+              "original_metric_index": 3,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/8/metric_checks/3"
+            }
+          ],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "fact_id": "F12",
+          "consumer_fact_sha256": "249cf1379b323f872f96a9309915b2a1eef487bb02eaaeb5b679d487cbc98eb9",
+          "consumer_pointer": "/facts/25",
+          "fact": {
+            "fact_id": "F12",
+            "text": "2025年前五名客户合计销售金额9,971,542,582.30元，占年度销售总额32.14%；前五名客户销售额中关联方销售额占年度销售总额0.00%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "前五名客户合计销售金额",
+                "raw_value": "9,971,542,582.30",
+                "value": "9971542582.30",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "前五名客户合计销售金额占年度销售总额比例",
+                "raw_value": "32.14%",
+                "value": "32.14",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "前五名客户销售额中关联方销售额占年度销售总额比例",
+                "raw_value": "0.00%",
+                "value": "0.00",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0008",
+              "record_pointer": "/workpaper/evidence/7",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "公司主要销售客户情况"
+              ],
+              "physical_pages": [
+                17
+              ],
+              "spans": [
+                {
+                  "page": 17,
+                  "start": 3363,
+                  "end": 3982,
+                  "quote_sha256": "fd4c4e0bf2e41b19a2e56d2fa60da84b8da1c9a8d0e6776063e4de15544b4633",
+                  "quote_pointer": "/workpaper/evidence/7/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "measurement",
+          "sampling_sha256": "2d1119f1e32fe2137b6f24fa941a7c00d7daece391e80903498427bbf2d5e2d4",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+            "sha256": "1c7a555c38d7a7300cc52fabc5d464c8d2d420af3e96444167c04f76d7f0561a",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/customers_channels_markets/facts/1",
+          "raw_fact_sha256": "249cf1379b323f872f96a9309915b2a1eef487bb02eaaeb5b679d487cbc98eb9",
+          "visible_metric_original_indices": [
+            0,
+            1,
+            2
+          ],
+          "raw_metric_count": 3,
+          "audit_groups": [
+            "important"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/9",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [
+            {
+              "consumer_metric_index": 0,
+              "original_metric_index": 0,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/9/metric_checks/0"
+            },
+            {
+              "consumer_metric_index": 1,
+              "original_metric_index": 1,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/9/metric_checks/1"
+            },
+            {
+              "consumer_metric_index": 2,
+              "original_metric_index": 2,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/9/metric_checks/2"
+            }
+          ],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "fact_id": "F13",
+          "consumer_fact_sha256": "beb91895ddad040812672925e058cebdfda21e1f6140c02c547261734aeb9a13",
+          "consumer_pointer": "/facts/26",
+          "fact": {
+            "fact_id": "F13",
+            "text": "制冷空调电器零部件业务方面，公司是全球家用空调、商用空调、商用制冷、工业制冷和小家电设备等市场制冷空调控制元器件的关键供应商；汽车零部件业务多款产品已进入大部分头部新能源汽车企业供应链进行批量供应。",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": "原文同一事实并列制冷空调电器零部件业务和汽车零部件业务两个业务板块，单一 subject_scope 无法同时忠实表达，未将其视为集团整体口径。"
+          },
+          "state": "limited",
+          "review_basis": "model_source_check",
+          "model_review_stage": "final",
+          "reasons": [
+            "原文同一事实并列制冷空调电器零部件业务和汽车零部件业务两个业务板块，单一 subject_scope 无法同时忠实表达，未将其视为集团整体口径。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0003",
+              "record_pointer": "/workpaper/evidence/2",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的主要业务"
+              ],
+              "physical_pages": [
+                10
+              ],
+              "spans": [
+                {
+                  "page": 10,
+                  "start": 162,
+                  "end": 1165,
+                  "quote_sha256": "69067991385ae17084fdb75e56ffa280b04ada0e001b151880dc6d2b1cd5931d",
+                  "quote_pointer": "/workpaper/evidence/2/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "other",
+          "sampling_sha256": "c808b025e99b2d4561a098d87c0f1f6b4a0cbb9d8f5a89462706445191bf0bb6",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+            "sha256": "1c7a555c38d7a7300cc52fabc5d464c8d2d420af3e96444167c04f76d7f0561a",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/customers_channels_markets/facts/2",
+          "raw_fact_sha256": "beb91895ddad040812672925e058cebdfda21e1f6140c02c547261734aeb9a13",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "supplement"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/10",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "fact_id": "F14",
+          "consumer_fact_sha256": "58a7c3e293a67aafac64bb32945adcd9ff4d7714c9feabb867f5e222cfb87851",
+          "consumer_pointer": "/facts/27",
+          "fact": {
+            "fact_id": "F14",
+            "text": "2025年制冷空调电器零部件业务聚焦核心客户和主导产品，推进新产品及迭代产品市场化、数据中心领域项目、阀类产品迭代切换和降本增效，以提升市场份额与产品竞争力。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0004",
+              "record_pointer": "/workpaper/evidence/3",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                14
+              ],
+              "spans": [
+                {
+                  "page": 14,
+                  "start": 359,
+                  "end": 1609,
+                  "quote_sha256": "a1133f9ae0c011d6508b365332cf5bbdcbe15b02fcc8ee3559c84ba927347b3b",
+                  "quote_pointer": "/workpaper/evidence/3/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "29035f8a192f94356d81a989be47431857ef30e64736b588cd7229e86d8befb1",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+            "sha256": "1c7a555c38d7a7300cc52fabc5d464c8d2d420af3e96444167c04f76d7f0561a",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/operating_drivers/facts/0",
+          "raw_fact_sha256": "58a7c3e293a67aafac64bb32945adcd9ff4d7714c9feabb867f5e222cfb87851",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "supplement"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/11",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "fact_id": "F15",
+          "consumer_fact_sha256": "db3af16c78fefa78c219518fe977b176edef6504be1cc6c2a2ef05c6c5ad2091",
+          "consumer_pointer": "/facts/28",
+          "fact": {
+            "fact_id": "F15",
+            "text": "2025年汽车零部件业务从“跑马圈地”转向“精耕细作”，继续开拓全球业务，改善海外工厂运营，推进目标成本、综合降成、组织优化、产品研发、数智化及全球供应链和采购降成。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0004",
+              "record_pointer": "/workpaper/evidence/3",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                14
+              ],
+              "spans": [
+                {
+                  "page": 14,
+                  "start": 359,
+                  "end": 1609,
+                  "quote_sha256": "a1133f9ae0c011d6508b365332cf5bbdcbe15b02fcc8ee3559c84ba927347b3b",
+                  "quote_pointer": "/workpaper/evidence/3/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "d05a5b739db25b3852fb5bbd49b3668011e5fee4173b56f5a8ea5d0f5f561188",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+            "sha256": "1c7a555c38d7a7300cc52fabc5d464c8d2d420af3e96444167c04f76d7f0561a",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/operating_drivers/facts/1",
+          "raw_fact_sha256": "db3af16c78fefa78c219518fe977b176edef6504be1cc6c2a2ef05c6c5ad2091",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "supplement"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/12",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "fact_id": "F16",
+          "consumer_fact_sha256": "2b6d97e6ce4e8832e5db0d3c3b236a1bb3afbeb58a4c7c2fe3d70aa09c5a5bb3",
+          "consumer_pointer": "/facts/29",
+          "fact": {
+            "fact_id": "F16",
+            "text": "2025年，战略新兴业务方面，公司聚焦多款关键型号产品开展技术改进，配合客户进行重点产品研发、试制、迭代、送样，获得客户高度评价，并取得一系列围绕现有产品的创新成果。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004",
+              "source-0005"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "final",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0004",
+              "record_pointer": "/workpaper/evidence/3",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                14
+              ],
+              "spans": [
+                {
+                  "page": 14,
+                  "start": 359,
+                  "end": 1609,
+                  "quote_sha256": "a1133f9ae0c011d6508b365332cf5bbdcbe15b02fcc8ee3559c84ba927347b3b",
+                  "quote_pointer": "/workpaper/evidence/3/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0005",
+              "record_pointer": "/workpaper/evidence/4",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                15
+              ],
+              "spans": [
+                {
+                  "page": 15,
+                  "start": 0,
+                  "end": 4436,
+                  "quote_sha256": "fde6abeff3de7e922ffa47a1fb4d4a5124377e61743c7fd8072263ff711d216c",
+                  "quote_pointer": "/workpaper/evidence/4/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "2dfc0af6856478b3a99b3de36e65022a0de4369662ffbde16edd983fd421e132",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+            "sha256": "1c7a555c38d7a7300cc52fabc5d464c8d2d420af3e96444167c04f76d7f0561a",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/operating_drivers/facts/2",
+          "raw_fact_sha256": "2b6d97e6ce4e8832e5db0d3c3b236a1bb3afbeb58a4c7c2fe3d70aa09c5a5bb3",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "supplement"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/13",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "fact_id": "F17",
+          "consumer_fact_sha256": "9a680011e253d901c41474f8b36f4ed12a549ac141f4bbbe470cc094a9c139d1",
+          "consumer_pointer": "/facts/30",
+          "fact": {
+            "fact_id": "F17",
+            "text": "报告期内公司合并范围发生变动：新增绍兴三花智能装备有限公司、香港三花有限公司、浙江三花商用制冷部件贸易有限公司等子公司；减少Sanhua Automotive USA INC、珠海恒途电子有限公司（注销）及绍兴三花新能源汽车部件有限公司（吸收合并）。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、主营业务分析"
+              ],
+              "physical_pages": [
+                17
+              ],
+              "spans": [
+                {
+                  "page": 17,
+                  "start": 0,
+                  "end": 3363,
+                  "quote_sha256": "50648405c266245b2ab22fac501350b347966429e1b17ebca129f48d11348a2e",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "1eddc2e5c805e2e7a09542a1a7fa03e78652c9328da0a461c74c38e037026afa",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+            "sha256": "1c7a555c38d7a7300cc52fabc5d464c8d2d420af3e96444167c04f76d7f0561a",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "002050.SZ",
+            "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+            "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-23T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/material_changes/facts/0",
+          "raw_fact_sha256": "9a680011e253d901c41474f8b36f4ed12a549ac141f4bbbe470cc094a9c139d1",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "supplement"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/14",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        }
+      ],
+      "excluded_objects": [
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F01",
+          "pointer": "/facts/0",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F02",
+          "pointer": "/facts/1",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F03",
+          "pointer": "/facts/2",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F04",
+          "pointer": "/facts/3",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F05",
+          "pointer": "/facts/4",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。",
+            "保留原文主体、数值或近似限定，不作为确定值使用。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F06",
+          "pointer": "/facts/5",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F07",
+          "pointer": "/facts/6",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F08",
+          "pointer": "/facts/7",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F09",
+          "pointer": "/facts/8",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F11",
+          "pointer": "/facts/9",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。",
+            "保留原文主体、数值或近似限定，不作为确定值使用。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F12",
+          "pointer": "/facts/10",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F13",
+          "pointer": "/facts/11",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F14",
+          "pointer": "/facts/12",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F15",
+          "pointer": "/facts/13",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F16",
+          "pointer": "/facts/14",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "fact_id": "F17",
+          "pointer": "/facts/15",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        }
+      ],
+      "records": [
+        {
+          "work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-5b933c3f4b3dbf103c7337d4.json",
+            "sha256": "1c7a555c38d7a7300cc52fabc5d464c8d2d420af3e96444167c04f76d7f0561a",
+            "json_pointer": ""
+          },
+          "processing_identity": {
+            "execution_mode": "provider",
+            "logical_request_timeout_seconds": 2450.0,
+            "max_layout_characters": 500000,
+            "max_section_characters": 160000,
+            "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+            "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+            "prompt_version": "company_profile_workpaper.2026-11-28.subject-relationships.v22",
+            "quality_review_profile": "semantic_extraction__scorpio_grok",
+            "reading_strategy": "chapter_workpaper_v1",
+            "repair_profile": "semantic_extraction__deepseek",
+            "review_existing_draft_hash": "79d91b0ec28675ed030ca6183c6bcd65dcc53805e4929eb290d93ae705f8aadf",
+            "review_max_output_tokens": 16384,
+            "review_seed_receipts_hash": "49dd6f7824a85b90ba9c631562c2ef1d5178316dfc8e2f3161d02f524f5d5162",
+            "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+            "semantic_policy": "company_profile_llm_led.v2",
+            "semantic_reuse": false,
+            "source_binding_policy": "company_workpaper_source_literals.column-wrapped-amounts.v8",
+            "workpaper_format_recovery": "local_shape_before_retry.v3",
+            "workpaper_max_output_tokens": 12000,
+            "workpaper_metric_format_policy": "source_metric_unparsed_value_null.v2.raw-null-accounting",
+            "workpaper_metric_limit_policy": "source_review_exact_metric_limits.v1",
+            "workpaper_review_policy": "company_profile_workpaper_review.v16",
+            "workpaper_review_recovery": {
+              "base_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+              "base_workpaper_sha256": "79d91b0ec28675ed030ca6183c6bcd65dcc53805e4929eb290d93ae705f8aadf",
+              "plan_sha256": "9d686cf8d314566454e9d10d02d2b0f9b67455194963df96e1ff9d2be3eba066",
+              "prior_use_review": null,
+              "report": {
+                "document_type": "annual_report",
+                "document_version": "f2ff01b21bc3e5354feb77c23c05515a5016db7bc3e01011b7de0db0fa17b626",
+                "instrument_id": "002050.SZ",
+                "published_at": "2026-03-23T16:00:00+00:00",
+                "report_id": "asset_878b16917fd94a5a55903f419e91e3b6",
+                "report_period": "2025-12-31"
+              },
+              "request_id": "6fn-review-002050-SZ"
+            },
+            "workpaper_subject_scope_limit_policy": "source_review_exact_subject_limits.v1"
+          },
+          "human_restrictions_present": false,
+          "calls": [
+            {
+              "call_pointer": "/workpaper/generation/selection",
+              "purpose": "select_profile_sections",
+              "request_id": "bp-work-bbf1d6652ff60cfb2e9310ba:workpaper:sections",
+              "request_hash": "c26af0e054cc9dea5faa4760ed8760268ba3f031bf4eac8712a6daecd49908ce",
+              "response_hash": "1b283d03c08194ce193ec9a400835111f8e478eb01a8b6b3e89fa479c4274701",
+              "model": "deepseek-flash",
+              "source_label": "deepseek:deepseek-flash",
+              "finish_reason": "stop",
+              "receipt_binding": "matched_exact",
+              "receipt_pointers": [
+                "/workpaper_receipts/0"
+              ]
+            },
+            {
+              "call_pointer": "/workpaper/generation/extraction",
+              "purpose": "extract_profile_workpaper",
+              "request_id": "bp-work-bbf1d6652ff60cfb2e9310ba:workpaper:extract",
+              "request_hash": "180f338a6a616805609c920cf3cb56a1364eb7682903cf4798b4d8c43698c84a",
+              "response_hash": "0e5187b9c0be114838cfb70e03a0719e2db9b36efe48c07996233d8a816f7eed",
+              "model": "deepseek-flash",
+              "source_label": "deepseek:deepseek-flash",
+              "finish_reason": "stop",
+              "receipt_binding": "matched_exact",
+              "receipt_pointers": [
+                "/workpaper_receipts/1"
+              ]
+            },
+            {
+              "call_pointer": "/workpaper/quality_review/calls/0",
+              "purpose": "review_profile_workpaper",
+              "request_id": "bp-work-5b933c3f4b3dbf103c7337d4:workpaper:review",
+              "request_hash": "f23f2bc3eb263cee8e950fde26523f9bb03f913ba432dde29972904469dd6d8b",
+              "response_hash": "c5f4d65e8c46aff39d2acf3e511ae5f795e6b9a806a7b31b39f6ff4a63ad8966",
+              "model": "grok-4.7",
+              "source_label": "scorpio:grok-4.7",
+              "finish_reason": "stop",
+              "receipt_binding": "matched_exact",
+              "receipt_pointers": [
+                "/workpaper_receipts/2"
+              ]
+            },
+            {
+              "call_pointer": "/workpaper/quality_review/calls/1",
+              "purpose": "repair_profile_workpaper",
+              "request_id": "bp-work-5b933c3f4b3dbf103c7337d4:workpaper:repair",
+              "request_hash": "b5bfb4aea8309fb63894b43af7e41b58960e4fbd646153a5c72324844c312e39",
+              "response_hash": "3c7283d32882b8ec760d478c16c7d6b8fcd7451e54918fe77cc7a151637dfde7",
+              "model": "deepseek-flash",
+              "source_label": "deepseek:deepseek-flash",
+              "finish_reason": "stop",
+              "receipt_binding": "matched_exact",
+              "receipt_pointers": [
+                "/workpaper_receipts/3"
+              ]
+            },
+            {
+              "call_pointer": "/workpaper/quality_review/calls/2",
+              "purpose": "verify_profile_workpaper_repair",
+              "request_id": "bp-work-5b933c3f4b3dbf103c7337d4:workpaper:repair-verify",
+              "request_hash": "bb01817a54a90051b933e0c01ccf3bf06764d176fa1a1168601994526cc0eaa7",
+              "response_hash": "9bc40f078b0bcb714cfdb9ae7c58318c401e4b9a27e51c8c3f8ac249b7225551",
+              "model": "grok-4.7",
+              "source_label": "scorpio:grok-4.7",
+              "finish_reason": "stop",
+              "receipt_binding": "matched_exact",
+              "receipt_pointers": [
+                "/workpaper_receipts/4"
+              ]
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "state": "final",
+        "supplement_target": 20,
+        "supplement_universe": 5,
+        "mandatory_unique_objects": 10,
+        "selected_unique_union": 15,
+        "selected_supplement": 5,
+        "semantic_duplicates": 0,
+        "unique_objects": 15,
+        "verification_errors": []
+      },
+      "verification_errors": [],
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "active": false,
+          "superseded_by_review_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "element": "products_services",
+          "status": "observed",
+          "reasons": [
+            "所选章节未披露战略新兴业务的收入金额，故未纳入收入构成。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "superseded_by_review"
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "active": false,
+          "superseded_by_review_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "element": "operations_and_inputs",
+          "status": "unclear",
+          "reasons": [
+            "所选章节仅披露成本构成，未披露具体原材料品种或供应商。",
+            "事实F10已隔离，未作为结论采用：metric number is absent from cited source: 通用设备制造业营业成本中材料金额"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "superseded_by_review"
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "active": false,
+          "superseded_by_review_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "element": "customers_channels_markets",
+          "status": "observed",
+          "reasons": [
+            "未披露前五名客户的具体名称，仅列示第一名至第五名，故不推断具体客户。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "superseded_by_review"
+        },
+        {
+          "reading_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+          "active": false,
+          "superseded_by_review_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "element": "material_changes",
+          "status": "observed",
+          "reasons": [
+            "未在所选章节展开各合并范围变动对收入或利润的影响。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "superseded_by_review"
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "active": true,
+          "element": "products_services",
+          "status": "observed",
+          "reasons": [
+            "所选章节未披露战略新兴业务的收入金额，故未纳入收入构成。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "active": true,
+          "element": "operations_and_inputs",
+          "status": "unclear",
+          "reasons": [
+            "所选章节仅披露成本构成，未披露具体原材料品种或供应商。",
+            "事实F10已隔离，未作为结论采用：metric number is absent from cited source: 通用设备制造业营业成本中材料金额"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "active": true,
+          "element": "customers_channels_markets",
+          "status": "observed",
+          "reasons": [
+            "未披露前五名客户的具体名称，仅列示第一名至第五名，故不推断具体客户。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+          "active": true,
+          "element": "material_changes",
+          "status": "observed",
+          "reasons": [
+            "未在所选章节展开各合并范围变动对收入或利润的影响。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "metric_gaps": [],
+      "suggested_acquisitions": [],
+      "A_core_conditions": [
+        {
+          "condition_id": "C1",
+          "view": "company_profile",
+          "supported": true,
+          "supporting_fact_ids": [
+            "F01"
+          ],
+          "reason": "A按原文与实际可读基础描述核实主营/产品应用/变现三问，重要业务实质覆盖；局部可隔离经营尾项错误不一票否决公司，准确率仍逐对象计错。"
+        },
+        {
+          "condition_id": "C2",
+          "view": "company_profile",
+          "supported": true,
+          "supporting_fact_ids": [
+            "F02",
+            "F03"
+          ],
+          "reason": "A按原文与实际可读基础描述核实主营/产品应用/变现三问，重要业务实质覆盖；局部可隔离经营尾项错误不一票否决公司，准确率仍逐对象计错。"
+        },
+        {
+          "condition_id": "C3",
+          "view": "company_profile",
+          "supported": true,
+          "supporting_fact_ids": [
+            "F05",
+            "F08",
+            "F09"
+          ],
+          "reason": "A按原文与实际可读基础描述核实主营/产品应用/变现三问，重要业务实质覆盖；局部可隔离经营尾项错误不一票否决公司，准确率仍逐对象计错。"
+        }
+      ],
+      "independent_review_source": {
+        "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-audit-final.json",
+        "sha256": "96efe13aada4523fda78c24097588de2399a90c0fb0b41432920892924de3336",
+        "json_pointer": "/companies/2/phases/automatic_final"
+      },
+      "A_usable": true,
+      "A_source_reference_sha256": "72aced4c252482852f59380ce9613a932c8d7f66bb6e9b5dd20478dda3d60a41"
+    },
+    "human_safe": {
+      "state": "not_delivered",
+      "objects": [],
+      "selection": null
+    }
+  },
+  "cross_stage_ID_comparisons": [
+    {
+      "fact_id": "F01",
+      "first_identity": [
+        "bp-work-bbf1d6652ff60cfb2e9310ba",
+        "F01",
+        "8dcb5cfc3e26b936c4267a4b7510cb25b76f0a34f3dbdd8d3a471484390d7932"
+      ],
+      "automatic_identity": [
+        "bp-work-5b933c3f4b3dbf103c7337d4",
+        "F01",
+        "8dcb5cfc3e26b936c4267a4b7510cb25b76f0a34f3dbdd8d3a471484390d7932"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F02",
+      "first_identity": [
+        "bp-work-bbf1d6652ff60cfb2e9310ba",
+        "F02",
+        "2d9d72284b3b003e8204c8c4d2caebbf5fef38248195cfd626667166e07e8d16"
+      ],
+      "automatic_identity": [
+        "bp-work-5b933c3f4b3dbf103c7337d4",
+        "F02",
+        "2d9d72284b3b003e8204c8c4d2caebbf5fef38248195cfd626667166e07e8d16"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F03",
+      "first_identity": [
+        "bp-work-bbf1d6652ff60cfb2e9310ba",
+        "F03",
+        "1cd971afad0a887bdc32a1ef8ff5e76e865c5aca01648640abc23de0e40fa89f"
+      ],
+      "automatic_identity": [
+        "bp-work-5b933c3f4b3dbf103c7337d4",
+        "F03",
+        "1cd971afad0a887bdc32a1ef8ff5e76e865c5aca01648640abc23de0e40fa89f"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F05",
+      "first_identity": [
+        "bp-work-bbf1d6652ff60cfb2e9310ba",
+        "F05",
+        "375cd3c9aa8ba2823a004cd4484942885bb537d61493ea3725c24af32bda06fe"
+      ],
+      "automatic_identity": [
+        "bp-work-5b933c3f4b3dbf103c7337d4",
+        "F05",
+        "375cd3c9aa8ba2823a004cd4484942885bb537d61493ea3725c24af32bda06fe"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F06",
+      "first_identity": [
+        "bp-work-bbf1d6652ff60cfb2e9310ba",
+        "F06",
+        "c15d78d46cbe5205d293c56bc5155afb2e837cccec92299799030eafea8825f8"
+      ],
+      "automatic_identity": [
+        "bp-work-5b933c3f4b3dbf103c7337d4",
+        "F06",
+        "c15d78d46cbe5205d293c56bc5155afb2e837cccec92299799030eafea8825f8"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F07",
+      "first_identity": [
+        "bp-work-bbf1d6652ff60cfb2e9310ba",
+        "F07",
+        "a5182c6e849b5b9cf978a2f6d15a47079c13318612e796dbd5b39c836c85e00d"
+      ],
+      "automatic_identity": [
+        "bp-work-5b933c3f4b3dbf103c7337d4",
+        "F07",
+        "a5182c6e849b5b9cf978a2f6d15a47079c13318612e796dbd5b39c836c85e00d"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F08",
+      "first_identity": [
+        "bp-work-bbf1d6652ff60cfb2e9310ba",
+        "F08",
+        "ca7a52d5e6b60119729cd56719e0a724e2199092c363440fa853feaca5004ac3"
+      ],
+      "automatic_identity": [
+        "bp-work-5b933c3f4b3dbf103c7337d4",
+        "F08",
+        "ca7a52d5e6b60119729cd56719e0a724e2199092c363440fa853feaca5004ac3"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F09",
+      "first_identity": [
+        "bp-work-bbf1d6652ff60cfb2e9310ba",
+        "F09",
+        "e60f59dd4215912585722a75f67280e42a2eebed8e5f4996cd4d61e196292452"
+      ],
+      "automatic_identity": [
+        "bp-work-5b933c3f4b3dbf103c7337d4",
+        "F09",
+        "e60f59dd4215912585722a75f67280e42a2eebed8e5f4996cd4d61e196292452"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F11",
+      "first_identity": [
+        "bp-work-bbf1d6652ff60cfb2e9310ba",
+        "F11",
+        "2d44931bf71a1bf686c6cc97cc18fb831d0b1b0ebe90a476db638610ed0a1a9a"
+      ],
+      "automatic_identity": [
+        "bp-work-5b933c3f4b3dbf103c7337d4",
+        "F11",
+        "2d44931bf71a1bf686c6cc97cc18fb831d0b1b0ebe90a476db638610ed0a1a9a"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F12",
+      "first_identity": [
+        "bp-work-bbf1d6652ff60cfb2e9310ba",
+        "F12",
+        "249cf1379b323f872f96a9309915b2a1eef487bb02eaaeb5b679d487cbc98eb9"
+      ],
+      "automatic_identity": [
+        "bp-work-5b933c3f4b3dbf103c7337d4",
+        "F12",
+        "249cf1379b323f872f96a9309915b2a1eef487bb02eaaeb5b679d487cbc98eb9"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F13",
+      "first_identity": [
+        "bp-work-bbf1d6652ff60cfb2e9310ba",
+        "F13",
+        "84454e9a9b290a9578a0f8905367840ed25a1d1613601b60d5e4d1dcb83c0cdb"
+      ],
+      "automatic_identity": [
+        "bp-work-5b933c3f4b3dbf103c7337d4",
+        "F13",
+        "beb91895ddad040812672925e058cebdfda21e1f6140c02c547261734aeb9a13"
+      ],
+      "consumer_hash_equal": false,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F14",
+      "first_identity": [
+        "bp-work-bbf1d6652ff60cfb2e9310ba",
+        "F14",
+        "58a7c3e293a67aafac64bb32945adcd9ff4d7714c9feabb867f5e222cfb87851"
+      ],
+      "automatic_identity": [
+        "bp-work-5b933c3f4b3dbf103c7337d4",
+        "F14",
+        "58a7c3e293a67aafac64bb32945adcd9ff4d7714c9feabb867f5e222cfb87851"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F15",
+      "first_identity": [
+        "bp-work-bbf1d6652ff60cfb2e9310ba",
+        "F15",
+        "db3af16c78fefa78c219518fe977b176edef6504be1cc6c2a2ef05c6c5ad2091"
+      ],
+      "automatic_identity": [
+        "bp-work-5b933c3f4b3dbf103c7337d4",
+        "F15",
+        "db3af16c78fefa78c219518fe977b176edef6504be1cc6c2a2ef05c6c5ad2091"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F16",
+      "first_identity": [
+        "bp-work-bbf1d6652ff60cfb2e9310ba",
+        "F16",
+        "1a9042340042f8046e12c11c59400e3bed4501c03d14a9fc45d4ab980c678a2f"
+      ],
+      "automatic_identity": [
+        "bp-work-5b933c3f4b3dbf103c7337d4",
+        "F16",
+        "2b6d97e6ce4e8832e5db0d3c3b236a1bb3afbeb58a4c7c2fe3d70aa09c5a5bb3"
+      ],
+      "consumer_hash_equal": false,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F17",
+      "first_identity": [
+        "bp-work-bbf1d6652ff60cfb2e9310ba",
+        "F17",
+        "9a680011e253d901c41474f8b36f4ed12a549ac141f4bbbe470cc094a9c139d1"
+      ],
+      "automatic_identity": [
+        "bp-work-5b933c3f4b3dbf103c7337d4",
+        "F17",
+        "9a680011e253d901c41474f8b36f4ed12a549ac141f4bbbe470cc094a9c139d1"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    }
+  ],
+  "version_issues": [],
+  "semantic_assessment": "none_by_mechanical_assistant",
+  "supplier_requests": 0
+}

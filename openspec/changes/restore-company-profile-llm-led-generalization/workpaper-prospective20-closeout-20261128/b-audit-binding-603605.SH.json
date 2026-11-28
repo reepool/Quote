@@ -1,0 +1,3548 @@
+{
+  "task": "6.FY",
+  "instrument_id": "603605.SH",
+  "group": "manufacturing",
+  "industry": "美容护理",
+  "execution_state": "completed",
+  "method_freeze": {
+    "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/b-audit-method-freeze.json",
+    "sha256": "4a41851bc3c871e9c787a80944003f90e61775eed4106d396a049a1976e2401b",
+    "json_pointer": ""
+  },
+  "method_clarification": {
+    "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/b-audit-method-clarification.json",
+    "sha256": "dcdf70c6fccd0dffdd5c0850b277715ae62d9e4a06aac082efc20992e246e19b",
+    "json_pointer": ""
+  },
+  "operator_inputs": {
+    "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/b-observed-inputs.json",
+    "sha256": "3e73c1239a2a7e07b30a3f12dc5a24ccf0e2b586307671e14c47faa777f4d56e",
+    "json_pointer": ""
+  },
+  "A_review_inputs": [
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-audit-final.json",
+      "sha256": "96efe13aada4523fda78c24097588de2399a90c0fb0b41432920892924de3336",
+      "json_pointer": ""
+    }
+  ],
+  "input_resolution": "B_explicit_company_pointers",
+  "A_review_provenance": {
+    "authority": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-audit-final.json",
+      "sha256": "96efe13aada4523fda78c24097588de2399a90c0fb0b41432920892924de3336",
+      "json_pointer": ""
+    },
+    "auditor": "main A final source adjudication with independent A-side original-PDF reviewers",
+    "source_audits": [
+      {
+        "source": {
+          "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-audit-main.json",
+          "sha256": "902240dfc0869a751022b303e4bf1d62654c249b390404877e0e9a568ba38a4c",
+          "json_pointer": ""
+        },
+        "declared_sha256": "902240dfc0869a751022b303e4bf1d62654c249b390404877e0e9a568ba38a4c",
+        "exact_hash_match": true
+      },
+      {
+        "source": {
+          "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-audit-side.json",
+          "sha256": "a02adfac275ac3758cd760cbb740aff21a8a9bed48572d96f70c519b46723eb5",
+          "json_pointer": ""
+        },
+        "declared_sha256": "a02adfac275ac3758cd760cbb740aff21a8a9bed48572d96f70c519b46723eb5",
+        "exact_hash_match": true
+      },
+      {
+        "source": {
+          "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-audit-services.json",
+          "sha256": "f45d7fdd640bba3f2c447a8d1ba9e1fde0c8a8817a99e09f353d873eaf5abf34",
+          "json_pointer": ""
+        },
+        "declared_sha256": "f45d7fdd640bba3f2c447a8d1ba9e1fde0c8a8817a99e09f353d873eaf5abf34",
+        "exact_hash_match": true
+      }
+    ],
+    "dispute_adjudication_pointers": [],
+    "original_side_audits_preserved": true
+  },
+  "postrun_read_dependency_compatibility": [
+    {
+      "path": "/home/python/Quote/research/company_profile/workpaper.py",
+      "frozen_sha256": "66cd72a62391d5899f905385d4853eebd449128f728d2d93d75c2dd3ceba70a8",
+      "current_sha256": "68a04af9a341506d1af6b451033c004a94686d2a7d131e5a55152575b23edfb3",
+      "verification": "all original AST declarations exact; only three added string constants",
+      "application_edited_by_this_tool": false
+    }
+  ],
+  "mechanical_script_version": {
+    "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/b-audit-script-version.json",
+    "sha256": "f22d600cb11baf0af15bef1997fd6322cc6607ffc66f95b1f1eaca26c5829b5b",
+    "json_pointer": ""
+  },
+  "official_pdf": {
+    "path": "/home/python/Quote/data/filings/announcements/blobs/ac/ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a.pdf",
+    "expected_sha256": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+    "read_by_this_tool": false
+  },
+  "source_files": {
+    "budget": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603605.SH/run/budget.json",
+      "sha256": "81a16cd8f50c2a0dda71f0262a2be76fad189660e24fa5c1266819093452cc52",
+      "json_pointer": ""
+    },
+    "source_reference": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-603605.SH.json",
+      "sha256": "3f659de187d4c7bb4522715cf68c615754c31dd71a51581c6e3cac9f8879abda",
+      "json_pointer": ""
+    }
+  },
+  "wires": [
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603605.SH/run/wires/001.json",
+      "sha256": "80ad6b84bedb6af9f9f0a8116c35ad0067daa4568694d6dd2c8eca370e6caab9",
+      "json_pointer": ""
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603605.SH/run/wires/002.json",
+      "sha256": "70c4029a942197f377990f0187910f59ebe5f144ca566e9cf77b180d3e38beeb",
+      "json_pointer": ""
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603605.SH/run/wires/003.json",
+      "sha256": "267fbbc5ab525808431aa19b17d6f4a30cc2daf2f6fd07c864e69651c1760ba2",
+      "json_pointer": ""
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603605.SH/run/wires/004.json",
+      "sha256": "ab94aef7949152aba3f49276087c0043cb639b4bb1d7fa6c8313491c5f0e02d7",
+      "json_pointer": ""
+    },
+    {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603605.SH/run/wires/005.json",
+      "sha256": "07c3b02328996e0c24ec2fed908a19fd6f7a7ede282da86736a26ad253f4b995",
+      "json_pointer": ""
+    }
+  ],
+  "wire_to_call_binding": "not_assessed; retained receipt hashes are checked separately",
+  "author_attribution_scope": "actual record call/receipt identities; no inference that every unchanged or revised fact has the same author",
+  "phases": {
+    "first": {
+      "state": "delivered",
+      "api": {
+        "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603605.SH/run/first-api.json",
+        "sha256": "cc3cffb23d1a6971bd99f337953770aa316d358bd661bfbbbdb4c7c1a3ba6441",
+        "json_pointer": ""
+      },
+      "report": {
+        "instrument_id": "603605.SH",
+        "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+        "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-21T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "objects": [
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F001",
+          "consumer_fact_sha256": "3d4e661bb901740380950cfd9b51a7429deebd18475e3972e5b7cba7f495a71e",
+          "consumer_pointer": "/facts/0",
+          "fact": {
+            "fact_id": "F001",
+            "text": "公司定位新国货化妆品产业平台，主要从事化妆品研发、生产和销售；自有品牌覆盖大众精致护肤、彩妆、洗护、高功效护肤，主要品牌包括珀莱雅、彩棠、Off&Relax、悦芙媞、CORRECTORS、原色波塔、惊时、优资莱、韩雅。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ],
+              "spans": [
+                {
+                  "page": 11,
+                  "start": 656,
+                  "end": 1924,
+                  "quote_sha256": "d70518d2742bc89f34531032a42b58da4e77234b65508dd1a2d2b2fef1161738",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "8c8f8f8e1935e4d1555174eaaf1fc7d4467e74a556078775c5a607264cd66bc7",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-d08bc2adf7cd270f103a03fb.json",
+            "sha256": "8b21c9cca5cb01b99b2ede60d416097e8c91ded052bd6c849d58765a32627fba",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/business_structure/facts/0",
+          "raw_fact_sha256": "3d4e661bb901740380950cfd9b51a7429deebd18475e3972e5b7cba7f495a71e",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "core"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/0",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F002",
+          "consumer_fact_sha256": "3e8354a2fefd73aec23c0699a84a537ce49db75909466bb6ffda33f63a05370a",
+          "consumer_pointer": "/facts/1",
+          "fact": {
+            "fact_id": "F002",
+            "text": "珀莱雅品牌专注科技护肤，面向年轻白领女性，覆盖抗老、美白、修护和防晒等需求；报告期推进双抗、能量、红宝石、源力/PROYA MED等系列迭代。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0012",
+              "source-0013"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ],
+              "spans": [
+                {
+                  "page": 11,
+                  "start": 656,
+                  "end": 1924,
+                  "quote_sha256": "d70518d2742bc89f34531032a42b58da4e77234b65508dd1a2d2b2fef1161738",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0012",
+              "record_pointer": "/workpaper/evidence/11",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                14
+              ],
+              "spans": [
+                {
+                  "page": 14,
+                  "start": 0,
+                  "end": 1507,
+                  "quote_sha256": "d6dc74e7558e2d25cdfb186594978e87aa8ae22356ef6020c97f120714b099a9",
+                  "quote_pointer": "/workpaper/evidence/11/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0013",
+              "record_pointer": "/workpaper/evidence/12",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                15
+              ],
+              "spans": [
+                {
+                  "page": 15,
+                  "start": 0,
+                  "end": 1445,
+                  "quote_sha256": "61ff656ca5a0c804070dca67fa8807a42befcdd4d837916598f332a38f9b3d2e",
+                  "quote_pointer": "/workpaper/evidence/12/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "642626aceb88e03feda44226001e95d930a1892c639209df6a69facd69aa958a",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-d08bc2adf7cd270f103a03fb.json",
+            "sha256": "8b21c9cca5cb01b99b2ede60d416097e8c91ded052bd6c849d58765a32627fba",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/products_services/facts/0",
+          "raw_fact_sha256": "3e8354a2fefd73aec23c0699a84a537ce49db75909466bb6ffda33f63a05370a",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "core"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/1",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F003",
+          "consumer_fact_sha256": "3f2a68d6a111d0cbb732a7a53ddb735eb7904fcde09d6d0e6c5c4b6ca8001cac",
+          "consumer_pointer": "/facts/2",
+          "fact": {
+            "fact_id": "F003",
+            "text": "彩棠为中式美学专业彩妆，重点锚定底妆并覆盖妆前、修容、遮瑕等；原色波塔为新锐彩妆，覆盖底妆、色彩、眼部和功能线，面向Z世代。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0016",
+              "source-0018"
+            ],
+            "metrics": [],
+            "uncertainty_reason": "涵盖彩棠与原色波塔两个品牌，不能合并为单一业务分部。"
+          },
+          "state": "limited",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。",
+            "涵盖彩棠与原色波塔两个品牌，不能合并为单一业务分部。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ],
+              "spans": [
+                {
+                  "page": 11,
+                  "start": 656,
+                  "end": 1924,
+                  "quote_sha256": "d70518d2742bc89f34531032a42b58da4e77234b65508dd1a2d2b2fef1161738",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0016",
+              "record_pointer": "/workpaper/evidence/15",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                18
+              ],
+              "spans": [
+                {
+                  "page": 18,
+                  "start": 0,
+                  "end": 1231,
+                  "quote_sha256": "8265434497965709ad19bdfa8e5b7bd43397ab22ffe3526286d1b159f304b8f2",
+                  "quote_pointer": "/workpaper/evidence/15/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0018",
+              "record_pointer": "/workpaper/evidence/17",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                20
+              ],
+              "spans": [
+                {
+                  "page": 20,
+                  "start": 0,
+                  "end": 1331,
+                  "quote_sha256": "40dbe406dfc1879444da4237b758d01b8958a9d5ea87354113cbdbc697f4bf62",
+                  "quote_pointer": "/workpaper/evidence/17/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "other",
+          "sampling_sha256": "e9250f775ba62f873abc92935a95dd26ee8bece6120a9215c91d8a196b9b2d0b",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-d08bc2adf7cd270f103a03fb.json",
+            "sha256": "8b21c9cca5cb01b99b2ede60d416097e8c91ded052bd6c849d58765a32627fba",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/products_services/facts/1",
+          "raw_fact_sha256": "3f2a68d6a111d0cbb732a7a53ddb735eb7904fcde09d6d0e6c5c4b6ca8001cac",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "core"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/2",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F004",
+          "consumer_fact_sha256": "dda48f74e737e9cfc7a0887657441c3b36b1a94b80566b62aa671b2d9618edd1",
+          "consumer_pointer": "/facts/3",
+          "fact": {
+            "fact_id": "F004",
+            "text": "悦芙媞定位年轻肌专研，产品由基础清洁向痘敏修护延伸；Off&Relax定位亚洲头皮整全愈养专家，覆盖洗发、头皮护理、防脱育发及护发/身体护理；惊时专研头皮微生态洗护，布局控油、去屑和舒敏线；CORRECTORS定位实验室级专业护肤。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0015",
+              "source-0020",
+              "source-0023"
+            ],
+            "metrics": [],
+            "uncertainty_reason": "涵盖多个品牌和洗护/护肤细分，不能合并为单一业务分部。"
+          },
+          "state": "limited",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。",
+            "涵盖多个品牌和洗护/护肤细分，不能合并为单一业务分部。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ],
+              "spans": [
+                {
+                  "page": 11,
+                  "start": 656,
+                  "end": 1924,
+                  "quote_sha256": "d70518d2742bc89f34531032a42b58da4e77234b65508dd1a2d2b2fef1161738",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0015",
+              "record_pointer": "/workpaper/evidence/14",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                17
+              ],
+              "spans": [
+                {
+                  "page": 17,
+                  "start": 0,
+                  "end": 1865,
+                  "quote_sha256": "bd48e2c6a1ed452ef3ce82802eb797d51d01774c427f900d05e543cec6624fb6",
+                  "quote_pointer": "/workpaper/evidence/14/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0020",
+              "record_pointer": "/workpaper/evidence/19",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                22
+              ],
+              "spans": [
+                {
+                  "page": 22,
+                  "start": 0,
+                  "end": 1686,
+                  "quote_sha256": "46222632bf2b3dee345e8db4e1618b0031ad57503413a34ec0e824e5d80621e2",
+                  "quote_pointer": "/workpaper/evidence/19/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0023",
+              "record_pointer": "/workpaper/evidence/22",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                25
+              ],
+              "spans": [
+                {
+                  "page": 25,
+                  "start": 0,
+                  "end": 1321,
+                  "quote_sha256": "e9efabe6dcb59e376810bee962f90e4d46294de85b54e9a6194938ec7e555993",
+                  "quote_pointer": "/workpaper/evidence/22/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "other",
+          "sampling_sha256": "40870242940c1810510fc7d58b843ce3a0acc846c6162da3dc988a69a8f150be",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-d08bc2adf7cd270f103a03fb.json",
+            "sha256": "8b21c9cca5cb01b99b2ede60d416097e8c91ded052bd6c849d58765a32627fba",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/products_services/facts/2",
+          "raw_fact_sha256": "dda48f74e737e9cfc7a0887657441c3b36b1a94b80566b62aa671b2d9618edd1",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "core"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/3",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F005",
+          "consumer_fact_sha256": "a3198a4804d7db2f5e604468f560ef16207c4411b041c77ada607d7d28055a31",
+          "consumer_pointer": "/facts/4",
+          "fact": {
+            "fact_id": "F005",
+            "text": "公司通过化妆品产品销售取得收入：线上以直营和分销为主，直营覆盖天猫、抖音、京东、快手、拼多多等平台，分销包括淘宝、京东、唯品会等；线下通过经销商进入化妆品专营店、百货、美妆集合店等。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ],
+              "spans": [
+                {
+                  "page": 11,
+                  "start": 656,
+                  "end": 1924,
+                  "quote_sha256": "d70518d2742bc89f34531032a42b58da4e77234b65508dd1a2d2b2fef1161738",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "29d6fec02335868db620d42e0777fd13702c818a084833d0330e49464ad97fc5",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-d08bc2adf7cd270f103a03fb.json",
+            "sha256": "8b21c9cca5cb01b99b2ede60d416097e8c91ded052bd6c849d58765a32627fba",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/revenue_model/facts/0",
+          "raw_fact_sha256": "a3198a4804d7db2f5e604468f560ef16207c4411b041c77ada607d7d28055a31",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "core"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/4",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F015",
+          "consumer_fact_sha256": "e3d7d97d1e25d62edceb4f96f6ba63eb85618d80a6a87cd1ddf1fd1d3af9da1b",
+          "consumer_pointer": "/facts/5",
+          "fact": {
+            "fact_id": "F015",
+            "text": "公司以自主生产为主、OEM/ODM为辅；护肤品类以自主生产为主，彩妆品类自主生产与OEM并行，拥有自建护肤工厂和彩妆工厂；湖州生产基地推进未来工厂和工业互联网试点。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0026"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ],
+              "spans": [
+                {
+                  "page": 11,
+                  "start": 656,
+                  "end": 1924,
+                  "quote_sha256": "d70518d2742bc89f34531032a42b58da4e77234b65508dd1a2d2b2fef1161738",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0026",
+              "record_pointer": "/workpaper/evidence/25",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                28
+              ],
+              "spans": [
+                {
+                  "page": 28,
+                  "start": 0,
+                  "end": 2310,
+                  "quote_sha256": "ef2215679f474cd5bbda967b3be2fe00faea0d6ab487ac76356603913cbb70e2",
+                  "quote_pointer": "/workpaper/evidence/25/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "f9985a0e591d32ddaf4cab75a300c74d9fb158a4a02ed93afe7e3d48ca2fcc59",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-d08bc2adf7cd270f103a03fb.json",
+            "sha256": "8b21c9cca5cb01b99b2ede60d416097e8c91ded052bd6c849d58765a32627fba",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/operations_and_inputs/facts/0",
+          "raw_fact_sha256": "e3d7d97d1e25d62edceb4f96f6ba63eb85618d80a6a87cd1ddf1fd1d3af9da1b",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "supplement"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/5",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F016",
+          "consumer_fact_sha256": "61e879ab0cb5b6046b133382d803ac68e8e5c2b539adb71475e2e2a5f7d32d1a",
+          "consumer_pointer": "/facts/6",
+          "fact": {
+            "fact_id": "F016",
+            "text": "公司采用自主研发为主、产学研合作与国际协同的研发模式，设有杭州、上海和巴黎研发中心，并与高校、医院及原料供应商合作；报告期推进自研原料产业化，但未披露具体采购量或供应商集中度。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008",
+              "source-0025"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0008",
+              "record_pointer": "/workpaper/evidence/7",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                12
+              ],
+              "spans": [
+                {
+                  "page": 12,
+                  "start": 0,
+                  "end": 464,
+                  "quote_sha256": "d62d705006655871f69c816c52c36f0440601e4156d0b8928ee4cc6d98d3998e",
+                  "quote_pointer": "/workpaper/evidence/7/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0025",
+              "record_pointer": "/workpaper/evidence/24",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                27
+              ],
+              "spans": [
+                {
+                  "page": 27,
+                  "start": 0,
+                  "end": 2279,
+                  "quote_sha256": "b4d8de7006d7f1ac8bb88623a54d7d5dc788d7322288ec113967808b3a959c51",
+                  "quote_pointer": "/workpaper/evidence/24/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "39371147ec6a1e692bda76a8aa8485ddbc3fae7ca1461d3cff5cb8599bd92839",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-d08bc2adf7cd270f103a03fb.json",
+            "sha256": "8b21c9cca5cb01b99b2ede60d416097e8c91ded052bd6c849d58765a32627fba",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/operations_and_inputs/facts/1",
+          "raw_fact_sha256": "61e879ab0cb5b6046b133382d803ac68e8e5c2b539adb71475e2e2a5f7d32d1a",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "suspect"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "error",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/6",
+          "independent_narrative_status": "error",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F022",
+          "consumer_fact_sha256": "f0675cd1c4108064a38295b225120393f68d186aed36ec2236f1c1f20844fd3d",
+          "consumer_pointer": "/facts/7",
+          "fact": {
+            "fact_id": "F022",
+            "text": "公司处于化妆品产业链的品牌运营、研发与生产环节，主要从事化妆品研发、生产和销售。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ],
+              "spans": [
+                {
+                  "page": 11,
+                  "start": 656,
+                  "end": 1924,
+                  "quote_sha256": "d70518d2742bc89f34531032a42b58da4e77234b65508dd1a2d2b2fef1161738",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "74e793a7b45603e01b64356be3a7bb04e468b488b685199af08fc56d8157a26b",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-d08bc2adf7cd270f103a03fb.json",
+            "sha256": "8b21c9cca5cb01b99b2ede60d416097e8c91ded052bd6c849d58765a32627fba",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/supply_chain/position/facts/0",
+          "raw_fact_sha256": "f0675cd1c4108064a38295b225120393f68d186aed36ec2236f1c1f20844fd3d",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [],
+          "A_semantic_duplicate_excluded": true,
+          "A_semantic_duplicate_of": {
+            "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+            "fact_id": "F001",
+            "consumer_fact_sha256": "3d4e661bb901740380950cfd9b51a7429deebd18475e3972e5b7cba7f495a71e"
+          },
+          "A_duplicate_reason": "A比较完整经济断言后确认该可选条只重复已有主营/用途断言，没有新增数值或关系；准确率按唯一对象去重，原展示不重写。",
+          "selected": false,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/7",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F023",
+          "consumer_fact_sha256": "aaf28c53aa4d74ef8ef5ac0a900cba45690a10072fbad745bf82486266c5d383",
+          "consumer_pointer": "/facts/8",
+          "fact": {
+            "fact_id": "F023",
+            "text": "上游投入涉及化妆品原料、配方研发及与高校、医院、原料供应商的产学研合作；公司推进自研原料产业化，但未披露具体采购量或供应商集中度。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008",
+              "source-0025"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0008",
+              "record_pointer": "/workpaper/evidence/7",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                12
+              ],
+              "spans": [
+                {
+                  "page": 12,
+                  "start": 0,
+                  "end": 464,
+                  "quote_sha256": "d62d705006655871f69c816c52c36f0440601e4156d0b8928ee4cc6d98d3998e",
+                  "quote_pointer": "/workpaper/evidence/7/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0025",
+              "record_pointer": "/workpaper/evidence/24",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                27
+              ],
+              "spans": [
+                {
+                  "page": 27,
+                  "start": 0,
+                  "end": 2279,
+                  "quote_sha256": "b4d8de7006d7f1ac8bb88623a54d7d5dc788d7322288ec113967808b3a959c51",
+                  "quote_pointer": "/workpaper/evidence/24/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "41bce45dc2caf0bc7a0cb92a4b6b6705c6249238fad901c8a61d7a788fc560d9",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-d08bc2adf7cd270f103a03fb.json",
+            "sha256": "8b21c9cca5cb01b99b2ede60d416097e8c91ded052bd6c849d58765a32627fba",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/supply_chain/upstream_inputs/facts/0",
+          "raw_fact_sha256": "aaf28c53aa4d74ef8ef5ac0a900cba45690a10072fbad745bf82486266c5d383",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "suspect"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "error",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/8",
+          "independent_narrative_status": "error",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F024",
+          "consumer_fact_sha256": "bfedff97a0edc8feb4ba16c1827c2222cda8f26754b124b50e3e92009ae68f5d",
+          "consumer_pointer": "/facts/9",
+          "fact": {
+            "fact_id": "F024",
+            "text": "下游为化妆品消费者，产品通过线上平台及线下经销商/门店触达，覆盖护肤、彩妆、洗护等需求。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "pending",
+          "review_basis": "not_reviewed",
+          "model_review_stage": null,
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ],
+              "spans": [
+                {
+                  "page": 11,
+                  "start": 656,
+                  "end": 1924,
+                  "quote_sha256": "d70518d2742bc89f34531032a42b58da4e77234b65508dd1a2d2b2fef1161738",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "902a3b021c624fd142a2212ee4666da60322c3405f7edced23a755a2682a9d3c",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-d08bc2adf7cd270f103a03fb.json",
+            "sha256": "8b21c9cca5cb01b99b2ede60d416097e8c91ded052bd6c849d58765a32627fba",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/supply_chain/downstream_customers/facts/0",
+          "raw_fact_sha256": "bfedff97a0edc8feb4ba16c1827c2222cda8f26754b124b50e3e92009ae68f5d",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "supplement"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/9",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        }
+      ],
+      "excluded_objects": [],
+      "records": [
+        {
+          "work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-d08bc2adf7cd270f103a03fb.json",
+            "sha256": "8b21c9cca5cb01b99b2ede60d416097e8c91ded052bd6c849d58765a32627fba",
+            "json_pointer": ""
+          },
+          "processing_identity": {
+            "execution_mode": "provider",
+            "logical_request_timeout_seconds": 2450.0,
+            "max_layout_characters": 500000,
+            "max_section_characters": 160000,
+            "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+            "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+            "prompt_version": "company_profile_workpaper.2026-11-28.subject-relationships.v22",
+            "quality_review_profile": "semantic_extraction__scorpio_grok",
+            "reading_strategy": "chapter_workpaper_v1",
+            "repair_profile": "semantic_extraction__deepseek",
+            "review_max_output_tokens": 16384,
+            "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+            "semantic_policy": "company_profile_llm_led.v2",
+            "semantic_reuse": false,
+            "source_binding_policy": "company_workpaper_source_literals.column-wrapped-amounts.v8",
+            "workpaper_format_recovery": "local_shape_before_retry.v3",
+            "workpaper_max_output_tokens": 12000,
+            "workpaper_metric_format_policy": "source_metric_unparsed_value_null.v2.raw-null-accounting",
+            "workpaper_metric_limit_policy": "source_review_exact_metric_limits.v1",
+            "workpaper_review_execution": "deferred",
+            "workpaper_review_policy": "company_profile_workpaper_review.v16",
+            "workpaper_subject_scope_limit_policy": "source_review_exact_subject_limits.v1"
+          },
+          "human_restrictions_present": false,
+          "calls": [
+            {
+              "call_pointer": "/workpaper/generation/selection",
+              "purpose": "select_profile_sections",
+              "request_id": "bp-work-d08bc2adf7cd270f103a03fb:workpaper:sections",
+              "request_hash": "7933e42b28b963a21e4fbf86b24d5184c7f211dd04f9dd40081ecba774d9b748",
+              "response_hash": "c32afb1c0cab26d951997d18927a59d1c81123b9ae8b5ef1f42bd1372a3e8011",
+              "model": "deepseek-flash",
+              "source_label": "deepseek:deepseek-flash",
+              "finish_reason": "stop",
+              "receipt_binding": "matched_exact",
+              "receipt_pointers": [
+                "/workpaper_receipts/0"
+              ]
+            },
+            {
+              "call_pointer": "/workpaper/generation/extraction",
+              "purpose": "extract_profile_workpaper",
+              "request_id": "bp-work-d08bc2adf7cd270f103a03fb:workpaper:extract",
+              "request_hash": "386c75d5e90c9c48a20598364e48f988715dce4dc5a206a3e6f110a2fd89da19",
+              "response_hash": "1d79f231ae85cfa2a1652b425bf61c073cb027e5b76f76e52740d8f2cff5a80c",
+              "model": "deepseek-flash",
+              "source_label": "deepseek:deepseek-flash",
+              "finish_reason": "stop",
+              "receipt_binding": "matched_exact",
+              "receipt_pointers": [
+                "/workpaper_receipts/1"
+              ]
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "state": "final",
+        "supplement_target": 20,
+        "supplement_universe": 2,
+        "mandatory_unique_objects": 7,
+        "selected_unique_union": 9,
+        "selected_supplement": 2,
+        "semantic_duplicates": 1,
+        "unique_objects": 9,
+        "verification_errors": []
+      },
+      "verification_errors": [],
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "element": "business_structure",
+          "status": "observed",
+          "reasons": [
+            "未展开各子品牌完整产品线、价格区间和收入明细。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "element": "products_services",
+          "status": "observed",
+          "reasons": [
+            "未逐一列示所有SKU、价格区间和子品牌细节。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "element": "revenue_model",
+          "status": "observed",
+          "reasons": [
+            "未获取分平台佣金、经销折扣及收入确认细项。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "element": "scale_and_mix",
+          "status": "unclear",
+          "reasons": [
+            "未获取成功：分地区明细中“其他（部分电商）”为混合口径，未作为地区或业务分部量化；其他品牌收入未单独展开。",
+            "指标格式隔离：事实F006未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F007未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F008未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F009未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F010未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F011未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F012未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F013未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F014未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "element": "operations_and_inputs",
+          "status": "observed",
+          "reasons": [
+            "未获取成功：产能、产量、库存量及具体原材料采购数据未纳入；保留经营模式与研发资源说明。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "element": "customers_channels_markets",
+          "status": "unclear",
+          "reasons": [
+            "未获取成功：客户集中度、会员数和单平台成交额明细未获取；保留渠道结构与销售模式。",
+            "指标格式隔离：事实F017未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted; metrics.3.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F018未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted; metrics.3.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "element": "operating_drivers",
+          "status": "unclear",
+          "reasons": [
+            "未展开销售费用投放效率、分品牌毛利率和研发项目投入明细。",
+            "指标格式隔离：事实F019未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted; metrics.3.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "element": "material_changes",
+          "status": "unclear",
+          "reasons": [
+            "未获取处置、并购等事件时间及完整原因；仅保留报告期收入、成本和现金流变动说明。",
+            "指标格式隔离：事实F020未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F021未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "element": "position",
+          "status": "observed",
+          "reasons": [
+            "未披露具体采购量、供应商集中度及客户名单。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "element": "upstream_inputs",
+          "status": "observed",
+          "reasons": [
+            "未获取成功：具体原料采购量、供应商名称及集中度未获取；仅保留已披露的研发合作方向。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "element": "downstream_customers",
+          "status": "observed",
+          "reasons": [
+            "未获取客户名单、客户集中度及分渠道消费者画像明细。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "metric_gaps": [],
+      "suggested_acquisitions": [],
+      "A_core_conditions": [
+        {
+          "condition_id": "C1",
+          "view": "company_profile",
+          "supported": true,
+          "supporting_fact_ids": [
+            "F001"
+          ],
+          "reason": "A按原文与实际可读基础描述核实主营/产品应用/变现三问，重要业务实质覆盖；局部可隔离经营尾项错误不一票否决公司，准确率仍逐对象计错。"
+        },
+        {
+          "condition_id": "C2",
+          "view": "company_profile",
+          "supported": true,
+          "supporting_fact_ids": [
+            "F002",
+            "F003",
+            "F004"
+          ],
+          "reason": "A按原文与实际可读基础描述核实主营/产品应用/变现三问，重要业务实质覆盖；局部可隔离经营尾项错误不一票否决公司，准确率仍逐对象计错。"
+        },
+        {
+          "condition_id": "C3",
+          "view": "company_profile",
+          "supported": true,
+          "supporting_fact_ids": [
+            "F005"
+          ],
+          "reason": "A按原文与实际可读基础描述核实主营/产品应用/变现三问，重要业务实质覆盖；局部可隔离经营尾项错误不一票否决公司，准确率仍逐对象计错。"
+        }
+      ],
+      "independent_review_source": {
+        "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-audit-final.json",
+        "sha256": "96efe13aada4523fda78c24097588de2399a90c0fb0b41432920892924de3336",
+        "json_pointer": "/companies/5/phases/first"
+      },
+      "A_usable": true,
+      "A_source_reference_sha256": "3f659de187d4c7bb4522715cf68c615754c31dd71a51581c6e3cac9f8879abda"
+    },
+    "automatic_final": {
+      "state": "delivered",
+      "api": {
+        "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/execution/603605.SH/run/automatic-final-api.json",
+        "sha256": "f2169068cc8084b49b6dd172e024314575993d0f92e4b69cb74b95b0ca516265",
+        "json_pointer": ""
+      },
+      "report": {
+        "instrument_id": "603605.SH",
+        "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+        "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-21T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "objects": [
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "fact_id": "F001",
+          "consumer_fact_sha256": "3d4e661bb901740380950cfd9b51a7429deebd18475e3972e5b7cba7f495a71e",
+          "consumer_pointer": "/facts/10",
+          "fact": {
+            "fact_id": "F001",
+            "text": "公司定位新国货化妆品产业平台，主要从事化妆品研发、生产和销售；自有品牌覆盖大众精致护肤、彩妆、洗护、高功效护肤，主要品牌包括珀莱雅、彩棠、Off&Relax、悦芙媞、CORRECTORS、原色波塔、惊时、优资莱、韩雅。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ],
+              "spans": [
+                {
+                  "page": 11,
+                  "start": 656,
+                  "end": 1924,
+                  "quote_sha256": "d70518d2742bc89f34531032a42b58da4e77234b65508dd1a2d2b2fef1161738",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "ce5d463b48542bbca99aea99b9ac6e68cf738f067307f1905490b2936c55652b",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-a9b750074793e8ae0317da86.json",
+            "sha256": "fac1a430b3d886c81875c4fadf6ae14086c9f40dfe1606a8d09b83ede28b1690",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/business_structure/facts/0",
+          "raw_fact_sha256": "3d4e661bb901740380950cfd9b51a7429deebd18475e3972e5b7cba7f495a71e",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "core"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/0",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "fact_id": "F002",
+          "consumer_fact_sha256": "3e8354a2fefd73aec23c0699a84a537ce49db75909466bb6ffda33f63a05370a",
+          "consumer_pointer": "/facts/11",
+          "fact": {
+            "fact_id": "F002",
+            "text": "珀莱雅品牌专注科技护肤，面向年轻白领女性，覆盖抗老、美白、修护和防晒等需求；报告期推进双抗、能量、红宝石、源力/PROYA MED等系列迭代。",
+            "subject_scope": "business_segment",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0012",
+              "source-0013"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ],
+              "spans": [
+                {
+                  "page": 11,
+                  "start": 656,
+                  "end": 1924,
+                  "quote_sha256": "d70518d2742bc89f34531032a42b58da4e77234b65508dd1a2d2b2fef1161738",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0012",
+              "record_pointer": "/workpaper/evidence/11",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                14
+              ],
+              "spans": [
+                {
+                  "page": 14,
+                  "start": 0,
+                  "end": 1507,
+                  "quote_sha256": "d6dc74e7558e2d25cdfb186594978e87aa8ae22356ef6020c97f120714b099a9",
+                  "quote_pointer": "/workpaper/evidence/11/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0013",
+              "record_pointer": "/workpaper/evidence/12",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                15
+              ],
+              "spans": [
+                {
+                  "page": 15,
+                  "start": 0,
+                  "end": 1445,
+                  "quote_sha256": "61ff656ca5a0c804070dca67fa8807a42befcdd4d837916598f332a38f9b3d2e",
+                  "quote_pointer": "/workpaper/evidence/12/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "d0e002e742712844fb3732c6ae9df3f4f5b1f94cc1e7ed253b0e986bf2668735",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-a9b750074793e8ae0317da86.json",
+            "sha256": "fac1a430b3d886c81875c4fadf6ae14086c9f40dfe1606a8d09b83ede28b1690",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/products_services/facts/0",
+          "raw_fact_sha256": "3e8354a2fefd73aec23c0699a84a537ce49db75909466bb6ffda33f63a05370a",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "core"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/1",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "fact_id": "F003",
+          "consumer_fact_sha256": "35a5faec58c3b92b84889d832c58e243d4e08e14694d0be8ccb11eb545f5ed87",
+          "consumer_pointer": "/facts/12",
+          "fact": {
+            "fact_id": "F003",
+            "text": "彩棠定位中式美学专业彩妆、专业化妆师品牌，报告期锚定底妆并涉及妆前、修容、遮瑕等；原色波塔为新锐彩妆，面向Z世代，产品涉及底妆、色彩、眼部和功能线。",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0016",
+              "source-0017",
+              "source-0019"
+            ],
+            "metrics": [],
+            "uncertainty_reason": "同一事实并列彩棠与原色波塔两个品牌，无法用单一业务分部范围表达；保留两品牌各自表述。"
+          },
+          "state": "limited",
+          "review_basis": "model_source_check",
+          "model_review_stage": "final",
+          "reasons": [
+            "同一事实并列彩棠与原色波塔两个品牌，无法用单一业务分部范围表达；保留两品牌各自表述。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ],
+              "spans": [
+                {
+                  "page": 11,
+                  "start": 656,
+                  "end": 1924,
+                  "quote_sha256": "d70518d2742bc89f34531032a42b58da4e77234b65508dd1a2d2b2fef1161738",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0016",
+              "record_pointer": "/workpaper/evidence/15",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                18
+              ],
+              "spans": [
+                {
+                  "page": 18,
+                  "start": 0,
+                  "end": 1231,
+                  "quote_sha256": "8265434497965709ad19bdfa8e5b7bd43397ab22ffe3526286d1b159f304b8f2",
+                  "quote_pointer": "/workpaper/evidence/15/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0017",
+              "record_pointer": "/workpaper/evidence/16",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                19
+              ],
+              "spans": [
+                {
+                  "page": 19,
+                  "start": 0,
+                  "end": 1396,
+                  "quote_sha256": "c97c3987ef7090e058a798f4edd2fbb05c4b2e7b918115b945cd5aefb3b65741",
+                  "quote_pointer": "/workpaper/evidence/16/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0019",
+              "record_pointer": "/workpaper/evidence/18",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                21
+              ],
+              "spans": [
+                {
+                  "page": 21,
+                  "start": 0,
+                  "end": 1246,
+                  "quote_sha256": "2e989a402d31d8bb2d46b554700ec99a84f5798ac682cd7a7dc181748c978f49",
+                  "quote_pointer": "/workpaper/evidence/18/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "other",
+          "sampling_sha256": "18e3a55c7acd49d08ce7b5378703d68f52951fda027fe9b7e34d2d666eb16ea6",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-a9b750074793e8ae0317da86.json",
+            "sha256": "fac1a430b3d886c81875c4fadf6ae14086c9f40dfe1606a8d09b83ede28b1690",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/products_services/facts/1",
+          "raw_fact_sha256": "35a5faec58c3b92b84889d832c58e243d4e08e14694d0be8ccb11eb545f5ed87",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "core"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/2",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "fact_id": "F004",
+          "consumer_fact_sha256": "60c15cc24bbeeef3d37cb00558436cf4ce18c000059f664dad63a2a5cebecd93",
+          "consumer_pointer": "/facts/13",
+          "fact": {
+            "fact_id": "F004",
+            "text": "悦芙媞定位年轻肌专研，产品由基础清洁向痘敏修护延伸；Off&Relax定位亚洲头皮整全愈养专家，覆盖洗发、头皮护理、防脱育发及护发/身体护理；惊时专研头皮微生态洗护，布局控油、去屑和舒敏线；CORRECTORS定位实验室级专业护肤。",
+            "subject_scope": "unclear",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0015",
+              "source-0020",
+              "source-0023"
+            ],
+            "metrics": [],
+            "uncertainty_reason": "涵盖多个品牌和洗护/护肤细分，不能合并为单一业务分部。；原文支持悦芙媞年轻肌专研及由基础清洁向痘敏修护延伸、Off&Relax亚洲头皮整全愈养及洗发/头皮护理/防脱育发/护发与身体护理、惊时头皮微生态洗护及控油/去屑/舒敏线、CORRECTORS实验室级专业护肤；期间为2025报告期，所引四页可覆盖各句。单一business_segment无法同时表达四个品牌以及洗护与护肤两类关系，不能据此合并为一个业务分部，也不能改标为consolidated_group。叙述、期间与引证应保留，仅限制该事实的subject_scope枚举。"
+          },
+          "state": "limited",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [
+            "涵盖多个品牌和洗护/护肤细分，不能合并为单一业务分部。",
+            "原文支持悦芙媞年轻肌专研及由基础清洁向痘敏修护延伸、Off&Relax亚洲头皮整全愈养及洗发/头皮护理/防脱育发/护发与身体护理、惊时头皮微生态洗护及控油/去屑/舒敏线、CORRECTORS实验室级专业护肤；期间为2025报告期，所引四页可覆盖各句。单一business_segment无法同时表达四个品牌以及洗护与护肤两类关系，不能据此合并为一个业务分部，也不能改标为consolidated_group。叙述、期间与引证应保留，仅限制该事实的subject_scope枚举。",
+            "不得按事实主体作为合并口径加总或比较；指标须按各自主体及现有限制使用。"
+          ],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ],
+              "spans": [
+                {
+                  "page": 11,
+                  "start": 656,
+                  "end": 1924,
+                  "quote_sha256": "d70518d2742bc89f34531032a42b58da4e77234b65508dd1a2d2b2fef1161738",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0015",
+              "record_pointer": "/workpaper/evidence/14",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                17
+              ],
+              "spans": [
+                {
+                  "page": 17,
+                  "start": 0,
+                  "end": 1865,
+                  "quote_sha256": "bd48e2c6a1ed452ef3ce82802eb797d51d01774c427f900d05e543cec6624fb6",
+                  "quote_pointer": "/workpaper/evidence/14/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0020",
+              "record_pointer": "/workpaper/evidence/19",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                22
+              ],
+              "spans": [
+                {
+                  "page": 22,
+                  "start": 0,
+                  "end": 1686,
+                  "quote_sha256": "46222632bf2b3dee345e8db4e1618b0031ad57503413a34ec0e824e5d80621e2",
+                  "quote_pointer": "/workpaper/evidence/19/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0023",
+              "record_pointer": "/workpaper/evidence/22",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                25
+              ],
+              "spans": [
+                {
+                  "page": 25,
+                  "start": 0,
+                  "end": 1321,
+                  "quote_sha256": "e9efabe6dcb59e376810bee962f90e4d46294de85b54e9a6194938ec7e555993",
+                  "quote_pointer": "/workpaper/evidence/22/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "other",
+          "sampling_sha256": "e56495d04c493b34cc3266d45868433e87cdee7b27ddebe9eb645e723b2a4dc7",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-a9b750074793e8ae0317da86.json",
+            "sha256": "fac1a430b3d886c81875c4fadf6ae14086c9f40dfe1606a8d09b83ede28b1690",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/products_services/facts/2",
+          "raw_fact_sha256": "dda48f74e737e9cfc7a0887657441c3b36b1a94b80566b62aa671b2d9618edd1",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "core"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/3",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "fact_id": "F005",
+          "consumer_fact_sha256": "a3198a4804d7db2f5e604468f560ef16207c4411b041c77ada607d7d28055a31",
+          "consumer_pointer": "/facts/14",
+          "fact": {
+            "fact_id": "F005",
+            "text": "公司通过化妆品产品销售取得收入：线上以直营和分销为主，直营覆盖天猫、抖音、京东、快手、拼多多等平台，分销包括淘宝、京东、唯品会等；线下通过经销商进入化妆品专营店、百货、美妆集合店等。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ],
+              "spans": [
+                {
+                  "page": 11,
+                  "start": 656,
+                  "end": 1924,
+                  "quote_sha256": "d70518d2742bc89f34531032a42b58da4e77234b65508dd1a2d2b2fef1161738",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "ad3d880c6cfac5c76b4bcee025912035f2f52b4be5f51e0c826fe0ccb1a55948",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-a9b750074793e8ae0317da86.json",
+            "sha256": "fac1a430b3d886c81875c4fadf6ae14086c9f40dfe1606a8d09b83ede28b1690",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/revenue_model/facts/0",
+          "raw_fact_sha256": "a3198a4804d7db2f5e604468f560ef16207c4411b041c77ada607d7d28055a31",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "core"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/4",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "fact_id": "review-add:OM001",
+          "consumer_fact_sha256": "edc40737b492251e8c91fe988e0fc77ce12f893fbb48b622f64df9236cc0fdbf",
+          "consumer_pointer": "/facts/15",
+          "fact": {
+            "fact_id": "review-add:OM001",
+            "text": "2025年公司营业收入为10,597,428,522.23元，较2024年10,778,411,781.20元下降1.68%；收入下降主要系珀莱雅品牌营收减少。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0002",
+              "source-0009",
+              "source-0028"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入",
+                "raw_value": "10,597,428,522.23",
+                "value": "10597428522.23",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "2024年10,778,411,781.20元，同比下降1.68%",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "final",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0002",
+              "record_pointer": "/workpaper/evidence/1",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第二节 公司简介和主要财务指标"
+              ],
+              "physical_pages": [
+                7
+              ],
+              "spans": [
+                {
+                  "page": 7,
+                  "start": 0,
+                  "end": 2797,
+                  "quote_sha256": "71e5a8e07eea2a99cd9a72c459d29ac184bbd8d074ddc3247f8217dfef693ea7",
+                  "quote_pointer": "/workpaper/evidence/1/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0009",
+              "record_pointer": "/workpaper/evidence/8",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ],
+              "physical_pages": [
+                12
+              ],
+              "spans": [
+                {
+                  "page": 12,
+                  "start": 885,
+                  "end": 3792,
+                  "quote_sha256": "cab223f5c1de84bd15a7900774d7300d50abbe87107a005bf3a5b28d9d5080d5",
+                  "quote_pointer": "/workpaper/evidence/8/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0028",
+              "record_pointer": "/workpaper/evidence/27",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                30
+              ],
+              "spans": [
+                {
+                  "page": 30,
+                  "start": 0,
+                  "end": 2386,
+                  "quote_sha256": "27b31ef3bf05f071cbbb0e9edc002ab359d6aeb7efb1750593ea43b4f7080d94",
+                  "quote_pointer": "/workpaper/evidence/27/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": true,
+          "sampling_stratum": "measurement",
+          "sampling_sha256": "1461b7836a7a9a6daef1cc335c1d2ff5fca30c19623b140cc44da83fefbd0de8",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-a9b750074793e8ae0317da86.json",
+            "sha256": "fac1a430b3d886c81875c4fadf6ae14086c9f40dfe1606a8d09b83ede28b1690",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/scale_and_mix/facts/0",
+          "raw_fact_sha256": "edc40737b492251e8c91fe988e0fc77ce12f893fbb48b622f64df9236cc0fdbf",
+          "visible_metric_original_indices": [
+            0
+          ],
+          "raw_metric_count": 1,
+          "audit_groups": [
+            "important"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/5",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [
+            {
+              "consumer_metric_index": 0,
+              "original_metric_index": 0,
+              "status": "supported",
+              "standardized_status": "not_assessed",
+              "binding_valid": true,
+              "judgment_pointer": "/objects/5/metric_checks/0"
+            }
+          ],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "fact_id": "F015",
+          "consumer_fact_sha256": "e3d7d97d1e25d62edceb4f96f6ba63eb85618d80a6a87cd1ddf1fd1d3af9da1b",
+          "consumer_pointer": "/facts/16",
+          "fact": {
+            "fact_id": "F015",
+            "text": "公司以自主生产为主、OEM/ODM为辅；护肤品类以自主生产为主，彩妆品类自主生产与OEM并行，拥有自建护肤工厂和彩妆工厂；湖州生产基地推进未来工厂和工业互联网试点。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0026"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ],
+              "spans": [
+                {
+                  "page": 11,
+                  "start": 656,
+                  "end": 1924,
+                  "quote_sha256": "d70518d2742bc89f34531032a42b58da4e77234b65508dd1a2d2b2fef1161738",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0026",
+              "record_pointer": "/workpaper/evidence/25",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                28
+              ],
+              "spans": [
+                {
+                  "page": 28,
+                  "start": 0,
+                  "end": 2310,
+                  "quote_sha256": "ef2215679f474cd5bbda967b3be2fe00faea0d6ab487ac76356603913cbb70e2",
+                  "quote_pointer": "/workpaper/evidence/25/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "6d5705b0d0ee6335d67d83104ebc46f8c24cea812d578dde3fc5abdf2c97ce63",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-a9b750074793e8ae0317da86.json",
+            "sha256": "fac1a430b3d886c81875c4fadf6ae14086c9f40dfe1606a8d09b83ede28b1690",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/operations_and_inputs/facts/0",
+          "raw_fact_sha256": "e3d7d97d1e25d62edceb4f96f6ba63eb85618d80a6a87cd1ddf1fd1d3af9da1b",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "supplement"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/6",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "fact_id": "F016",
+          "consumer_fact_sha256": "b47380cd69fd1a3dec9920d7393aa7e926133b25f8b655a94c8e4ee39255e712",
+          "consumer_pointer": "/facts/17",
+          "fact": {
+            "fact_id": "F016",
+            "text": "公司采用自主研发为主、产学研合作与国际协同的研发模式，设有杭州、上海和巴黎研发中心，并与高校、医院及原料供应商合作；报告期推进自研原料产业化。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008",
+              "source-0025"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "final",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0008",
+              "record_pointer": "/workpaper/evidence/7",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                12
+              ],
+              "spans": [
+                {
+                  "page": 12,
+                  "start": 0,
+                  "end": 464,
+                  "quote_sha256": "d62d705006655871f69c816c52c36f0440601e4156d0b8928ee4cc6d98d3998e",
+                  "quote_pointer": "/workpaper/evidence/7/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0025",
+              "record_pointer": "/workpaper/evidence/24",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                27
+              ],
+              "spans": [
+                {
+                  "page": 27,
+                  "start": 0,
+                  "end": 2279,
+                  "quote_sha256": "b4d8de7006d7f1ac8bb88623a54d7d5dc788d7322288ec113967808b3a959c51",
+                  "quote_pointer": "/workpaper/evidence/24/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "be3497af9b3b0abaaac30393757d516c30ec4d2b541304bd9bc9db1ecc934f09",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-a9b750074793e8ae0317da86.json",
+            "sha256": "fac1a430b3d886c81875c4fadf6ae14086c9f40dfe1606a8d09b83ede28b1690",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/elements/operations_and_inputs/facts/1",
+          "raw_fact_sha256": "b47380cd69fd1a3dec9920d7393aa7e926133b25f8b655a94c8e4ee39255e712",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "supplement"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/7",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "fact_id": "F022",
+          "consumer_fact_sha256": "f0675cd1c4108064a38295b225120393f68d186aed36ec2236f1c1f20844fd3d",
+          "consumer_pointer": "/facts/18",
+          "fact": {
+            "fact_id": "F022",
+            "text": "公司处于化妆品产业链的品牌运营、研发与生产环节，主要从事化妆品研发、生产和销售。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ],
+              "spans": [
+                {
+                  "page": 11,
+                  "start": 656,
+                  "end": 1924,
+                  "quote_sha256": "d70518d2742bc89f34531032a42b58da4e77234b65508dd1a2d2b2fef1161738",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "c8d0be896f4d2afa9e0f759f4d39ecca3e7494c9c1dd1b3d0b266aa2c930cea3",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-a9b750074793e8ae0317da86.json",
+            "sha256": "fac1a430b3d886c81875c4fadf6ae14086c9f40dfe1606a8d09b83ede28b1690",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/supply_chain/position/facts/0",
+          "raw_fact_sha256": "f0675cd1c4108064a38295b225120393f68d186aed36ec2236f1c1f20844fd3d",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [],
+          "A_semantic_duplicate_excluded": true,
+          "A_semantic_duplicate_of": {
+            "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+            "fact_id": "F001",
+            "consumer_fact_sha256": "3d4e661bb901740380950cfd9b51a7429deebd18475e3972e5b7cba7f495a71e"
+          },
+          "A_duplicate_reason": "A比较完整经济断言后确认该可选条只重复已有主营/用途断言，没有新增数值或关系；准确率按唯一对象去重，原展示不重写。",
+          "selected": false,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/8",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "fact_id": "F023",
+          "consumer_fact_sha256": "1e1b55355fd4de407c3c799c8ca3061a177bdf04310ad41e11c2c60b57410c27",
+          "consumer_pointer": "/facts/19",
+          "fact": {
+            "fact_id": "F023",
+            "text": "公司研发涉及化妆品原料与配方，并与高校、医院及原料供应商开展产学研合作；报告期推进自研原料产业化。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008",
+              "source-0025"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "final",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0008",
+              "record_pointer": "/workpaper/evidence/7",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                12
+              ],
+              "spans": [
+                {
+                  "page": 12,
+                  "start": 0,
+                  "end": 464,
+                  "quote_sha256": "d62d705006655871f69c816c52c36f0440601e4156d0b8928ee4cc6d98d3998e",
+                  "quote_pointer": "/workpaper/evidence/7/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            },
+            {
+              "evidence_id": "source-0025",
+              "record_pointer": "/workpaper/evidence/24",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况"
+              ],
+              "physical_pages": [
+                27
+              ],
+              "spans": [
+                {
+                  "page": 27,
+                  "start": 0,
+                  "end": 2279,
+                  "quote_sha256": "b4d8de7006d7f1ac8bb88623a54d7d5dc788d7322288ec113967808b3a959c51",
+                  "quote_pointer": "/workpaper/evidence/24/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "4d30ce9c7a78eab37a0056a90b5c1256fdcd9bedaf75cc3547cbdf2f65c4e8a7",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-a9b750074793e8ae0317da86.json",
+            "sha256": "fac1a430b3d886c81875c4fadf6ae14086c9f40dfe1606a8d09b83ede28b1690",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/supply_chain/upstream_inputs/facts/0",
+          "raw_fact_sha256": "1e1b55355fd4de407c3c799c8ca3061a177bdf04310ad41e11c2c60b57410c27",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "supplement"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/9",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "fact_id": "F024",
+          "consumer_fact_sha256": "bfedff97a0edc8feb4ba16c1827c2222cda8f26754b124b50e3e92009ae68f5d",
+          "consumer_pointer": "/facts/20",
+          "fact": {
+            "fact_id": "F024",
+            "text": "下游为化妆品消费者，产品通过线上平台及线下经销商/门店触达，覆盖护肤、彩妆、洗护等需求。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          "state": "reviewed",
+          "review_basis": "model_source_check",
+          "model_review_stage": "initial",
+          "reasons": [],
+          "metric_gaps": [],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "record_pointer": "/workpaper/evidence/6",
+              "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+              "document_hash_matches_report": true,
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ],
+              "spans": [
+                {
+                  "page": 11,
+                  "start": 656,
+                  "end": 1924,
+                  "quote_sha256": "d70518d2742bc89f34531032a42b58da4e77234b65508dd1a2d2b2fef1161738",
+                  "quote_pointer": "/workpaper/evidence/6/source_spans/0/quote",
+                  "coordinate_state": "not_checked_native_unavailable"
+                }
+              ]
+            }
+          ],
+          "binding_errors": [],
+          "review_all_candidate": false,
+          "sampling_stratum": "other",
+          "sampling_sha256": "14feee8cc07c4b2dae61d74163c445e077246ce92b2dc21a904d13334bbea7ae",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-a9b750074793e8ae0317da86.json",
+            "sha256": "fac1a430b3d886c81875c4fadf6ae14086c9f40dfe1606a8d09b83ede28b1690",
+            "json_pointer": ""
+          },
+          "report": {
+            "instrument_id": "603605.SH",
+            "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+            "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-21T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "raw_fact_pointer": "/workpaper/supply_chain/downstream_customers/facts/0",
+          "raw_fact_sha256": "bfedff97a0edc8feb4ba16c1827c2222cda8f26754b124b50e3e92009ae68f5d",
+          "visible_metric_original_indices": [],
+          "raw_metric_count": 0,
+          "audit_groups": [
+            "supplement"
+          ],
+          "A_semantic_duplicate_excluded": false,
+          "A_semantic_duplicate_of": null,
+          "A_duplicate_reason": null,
+          "selected": true,
+          "independent_status": "supported",
+          "A_assessment_kind": null,
+          "independent_judgment_pointer": "/objects/10",
+          "independent_narrative_status": "supported",
+          "independent_metric_checks": [],
+          "independent_metric_checks_complete": true
+        }
+      ],
+      "excluded_objects": [
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F001",
+          "pointer": "/facts/0",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F002",
+          "pointer": "/facts/1",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F003",
+          "pointer": "/facts/2",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。",
+            "涵盖彩棠与原色波塔两个品牌，不能合并为单一业务分部。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F004",
+          "pointer": "/facts/3",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。",
+            "涵盖多个品牌和洗护/护肤细分，不能合并为单一业务分部。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F005",
+          "pointer": "/facts/4",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F015",
+          "pointer": "/facts/5",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F016",
+          "pointer": "/facts/6",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F022",
+          "pointer": "/facts/7",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F023",
+          "pointer": "/facts/8",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "fact_id": "F024",
+          "pointer": "/facts/9",
+          "state": "superseded",
+          "reasons": [
+            "尚未源复核。"
+          ],
+          "metric_gaps": []
+        }
+      ],
+      "records": [
+        {
+          "work_id": "bp-work-a9b750074793e8ae0317da86",
+          "record": {
+            "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/raw20/company_profile_common_core.v1/bp-work-a9b750074793e8ae0317da86.json",
+            "sha256": "fac1a430b3d886c81875c4fadf6ae14086c9f40dfe1606a8d09b83ede28b1690",
+            "json_pointer": ""
+          },
+          "processing_identity": {
+            "execution_mode": "provider",
+            "logical_request_timeout_seconds": 2450.0,
+            "max_layout_characters": 500000,
+            "max_section_characters": 160000,
+            "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+            "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+            "prompt_version": "company_profile_workpaper.2026-11-28.subject-relationships.v22",
+            "quality_review_profile": "semantic_extraction__scorpio_grok",
+            "reading_strategy": "chapter_workpaper_v1",
+            "repair_profile": "semantic_extraction__deepseek",
+            "review_existing_draft_hash": "f0a3b6396a484a60e3fa46489ad8ca0bcb2977946404c3b44296fd68e0a36e98",
+            "review_max_output_tokens": 16384,
+            "review_seed_receipts_hash": "ad36c7b1157987a52514b12f38a8cc8daa5f4eb1a82b14b119cfd1ddd57cb5b3",
+            "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+            "semantic_policy": "company_profile_llm_led.v2",
+            "semantic_reuse": false,
+            "source_binding_policy": "company_workpaper_source_literals.column-wrapped-amounts.v8",
+            "workpaper_format_recovery": "local_shape_before_retry.v3",
+            "workpaper_max_output_tokens": 12000,
+            "workpaper_metric_format_policy": "source_metric_unparsed_value_null.v2.raw-null-accounting",
+            "workpaper_metric_limit_policy": "source_review_exact_metric_limits.v1",
+            "workpaper_review_policy": "company_profile_workpaper_review.v16",
+            "workpaper_review_recovery": {
+              "base_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+              "base_workpaper_sha256": "f0a3b6396a484a60e3fa46489ad8ca0bcb2977946404c3b44296fd68e0a36e98",
+              "plan_sha256": "ddeb885765be32ca7bfd205711691e1b2c083cc708b81b4b6cbe623b0d9c74e4",
+              "prior_use_review": null,
+              "report": {
+                "document_type": "annual_report",
+                "document_version": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+                "instrument_id": "603605.SH",
+                "published_at": "2026-04-21T16:00:00+00:00",
+                "report_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218",
+                "report_period": "2025-12-31"
+              },
+              "request_id": "6fn-review-603605-SH"
+            },
+            "workpaper_subject_scope_limit_policy": "source_review_exact_subject_limits.v1"
+          },
+          "human_restrictions_present": false,
+          "calls": [
+            {
+              "call_pointer": "/workpaper/generation/selection",
+              "purpose": "select_profile_sections",
+              "request_id": "bp-work-d08bc2adf7cd270f103a03fb:workpaper:sections",
+              "request_hash": "7933e42b28b963a21e4fbf86b24d5184c7f211dd04f9dd40081ecba774d9b748",
+              "response_hash": "c32afb1c0cab26d951997d18927a59d1c81123b9ae8b5ef1f42bd1372a3e8011",
+              "model": "deepseek-flash",
+              "source_label": "deepseek:deepseek-flash",
+              "finish_reason": "stop",
+              "receipt_binding": "matched_exact",
+              "receipt_pointers": [
+                "/workpaper_receipts/0"
+              ]
+            },
+            {
+              "call_pointer": "/workpaper/generation/extraction",
+              "purpose": "extract_profile_workpaper",
+              "request_id": "bp-work-d08bc2adf7cd270f103a03fb:workpaper:extract",
+              "request_hash": "386c75d5e90c9c48a20598364e48f988715dce4dc5a206a3e6f110a2fd89da19",
+              "response_hash": "1d79f231ae85cfa2a1652b425bf61c073cb027e5b76f76e52740d8f2cff5a80c",
+              "model": "deepseek-flash",
+              "source_label": "deepseek:deepseek-flash",
+              "finish_reason": "stop",
+              "receipt_binding": "matched_exact",
+              "receipt_pointers": [
+                "/workpaper_receipts/1"
+              ]
+            },
+            {
+              "call_pointer": "/workpaper/quality_review/calls/0",
+              "purpose": "review_profile_workpaper",
+              "request_id": "bp-work-a9b750074793e8ae0317da86:workpaper:review",
+              "request_hash": "1924bbb5bb517c399e2b21a205d56b31aba3e9a5c673fd81e1ffc80076895b7e",
+              "response_hash": "a4781e08b8fac5085a9df6e0416df2f7f75b8a881b1c093e612b0a3bcf617588",
+              "model": "grok-4.7",
+              "source_label": "scorpio:grok-4.7",
+              "finish_reason": "stop",
+              "receipt_binding": "matched_exact",
+              "receipt_pointers": [
+                "/workpaper_receipts/2"
+              ]
+            },
+            {
+              "call_pointer": "/workpaper/quality_review/calls/1",
+              "purpose": "repair_profile_workpaper",
+              "request_id": "bp-work-a9b750074793e8ae0317da86:workpaper:repair",
+              "request_hash": "2970d87408ca96be7ce058d837e8eafb2291277b1c6c47159c038003df8e80c0",
+              "response_hash": "0c1ba0a0b535bced01b7be83545beac88ed87e251b20fa5bdbff4541ccda452e",
+              "model": "deepseek-flash",
+              "source_label": "deepseek:deepseek-flash",
+              "finish_reason": "stop",
+              "receipt_binding": "matched_exact",
+              "receipt_pointers": [
+                "/workpaper_receipts/3"
+              ]
+            },
+            {
+              "call_pointer": "/workpaper/quality_review/calls/2",
+              "purpose": "verify_profile_workpaper_repair",
+              "request_id": "bp-work-a9b750074793e8ae0317da86:workpaper:repair-verify",
+              "request_hash": "8d99e4b48a8a8c6f52e9099ae60445a961419650f64b68e0ef7c5156347d6da1",
+              "response_hash": "2c2005aac5ad460b17e3c8ec8e470ff731a1bc17add24e706e62e67cfb03e0a5",
+              "model": "grok-4.7",
+              "source_label": "scorpio:grok-4.7",
+              "finish_reason": "stop",
+              "receipt_binding": "matched_exact",
+              "receipt_pointers": [
+                "/workpaper_receipts/4"
+              ]
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "state": "final",
+        "supplement_target": 20,
+        "supplement_universe": 4,
+        "mandatory_unique_objects": 6,
+        "selected_unique_union": 10,
+        "selected_supplement": 4,
+        "semantic_duplicates": 1,
+        "unique_objects": 10,
+        "verification_errors": []
+      },
+      "verification_errors": [],
+      "information_gaps": [
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "active": false,
+          "superseded_by_review_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "element": "business_structure",
+          "status": "observed",
+          "reasons": [
+            "未展开各子品牌完整产品线、价格区间和收入明细。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "superseded_by_review"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "active": false,
+          "superseded_by_review_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "element": "products_services",
+          "status": "observed",
+          "reasons": [
+            "未逐一列示所有SKU、价格区间和子品牌细节。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "superseded_by_review"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "active": false,
+          "superseded_by_review_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "element": "revenue_model",
+          "status": "observed",
+          "reasons": [
+            "未获取分平台佣金、经销折扣及收入确认细项。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "superseded_by_review"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "active": false,
+          "superseded_by_review_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "element": "scale_and_mix",
+          "status": "unclear",
+          "reasons": [
+            "未获取成功：分地区明细中“其他（部分电商）”为混合口径，未作为地区或业务分部量化；其他品牌收入未单独展开。",
+            "指标格式隔离：事实F006未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F007未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F008未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F009未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F010未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F011未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F012未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F013未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F014未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "superseded_by_review"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "active": false,
+          "superseded_by_review_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "element": "operations_and_inputs",
+          "status": "observed",
+          "reasons": [
+            "未获取成功：产能、产量、库存量及具体原材料采购数据未纳入；保留经营模式与研发资源说明。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "superseded_by_review"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "active": false,
+          "superseded_by_review_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "element": "customers_channels_markets",
+          "status": "unclear",
+          "reasons": [
+            "未获取成功：客户集中度、会员数和单平台成交额明细未获取；保留渠道结构与销售模式。",
+            "指标格式隔离：事实F017未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted; metrics.3.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F018未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted; metrics.3.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "superseded_by_review"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "active": false,
+          "superseded_by_review_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "element": "operating_drivers",
+          "status": "unclear",
+          "reasons": [
+            "未展开销售费用投放效率、分品牌毛利率和研发项目投入明细。",
+            "指标格式隔离：事实F019未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted; metrics.3.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "superseded_by_review"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "active": false,
+          "superseded_by_review_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "element": "material_changes",
+          "status": "unclear",
+          "reasons": [
+            "未获取处置、并购等事件时间及完整原因；仅保留报告期收入、成本和现金流变动说明。",
+            "指标格式隔离：事实F020未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F021未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "superseded_by_review"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "active": false,
+          "superseded_by_review_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "element": "position",
+          "status": "observed",
+          "reasons": [
+            "未披露具体采购量、供应商集中度及客户名单。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "superseded_by_review"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "active": false,
+          "superseded_by_review_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "element": "upstream_inputs",
+          "status": "observed",
+          "reasons": [
+            "未获取成功：具体原料采购量、供应商名称及集中度未获取；仅保留已披露的研发合作方向。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "superseded_by_review"
+        },
+        {
+          "reading_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+          "active": false,
+          "superseded_by_review_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "element": "downstream_customers",
+          "status": "observed",
+          "reasons": [
+            "未获取客户名单、客户集中度及分渠道消费者画像明细。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "superseded_by_review"
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "element": "business_structure",
+          "status": "observed",
+          "reasons": [
+            "未展开各子品牌完整产品线、价格区间和收入明细。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "element": "products_services",
+          "status": "observed",
+          "reasons": [
+            "未逐一列示所有SKU、价格区间和子品牌细节。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "element": "revenue_model",
+          "status": "observed",
+          "reasons": [
+            "未获取分平台佣金、经销折扣及收入确认细项。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "element": "scale_and_mix",
+          "status": "observed",
+          "reasons": [
+            "未获取成功：分地区明细中“其他（部分电商）”为混合口径，未作为地区或业务分部量化；其他品牌收入未单独展开。",
+            "指标格式隔离：事实F006未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F007未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F008未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F009未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F010未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F011未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F012未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F013未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F014未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "element": "operations_and_inputs",
+          "status": "observed",
+          "reasons": [
+            "未获取成功：产能、产量、库存量及具体原材料采购数据未纳入；保留经营模式与研发资源说明。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "element": "customers_channels_markets",
+          "status": "unclear",
+          "reasons": [
+            "未获取成功：客户集中度、会员数和单平台成交额明细未获取；保留渠道结构与销售模式。",
+            "指标格式隔离：事实F017未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted; metrics.3.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F018未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted; metrics.3.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "element": "operating_drivers",
+          "status": "unclear",
+          "reasons": [
+            "未展开销售费用投放效率、分品牌毛利率和研发项目投入明细。",
+            "指标格式隔离：事实F019未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted; metrics.3.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "element": "material_changes",
+          "status": "unclear",
+          "reasons": [
+            "未获取处置、并购等事件时间及完整原因；仅保留报告期收入、成本和现金流变动说明。",
+            "指标格式隔离：事实F020未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted; metrics.2.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。",
+            "指标格式隔离：事实F021未作为结论采用；metrics.0.evidence_ids: Extra inputs are not permitted; metrics.1.evidence_ids: Extra inputs are not permitted；原内容保留在模型回执。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "element": "position",
+          "status": "observed",
+          "reasons": [
+            "未披露具体采购量、供应商集中度及客户名单。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "element": "upstream_inputs",
+          "status": "observed",
+          "reasons": [
+            "未获取成功：具体原料采购量、供应商名称及集中度未获取；仅保留已披露的研发合作方向。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "element": "downstream_customers",
+          "status": "observed",
+          "reasons": [
+            "未获取客户名单、客户集中度及分渠道消费者画像明细。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "element": "products_services",
+          "fact_id": "F004",
+          "status": "unclear",
+          "field": "subject_scope",
+          "state": "unclear",
+          "reason": "原文支持悦芙媞年轻肌专研及由基础清洁向痘敏修护延伸、Off&Relax亚洲头皮整全愈养及洗发/头皮护理/防脱育发/护发与身体护理、惊时头皮微生态洗护及控油/去屑/舒敏线、CORRECTORS实验室级专业护肤；期间为2025报告期，所引四页可覆盖各句。单一business_segment无法同时表达四个品牌以及洗护与护肤两类关系，不能据此合并为一个业务分部，也不能改标为consolidated_group。叙述、期间与引证应保留，仅限制该事实的subject_scope枚举。",
+          "consolidated_aggregation_allowed": false,
+          "usage_restriction": "不得按事实主体作为合并口径加总或比较；指标须按各自主体及现有限制使用。",
+          "review_basis": "model_source_check",
+          "model_finding_ids": [
+            "CF004"
+          ],
+          "model_reasons": [
+            "原文支持悦芙媞年轻肌专研及由基础清洁向痘敏修护延伸、Off&Relax亚洲头皮整全愈养及洗发/头皮护理/防脱育发/护发与身体护理、惊时头皮微生态洗护及控油/去屑/舒敏线、CORRECTORS实验室级专业护肤；期间为2025报告期，所引四页可覆盖各句。单一business_segment无法同时表达四个品牌以及洗护与护肤两类关系，不能据此合并为一个业务分部，也不能改标为consolidated_group。叙述、期间与引证应保留，仅限制该事实的subject_scope枚举。"
+          ],
+          "evidence_ids": [
+            "source-0007",
+            "source-0015",
+            "source-0020",
+            "source-0023"
+          ],
+          "reasons": [
+            "原文支持悦芙媞年轻肌专研及由基础清洁向痘敏修护延伸、Off&Relax亚洲头皮整全愈养及洗发/头皮护理/防脱育发/护发与身体护理、惊时头皮微生态洗护及控油/去屑/舒敏线、CORRECTORS实验室级专业护肤；期间为2025报告期，所引四页可覆盖各句。单一business_segment无法同时表达四个品牌以及洗护与护肤两类关系，不能据此合并为一个业务分部，也不能改标为consolidated_group。叙述、期间与引证应保留，仅限制该事实的subject_scope枚举。",
+            "不得按事实主体作为合并口径加总或比较；指标须按各自主体及现有限制使用。"
+          ],
+          "supplemental_reading_work_ids": [],
+          "follow_up_state": "no_supplement_yet"
+        }
+      ],
+      "metric_gaps": [],
+      "suggested_acquisitions": [
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "finding_id": "OM002",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "reason": "主营业务分品类构成缺失，公司总收入或单一最大品类不能代替。source-0009：主营业务收入105.85亿元、同比下降1.67%；护肤类（含洁肤）81.82亿元、下降9.28%、占主营业务77.29%；美容彩妆类15.63亿元、增长14.86%、占14.77%；洗护类8.40亿元、增长117.85%、占7.94%。占比分母是主营业务总收入。source-0029、source-0030对应元口径收入分别为8,181,722,642.43元、1,562,939,340.99元、840,692,043.40元，合计10,585,354,026.82元。应使用来源品类名称，不要把护肤类写成集团总收入。",
+          "evidence_ids": [
+            "source-0009",
+            "source-0029",
+            "source-0030"
+          ]
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "finding_id": "OM003",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "reason": "主营业务分品牌构成缺失，且与分品类口径不同，应单独补充。source-0009按占主营业务总收入列示：珀莱雅76.89亿元、下降10.39%、占72.64%；彩棠12.55亿元、增长5.37%、占11.86%；OR 7.44亿元、增长102.19%、占7.03%；悦芙媞3.71亿元、增长11.80%、占3.50%；原色波塔2.56亿元、增长125.38%、占2.42%；惊时0.96亿元、增长441.66%、占0.91%；其他品牌1.74亿元。source-0010注明2023年及以前原色波塔并入其他品牌、2024年惊时并入其他品牌，表内“-”不得当成零或推算缺失年度。品牌行不是合并集团总额。",
+          "evidence_ids": [
+            "source-0009",
+            "source-0010"
+          ]
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "finding_id": "OM004",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "reason": "F005只说明销售模式，没有渠道收入权重。source-0009主营业务分渠道：线上直营81.92亿元、增长0.87%、占主营业务77.39%；线上分销19.25亿元、下降8.84%、占18.19%；线上小计101.17亿元、下降1.14%、占95.58%；线下日化2.82亿元、下降22.70%；线下其他1.86亿元、增长11.10%；线下小计4.68亿元、下降12.04%、占4.42%。占比为占主营业务总收入。source-0032元口径仅有线上10,117,452,338.31元、线下467,901,688.51元，不能再拆成直营/分销。直营、分销、日化是渠道或销售模式，不是业务分部。",
+          "evidence_ids": [
+            "source-0009",
+            "source-0032"
+          ]
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "finding_id": "OM005",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "reason": "其他业务收入0.12亿元是营业收入105.97亿元与主营业务收入105.85亿元之间的调节项，不是公司总收入，也不是普通产品分部。金额较小，但应单独保留，避免把两个总额轧差后改写成同一口径。已供章节未给出其他业务的同比或构成，不要补造。",
+          "evidence_ids": [
+            "source-0009"
+          ]
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "finding_id": "OM006",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "reason": "经营要素限制把产量、库存量写成未获取，与已供source-0033矛盾。日化产品（支，含自产及ODM、OEM）：生产量361,318,426、同比-2.75%；销售量357,392,896、同比-6.40%；库存量102,802,179、同比3.97%。这不是收入，也不能据此推断产能或原材料采购量；后两者在已供章节仍未出现，应继续保持未知。",
+          "evidence_ids": [
+            "source-0033"
+          ]
+        },
+        {
+          "reading_work_id": "bp-work-a9b750074793e8ae0317da86",
+          "active": true,
+          "element": "products_services",
+          "fact_id": "F004",
+          "field": "subject_scope",
+          "severity": "material",
+          "reason": "建议按需定向精读原业务章节，区分经营主体、统计范围与资产所属；不猜替代主体。 原文支持悦芙媞年轻肌专研及由基础清洁向痘敏修护延伸、Off&Relax亚洲头皮整全愈养及洗发/头皮护理/防脱育发/护发与身体护理、惊时头皮微生态洗护及控油/去屑/舒敏线、CORRECTORS实验室级专业护肤；期间为2025报告期，所引四页可覆盖各句。单一business_segment无法同时表达四个品牌以及洗护与护肤两类关系，不能据此合并为一个业务分部，也不能改标为consolidated_group。叙述、期间与引证应保留，仅限制该事实的subject_scope枚举。；不得按事实主体作为合并口径加总或比较；指标须按各自主体及现有限制使用。",
+          "evidence_ids": [
+            "source-0007",
+            "source-0015",
+            "source-0020",
+            "source-0023"
+          ]
+        }
+      ],
+      "A_core_conditions": [
+        {
+          "condition_id": "C1",
+          "view": "company_profile",
+          "supported": true,
+          "supporting_fact_ids": [
+            "F001"
+          ],
+          "reason": "A按原文与实际可读基础描述核实主营/产品应用/变现三问，重要业务实质覆盖；局部可隔离经营尾项错误不一票否决公司，准确率仍逐对象计错。"
+        },
+        {
+          "condition_id": "C2",
+          "view": "company_profile",
+          "supported": true,
+          "supporting_fact_ids": [
+            "F002",
+            "F003",
+            "F004"
+          ],
+          "reason": "A按原文与实际可读基础描述核实主营/产品应用/变现三问，重要业务实质覆盖；局部可隔离经营尾项错误不一票否决公司，准确率仍逐对象计错。"
+        },
+        {
+          "condition_id": "C3",
+          "view": "company_profile",
+          "supported": true,
+          "supporting_fact_ids": [
+            "F005"
+          ],
+          "reason": "A按原文与实际可读基础描述核实主营/产品应用/变现三问，重要业务实质覆盖；局部可隔离经营尾项错误不一票否决公司，准确率仍逐对象计错。"
+        }
+      ],
+      "independent_review_source": {
+        "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-audit-final.json",
+        "sha256": "96efe13aada4523fda78c24097588de2399a90c0fb0b41432920892924de3336",
+        "json_pointer": "/companies/5/phases/automatic_final"
+      },
+      "A_usable": true,
+      "A_source_reference_sha256": "3f659de187d4c7bb4522715cf68c615754c31dd71a51581c6e3cac9f8879abda"
+    },
+    "human_safe": {
+      "state": "not_delivered",
+      "objects": [],
+      "selection": null
+    }
+  },
+  "cross_stage_ID_comparisons": [
+    {
+      "fact_id": "F001",
+      "first_identity": [
+        "bp-work-d08bc2adf7cd270f103a03fb",
+        "F001",
+        "3d4e661bb901740380950cfd9b51a7429deebd18475e3972e5b7cba7f495a71e"
+      ],
+      "automatic_identity": [
+        "bp-work-a9b750074793e8ae0317da86",
+        "F001",
+        "3d4e661bb901740380950cfd9b51a7429deebd18475e3972e5b7cba7f495a71e"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F002",
+      "first_identity": [
+        "bp-work-d08bc2adf7cd270f103a03fb",
+        "F002",
+        "3e8354a2fefd73aec23c0699a84a537ce49db75909466bb6ffda33f63a05370a"
+      ],
+      "automatic_identity": [
+        "bp-work-a9b750074793e8ae0317da86",
+        "F002",
+        "3e8354a2fefd73aec23c0699a84a537ce49db75909466bb6ffda33f63a05370a"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F003",
+      "first_identity": [
+        "bp-work-d08bc2adf7cd270f103a03fb",
+        "F003",
+        "3f2a68d6a111d0cbb732a7a53ddb735eb7904fcde09d6d0e6c5c4b6ca8001cac"
+      ],
+      "automatic_identity": [
+        "bp-work-a9b750074793e8ae0317da86",
+        "F003",
+        "35a5faec58c3b92b84889d832c58e243d4e08e14694d0be8ccb11eb545f5ed87"
+      ],
+      "consumer_hash_equal": false,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F004",
+      "first_identity": [
+        "bp-work-d08bc2adf7cd270f103a03fb",
+        "F004",
+        "dda48f74e737e9cfc7a0887657441c3b36b1a94b80566b62aa671b2d9618edd1"
+      ],
+      "automatic_identity": [
+        "bp-work-a9b750074793e8ae0317da86",
+        "F004",
+        "60c15cc24bbeeef3d37cb00558436cf4ce18c000059f664dad63a2a5cebecd93"
+      ],
+      "consumer_hash_equal": false,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F005",
+      "first_identity": [
+        "bp-work-d08bc2adf7cd270f103a03fb",
+        "F005",
+        "a3198a4804d7db2f5e604468f560ef16207c4411b041c77ada607d7d28055a31"
+      ],
+      "automatic_identity": [
+        "bp-work-a9b750074793e8ae0317da86",
+        "F005",
+        "a3198a4804d7db2f5e604468f560ef16207c4411b041c77ada607d7d28055a31"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F015",
+      "first_identity": [
+        "bp-work-d08bc2adf7cd270f103a03fb",
+        "F015",
+        "e3d7d97d1e25d62edceb4f96f6ba63eb85618d80a6a87cd1ddf1fd1d3af9da1b"
+      ],
+      "automatic_identity": [
+        "bp-work-a9b750074793e8ae0317da86",
+        "F015",
+        "e3d7d97d1e25d62edceb4f96f6ba63eb85618d80a6a87cd1ddf1fd1d3af9da1b"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F016",
+      "first_identity": [
+        "bp-work-d08bc2adf7cd270f103a03fb",
+        "F016",
+        "61e879ab0cb5b6046b133382d803ac68e8e5c2b539adb71475e2e2a5f7d32d1a"
+      ],
+      "automatic_identity": [
+        "bp-work-a9b750074793e8ae0317da86",
+        "F016",
+        "b47380cd69fd1a3dec9920d7393aa7e926133b25f8b655a94c8e4ee39255e712"
+      ],
+      "consumer_hash_equal": false,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F022",
+      "first_identity": [
+        "bp-work-d08bc2adf7cd270f103a03fb",
+        "F022",
+        "f0675cd1c4108064a38295b225120393f68d186aed36ec2236f1c1f20844fd3d"
+      ],
+      "automatic_identity": [
+        "bp-work-a9b750074793e8ae0317da86",
+        "F022",
+        "f0675cd1c4108064a38295b225120393f68d186aed36ec2236f1c1f20844fd3d"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F023",
+      "first_identity": [
+        "bp-work-d08bc2adf7cd270f103a03fb",
+        "F023",
+        "aaf28c53aa4d74ef8ef5ac0a900cba45690a10072fbad745bf82486266c5d383"
+      ],
+      "automatic_identity": [
+        "bp-work-a9b750074793e8ae0317da86",
+        "F023",
+        "1e1b55355fd4de407c3c799c8ca3061a177bdf04310ad41e11c2c60b57410c27"
+      ],
+      "consumer_hash_equal": false,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    },
+    {
+      "fact_id": "F024",
+      "first_identity": [
+        "bp-work-d08bc2adf7cd270f103a03fb",
+        "F024",
+        "bfedff97a0edc8feb4ba16c1827c2222cda8f26754b124b50e3e92009ae68f5d"
+      ],
+      "automatic_identity": [
+        "bp-work-a9b750074793e8ae0317da86",
+        "F024",
+        "bfedff97a0edc8feb4ba16c1827c2222cda8f26754b124b50e3e92009ae68f5d"
+      ],
+      "consumer_hash_equal": true,
+      "semantic_identity": "not_assessed; same ID is only a comparison candidate"
+    }
+  ],
+  "version_issues": [],
+  "semantic_assessment": "none_by_mechanical_assistant",
+  "supplier_requests": 0
+}

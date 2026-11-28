@@ -1,0 +1,134 @@
+{
+  "task": "6.FY",
+  "authorized": true,
+  "approval_reference": "User 2026-11-28 explicitly approved group-level criteria correction, fixed prospective20 once and original-owner research delivery; A releases all20 under company-profile-prospective20-closeout-card.md",
+  "plan_sha256": "85eeb4033daba7956a3865bd3b2b9e47f7fad1e4d4560e34bc32fe0f61edbc66",
+  "method": {
+    "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-group-method.md",
+    "sha256": "9492e3ddec06865f876011c35a8ad806a8a5e773cdd786c94280e4c69fa32bd9"
+  },
+  "runtime_stop_file": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-stop.json",
+  "references": {
+    "920022.BJ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-920022.BJ.json",
+      "sha256": "cf606752c40ae7d8986d2efea8b48d4f8f4afc9fbc7cea2db3b91ab426cd49e8"
+    },
+    "601000.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-601000.SH.json",
+      "sha256": "67529fbe25680845d8cc3d3c82cd14e1fe787eb24a4af7c2c177e230b40420a3"
+    },
+    "600928.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-600928.SH.json",
+      "sha256": "f5cccc88475e4e64ae4a96f2118b48ec366d8a9e7830355c2738caf65bf1a6f0"
+    },
+    "002316.SZ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-002316.SZ.json",
+      "sha256": "0e2fcd2e283e14a00cb3790b383746887c66797ff3901654f5048283096b80ef"
+    },
+    "002050.SZ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-002050.SZ.json",
+      "sha256": "72aced4c252482852f59380ce9613a932c8d7f66bb6e9b5dd20478dda3d60a41"
+    },
+    "603128.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-603128.SH.json",
+      "sha256": "08276761d045ecbad5ddd6ded89166b7d051bb81d4577e160a3cbb7e27c8f07e"
+    },
+    "601336.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-601336.SH.json",
+      "sha256": "c0c10ea119bee0e4c0de2c3220a31eadfc9d5bae8f4363d56340bd7be7f03a78"
+    },
+    "002420.SZ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-002420.SZ.json",
+      "sha256": "7555aa70ce58e970e4d24ede4684839bf6f01e9767c76761b937f1c06db57ad4"
+    },
+    "002463.SZ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-002463.SZ.json",
+      "sha256": "4b19db5a7ca37559208286cb241e53f24aabed039b4cd96d563e1feb21007d9f"
+    },
+    "601098.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-601098.SH.json",
+      "sha256": "ee456b4c4323553eea2d3481a1f3cc90297ae5d9ffa65b850093adf927763110"
+    },
+    "601108.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-601108.SH.json",
+      "sha256": "90bfe2c3407b74313e5123065f6d8c7ce5874ba6e343bf52efa2d48c4f207c00"
+    },
+    "002575.SZ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-002575.SZ.json",
+      "sha256": "bcfbb3921ea6156cd65e21dcd5916a32d9390fce52bbb36c5d8c6f83900da6d9"
+    },
+    "920026.BJ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-920026.BJ.json",
+      "sha256": "773418cec2c664b6e4e56aa7ad40f8a191c004b78571a5d92f26a83797c1b584"
+    },
+    "601156.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-601156.SH.json",
+      "sha256": "2cda174a9bb897fb63e82a3dfd448339650ab7cbbebe641995dcb8bd5eb7b9ef"
+    },
+    "601665.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-601665.SH.json",
+      "sha256": "2dbd457400f6b2511859477f82e935aaedce76301bd94b9071b5b7f111191edb"
+    },
+    "600673.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-600673.SH.json",
+      "sha256": "5cc7efabf7b61b86eb15d6514ff9b90560d1a5e98c45124ee91b55ef49a10cf7"
+    },
+    "603605.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-603605.SH.json",
+      "sha256": "3f659de187d4c7bb4522715cf68c615754c31dd71a51581c6e3cac9f8879abda"
+    },
+    "600717.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-600717.SH.json",
+      "sha256": "1896d15bd46fe8dc84e1717da1d18ab127d01cde8e1b4c80f21568eb38213d1f"
+    },
+    "002807.SZ": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-002807.SZ.json",
+      "sha256": "233ac9757d8e97f1373ee4960c124d84b2c90090562c646d906ddb0fd65efc23"
+    },
+    "600881.SH": {
+      "path": "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/a-reference-600881.SH.json",
+      "sha256": "be385b55934c8cedd8f164f4d1f586fb93103daa0bf73f4487cd08e7ac38748c"
+    }
+  },
+  "scope": [
+    "920022.BJ",
+    "601000.SH",
+    "600928.SH",
+    "002316.SZ",
+    "002050.SZ",
+    "603128.SH",
+    "601336.SH",
+    "002420.SZ",
+    "002463.SZ",
+    "601098.SH",
+    "601108.SH",
+    "002575.SZ",
+    "920026.BJ",
+    "601156.SH",
+    "601665.SH",
+    "600673.SH",
+    "603605.SH",
+    "600717.SH",
+    "002807.SZ",
+    "600881.SH"
+  ],
+  "knowledge_cutoff": "2026-11-25",
+  "execution_date": "2026-11-28",
+  "budget": {
+    "company_seconds": 6000,
+    "company_tokens": 1000000,
+    "company_physical": 10,
+    "company_recoveries": 3,
+    "per_logical_recovery": 1,
+    "group_seconds": 30600,
+    "group_tokens": 20000000,
+    "group_physical": 200,
+    "concurrency": 4
+  },
+  "network_execution": "require_escalated approved environment only; same process DNS/TLS before group marker",
+  "data_transfer": "Only the20 existing public annual reports TOCs/selected sections and public-derived drafts to existing official DeepSeek and Scorpio/Grok profiles; no A reference, old semantic answers, private user data or credentials",
+  "A_review": "source identities and60 core conditions frozen; original same-budget two-stage function reused, actual identity/timeout/shared-budget proof reviewed; no new app change or new zero-omission prerequisite",
+  "historical_results_and_current39_protected": true,
+  "new_model_calls_before_this_freeze": 0,
+  "subsequent100_or_production_authorized": false
+}

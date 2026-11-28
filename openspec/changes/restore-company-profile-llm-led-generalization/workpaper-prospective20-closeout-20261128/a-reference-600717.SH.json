@@ -1,0 +1,49 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "instrument_id": "600717.SH",
+  "name": "天津港",
+  "report": {
+    "content_hash": "3dd77ce66d89bead987859aef3c5603bd1259610088cf333512a2a3d05d86c6b",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-24T16:00:00+00:00",
+    "source": "cninfo",
+    "source_announcement_id": "1225029230",
+    "asset_id": "asset_838a86dabc181e3338d533cc80309e72"
+  },
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/3d/3dd77ce66d89bead987859aef3c5603bd1259610088cf333512a2a3d05d86c6b.pdf",
+  "pdf_sha256": "3dd77ce66d89bead987859aef3c5603bd1259610088cf333512a2a3d05d86c6b",
+  "source_sections_and_physical_pages": "第三节/一、公司业务与市场物理10；三、经营讨论11；五/主营分析与收入成本13–15",
+  "core_conditions": [
+    {
+      "condition_id": "C1",
+      "question": "公司做什么",
+      "expected_source_answer": "综合港口装卸运营主体，兼营销售、港口物流、港口服务及其他业务"
+    },
+    {
+      "condition_id": "C2",
+      "question": "主要产品/服务与板块",
+      "expected_source_answer": "集装箱及矿石煤炭油品钢材等货类装卸、运输仓储物流和港口配套服务，另有销售业务"
+    },
+    {
+      "condition_id": "C3",
+      "question": "怎么赚钱",
+      "expected_source_answer": "提供港口装卸和物流/配套服务并有销售收入；公司四板块收入均按源描述，不只写装卸"
+    }
+  ],
+  "important_numbers": {
+    "company_revenue_CNY": "12791680229.52",
+    "loading_unloading_revenue_CNY": "7799137524.32",
+    "sales_revenue_CNY": "2612064182.03",
+    "port_logistics_revenue_CNY": "2581368231.57",
+    "port_other_services_CNY": "655261691.03",
+    "elimination_CNY": "-856151399.43"
+  },
+  "qualifications": [
+    "主营表13–14含本/上期及调整/抵销，不借错列",
+    "天津全港网络/行业排名与上市公司具体业绩范围不同",
+    "已实现营收127.92亿不把预算116亿当实际；公司吞吐4.57亿吨与集装箱2081万TEU不能混单位"
+  ],
+  "basis": "A direct original PDF reading before new20 model sends, with exact earlier original-source reading reused where unchanged",
+  "reference_sent_to_model": false
+}

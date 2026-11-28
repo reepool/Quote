@@ -1,0 +1,49 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "instrument_id": "601000.SH",
+  "report": {
+    "content_hash": "2a609f967dbcd75e6db696a1aa4ac10a205a5c12c02ca974b55ccedf72f307dc",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-27T16:00:00+00:00",
+    "source": "cninfo",
+    "source_announcement_id": "1225040947",
+    "asset_id": "asset_05afecec40bdda51a6b46f441d753ea6"
+  },
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/2a/2a609f967dbcd75e6db696a1aa4ac10a205a5c12c02ca974b55ccedf72f307dc.pdf",
+  "pdf_sha256": "2a609f967dbcd75e6db696a1aa4ac10a205a5c12c02ca974b55ccedf72f307dc",
+  "name": "唐山港",
+  "source_sections_and_physical_pages": "第三节/一、业务情况、三、经营讨论及五、主要经营/利润表分析，物理10–12",
+  "core_conditions": [
+    {
+      "condition_id": "C1",
+      "question": "公司做什么",
+      "expected_source_answer": "京唐港区港口建设运营与综合运输服务"
+    },
+    {
+      "condition_id": "C2",
+      "question": "主要产品/服务与板块",
+      "expected_source_answer": "装卸堆存、运输物流、保税仓储和港口综合服务，以矿石煤炭钢材等货种为主"
+    },
+    {
+      "condition_id": "C3",
+      "question": "怎么赚钱",
+      "expected_source_answer": "按港口作业/运输合同提供作业增值服务，收作业包干费、库场使用费及理货服务费"
+    }
+  ],
+  "important_numbers": {
+    "company_revenue_CNY": "5683742176.20",
+    "cargo_throughput_raw": "2.42亿吨",
+    "ore_raw": "1.29亿吨",
+    "coal_raw": "0.66亿吨"
+  },
+  "qualifications": [
+    "全国港口183.4亿吨不是公司吞吐量",
+    "收入下降0.71%而利润总额增长2.09%，指标含义不能互换",
+    "51/52泊位即将实质建设与已投产项目需区分"
+  ],
+  "basis": "exact original PDF/version and existing independent A source reading reused; no model answer used",
+  "prior_source_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/a-prospective-source-reference.json",
+  "prior_source_sha256": "a4e8d1d47431ff07cdddad12cda62b91cfab14194b66cf9bf6a73af28babdb22",
+  "reference_sent_to_model": false
+}

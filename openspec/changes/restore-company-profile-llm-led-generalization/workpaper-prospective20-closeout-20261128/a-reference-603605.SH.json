@@ -1,0 +1,51 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "instrument_id": "603605.SH",
+  "report": {
+    "content_hash": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-21T16:00:00+00:00",
+    "source": "cninfo",
+    "source_announcement_id": "1225138279",
+    "asset_id": "asset_bbd342a0f456032b0ea04c5ab8b6a218"
+  },
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/ac/ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a.pdf",
+  "pdf_sha256": "ac728cbb99a3c9be9092f5d765431d0540fe784cd8bd3ca4a1cb96bb20b04b0a",
+  "name": "珀莱雅",
+  "source_sections_and_physical_pages": "第三节/一、业务情况及三、经营讨论，物理11–13",
+  "core_conditions": [
+    {
+      "condition_id": "C1",
+      "question": "公司做什么",
+      "expected_source_answer": "多品牌化妆品研发生产销售，覆盖护肤、彩妆和洗护"
+    },
+    {
+      "condition_id": "C2",
+      "question": "主要产品/服务与板块",
+      "expected_source_answer": "珀莱雅/彩棠/OR等品牌，产品主类护肤含洁肤、美容彩妆、洗护"
+    },
+    {
+      "condition_id": "C3",
+      "question": "怎么赚钱",
+      "expected_source_answer": "线上直营/分销为主、线下经销并行；自主生产为主并有OEM/ODM"
+    }
+  ],
+  "important_numbers": {
+    "company_revenue_raw": "105.97亿元",
+    "main_business_revenue_raw": "105.85亿元",
+    "skin_care_raw": "81.82亿元",
+    "makeup_raw": "15.63亿元",
+    "hair_body_care_raw": "8.40亿元",
+    "online_main_share": "95.58%"
+  },
+  "qualifications": [
+    "收入同比实际下降1.68%，不可照模板小标题写增长",
+    "品牌/渠道/品类是同一主营收入的不同拆分不能加总",
+    "渠道/品牌占比的分母是主营业务总收入，源表已明示，保原文即可"
+  ],
+  "basis": "exact original PDF/version and existing independent A source reading reused; no model answer used",
+  "prior_source_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/a-prospective-source-reference.json",
+  "prior_source_sha256": "a4e8d1d47431ff07cdddad12cda62b91cfab14194b66cf9bf6a73af28babdb22",
+  "reference_sent_to_model": false
+}

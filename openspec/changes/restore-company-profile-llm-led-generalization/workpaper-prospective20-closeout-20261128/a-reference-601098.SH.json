@@ -1,0 +1,48 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "instrument_id": "601098.SH",
+  "name": "中南传媒",
+  "report": {
+    "content_hash": "fabeb17501c137f39808941adbb18c609d32378680ed48619cd497470b330c31",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-08T16:00:00+00:00",
+    "source": "cninfo",
+    "source_announcement_id": "1225086508",
+    "asset_id": "asset_f5a0ad28ad8eedb3bbde6cb160e18f32"
+  },
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/fa/fabeb17501c137f39808941adbb18c609d32378680ed48619cd497470b330c31.pdf",
+  "pdf_sha256": "fabeb17501c137f39808941adbb18c609d32378680ed48619cd497470b330c31",
+  "source_sections_and_physical_pages": "第三节/一、业务与模式物理8–9；三、经营讨论10；五、主要经营/收入与成本12–13",
+  "core_conditions": [
+    {
+      "condition_id": "C1",
+      "question": "公司做什么",
+      "expected_source_answer": "出版传媒集团，出版发行及印刷物资等全产业链，并有媒体、数字服务和金融协同"
+    },
+    {
+      "condition_id": "C2",
+      "question": "主要产品/服务与板块",
+      "expected_source_answer": "图书教材教辅出版/租型发行、印刷与纸张物资供应，广告/媒体和数字教育等服务"
+    },
+    {
+      "condition_id": "C3",
+      "question": "怎么赚钱",
+      "expected_source_answer": "内容出版、批零/电商及政府采购发行、合同印刷/物资销售、广告与数字服务等取得收入；集团内部金融/投资按源限定"
+    }
+  ],
+  "important_numbers": {
+    "company_revenue_CNY": "12601193497.11",
+    "main_business_total_CNY": "12397176313.51",
+    "publishing_main_CNY": "3775095436.44",
+    "distribution_main_CNY": "10145727127.19",
+    "internal_elimination_main_CNY": "-5021297876.69"
+  },
+  "qualifications": [
+    "板块整体经营收入与主营表两口径不同，不按相近金额合并",
+    "内部抵销不作普通业务/公司总额，分项不能直接相加",
+    "媒体/物资/印刷/数字有真实业务，数字化AI自述不替代出版发行主业"
+  ],
+  "basis": "A direct original PDF reading before new20 model sends, with exact earlier original-source reading reused where unchanged",
+  "reference_sent_to_model": false
+}

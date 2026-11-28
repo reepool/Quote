@@ -1,5 +1,9 @@
 # 公司画像交付路径与开发任务卡
 
+6.FY固定20家运行与独立评分已经完成，当前转[同卡交付收尾](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-prospective20-closeout-20261128/result.md)：两层基础19/20、召回98.33%，首读98.5%未达99%，自动审后417项及631指标有源支持。明确正式未通过，不再以“尚未充分评估”续开同类测试。两类组后最小修正已实现并离线验证，新源语义策略效果不冒称已测；原writer/API交安全研究稿和东航缺项，保原39/原成绩。A有限审核、B沿同owner连续交付/清库，必要证据一套后隔离本人Git；没有新模型窗口、第二组或S3/生产授权，后续优先具体研究使用。
+
+当前执行[6.FY新版20家前瞻验收与交付收口](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-prospective20-closeout-card.md)。用户合并授权标准对齐、固定20一次原入口/合同内源核修订和明确结论；不再把旧四类每一标签全对作为前置。A源先行/独立计分，B原TaskService两阶段同预算并发≤4；单个局部问题不阻无关样本，按冻结95%/99%和公司可用率判定，到数量/硬停止即给通过或失败与安全研究交付，不追100%细节。代码/旧分/原39及既有20脏改保护，前后清本人垃圾，普通Git只本人可隔离增量。
+
 当前[6.FX合并卡已按停止条件收口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-automatic-uncertainty-20261128/result.md)。模型新主体限用真实生效，四类原入口/必要别名与计划开关修复及零调用直接验证通过；四类一次10物理411019账本/0恢复/882.212组秒，A原PDF核11项新增修订有据。仍漏sm-12指标范围、依赖原A保护，故自动gate未过，新20仅候选/部分参考未启动；不为单股标签继续付费试跑或换20碰运气。已审有用后继原writer交39股1102/1699，其余35完整保持、actual39/四详情及导出新实例一致。旧正式失败/95%/99%/S3/生产不改；先清后做、必要一套后清/隔离本人Git，当前继续研究使用及具体问题有界补读，下一自动方案须有针对剩余根因的实质变化和明确范围裁决。
 
 当前[6.FW主体口径分级消费已交付](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-subject-consumption-20261128/result.md)：A原PDF独核、B原typed决定/投影/reader实现事实主体unclear限用，元数据不确定时保有据正文；原指标及整事实缺陷隔离不松，改稿接续不自动解除限制。新31直测纳入69项定向回归全过，合并回归113过/1既有冲突已基线复现；新代码读旧39完整保持。0新模型，原writer一安全后继恢复山东1描述/0指标，当前39=1098/1687、其他38完整不变；原402文件保护，实际API/导出/新实例同源核对。旧分/S3/生产边界不变，必要证据一套后清本人产物，普通Git只本人可隔离块；不续同股提示或新的付费卡。

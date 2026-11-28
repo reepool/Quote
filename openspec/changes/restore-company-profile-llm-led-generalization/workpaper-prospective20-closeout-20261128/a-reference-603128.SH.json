@@ -1,0 +1,47 @@
+{
+  "task": "6.FY",
+  "status": "source_frozen_before_new_model_input",
+  "instrument_id": "603128.SH",
+  "name": "华贸物流",
+  "report": {
+    "content_hash": "0078292f91a3db98fa4775ef034e8c3fed91d1f9cb1cbab10042af459c1b51a9",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-29T16:00:00+00:00",
+    "source": "cninfo",
+    "source_announcement_id": "1225266895",
+    "asset_id": "asset_7518383adf74a4155a170773687fba8d"
+  },
+  "pdf": "/home/python/Quote/data/filings/announcements/blobs/00/0078292f91a3db98fa4775ef034e8c3fed91d1f9cb1cbab10042af459c1b51a9.pdf",
+  "pdf_sha256": "0078292f91a3db98fa4775ef034e8c3fed91d1f9cb1cbab10042af459c1b51a9",
+  "source_sections_and_physical_pages": "第三节/一、公司业务与经营模式物理8；五、主要经营及主营分析/收入成本物理23–25（表头24、数据25续页）",
+  "core_conditions": [
+    {
+      "condition_id": "C1",
+      "question": "公司做什么",
+      "expected_source_answer": "第三方国际综合物流服务商，经营空海铁综合物流、跨境电商、国际工程、仓储、国际大宗合同与特大件特种物流"
+    },
+    {
+      "condition_id": "C2",
+      "question": "主要产品/服务与板块",
+      "expected_source_answer": "为客户提供运输、仓储、通关及门到门全程或部分环节的国际物流/供应链方案"
+    },
+    {
+      "condition_id": "C3",
+      "question": "怎么赚钱",
+      "expected_source_answer": "整合集货、装箱、通关、国际干线到境外派送等资源并收服务费用，非制造/生产贸易标的货品"
+    }
+  ],
+  "important_numbers": {
+    "company_revenue_CNY": "17964066948.74",
+    "international_air_revenue_CNY": "5924828193.81",
+    "international_sea_revenue_CNY": "5444753003.62",
+    "cross_border_ecommerce_CNY": "3009578738.81"
+  },
+  "qualifications": [
+    "物流六业务表述与财务产品分项不是逐字一一对应，按有据实质覆盖",
+    "不把外贸市场总额当公司收入/货量",
+    "表头24与25续页保持元/本期上期，跨境电商空海铁货量为该子类而非公司全部货量"
+  ],
+  "basis": "A direct original PDF reading before new20 model sends, with exact earlier original-source reading reused where unchanged",
+  "reference_sent_to_model": false
+}

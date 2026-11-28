@@ -1,0 +1,48 @@
+{
+  "task": "6.FY",
+  "state": "research_delivery_and_finite_closeout_complete; formal_acceptance_not_passed",
+  "checks": {
+    "original_sealed_files": 393,
+    "sealed_changed": 0,
+    "old_research_files": 411,
+    "old_changed": 0,
+    "old39_complete_profiles_unchanged": true,
+    "new20_reader_export_fresh_equal": true,
+    "actual_HTTP59_and_detail_equal": true,
+    "HTTP_statuses": [
+      200,
+      200,
+      200
+    ],
+    "openspec_strict": "passed",
+    "git_diff_check": "passed",
+    "verification_reuse": "Exact final B1 source/test hashes match 102 distinct format checks and 7 final source-alignment checks; no broad rerun.",
+    "review": "No remaining known blocking defect in this task; unrelated baseline changes excluded."
+  },
+  "assessment": "a-quality-result.json",
+  "delivery": "a-release-result.json",
+  "actual_HTTP": "a-http-read-check.json",
+  "new_model_calls_for_closeout": 0,
+  "service_restarts": 0,
+  "shared_configuration_changes": 0,
+  "cleanup": [
+    {
+      "path": "/home/python/Quote/data/QuoteBak/company-profile-6fy-b-exec-ARl4OKL5",
+      "regular_files": 63,
+      "file_bytes_removed": 25779029,
+      "recovery": "Reproducible from retained official sources, original receipts and committed source; not retained as a second evidence copy."
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/company-profile-6fy-a-vDlEzPeX",
+      "regular_files": 119,
+      "file_bytes_removed": 64684584,
+      "recovery": "Reproducible from retained official sources, original receipts and committed source; not retained as a second evidence copy."
+    }
+  ],
+  "cleanup_basis": "Original source PDFs/effective caches, 393 sealed results,40 raw writer records,90 real wires,20 ledgers,20 source references and exact independent judgments retained. Only disposable private20 databases, test/export copies, preview,39/59 snapshots and one-off helpers removed.",
+  "existing_dirty_count_at_task_start": 20,
+  "existing_dirty_not_submitted_or_reverted": true,
+  "git_closeout": "Normal isolated commit and ordinary upstream push authorized after this receipt; no amend/history rewrite/force.",
+  "S3_or_production_started": false,
+  "cleanup_file_bytes_total": 90463613
+}

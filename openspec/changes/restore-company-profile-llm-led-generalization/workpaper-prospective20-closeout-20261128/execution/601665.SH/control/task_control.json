@@ -1,0 +1,37 @@
+{
+  "schema_version": "company_profile_task_control.v1",
+  "state": "completed",
+  "run_id": "company_profile_common_core-6663a20704f1",
+  "action": "run",
+  "started_at": "2026-11-28T19:41:27.909625+08:00",
+  "updated_at": "2026-11-28T19:52:39.182988+08:00",
+  "finished_at": "2026-11-28T19:52:39.182988+08:00",
+  "stop_requested": false,
+  "reason": null,
+  "parameters": {
+    "knowledge_cutoff": "2026-11-25",
+    "instrument_ids": [
+      "601665.SH"
+    ],
+    "max_items": 1,
+    "token_budget": 1000000,
+    "max_elapsed_seconds": 5714.86959745799
+  },
+  "latest_result": {
+    "action": "review_batch",
+    "state": "completed",
+    "items": [
+      {
+        "instrument_id": "601665.SH",
+        "request_id": "6fn-review-601665-SH",
+        "state": "completed",
+        "work_id": "bp-work-24622706e15f5d412a9c4258",
+        "review_status": "completed"
+      }
+    ],
+    "stop_reason": null,
+    "remaining_request_ids": [],
+    "research_only": true,
+    "production_authorization": "not_authorized"
+  }
+}

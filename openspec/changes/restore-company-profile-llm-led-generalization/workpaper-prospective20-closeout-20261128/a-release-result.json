@@ -1,0 +1,218 @@
+{
+  "task": "6.FY",
+  "state": "published",
+  "new_stocks": 20,
+  "release_supplier_calls": 0,
+  "independent_safe_decisions_do_not_recompute_automatic_scores": true,
+  "releases": [
+    {
+      "instrument_id": "920022.BJ",
+      "source_work_id": "bp-work-c18b69c650f98f5458c670f9",
+      "base_work_id": "bp-work-e7dfb860aa313dfdccf6141e",
+      "safe_work_id": "bp-work-5c641f439885c84effadbc3f",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-5c641f439885c84effadbc3f.json",
+      "sha256": "0d5c2fc4e192336245aac4edf064ca9688dae3069a049cc0d16d40e38821f0a4",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "601000.SH",
+      "source_work_id": "bp-work-4ad2ae08576c3df0ccf722ba",
+      "base_work_id": "bp-work-7572f39ffbd25e16bc37d177",
+      "safe_work_id": "bp-work-7193aa3e4fbcb790fa29f56d",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-7193aa3e4fbcb790fa29f56d.json",
+      "sha256": "a7a73fa75eb3411eb608adda63f8db6e243574f7b2745b04e804a43da5bc0574",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "002050.SZ",
+      "source_work_id": "bp-work-5b933c3f4b3dbf103c7337d4",
+      "base_work_id": "bp-work-bbf1d6652ff60cfb2e9310ba",
+      "safe_work_id": "bp-work-0184803029ced5bd0018205c",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-0184803029ced5bd0018205c.json",
+      "sha256": "17c102a42bae8824e0cf2a64d8ad11ad7afef81048168ec6464ec99b9ae2331f",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "002463.SZ",
+      "source_work_id": "bp-work-0e8b9cabc3cd0c265479f82e",
+      "base_work_id": "bp-work-ead3d24df2986375eab05f80",
+      "safe_work_id": "bp-work-fabe15a04fd8adc4b1c3c3df",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-fabe15a04fd8adc4b1c3c3df.json",
+      "sha256": "72b148a9509e606f237e4a38428d8f5def7be9bed85506f093b0126983340095",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "920026.BJ",
+      "source_work_id": "bp-work-5b6c38b98748cf3fa241cf4b",
+      "base_work_id": "bp-work-22af4e6aa963a0c1b081f1af",
+      "safe_work_id": "bp-work-2f7668bb55038cab32ebe96b",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-2f7668bb55038cab32ebe96b.json",
+      "sha256": "840c6e784e42c7dd08f7c6c392179397b1ba565e6c9c387343036d66b5c95f39",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "603605.SH",
+      "source_work_id": "bp-work-a9b750074793e8ae0317da86",
+      "base_work_id": "bp-work-d08bc2adf7cd270f103a03fb",
+      "safe_work_id": "bp-work-40a6fcd7f7d7ca8594c45a38",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-40a6fcd7f7d7ca8594c45a38.json",
+      "sha256": "842379d68fcecf944fa74f92cd964ad9de6c0d701f1067714b6e2fd9eea6d566",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "600928.SH",
+      "source_work_id": "bp-work-3e61143b1556be9637978a0e",
+      "base_work_id": "bp-work-36b2fe8ca8f5441fa4b41ca2",
+      "safe_work_id": "bp-work-a11d8bc4c9b1bfc8eafe590d",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-a11d8bc4c9b1bfc8eafe590d.json",
+      "sha256": "2a3b13323ef10039dee83b9f274130a96fcacde882ca481ccd3f0fcf8be7cdcd",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "601336.SH",
+      "source_work_id": "bp-work-902387591f4553d15f15cfb5",
+      "base_work_id": "bp-work-406e2ee2dd9631a69c4b76d8",
+      "safe_work_id": "bp-work-333c540601b9ccb09a5647f1",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-333c540601b9ccb09a5647f1.json",
+      "sha256": "9aeeb4879dd14df5ab13bfd5321b25838298a43e50999735b1746d02efeec38b",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "601108.SH",
+      "source_work_id": "bp-work-67026e9cd3df148113130024",
+      "base_work_id": "bp-work-e87eafc5cf10236c1a8b2ae0",
+      "safe_work_id": "bp-work-7fbd676a7e28da7c7df77046",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-7fbd676a7e28da7c7df77046.json",
+      "sha256": "245253bd0749eb65f52638504de0a3ad2924cd927c0122ca1e69ce8323df8367",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "601665.SH",
+      "source_work_id": "bp-work-24622706e15f5d412a9c4258",
+      "base_work_id": "bp-work-7fddfbf0fd3c066b0df1a401",
+      "safe_work_id": "bp-work-a06b2b2e254b38aaa6815a45",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-a06b2b2e254b38aaa6815a45.json",
+      "sha256": "e186f867c551af94fe992644398edb5f9f67bb2b42e3a7f9abc41243651c00f1",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "002807.SZ",
+      "source_work_id": "bp-work-44beaf33e968ddf38dc6db9e",
+      "base_work_id": "bp-work-44a1b4a34da40e2ab79e62fd",
+      "safe_work_id": "bp-work-83d279e3981e49cfc79c3ecb",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-83d279e3981e49cfc79c3ecb.json",
+      "sha256": "3b97a3950938b3d538c4d583bd4afc433f239fba702c3346d958f573f2d49299",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "002316.SZ",
+      "source_work_id": "bp-work-ab6d6648c525066ca11e8a92",
+      "base_work_id": "bp-work-27af25647bf58c8005c1b75a",
+      "safe_work_id": "bp-work-358728ffd5628f48585e3a17",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-358728ffd5628f48585e3a17.json",
+      "sha256": "ffd2fd641e4161e6dddd73ff712d4a6afa3d5d7ca00c9d4dd2da8110a8e8d9d2",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "002420.SZ",
+      "source_work_id": "bp-work-0b6cae2abdc5fb6a836c5afe",
+      "base_work_id": "bp-work-b38bcf758f0aeffd75b9964e",
+      "safe_work_id": "bp-work-63d17e08f141b4ed4037073f",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-63d17e08f141b4ed4037073f.json",
+      "sha256": "9b1ee310d1bfacfcaec3906bd30fe2f3075ce62ba48bfe1e50c0dc4d3fceea64",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "002575.SZ",
+      "source_work_id": "bp-work-42a7fd466b7455d1cdf900f6",
+      "base_work_id": "bp-work-42af67a5c4e56eaaf01a9ef9",
+      "safe_work_id": "bp-work-59c017a5d111cd5ceed12075",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-59c017a5d111cd5ceed12075.json",
+      "sha256": "fb3f6e76208f2d38e356db2e06a95cad0a9df0d2376a1994651b5781b171da1a",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "600673.SH",
+      "source_work_id": "bp-work-a0d276b02ebba6321ecec474",
+      "base_work_id": "bp-work-1ea30c1a2639a5d6fab4f322",
+      "safe_work_id": "bp-work-bedd86ab130e515d3ed9773c",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-bedd86ab130e515d3ed9773c.json",
+      "sha256": "041f9755faa75907d16b59df7c9181e49c499ea06e9f43222b4509fc9512e5d6",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "600881.SH",
+      "source_work_id": "bp-work-00bac93a5c4871545f8008bf",
+      "base_work_id": "bp-work-a0dc1e715ff38dba1d2c5f49",
+      "safe_work_id": "bp-work-3915a6bb53836392cf05e3c0",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-3915a6bb53836392cf05e3c0.json",
+      "sha256": "4f682d84c52ca6dbd0cda707d6ff3e8ef6b4dcf84dfd1509342e72b516c9b1af",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "603128.SH",
+      "source_work_id": "bp-work-ee7bc410aaf52a67ad3c82e6",
+      "base_work_id": "bp-work-c4b9d3276ec652e2444e0f6c",
+      "safe_work_id": "bp-work-3ddedf6dc2307c89ddc03648",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-3ddedf6dc2307c89ddc03648.json",
+      "sha256": "2c98f782b79ae559be02ba6dfd898200a7938921939e836e58ccb3a6d12864b5",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "601098.SH",
+      "source_work_id": "bp-work-5b1cd9d7aab6b57fcc9874f5",
+      "base_work_id": "bp-work-d6a3fe38614c1779135e0ace",
+      "safe_work_id": "bp-work-73a814199b8d9e22d41d5185",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-73a814199b8d9e22d41d5185.json",
+      "sha256": "c91afbb4a18b6ca041119cd4f8ea5f633bf2b4139daec3f49c3192f1860134b8",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    },
+    {
+      "instrument_id": "601156.SH",
+      "source_work_id": "bp-work-63c3d112b7c9ccca06c71e33",
+      "base_work_id": "bp-work-cf26bf2d28be95ad860b9198",
+      "safe_work_id": "bp-work-9c405dbfad5d9b0a5ba4f384",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-9c405dbfad5d9b0a5ba4f384.json",
+      "sha256": "b23c3fc3f4c6b627755807020f5e6dbdb30d5f33b34c36dc1635a3720349e940",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 2
+    },
+    {
+      "instrument_id": "600717.SH",
+      "source_work_id": "bp-work-a0233d34e1951d1c4e380c6e",
+      "base_work_id": "bp-work-7ed5bb4a0760aac9764c3c62",
+      "safe_work_id": "bp-work-5453ba5e1835c2749ae50f25",
+      "path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-5453ba5e1835c2749ae50f25.json",
+      "sha256": "4b38b6c1b1a82cefe1fe65a806cf564b514cd13d6d01d718f164a7d8cb5b2df9",
+      "original_facts_evidence_generation_model_review_unchanged": true,
+      "core_supported": 3
+    }
+  ],
+  "current_companies": 59,
+  "current_visible_facts": 1523,
+  "current_visible_metrics": 2330,
+  "new_visible_facts": 421,
+  "new_visible_metrics": 631,
+  "old39_complete_profiles_unchanged": true,
+  "same_writer_reader_export_fresh_equal": true,
+  "east_trade_gap_visible": true,
+  "original411_files_unchanged_before_navigation": true
+}
