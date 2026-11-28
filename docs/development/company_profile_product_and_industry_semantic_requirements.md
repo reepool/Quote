@@ -7,6 +7,8 @@
 
 ## 0. 文档权威关系
 
+2026-11-28主体口径消费澄清：经营管理主体、指标统计切片与资产产权是不同关系，保留原文明示，不因“受托管理”推为自有，也不因地区/销售模式强套分部。经独立原文核对，只有事实主体枚举无法确认时，可在精确绑定当前事实/证据的研究投影中标unclear及原因，保留有据正文/期间/引用；各指标按自身依据限用，不能继承事实标签或将unclear当合并口径计算。错实体正文、错数/期间和无据引用仍隔离；旧原始记录、模型结果及评分不追改。实施与停止见[6.FW卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-subject-consumption-card.md)。
+
 本文件确定“交付什么”；[验收计划v2](company_profile_acceptance_program.md)唯一确定数量、阈值、补救上限与实际进度；[交付路径与任务卡v3](company_profile_delivery_plan.md)确定先后顺序、owner及清理；[A/B流程v3](ab_role_development_workflow.md)确定职责和审核顺序。下一开发唯一change为 `restore-company-profile-llm-led-generalization`。
 
 2026-11-27用户确认的持续优化方针：每轮按固定标准说明达标情况；未达标须先分析原因，实施直接对应的代码或处理策略优化，再验证是否缩小差距。每轮必读并执行[验收计划§4.3](company_profile_acceptance_program.md#43-评估完成与达标及失败驱动的优化方针2026-11-27起生效)及[A/B流程§3.1](ab_role_development_workflow.md#31-未达标后的有据优化与复验强制)。不得以反复测试、换公司或改版本号替代实际改进，也不要求为没有实现缺陷的情况强改代码；业务目标、基础信息取舍和供应链可选政策继续有效。

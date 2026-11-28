@@ -76,6 +76,7 @@ def project_workpaper_delivery(paper: CompanyProfileWorkpaper) -> dict:
     decisions = {d.fact_id: d for d in paper.use_review.decisions} if paper.use_review else {}
     facts = []
     metric_gaps = []
+    subject_scope_gaps = []
     counts = dict.fromkeys(DELIVERY_LABELS, 0)
     for element, group in workpaper_elements(paper).items():
         for fact in group.facts:
@@ -116,7 +117,8 @@ def project_workpaper_delivery(paper: CompanyProfileWorkpaper) -> dict:
                 reasons.append((decision.limitation if decision else None) or fact.uncertainty_reason
                                or "保留原文主体、数值或近似限定，不作为确定值使用。")
             restrictions = list(decision.metric_restrictions if decision is not None else ())
-            if review and review.metric_limit_policy == "source_review_exact_metric_limits.v1":
+            subject_restriction = decision.subject_scope_restriction if decision is not None else None
+            if review and (review.metric_limit_policy == "source_review_exact_metric_limits.v1" or subject_restriction):
                 whole_defects = [finding for finding in review.findings if finding.affected_fact_id == fid
                                  and finding.original_fact is not None
                                  and finding.resolution not in {"corrected_pending_trust", "metrics_limited"}]
@@ -148,17 +150,30 @@ def project_workpaper_delivery(paper: CompanyProfileWorkpaper) -> dict:
             if restrictions and state not in {"source_only", "withheld", "duplicate"}:
                 state = "limited"
                 reasons.append(("独立源核" if decision else "模型源核") + "仅支持原描述及未受限指标；部分原指标已隔离，不能视为完整数值覆盖。")
-            counts[state] += 1
             excluded = state in {"source_only", "withheld", "duplicate"}
+            payload = fact.model_dump(mode="json")
+            component_metadata = {}
+            if subject_restriction and not excluded:
+                state = "limited"
+                usage_restriction = "不得按事实主体作为合并口径加总或比较；指标须按各自主体及现有限制使用。"
+                reasons.extend((subject_restriction, usage_restriction))
+                payload["subject_scope"] = "unclear"
+                payload["uncertainty_reason"] = "；".join(dict.fromkeys(
+                    reason for reason in (fact.uncertainty_reason, subject_restriction) if reason))
+                gap = {"field": "subject_scope", "state": "unclear", "reason": subject_restriction,
+                       "consolidated_aggregation_allowed": False, "usage_restriction": usage_restriction}
+                component_metadata["subject_scope_gap"] = gap
+                subject_scope_gaps.append({"element": element, "fact_id": fid, "status": "unclear",
+                    **gap, "evidence_ids": list(fact.evidence_ids),
+                    "reasons": [subject_restriction, usage_restriction]})
+            counts[state] += 1
             basis_label = {"independent_source_check": "独立源核", "model_source_check": "模型源核"}.get(basis)
             if state == "limited" and basis == "not_reviewed":
                 basis_label = "待核"
             label = DELIVERY_LABELS[state] + (f"／{basis_label}" if basis_label else "")
-            payload = fact.model_dump(mode="json")
-            component_metadata = {}
             if restrictions and not excluded:
                 blocked = {item.metric_index for item in restrictions}
-                component_metadata = {
+                component_metadata.update({
                     "metric_gaps": [{"metric_index": item.metric_index, "name": fact.metrics[item.metric_index].name,
                                      "state": "withheld", "reason": item.reason,
                                      **({"review_basis": ("independent_and_model_source_check"
@@ -171,7 +186,7 @@ def project_workpaper_delivery(paper: CompanyProfileWorkpaper) -> dict:
                                         if item.metric_index in model_gap_sources else {})}
                                     for item in restrictions],
                     "metric_source_indices": [i for i in range(len(fact.metrics)) if i not in blocked],
-                }
+                })
                 payload["metrics"] = [item for i, item in enumerate(payload["metrics"]) if i not in blocked]
                 metric_gaps.append({"element": element, "fact_id": fid, "status": "unclear",
                     "metric_indices": sorted(blocked),
@@ -213,10 +228,15 @@ def project_workpaper_delivery(paper: CompanyProfileWorkpaper) -> dict:
             "omission_candidate", "repair_rejected", "verification_failed"}
     ]
     information_gaps.extend(metric_gaps)
+    information_gaps.extend(subject_scope_gaps)
     suggested_acquisitions.extend({"element": gap["element"], "fact_id": gap["fact_id"],
         "metric_indices": gap["metric_indices"], "metric_names": gap["metric_names"], "severity": "material",
         "reason": gap["suggested_reading"] + " " + "；".join(gap["reasons"]),
         "evidence_ids": gap["evidence_ids"]} for gap in metric_gaps)
+    suggested_acquisitions.extend({"element": gap["element"], "fact_id": gap["fact_id"],
+        "field": "subject_scope", "severity": "material",
+        "reason": "建议按需定向精读原业务章节，区分经营主体、统计范围与资产所属；不猜替代主体。 " + "；".join(gap["reasons"]),
+        "evidence_ids": gap["evidence_ids"]} for gap in subject_scope_gaps)
     return {"policy_version": "company_profile_research_delivery.v1", "research_only": True,
             "formal_acceptance": "not_assessed", "production_authorization": "not_authorized",
             "information_gaps": information_gaps, "suggested_acquisitions": suggested_acquisitions,

@@ -1,0 +1,45 @@
+{
+  "task": "6.FW",
+  "mode": "published",
+  "source_work_id": "bp-work-5dd34b44ee0f10180cf07a8c",
+  "safe_work_id": "bp-work-90d584ecf4f680518ae247e7",
+  "raw_facts_evidence_generation_model_reviews_unchanged": true,
+  "restored_descriptions": [
+    "op-01"
+  ],
+  "restored_metrics": [],
+  "retained_metric_limits": {
+    "op-01": [
+      0
+    ],
+    "sm-12": [
+      1
+    ],
+    "bs-02": [
+      2
+    ]
+  },
+  "positive_controls_unchanged": [
+    "sm-01",
+    "cm-01",
+    "review-add:f-revenue-decline-driver"
+  ],
+  "supplier_calls": 0,
+  "automatic_accuracy_remeasured": false,
+  "published_path": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-90d584ecf4f680518ae247e7.json",
+  "published_sha256": "2399026406cb330a55e8b9f249e5f94456aa9736888492bf6bce4bb4153e0279",
+  "current_companies": 39,
+  "other38_complete_profiles_unchanged": true,
+  "current_visible_objects": 1098,
+  "current_visible_metrics": 1687,
+  "before": {
+    "visible_objects": 25,
+    "visible_metrics": 26
+  },
+  "after": {
+    "visible_objects": 26,
+    "visible_metrics": 26
+  },
+  "query_export_fresh_and_markdown_equal": true,
+  "original_402_files_unchanged": true
+}

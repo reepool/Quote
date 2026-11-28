@@ -942,12 +942,24 @@ class WorkpaperUseDecision(_Model):
     reason: str = Field(min_length=1)
     limitation: str | None = None
     metric_restrictions: tuple[WorkpaperMetricRestriction, ...] = ()
+    subject_scope_restriction: str | None = Field(default=None, min_length=1)
+
+    @model_validator(mode="after")
+    def source_checked_subject_restriction(self):
+        if self.subject_scope_restriction is not None:
+            if self.disposition != "source_checked":
+                raise ValueError("subject scope restriction requires source_checked narrative")
+            if not self.subject_scope_restriction.strip():
+                raise ValueError("subject scope restriction requires a reason")
+        return self
 
     @model_serializer(mode="wrap")
     def preserve_legacy_shape(self, handler):
         payload = handler(self)
         if not self.metric_restrictions:
             payload.pop("metric_restrictions", None)
+        if self.subject_scope_restriction is None:
+            payload.pop("subject_scope_restriction", None)
         return payload
 
 
@@ -1038,6 +1050,10 @@ class CompanyProfileWorkpaper(_Model):
                     raise ValueError("unknown, duplicate or out-of-range independent metric restriction")
                 if set(decision.evidence_ids) - sources.keys():
                     raise ValueError("independent use review cites unknown evidence")
+                if decision.subject_scope_restriction is not None and (
+                    set(facts[decision.fact_id].evidence_ids) - set(decision.evidence_ids)
+                ):
+                    raise ValueError("subject scope restriction must cover all fact evidence")
         return self
 
     def validate_pages(self, pages: Sequence[Mapping]) -> None:
@@ -1373,6 +1389,8 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper, *, delivery: Mapping | 
             entry = delivery_by_id[fact.fact_id] if delivery_by_id is not None else None
             if entry is not None and entry["fact"] is None:
                 continue
+            if entry is not None:
+                fact = WorkpaperFact.model_validate(entry["fact"])
             refs = "、".join(f"[{value}](#{value.lower()})" for value in fact.evidence_ids)
             uncertain = f"【不确定：{fact.uncertainty_reason or '主体范围未明确'}】" if fact.uncertainty_reason or fact.subject_scope == "unclear" else ""
             label = f"【{entry['label']}】" if entry is not None else ""
@@ -1394,6 +1412,8 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper, *, delivery: Mapping | 
                 entry = delivery_by_id[fact.fact_id] if delivery_by_id is not None else None
                 if entry is not None and entry["fact"] is None:
                     continue
+                if entry is not None:
+                    fact = WorkpaperFact.model_validate(entry["fact"])
                 refs = "、".join(f"[{value}](#{value.lower()})" for value in fact.evidence_ids)
                 uncertain = f"【不确定：{fact.uncertainty_reason or '主体范围未明确'}】" if fact.uncertainty_reason or fact.subject_scope == "unclear" else ""
                 label = f"【{entry['label']}】" if entry is not None else ""

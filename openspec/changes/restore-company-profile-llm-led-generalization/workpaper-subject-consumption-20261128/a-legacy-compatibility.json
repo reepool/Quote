@@ -1,0 +1,9 @@
+{
+  "task": "6.FW",
+  "phase": "new_code_before_new_metadata",
+  "existing39_profiles_unchanged": true,
+  "profiles": 39,
+  "canonical_sha256": "c324e3ec39fe1c7dff0fce41ad184d64ab2d30d79d97f81fe7468f2655311620",
+  "reader_seconds": 24.235268,
+  "supplier_calls": 0
+}

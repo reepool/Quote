@@ -678,6 +678,13 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **AND** known withheld, source-only and duplicate facts MUST NOT enter ordinary business text or standardized delivery metrics, while their unchanged originals and audit metadata remain available; one company's incomplete review does not discard unrelated checked facts, and completed status alone never overrides a source restriction
 - **AND** truthful source uncertainty MAY remain limited and readable; the existing writer/read owner serves persistence and all export formats without a new store, production dependency on development evidence or implicit model calls
 
+#### Scenario: Explicitly limited fact subject metadata preserves supported description
+- **WHEN** an independently source-checked decision identifies only an unreliable fact-level subject_scope and binds the current fact hash, report and all cited evidence
+- **THEN** the existing delivery projection MAY retain its supported narrative, period and references while projecting subject_scope as unclear with the restriction reason and an API-visible subject gap and acquisition suggestion; original facts, model replies and historical scores remain unchanged
+- **AND** this decision MUST NOT override a whole-fact model defect or relax metric restrictions; every metric retains its own support and scope, and unclear fact scope MUST NOT be treated as consolidated scope for aggregation or comparison
+- **AND** operation, the population measured by a statistic and asset ownership MUST remain distinct source relationships; uncertain enumeration alone does not establish a false narrative, and a sourced number alone does not establish the enumeration
+- **AND** absent metadata MUST preserve existing serialization/hash inputs and projections, extraction responses cannot author the independent decision, and unknown or stale bindings MUST be rejected
+
 #### Scenario: Human reference is rendered for review
 - **WHEN** a human_reference JSON workpaper is used to check presentation and local mapping
 - **THEN** the rendered facts, metrics and evidence remain the same as the JSON and their origin remains visible

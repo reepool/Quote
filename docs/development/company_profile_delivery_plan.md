@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+当前[6.FW主体口径分级消费已交付](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-subject-consumption-20261128/result.md)：A原PDF独核、B原typed决定/投影/reader实现事实主体unclear限用，元数据不确定时保有据正文；原指标及整事实缺陷隔离不松，改稿接续不自动解除限制。新31直测纳入69项定向回归全过，合并回归113过/1既有冲突已基线复现；新代码读旧39完整保持。0新模型，原writer一安全后继恢复山东1描述/0指标，当前39=1098/1687、其他38完整不变；原402文件保护，实际API/导出/新实例同源核对。旧分/S3/生产边界不变，必要证据一套后清本人产物，普通Git只本人可隔离块；不续同股提示或新的付费卡。
+
 当前[6.FV v15单股策略观察已收口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-v15-subject-observation-20261127/result.md)：用户确认后一次原初/修/终3物理/107381/0恢复/723.105秒unknown费用，索引/原25facts/3正控保持但两目标仍漏，0/2未达标；结束该同股索引/优先级策略，不自动v16/再加同义提示或续额。模型自主补的收入下降原因/建造服务同期比较有源，经A原PDF与自己的真实final后交研究；另1里程metadata保守限用不当错数收益，原两限制保持。主39=1097/1687、其余38完整不变，当前数据仍研究使用；真实失败、旧分/原件保持，有限Review/必要一套后清/Git同卡，不自动新正式组或生产。
 
 当前[6.FU分类维度/主体口径卡已收口](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-classification-scope-closeout-20261127/result.md)：用户确认后真实三股10物理/272622/1恢复/767.607秒unknown费用，v14实际修正中诚/物产2个目标、山东2目标仍漏，额外cm-01修订有源。A独核3final/6正控，安全3后继主root39现1096/1683、其他36不变、actual39及三详情200相等；两未解安全限制继续。按验收§4.3原run封存后零调用实现v15主体审查索引/优先级，工程101有效并集+A9直接通过，不算2→4模型提升。当前不因一组已见观察宣称前瞻正式验收就绪；下一真实验证需针对这次新增策略及未解问题另有明确版本/预算，不追加旧窗/重抽三家/自动新20或生产。必要证据一套后清本人产物、保护旧分并隔离Git同卡。

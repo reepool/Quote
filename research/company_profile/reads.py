@@ -512,13 +512,14 @@ class CompanyProfileReadService:
             missing = []
         if processing_identity is None and work_id is None:
             # Legacy single-reading queries keep their old selection. Only an
-            # explicit metric restriction opts into its exact linked successor.
+            # explicit component restriction opts into its exact linked successor.
             component_records = {}
             all_records = {}
             for candidate in records:
                 all_records[candidate.work_id] = candidate
                 if (isinstance(candidate, CompanyProfileRuntimeRecordV3) and (
-                    candidate.workpaper.use_review and any(d.metric_restrictions for d in candidate.workpaper.use_review.decisions)
+                    candidate.workpaper.use_review and any(d.metric_restrictions or d.subject_scope_restriction
+                                                           for d in candidate.workpaper.use_review.decisions)
                     or candidate.workpaper.quality_review and candidate.workpaper.quality_review.metric_limit_policy is not None
                 )):
                     component_records[candidate.work_id] = candidate
@@ -697,12 +698,21 @@ class CompanyProfileReadService:
                 "delivery_pending_review_count": delivery["pending_review_count"],
                 **{f"delivery_{key}_count": value for key, value in delivery["counts"].items()},
             }
-            if any(entry.get("metric_gaps") for entry in delivery["facts"]):
+            has_subject_gaps = any(entry.get("subject_scope_gap") for entry in delivery["facts"])
+            if has_subject_gaps or any(entry.get("metric_gaps") for entry in delivery["facts"]):
                 visible = [entry["fact"] for entry in delivery["facts"] if entry["fact"] is not None]
                 profile["workpaper_summary"].update(
                     fact_count=len(visible), metric_count=sum(len(fact["metrics"]) for fact in visible),
                     metric_gaps=[{"fact_id": entry["fact_id"], "element": entry["element"], **gap}
                                  for entry in delivery["facts"] for gap in entry.get("metric_gaps", [])],
+                )
+            if has_subject_gaps:
+                profile["workpaper_summary"].update(
+                    element_fact_counts={name: sum(entry["element"] == name and entry["fact"] is not None
+                                                  for entry in delivery["facts"]) for name in elements},
+                    subject_scope_gaps=[{"fact_id": entry["fact_id"], "element": entry["element"],
+                                         **entry["subject_scope_gap"]}
+                                        for entry in delivery["facts"] if entry.get("subject_scope_gap")],
                 )
         elif isinstance(record, CompanyProfileRuntimeRecordV2):
             from .report_interpretation import research_views
@@ -973,6 +983,9 @@ def _write_profile_csv(path: Path, profiles: Sequence[Mapping[str, Any]]) -> Non
     has_metric_gaps = any((p.get("workpaper_summary") or {}).get("metric_gaps") for p in profiles)
     if has_metric_gaps:
         fieldnames.append("workpaper_metric_gaps")
+    has_subject_gaps = any((p.get("workpaper_summary") or {}).get("subject_scope_gaps") for p in profiles)
+    if has_subject_gaps:
+        fieldnames.append("workpaper_subject_scope_gaps")
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
@@ -986,6 +999,8 @@ def _write_profile_csv(path: Path, profiles: Sequence[Mapping[str, Any]]) -> Non
             workpaper_values = {f"workpaper_{name}": workpaper.get(name) for name in workpaper_fields}
             if has_metric_gaps:
                 workpaper_values["workpaper_metric_gaps"] = json.dumps(workpaper.get("metric_gaps", []), ensure_ascii=False)
+            if has_subject_gaps:
+                workpaper_values["workpaper_subject_scope_gaps"] = json.dumps(workpaper.get("subject_scope_gaps", []), ensure_ascii=False)
             description = workpaper_values["workpaper_business_description"]
             if isinstance(description, str) and description.lstrip().startswith(("=", "+", "-", "@")):
                 # External/model text must remain text when opened in a spreadsheet.

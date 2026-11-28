@@ -631,17 +631,22 @@ def inherit_recovery_use_review(paper, link: ReviewRecoveryLink):
             continue
         fact = current[1]
         unchanged = decision.fact_sha256 == workpaper_fact_hash(fact)
-        if not unchanged and decision.disposition == "source_checked" and not decision.metric_restrictions:
+        local_restriction = bool(decision.metric_restrictions or decision.subject_scope_restriction)
+        if not unchanged and decision.disposition == "source_checked" and not local_restriction:
             continue
         payload = decision.model_dump(mode="json")
         if not unchanged:
+            reason = decision.reason
+            if decision.subject_scope_restriction:
+                reason += "；原事实主体限制：" + decision.subject_scope_restriction
             payload.update(fact_sha256=workpaper_fact_hash(fact), evidence_ids=list(fact.evidence_ids),
-                reason="继承原独立使用限制，模型接续不自动解除；" + decision.reason,
+                reason="继承原独立使用限制，模型接续不自动解除；" + reason,
                 limitation="修订后仍保留原限制；未进行新的独立原文核查。")
-            if decision.metric_restrictions:
-                # Positions cannot be rebound after model edits/reordering. Fail
-                # closed at the fact level until a new independent decision.
+            if local_restriction:
+                # Local metadata/positions cannot be rebound after model edits.
+                # Fail closed until a new independent source decision.
                 payload.pop("metric_restrictions", None)
+                payload.pop("subject_scope_restriction", None)
                 payload["disposition"] = "withheld"
         decisions.append(payload)
     if not decisions:

@@ -1,0 +1,50 @@
+{
+  "task": "6.FW",
+  "authority": "A independent original PDF reading; local delivery decision, not new model review",
+  "source_record": "data/research/company_profile_research_v1_20261123/company_profile_common_core.v1/bp-work-5dd34b44ee0f10180cf07a8c.json",
+  "source_record_sha256": "a7067b5ef39f3be37727742c09122ec8e756ac47f43ec480d3eb2580c38b0637",
+  "document_sha256": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+  "reading_method": "A directly read native text of original physical PDF pages 14, 17 and 273 through pypdfium2; no model, substitute draft or generated answer as source truth",
+  "decisions": [
+    {
+      "fact_id": "op-01",
+      "fact_sha256": "fe1bbbc0814e636484dc5bef523b579a11c948187c6697aa21ef45cc2c53a29d",
+      "evidence_ids": ["source-0005"],
+      "source_section": "第三节 管理层讨论与分析 / 三、经营情况讨论与分析 / （一）路桥运营板块",
+      "physical_page": 17,
+      "source_excerpt": "2025年，公司探索构建‘5公里救援圈’，建立突发事件‘5分钟到岗指挥’机制，全天候通行率达99.54%。……成功中标滨州G228套尔河特大桥收费站业务外包服务项目，实现市场化运营服务输出。",
+      "narrative_period_and_evidence_supported": true,
+      "disposition": "source_checked",
+      "reason": "逐句核对原PDF17页路桥运营板块，救援机制、99.54%及中标外包服务均有原文，2025期间和引用对应；只确认原描述支持，不确认其原事实及指标合并集团标签。",
+      "subject_scope_restriction": "原文属于路桥运营板块，原事实consolidated_group无法可靠表达该局部口径；保留原文关系并标unclear，不作为全公司合并口径加总或比较。",
+      "retain_model_metric_restriction": [0],
+      "change_is": "independent delivery metadata restriction with supported narrative restored",
+      "change_is_not": "automatic semantic correction or retrospectively passing the two v15 targets"
+    },
+    {
+      "fact_id": "sm-12",
+      "fact_sha256": "2a896714deae169fc01c1aa2ff0ae5b53948867904561c6d356e500c0d577e08",
+      "source_section": "财务报告 / 营业收入和营业成本 / 营业收入、营业成本的分解信息",
+      "physical_page": 273,
+      "source_excerpt": "本期营业收入：其他业务891,806,452.78，其中：租赁收入185,065,717.54；合计23,925,458,141.04；单位：元，币种：人民币。",
+      "judgment": "原描述含其中关系，其他业务合计可读；租赁是分解行，原metric1主体标签仍有限制。保持该指标隔离，不把金额匹配当标签确认，不为此次契约澄清自动解除限制。"
+    },
+    {
+      "fact_id": "bs-02",
+      "fact_sha256": "93c7d09ec8b14fa2cea4f9eb1958d2d862092f0e96f17022236734fa537c2229",
+      "source_section": "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况 / （一）智慧运营板块",
+      "physical_page": 14,
+      "source_excerpt": "公司运营管理的路桥资产总里程约2,917公里，其中公司所辖自有路桥资产里程约1,601公里、受托管理山东高速集团所属的路桥资产里程约1,316公里。",
+      "judgment": "公司是运营管理主体，1,316公里的资产所属是山东高速集团，两者不矛盾；原约数与自有/受托关系正确。本次不改原模型意见，metric2保守限用保持，不算数字错误或新纠错收益。"
+    }
+  ],
+  "positive_controls": [
+    {"fact_id": "sm-01", "support": "PDF273合计23,925,458,141.04元，PDF17公司规模陈述；原总额和范围不变"},
+    {"fact_id": "cm-01", "support": "精确复用6.FU/FV对现有cm-01及source-0001/source-0007的独判；保混合主体unclear及具名子公司指标"},
+    {"fact_id": "review-add:f-revenue-decline-driver", "fact_sha256": "11592ee89dd8c1ec4ea64f42422f518065d703c4f077b03ce414900885e280ca", "support": "精确复用6.FV A源判及真实final；PDF273建造服务本期3,100,006,510.91/上期7,485,491,706.94本次再核一致"}
+  ],
+  "cross_company_compatibility": "6.FU中诚ccm-2地区分类与物产F-CC-01销售模式沿精确原hash/源判保持，不再强归分部；本轮不修改这两稿",
+  "new_supplier_calls": 0,
+  "new_automatic_accuracy_measurement": false,
+  "historical_results_and_scores_unchanged": true
+}

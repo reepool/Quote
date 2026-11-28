@@ -1,0 +1,59 @@
+{
+  "task": "6.FW",
+  "status": "complete_for_research_delivery",
+  "baseline_head": "e8942566329713b87bf0615e7e7abf13324ec488",
+  "source_review": "A read original PDF pages 14/17/273 and exact compatible positive/cross-company references",
+  "review": {
+    "fixed_P1": [
+      "changed-content recovery must preserve subject restriction",
+      "whole-fact inheritance transition must remove positional fields and retain the subject reason"
+    ],
+    "remaining_task_blockers": [],
+    "unrelated_C": "one pre-existing enrichment selection assertion reproduced with HEAD"
+  },
+  "verification": {
+    "new_direct_passed": 31,
+    "final_targeted_passed": 69,
+    "earlier_combined_passed": 113,
+    "earlier_pre_existing_failed": 1,
+    "legacy39_exact": true,
+    "other38_exact": true,
+    "actual_HTTP39_and_detail_exact": true,
+    "openspec_strict": "passed",
+    "diff_check": "passed excluding generated literal-PDF Markdown whitespace",
+    "source_markdown": "kept byte-equal to original renderer/export; native PDF blank-line indentation is source formatting, a nonblocking style observation"
+  },
+  "original_files": {
+    "before": 402,
+    "unchanged_after_navigation_update": 401,
+    "only_authorized_existing_change": "data/research/company_profile_research_v1_20261123/research-current.md",
+    "baseline_manifest_sha256": "56b26adb741d14aba8b597c35c38d2ccf93a42f82093907869f71e142ede832b"
+  },
+  "original_dirty": {
+    "count": 20,
+    "untouched_other_paths": true,
+    "four_document_own_deltas_only": true,
+    "isolated_index_patch": "git apply --cached of baseline-to-current delta, excluding prior user changes"
+  },
+  "service": {
+    "ordinary_restart_completed": true,
+    "initial_non_root_restart": "OS access denied; no restart occurred",
+    "authorized_sudo_restart": "completed",
+    "pid_before": 1111027,
+    "pid_after": 1560646,
+    "shared_configuration_changed": false,
+    "new_live_task_window": false
+  },
+  "new_supplier_calls": 0,
+  "automatic_accuracy_remeasured": false,
+  "cleanup": {
+    "A_path": "/home/python/Quote/data/QuoteBak/company-profile-6fw-a-7ZoGKdZS",
+    "A_files": 38,
+    "A_logical_file_bytes": 35039850,
+    "B_first_removed_du_sb": 1379360,
+    "B_followup_removed_du_sb": 5070438,
+    "retained": "one persistent source adjudication, tests/review outcomes, release/API audit and current single-company JSON/Markdown; original source/cache/records and parallel changes untouched",
+    "A_path_absent_verified": true
+  },
+  "links_checked": 33
+}

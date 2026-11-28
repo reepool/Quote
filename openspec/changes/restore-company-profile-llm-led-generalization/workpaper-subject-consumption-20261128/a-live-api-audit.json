@@ -1,0 +1,16 @@
+{
+  "task": "6.FW",
+  "supplier_calls": 0,
+  "actual_base_url": "http://192.168.188.66:8000/api/v1/research/company",
+  "batch_status": 200,
+  "batch_seconds": 24.13735,
+  "batch_profiles": 39,
+  "batch_sha256": "a32a759334c89b414168cf56f75e46c0beeb9c672f25333f34a0223a1f22d8bc",
+  "batch_equals_exact_reader_expected": true,
+  "single_status": 200,
+  "single_seconds": 1.063626,
+  "single_sha256": "e0453b97963cd57cc5d9540e4e86e5971f911a56793ff0a46d494bb122746d48",
+  "single_equals_exact_reader_expected": true,
+  "subject_scope_gap_visible": true,
+  "original_op01_metric_still_withheld": true
+}

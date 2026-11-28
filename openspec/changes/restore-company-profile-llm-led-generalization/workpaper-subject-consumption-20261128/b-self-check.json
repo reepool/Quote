@@ -1,0 +1,97 @@
+{
+  "card": "6.FW",
+  "role": "B",
+  "date": "2026-11-28",
+  "status": "implementation_frozen_for_A_review",
+  "baseline_head": "e8942566329713b87bf0615e7e7abf13324ec488",
+  "business_result": {
+    "new_optional_decision_field": "subject_scope_restriction",
+    "requires": "source_checked, exact report/fact hash, known evidence covering every fact evidence_id",
+    "projection": "source-supported narrative remains readable; fact subject_scope=unclear with merged uncertainty, limited state and subject_scope_gap; no consolidated aggregation/comparison by that fact scope",
+    "metric_policy": "original metric scopes remain independent; original independent/model restrictions take conservative union; whole model defects still withhold the fact",
+    "read_paths": "original writer, pure subject-only recovery selection, query, JSON/Markdown/CSV export, fresh reader and in-process annual-profile detail/batch API checked",
+    "legacy": "absent/None decision field omitted; frozen pre-change decision/workpaper/delivery/Markdown hashes preserved",
+    "rendering": "basic elements, company_features and optional supply_chain all consume projected fact fields"
+  },
+  "write_set": {
+    "research/company_profile/workpaper.py": "acfc3ba726c1c5fc5c872d3e7dc334a92e52902213f3812af46a806cf79d5225",
+    "research/company_profile/workpaper_delivery.py": "98bcb569a3e438eb49a5db483daadaf5f8ba81e1d37bd5c2bee69dc36c8bce42",
+    "research/company_profile/reads.py": "6005c2e3dc1fbc1415ee0f548c0abb8e19653654f3e48856a98182c68ccfa6d6",
+    "tests/unit/test_research/test_company_profile_subject_consumption.py": "fac677c092c07a5edbcd4609d3e1fef50a59e5f9ebaa8bcb43675e50adf47e77"
+  },
+  "verification": {
+    "environment": "source scripts/quote_dev_env.sh; Python /home/python/miniconda3/envs/Quote/bin/python; ASGI runs in approved escalated environment, controlled providers only",
+    "command": "timeout 300s /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_subject_consumption.py tests/unit/test_research/test_company_profile_workpaper_delivery.py tests/unit/test_research/test_company_profile_review_metric_limits.py tests/unit/test_research/test_company_profile_annual_render.py tests/unit/test_research/test_company_profile_annual_export.py tests/unit/test_research/test_company_profile_batch_reads.py tests/unit/test_research/test_company_profile_enrichment.py tests/unit/test_research/test_company_profile_workpaper_fact_scope_review.py --basetemp=/home/python/Quote/data/QuoteBak/company-profile-6fw-b-S8KGicao/pytest-final -o cache_dir=/home/python/Quote/data/QuoteBak/company-profile-6fw-b-S8KGicao/pytest-cache --tb=short --junitxml=/home/python/Quote/data/QuoteBak/company-profile-6fw-b-S8KGicao/regression.xml",
+    "new_direct": {"passed": 27, "failed": 0},
+    "combined": {"passed": 113, "failed": 1, "warnings": 6, "pytest_seconds": 127.66},
+    "existing_failure": {
+      "test": "tests/unit/test_research/test_company_profile_enrichment.py::test_original_task_service_two_supplemental_reads_keep_base_and_target_only_stock",
+      "line": 154,
+      "expected": "first-read",
+      "actual": "bp-work-9276152fc790d9bda0cb59e6",
+      "cause": "old assertion expects the first reading, while the pre-existing quality_review.metric_limit_policy selection already opts into its linked successor; these inputs have no new subject_scope_restriction",
+      "baseline_check": "Loaded git show HEAD:research/company_profile/reads.py into an isolated in-memory module, substituted only CompanyProfileReadService._select_profiles, then reran the exact one failed test; no disk source changes",
+      "baseline_pytest_args": ["-q", "tests/unit/test_research/test_company_profile_enrichment.py::test_original_task_service_two_supplemental_reads_keep_base_and_target_only_stock", "--basetemp=/home/python/Quote/data/QuoteBak/company-profile-6fw-b-S8KGicao/pytest-baseline", "-o", "cache_dir=/home/python/Quote/data/QuoteBak/company-profile-6fw-b-S8KGicao/pytest-cache", "--tb=short", "--junitxml=/home/python/Quote/data/QuoteBak/company-profile-6fw-b-S8KGicao/baseline.xml"],
+      "baseline_result": {"passed": 0, "failed": 1, "pytest_seconds": 57.84, "same_assertion_and_actual_id": true},
+      "classification": "pre-existing behavior/assertion conflict; not modified by B"
+    },
+    "earlier_attempts": [
+      "Two restricted-environment pytest attempts were interrupted after ASGI thread wakeup stalled; no final pass count claimed for them.",
+      "First approved-environment direct run: 23 passed, 1 failed, stopped at a test-only helper that indexed only the eight core elements. The new test helper now uses workpaper_elements to include features and supply_chain; final combined run has all 27 new tests passing."
+    ],
+    "static": ["git diff --check: passed for the three changed application files", "ast.parse: four changed Python files passed"]
+  },
+  "review": {
+    "blocking_in_specified_write_set": [],
+    "outside_write_set_for_A": [
+      {
+        "path": "research/company_profile/workpaper_review.py:634",
+        "finding": "inherit_recovery_use_review drops a source_checked subject-only restriction when the fact content changes because it only recognizes metric_restrictions as restrictive decisions",
+        "minimal_fix": "Treat subject_scope_restriction as a restrictive decision; changed content must fail closed until fresh independent source judgment",
+        "modified_by_B": false
+      },
+      {
+        "path": "research/company_profile/workpaper_review.py:641",
+        "finding": "When changed content has both metric and subject restrictions, inherited metric handling switches disposition to withheld but leaves subject_scope_restriction, which the new source_checked-only validator rejects",
+        "minimal_fix": "On that fail-closed whole-fact transition, remove both positional metric restrictions and subject_scope_restriction from the inherited payload; retain the prior restriction reason",
+        "modified_by_B": false
+      }
+    ],
+    "scope_note": "These two follow-on recovery branches were reported to A; current independent safe publication does not invoke changed-content model recovery. No out-of-write-set owner code was changed."
+  },
+  "resources": {"supplier_calls": 0, "network_model_calls": 0, "main_research_root_writes": 0, "service_operations": 0, "commit": null, "push": null},
+  "cleanup": {
+    "removed_path": "/home/python/Quote/data/QuoteBak/company-profile-6fw-b-S8KGicao",
+    "bytes_removed_du_sb": 1379360,
+    "path_absent_verified": true,
+    "scope": "B-owned test roots, isolated writer records, duplicate exports, pytest cache and XML; final outcomes summarized once here",
+    "retained": "Only application/test source and this handoff receipt. A artifacts, original PDFs/caches, main research root and pre-existing dirty files were not modified or removed by B."
+  },
+  "recovery_follow_up": {
+    "authorization": "A confirmed both inherited-restriction findings as P1 and extended this card only to inherit_recovery_use_review and its direct tests",
+    "status": "fixed_and_frozen_for_A_release",
+    "resolved_initial_review_paths": ["research/company_profile/workpaper_review.py:634", "research/company_profile/workpaper_review.py:641"],
+    "changes": [
+      "Changed source_checked content is skipped only if it has neither metric_restrictions nor subject_scope_restriction.",
+      "Changed content with either local restriction is inherited as withheld, with both local restriction fields removed before typed validation.",
+      "The specific subject restriction is appended to the inherited reason, even when it was absent from decision.reason.",
+      "Unchanged decisions retain every field. Same-link and next-link repeated inheritance are serialization-stable."
+    ],
+    "current_source_hashes": {
+      "research/company_profile/workpaper.py": "acfc3ba726c1c5fc5c872d3e7dc334a92e52902213f3812af46a806cf79d5225",
+      "research/company_profile/workpaper_delivery.py": "98bcb569a3e438eb49a5db483daadaf5f8ba81e1d37bd5c2bee69dc36c8bce42",
+      "research/company_profile/reads.py": "6005c2e3dc1fbc1415ee0f548c0abb8e19653654f3e48856a98182c68ccfa6d6",
+      "research/company_profile/workpaper_review.py": "0aa233985a39fc6a4f0cd06a1b4d9a5d5ec2058c4fd81043689d385a51d3101f",
+      "tests/unit/test_research/test_company_profile_subject_consumption.py": "8163299ede25470f07255ab6a0989b838e5a7761ad6de873824d40151749fef6"
+    },
+    "command": "source scripts/quote_dev_env.sh; timeout 240s /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_subject_consumption.py tests/unit/test_research/test_company_profile_metric_use.py tests/unit/test_research/test_company_profile_current_recheck.py --basetemp=/home/python/Quote/data/QuoteBak/company-profile-6fw-b-recovery-9mK5P2lZ/pytest -o cache_dir=/home/python/Quote/data/QuoteBak/company-profile-6fw-b-recovery-9mK5P2lZ/pytest-cache --tb=short --junitxml=/home/python/Quote/data/QuoteBak/company-profile-6fw-b-recovery-9mK5P2lZ/result.xml",
+    "result": {"passed": 69, "failed": 0, "errors": 0, "skipped": 0, "warnings": 6, "pytest_seconds": 134.19},
+    "per_file_passed": {"subject_consumption": 31, "metric_use": 16, "current_recheck": 22},
+    "new_inheritance_tests": 4,
+    "initial_results_preserved": "Earlier 113 passed / 1 pre-existing failure remains unchanged in verification.combined; this targeted follow-up does not replace or recalculate it.",
+    "review": {"new_blocking_findings": 0, "both_initial_inheritance_P1s_fixed": true, "diff_check": "passed", "A_independent_review": "A confirmed the 69/0/0/0 XML and reviewed the function delta before cleanup"},
+    "cleanup": {"removed_path": "/home/python/Quote/data/QuoteBak/company-profile-6fw-b-recovery-9mK5P2lZ", "bytes_removed_du_sb": 5070438, "path_absent_verified": true, "scope": "Only B follow-up temporary tests, isolated writer/export records, caches and XML; necessary outcomes retained here once"},
+    "resources": {"supplier_calls": 0, "network_model_calls": 0, "main_research_root_writes": 0, "service_operations": 0, "commit": null, "push": null}
+  },
+  "handoff": "Initial snapshots and results above remain historical; recovery_follow_up.current_source_hashes is the latest frozen code. Both reported P1s are fixed. A owns service loading, original-writer safe publication, actual API39 checks and isolated Git. B has finished implementation and cleanup without model, main-root, service or Git operations."
+}

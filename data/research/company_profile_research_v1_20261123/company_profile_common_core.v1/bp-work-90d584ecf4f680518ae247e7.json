@@ -1,0 +1,4028 @@
+{
+  "schema_version": "company_profile_common_core_runtime.v3",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "production_authorization": "not_authorized",
+  "work_id": "bp-work-90d584ecf4f680518ae247e7",
+  "report": {
+    "instrument_id": "600350.SH",
+    "report_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+    "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-03T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "assessment": {
+    "mapping_version": "company_profile_common_core_mapping.v1",
+    "production_authorization": "not_authorized",
+    "report": {
+      "instrument_id": "600350.SH",
+      "report_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+      "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-03T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "principal_business": {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "products_services": {
+      "dimension_id": "products_services",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "revenue_model": {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "excerpt": null,
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    "core_complete": false
+  },
+  "activated_chapters": [],
+  "evidence_gap_codes": [],
+  "provider_calls": [
+    "select_profile_sections",
+    "extract_profile_workpaper",
+    "review_profile_workpaper",
+    "repair_profile_workpaper",
+    "verify_profile_workpaper_repair"
+  ],
+  "provider_blocked": false,
+  "execution": {
+    "schema_version": "company_profile_execution_record.v1",
+    "production_authorization": "not_authorized",
+    "input_identity": {
+      "instrument_id": "600350.SH",
+      "report_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+      "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+      "report_period": "2025-12-31",
+      "policy_version": "company_profile_common_core_mapping.v2",
+      "processing_identity": {
+        "current_review_binding": {
+          "current_draft_sha256": "e551a3ef794576bb6985994c0e1ea5bacc122aee8ae507b90caf816728a89d63",
+          "request_draft_sha256": "e3cf5149905c375b9cd1a19d25d9dd32704d3d249bd0eda680d9ce6c7012d189",
+          "source_packet_sha256": "9e530899c73fb0f0f509786c7731648556a43e9069adfe80decb4f17e6bc9fb2"
+        },
+        "execution_mode": "provider",
+        "logical_request_timeout_seconds": 2450.0,
+        "max_layout_characters": 500000,
+        "max_section_characters": 160000,
+        "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+        "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+        "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+        "quality_review_profile": "semantic_extraction__scorpio_grok",
+        "reading_strategy": "chapter_workpaper_v1",
+        "repair_profile": "semantic_extraction__deepseek",
+        "review_existing_draft_hash": "e551a3ef794576bb6985994c0e1ea5bacc122aee8ae507b90caf816728a89d63",
+        "review_max_output_tokens": 16384,
+        "review_seed_receipts_hash": "5d14150c136b07835e6652e4a430e0775fb0655b93a1db57642031b6cd443f25",
+        "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+        "semantic_policy": "company_profile_llm_led.v2",
+        "semantic_reuse": false,
+        "source_binding_policy": "company_workpaper_source_literals.column-wrapped-amounts.v8",
+        "source_recheck_policy": "source_review_current_draft.v1",
+        "workpaper_format_recovery": "local_shape_before_retry.v3",
+        "workpaper_max_output_tokens": 12000,
+        "workpaper_metric_format_policy": "source_metric_unparsed_value_null.v2.raw-null-accounting",
+        "workpaper_metric_limit_policy": "source_review_exact_metric_limits.v1",
+        "workpaper_review_policy": "company_profile_workpaper_review.v15",
+        "workpaper_review_recovery": {
+          "request_id": "6fw-600350-SH-20261128",
+          "base_work_id": "bp-work-5dd34b44ee0f10180cf07a8c",
+          "base_workpaper_sha256": "1071507bf72e31eae9a41a5f699d1e9b571dae3f7a4f169a9a66f80a40f8dcd3",
+          "report": {
+            "instrument_id": "600350.SH",
+            "report_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+            "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-03T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "plan_sha256": "378d11453e89e73df9432bf8b8d8045428d840e246fe2d3f5723578a1111805e",
+          "prior_use_review": {
+            "report": {
+              "instrument_id": "600350.SH",
+              "report_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+              "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-03T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "reviewer": "A:independent-original-PDF-review.6FV",
+            "reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-v15-subject-observation-20261127/a-source-adjudication.json",
+            "reference_sha256": "f22d61b24c9f4b49bd6e4e756aa178a870e08666d2173116e55140fecc0a16b8",
+            "decisions": [
+              {
+                "fact_id": "sm-12",
+                "fact_sha256": "2a896714deae169fc01c1aa2ff0ae5b53948867904561c6d356e500c0d577e08",
+                "disposition": "source_checked",
+                "evidence_ids": [
+                  "source-0016"
+                ],
+                "reason": "原PDF273页租赁收入是其中明确较窄业务行；原指标1却标集团整体。仅限制该指标，正文和其他业务合计原指标0保留。",
+                "limitation": null,
+                "metric_restrictions": [
+                  {
+                    "metric_index": 1,
+                    "reason": "原PDF273页租赁收入是其中明确较窄业务行；原指标1却标集团整体。仅限制该指标，正文和其他业务合计原指标0保留。"
+                  }
+                ]
+              },
+              {
+                "fact_id": "op-01",
+                "fact_sha256": "fe1bbbc0814e636484dc5bef523b579a11c948187c6697aa21ef45cc2c53a29d",
+                "disposition": "source_only",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "reason": "原PDF17页路桥运营板块下的通行率和运营机制，原指标已自动隔离，但事实层仍集团整体；仅源参考，保留其余画像。",
+                "limitation": null
+              },
+              {
+                "fact_id": "cm-01",
+                "fact_sha256": "2567cad8afc854140876eaa1b047966d5c064ca0a484ab49220e99c20dc0400d",
+                "disposition": "source_checked",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0007"
+                ],
+                "reason": "A另直接读原PDF14/19：智慧运营为过往车辆通行、受托其他企业路桥，信息集团覆盖31省/海外项目及轨道交通集团运量1.156亿吨/增长2.5%均有源。新增source-0001补足前句引用，事实unclear解释混合主体，三个metric保named_subsidiary。范围澄清和引用补足有用，不将其冒充原4项目标的解决。",
+                "limitation": null
+              },
+              {
+                "fact_id": "review-add:f-revenue-decline-driver",
+                "fact_sha256": "11592ee89dd8c1ec4ea64f42422f518065d703c4f077b03ce414900885e280ca",
+                "disposition": "source_checked",
+                "evidence_ids": [
+                  "source-0008",
+                  "source-0010",
+                  "source-0016"
+                ],
+                "reason": "A直接读原PDF20/21并复用同源273行：营业收入同比-16.03%及主要因改扩建通车后建造服务收入下降均有明示；本期3100006510.91元/上期7485491706.94元、分行业建造服务同比-58.59%、通行费同比+3.70%对应。原mc-01已有建造服务下降定性，本条补显式公司收入主因/同期比较与通行费对照；部分数值重复，不算目标纠错或五项全新独立知识。",
+                "limitation": null
+              },
+              {
+                "fact_id": "bs-02",
+                "fact_sha256": "93c7d09ec8b14fa2cea4f9eb1958d2d862092f0e96f17022236734fa537c2229",
+                "disposition": "source_checked",
+                "evidence_ids": [
+                  "source-0001"
+                ],
+                "reason": "原文明确公司运营管理约2917、自有约1601、受托管理山东高速集团所属约1316公里；原正文和指标名已保自有/受托关系。运营管理主体与资产所属对象是不同口径，模型对位置2限用可保守保留；原文/约数仍可引用。不为恢复单个标准化指标另造override或修改模型原意见。",
+                "limitation": null
+              }
+            ]
+          }
+        },
+        "independent_research_release": {
+          "task": "6.FW",
+          "source_work_id": "bp-work-5dd34b44ee0f10180cf07a8c",
+          "source_record_sha256": "a7067b5ef39f3be37727742c09122ec8e756ac47f43ec480d3eb2580c38b0637",
+          "A_reference_sha256": "378d11453e89e73df9432bf8b8d8045428d840e246fe2d3f5723578a1111805e",
+          "new_supplier_requests": 0,
+          "change": "source-supported narrative with independently restricted fact subject metadata"
+        }
+      }
+    },
+    "scope_digests": {},
+    "model_attempts": [],
+    "token_budget": {
+      "total_token_budget": 1000000,
+      "extract_max_output_tokens": 4000,
+      "verify_max_output_tokens": 2000,
+      "tokens_used": 107381,
+      "tokens_remaining": 892619
+    },
+    "scope_token_allocations": {},
+    "transport_retries": 0,
+    "semantic_disputes": [],
+    "predecessor_lineage": []
+  },
+  "legacy_writers_invoked": [],
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "llm_generated",
+    "report": {
+      "instrument_id": "600350.SH",
+      "report_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+      "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-03T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0038",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 14,
+          "end_page": 17,
+          "rationale": "选择覆盖公司业务与经营主线的完整子节：section-0038说明智慧运营、产业投资、工程建设、绿色低碳四大板块的产品/服务与经营方式；section-0047提供报告期各板块经营讨论、经营变化与驱动因素；section-0066及section-0071用于营业收入、成本、利润表变动和分行业收入构成，回答盈利来源与主要业务权重；section-0114补充主要控股参股公司的业务规模与利润贡献；section-1133为收入成本附注中的主营业务明细，用于核对 monetization 与收入构成，避免仅依赖业务介绍或经营亮点。上述组合可共同解释业务结构、产品服务用途、经营角色与资源、收入来源和本期变化。"
+        },
+        {
+          "section_id": "section-0047",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 17,
+          "end_page": 19,
+          "rationale": "选择覆盖公司业务与经营主线的完整子节：section-0038说明智慧运营、产业投资、工程建设、绿色低碳四大板块的产品/服务与经营方式；section-0047提供报告期各板块经营讨论、经营变化与驱动因素；section-0066及section-0071用于营业收入、成本、利润表变动和分行业收入构成，回答盈利来源与主要业务权重；section-0114补充主要控股参股公司的业务规模与利润贡献；section-1133为收入成本附注中的主营业务明细，用于核对 monetization 与收入构成，避免仅依赖业务介绍或经营亮点。上述组合可共同解释业务结构、产品服务用途、经营角色与资源、收入来源和本期变化。"
+        },
+        {
+          "section_id": "section-0066",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况"
+          ],
+          "start_page": 20,
+          "end_page": 21,
+          "rationale": "选择覆盖公司业务与经营主线的完整子节：section-0038说明智慧运营、产业投资、工程建设、绿色低碳四大板块的产品/服务与经营方式；section-0047提供报告期各板块经营讨论、经营变化与驱动因素；section-0066及section-0071用于营业收入、成本、利润表变动和分行业收入构成，回答盈利来源与主要业务权重；section-0114补充主要控股参股公司的业务规模与利润贡献；section-1133为收入成本附注中的主营业务明细，用于核对 monetization 与收入构成，避免仅依赖业务介绍或经营亮点。上述组合可共同解释业务结构、产品服务用途、经营角色与资源、收入来源和本期变化。"
+        },
+        {
+          "section_id": "section-0071",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "主营业务分行业情况"
+          ],
+          "start_page": 21,
+          "end_page": 21,
+          "rationale": "选择覆盖公司业务与经营主线的完整子节：section-0038说明智慧运营、产业投资、工程建设、绿色低碳四大板块的产品/服务与经营方式；section-0047提供报告期各板块经营讨论、经营变化与驱动因素；section-0066及section-0071用于营业收入、成本、利润表变动和分行业收入构成，回答盈利来源与主要业务权重；section-0114补充主要控股参股公司的业务规模与利润贡献；section-1133为收入成本附注中的主营业务明细，用于核对 monetization 与收入构成，避免仅依赖业务介绍或经营亮点。上述组合可共同解释业务结构、产品服务用途、经营角色与资源、收入来源和本期变化。"
+        },
+        {
+          "section_id": "section-0114",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "衍生品投资情况",
+            "(七) 主要控股参股公司分析"
+          ],
+          "start_page": 30,
+          "end_page": 33,
+          "rationale": "选择覆盖公司业务与经营主线的完整子节：section-0038说明智慧运营、产业投资、工程建设、绿色低碳四大板块的产品/服务与经营方式；section-0047提供报告期各板块经营讨论、经营变化与驱动因素；section-0066及section-0071用于营业收入、成本、利润表变动和分行业收入构成，回答盈利来源与主要业务权重；section-0114补充主要控股参股公司的业务规模与利润贡献；section-1133为收入成本附注中的主营业务明细，用于核对 monetization 与收入构成，避免仅依赖业务介绍或经营亮点。上述组合可共同解释业务结构、产品服务用途、经营角色与资源、收入来源和本期变化。"
+        },
+        {
+          "section_id": "section-1133",
+          "section_path": [
+            "第八节 财务报告",
+            "主营业务"
+          ],
+          "start_page": 272,
+          "end_page": 277,
+          "rationale": "选择覆盖公司业务与经营主线的完整子节：section-0038说明智慧运营、产业投资、工程建设、绿色低碳四大板块的产品/服务与经营方式；section-0047提供报告期各板块经营讨论、经营变化与驱动因素；section-0066及section-0071用于营业收入、成本、利润表变动和分行业收入构成，回答盈利来源与主要业务权重；section-0114补充主要控股参股公司的业务规模与利润贡献；section-1133为收入成本附注中的主营业务明细，用于核对 monetization 与收入构成，避免仅依赖业务介绍或经营亮点。上述组合可共同解释业务结构、产品服务用途、经营角色与资源、收入来源和本期变化。"
+        }
+      ],
+      "unread_or_deferred": [
+        "行业格局与趋势（如section-0046、section-0118）主要作为行业背景，当前公司级经营数据已可解释，暂不扩展。",
+        "客户及供应商集中度（section-0080）属于可选供应链信息，现有业务与收入分析未显示必须补读的实质缺口，暂缓。",
+        "分地区收入（section-0072）与分行业收入及公司路产区域集中的特征部分重叠，暂不单列。",
+        "公司治理、董事薪酬、审计委员会、债券、完整财务报表及会计政策等非经营主线章节不选，避免扩大为全报告阅读。",
+        "未来经营计划与风险（section-0117、section-0125）用于前瞻判断，当前重点在报告期实际经营与收入构成，故暂缓。",
+        "更细的收入附注、分部信息及关联交易明细仅在主营业务收入仍有缺口时定向补读，当前不继续下沉。"
+      ],
+      "selection_rationale": "选择覆盖公司业务与经营主线的完整子节：section-0038说明智慧运营、产业投资、工程建设、绿色低碳四大板块的产品/服务与经营方式；section-0047提供报告期各板块经营讨论、经营变化与驱动因素；section-0066及section-0071用于营业收入、成本、利润表变动和分行业收入构成，回答盈利来源与主要业务权重；section-0114补充主要控股参股公司的业务规模与利润贡献；section-1133为收入成本附注中的主营业务明细，用于核对 monetization 与收入构成，避免仅依赖业务介绍或经营亮点。上述组合可共同解释业务结构、产品服务用途、经营角色与资源、收入来源和本期变化。",
+      "stop_reason": "已选章节能完整回答公司做什么、如何经营、主要产品与服务、收入来源与业务权重、经营变化及主要子公司贡献；再扩展行业背景、治理、债券或完整财务报告只会增加重复与低相关细节，故在此停止。",
+      "transcription_version": "shared-pdf-pypdf-layout.structured-notes.v1"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "bs-01",
+            "text": "公司主要从事对交通基础设施的投资运营，以及高速公路产业链上下游相关行业的股权投资；目前经营智慧运营、产业投资、工程建设、绿色低碳四大业务板块，其中智慧运营是核心业务和主要收入来源。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "bs-02",
+            "text": "公司运营管理的路桥资产总里程约2,917公里，其中所辖自有路桥资产里程约1,601公里、受托管理山东高速集团所属路桥资产里程约1,316公里。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [
+              {
+                "name": "运营管理的路桥资产总里程",
+                "raw_value": "约2,917",
+                "value": "2917",
+                "unit": "公里",
+                "source_unit": "公里",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "所辖自有路桥资产里程",
+                "raw_value": "约1,601",
+                "value": "1601",
+                "unit": "公里",
+                "source_unit": "公里",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "受托管理山东高速集团所属路桥资产里程",
+                "raw_value": "约1,316",
+                "value": "1316",
+                "unit": "公里",
+                "source_unit": "公里",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "bs-03",
+            "text": "产业投资板块围绕路桥主业延伸至智慧交通、养护、物流、工程咨询、轨道交通、金融、环保等领域，并依托产业投资基金、保理公司构建供应链金融综合服务体系；工程建设板块提供高速公路改扩建从立项到竣工的全过程、专业化项目全周期服务；绿色低碳板块自2024年起围绕绿色电源、绿色水源、绿色热源、再生资源探索布局。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0002",
+              "source-0003",
+              "source-0004",
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未列示四大板块下全部子公司和路段的完整清单。"
+        ]
+      },
+      "products_services": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "ps-01",
+            "text": "智慧运营板块通过收购经营性高速公路资产，为过往车辆提供通行服务并按政府收费标准收取车辆通行费；同时凭管理经验受托管理其他企业所属高速公路资产，提供运营管理服务。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ps-02",
+            "text": "轨道交通集团提供铁路客货运输、货物装卸、铁路设施修理、铁路工程施工、运输设备及配件销售维护、仓储、货运代理、物流总包和运贸一体化等服务，并供应轨道板、道口板、双块枕等装备产品。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0007",
+              "source-0013"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ps-03",
+            "text": "信息集团提供智慧交通、软件与信息技术、机电工程、安防、系统集成及运行维护等服务；绿色低碳板块已落地邯郸450MW风电、万华余热长输管线以及莱州第二污水厂等分布式光伏项目，并中标辛安河污水处理厂、汤阴污泥、通许污泥等项目。",
+            "subject_scope": "unclear",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0007",
+              "source-0014"
+            ],
+            "metrics": [],
+            "uncertainty_reason": "叙述同时涉及信息集团与绿色低碳板块，无法归入单一主体范围"
+          }
+        ],
+        "limitations": [
+          "销售商品的具体品类及下游用途未在选读段落展开。"
+        ]
+      },
+      "revenue_model": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "rm-01",
+            "text": "高速公路通行费是核心收入来源；2025年公司实现通行费收入约103.00亿元（含税）。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0005",
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "通行费收入（含税）",
+                "raw_value": "约103.00",
+                "value": "103.00",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": "含税",
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "通行费收入为含税口径，与利润表营业收入口径不同。"
+        ]
+      },
+      "scale_and_mix": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "sm-01",
+            "text": "2025年公司营业收入为23,925,458,141.04元，同比下降16.03%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入",
+                "raw_value": "23,925,458,141.04",
+                "value": "23925458141.04",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": "本期数",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入同比变动",
+                "raw_value": "-16.03",
+                "value": "-16.03",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-02",
+            "text": "2025年归属于母公司的净利润为32.06亿元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "归属于母公司的净利润",
+                "raw_value": "32.06",
+                "value": "32.06",
+                "unit": "亿元",
+                "source_unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-03",
+            "text": "2025年高速公路通行费收入为10,012,165,366.61元。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0009",
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "高速公路通行费收入",
+                "raw_value": "10,012,165,366.61",
+                "value": "10012165366.61",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "主营业务分行业",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-04",
+            "text": "2025年铁路运输收入为2,735,455,363.31元。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0009",
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "铁路运输收入",
+                "raw_value": "2,735,455,363.31",
+                "value": "2735455363.31",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "主营业务分行业",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-05",
+            "text": "2025年销售商品收入为2,298,005,538.23元。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0009",
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "销售商品收入",
+                "raw_value": "2,298,005,538.23",
+                "value": "2298005538.23",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "主营业务分行业",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-06",
+            "text": "2025年工程施工收入为367,262,242.96元。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0009",
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "工程施工收入",
+                "raw_value": "367,262,242.96",
+                "value": "367262242.96",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "主营业务分行业",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-07",
+            "text": "2025年机电工程施工收入为3,219,046,303.07元。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0009",
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "机电工程施工收入",
+                "raw_value": "3,219,046,303.07",
+                "value": "3219046303.07",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "主营业务分行业",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-08",
+            "text": "2025年高速公路托管收入为688,252,549.37元。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0009",
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "高速公路托管收入",
+                "raw_value": "688,252,549.37",
+                "value": "688252549.37",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "主营业务分行业",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-09",
+            "text": "2025年软件、技术服务收入为347,484,224.67元。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0009",
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "软件、技术服务",
+                "raw_value": "347,484,224.67",
+                "value": "347484224.67",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "主营业务分行业",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-10",
+            "text": "2025年建造服务收入为3,100,006,510.91元。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0009",
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "建造服务收入",
+                "raw_value": "3,100,006,510.91",
+                "value": "3100006510.91",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "主营业务分行业",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-11",
+            "text": "2025年主营业务-其他收入为265,973,589.13元。",
+            "subject_scope": "business_segment",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0016"
+            ],
+            "metrics": [
+              {
+                "name": "主营业务-其他",
+                "raw_value": "265,973,589.13",
+                "value": "265973589.13",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "comparison_basis": "主营业务",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-12",
+            "text": "2025年其他业务收入为891,806,452.78元，其中租赁收入为185,065,717.54元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0016"
+            ],
+            "metrics": [
+              {
+                "name": "其他业务收入",
+                "raw_value": "891,806,452.78",
+                "value": "891806452.78",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": "其他业务",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "其他业务-租赁收入",
+                "raw_value": "185,065,717.54",
+                "value": "185065717.54",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": "其中",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未计算各业务收入占比；源表未直接给出占比，本底稿保留源表金额。"
+        ]
+      },
+      "operations_and_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "op-01",
+            "text": "2025年公司探索构建“5公里救援圈”和突发事件“5分钟到岗指挥”机制，全天候通行率达99.54%，并中标滨州G228套尔河特大桥收费站业务外包服务项目，实现市场化运营服务输出。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "全天候通行率",
+                "raw_value": "99.54",
+                "value": "99.54",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "源文未展开全天候通行率的统计口径与适用范围。"
+        ]
+      },
+      "customers_channels_markets": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "cm-01",
+            "text": "公司通行服务面向过往车辆，路桥受托管理服务面向其他企业所属高速公路资产；信息集团全国业务覆盖省份增至31个并拓展海外项目，轨道交通集团全年完成货物运量1.156亿吨、同比增长2.5%。",
+            "subject_scope": "unclear",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0001",
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "信息集团全国业务覆盖省份数",
+                "raw_value": "31",
+                "value": "31",
+                "unit": "个",
+                "source_unit": "个",
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "轨道交通集团全年货物运量",
+                "raw_value": "1.156",
+                "value": "1.156",
+                "unit": "亿吨",
+                "source_unit": "亿吨",
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "轨道交通集团货物运量同比变动",
+                "raw_value": "2.5",
+                "value": "2.5",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025年",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": "事实同时涵盖公司、信息集团和轨道交通集团，单一主体范围无法忠实表达；信息集团与轨道交通集团为具名子公司，不能将其业务覆盖和运量作为 consolidated_group 合并集团口径。"
+          }
+        ],
+        "limitations": [
+          "选读段落未披露具体客户名单及客户集中度。"
+        ]
+      },
+      "operating_drivers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "od-01",
+            "text": "2025年公司投资收益为1,863,465,065.28元，同比增长32.86%，主要包括权益法核算的长期股权投资收益、处置长期股权投资产生的投资收益、债权投资利息收入和交易性金融资产持有期间收益等。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0006",
+              "source-0019"
+            ],
+            "metrics": [
+              {
+                "name": "投资收益",
+                "raw_value": "1,863,465,065.28",
+                "value": "1863465065.28",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "投资收益同比变动",
+                "raw_value": "32.86",
+                "value": "32.86",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "投资收益构成项目的具体金额未在本事实中逐项展开。"
+        ]
+      },
+      "material_changes": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "mc-01",
+            "text": "报告期内部分高速公路改扩建项目通车，使本期路桥项目建造服务收入及成本下降；个别路段受相交路段封闭施工分流、停止收费改扩建或恢复双向通行等影响，通行费收入发生变动。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0006",
+              "source-0008"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "review-add:f-revenue-decline-driver",
+            "text": "2025年度，公司营业收入同比下降16.03%，主要因部分高速公路改扩建项目通车，本期路桥项目建造服务收入下降；营业成本下降亦主要因路桥项目建造服务成本下降。建造服务收入由2024年度的7,485,491,706.94元降至2025年度的3,100,006,510.91元，同比下降58.59%；同期高速公路通行费收入同比增长3.70%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008",
+              "source-0010",
+              "source-0016"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入同比",
+                "raw_value": "-16.03%",
+                "value": "-16.03",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "建造服务收入",
+                "raw_value": "3,100,006,510.91",
+                "value": "3100006510.91",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "建造服务收入",
+                "raw_value": "7,485,491,706.94",
+                "value": "7485491706.94",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2024年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "建造服务收入同比",
+                "raw_value": "-58.59%",
+                "value": "-58.59",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "营业收入比上年增减",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "高速公路通行费收入同比",
+                "raw_value": "3.70%",
+                "value": "3.70",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "营业收入比上年增减",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未将各路段的量化影响逐一列入本事实；具体原因见源文说明。"
+        ]
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          14
+        ],
+        "source_spans": [
+          {
+            "page": 14,
+            "start": 123,
+            "end": 3302,
+            "quote": "一、报告期内公司从事的业务情况\n    公司成立于        1999  年，并于      2002  年  3 月在上海证券交易所上市，注册资本                        48.35  亿元。公司\n主要从事对交通基础设施的投资运营、以及高速公路产业链上下游相关行业等领域的股权投资。\n    目前，公司主要经营四大业务板块，分别为智慧运营、产业投资、工程建设和绿色低碳。\n    （一）智慧运营板块\n    智慧运营板块作为公司的核心业务，一直是公司的主要收入来源。公司主要通过收购方式获\n取经营性高速公路资产，通过为过往车辆提供通行服务并按照政府收费标准收取车辆通行费的方\n式获取经营收益。同时公司凭借相关管理经验受托管理其他企业所属高速公路资产，为其提供优\n质的运营管理服务。目前，公司运营管理的路桥资产总里程约                                        2,917  公里，其中公司所辖自有路\n桥资产里程约         1,601  公里、受托管理山东高速集团所属的路桥资产里程约                                  1,316  公里。\n    截至本报告期末，公司所辖自有路段信息如下：\n序                                                本公司       批准收费结           收费里程         车\n号     路段名称                  细分路段                  权益          束时间          （公里）         道      状况\n                                                                                        数\n 1    济青高速            济南-青岛高速公路                   100%     2044.12.31          318.5     8     营运\n 2                 北京-台北高速公路德州-                   100%      2046.7.15         91.284     8     营运\n                             齐河段\n 3                   济南第二黄河公路大桥                   100%     2050.12.25           5.75    12     营运\n 4    京台高速          北京-台北高速公路齐河                   100%     2050.12.25         21.971    12     营运\n      相关路段                  至济南段\n 5                  北京-台北高速公路济青                   100%      2025.1.18         16.376     4     免费\n                             连接线\n 6                  北京-台北高速公路济南                   100%     2047.12.29         59.546     8     营运\n                            至泰安段\n 7    济莱高速         北京至上海公路（辅线）                    100%     2034.10.21         76.048     6     营运\n                      济南至莱芜高速公路\n 8    潍莱高速            潍坊-莱阳高速公路                   100%           /          137.264      4     改扩\n                                                                                                建\n 9    威乳高速            威海-乳山高速公路                   100%     2032.12.19          70.55     4     营运\n10    G104  国道      G104 国道泰安-曲阜一级                100%      2026.2.2          64.166     4     免费\n        泰曲段                   公路\n11    利津黄河             利津黄河公路大桥                    65%      2029.9.25           1.35     4     营运\n      公路大桥\n12    许禹高速         河南许昌至禹州高速公路                    100%      2038.2.1           39.07     4     营运\n13    济晋高速         二广高速济源至晋城（省                     90%      2038.9.9          20.555     4     营运\n                             界）段\n14    衡邵高速         湖南衡阳至邵阳高速公路                     70%      2041.3.18       132.059      4     营运\n15    武荆高速         湖北武汉至荆门高速公路                     60%      2040.8.14       183.214      4     营运\n16    泸渝高速         四川成渝环线合江（渝川                    100%      2043.6.27          73.15     4     营运\n                     界）至纳溪段高速公路\n17    济菏高速          济南-广州高速公路殷家                  38.93%    2049.12.19       153.601      8     营运\n                         林至王官屯段\n18    德上高速          德州-上饶高速公路聊城                  38.93%    2040.11.15         68.942     4     营运\n                      至范县（鲁豫界）段\n19    莘南高速         莘县至南乐（鲁豫界）高                   38.93%    2043.09.27         18.267     4     营运\n\n                                                14/ 417"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 0,
+            "end": 907,
+            "quote": "                             山东高速股份有限公司2025         年年度报告\n\n\n                  速公路林屯村至省界段\n20    菏宝高速        菏宝高速新乡至长垣段                 51%     2044.2.17        49.12    4    营运\n     合计                                                           1600.783\n    注：1.经相关部门批准，京台高速齐河至济南段、济南第二黄河公路大桥收费期限至                                             2050\n年 12 月  25日。\n    2.经相关部门批准，许禹高速收费期限至                     2038 年 2 月  1日。\n    3.经相关部门批准，衡邵高速收费期限至                     2041 年 3 月  18日。\n    4.经山东省交通运输厅批准，泰曲路收费期限至                        2026 年  2月  2 日。\n    （二）产业投资板块\n    一是坚持做大做强路桥主业理念，一方面稳住主业基本盘，省内以现有路段改扩建为主，同\n时积极开拓市场化公路投资建设项目，省外以收购已通车主业项目为主，建设省外区域发展平台。\n另一方面，不断延伸主业产业链，目前已涵盖智慧交通、养护、物流、工程咨询、轨道交通、金\n融、环保等多个领域。二是依托资金优势，深化产融结合。依托由产业投资基金、保理公司构成\n的集科技金融服务平台和保理业务为一体的供应链金融综合服务体系，坚持“审慎论证、效益优\n先、风险可控”原则，加强产业研究，为公司发展提供支撑。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                          15 /417"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          16
+        ],
+        "source_spans": [
+          {
+            "page": 16,
+            "start": 0,
+            "end": 324,
+            "quote": "                            山东高速股份有限公司2025        年年度报告\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n    （三）工程建设板块\n    基于济青高速、京台高速等改扩建经验，形成了高速公路改扩建从立项到竣工全过程、专业\n化的管理模式，成立集“项目建设+市场开发”于一身的工程建设事业部，逐渐发展成工程建设板\n块，聚焦工程建设和建设开发，发挥投、建、营一体化、全链条优势，提供项目全周期服务。\n    （四）绿色低碳板块\n                                         16/417"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          17
+        ],
+        "source_spans": [
+          {
+            "page": 17,
+            "start": 0,
+            "end": 230,
+            "quote": "                                山东高速股份有限公司2025           年年度报告\n\n\n    公司自     2024 年起探索布局新能源产业，秉承“由小到大、由参到控”的原则，围绕绿色电源、\n绿色水源、绿色热源、再生资源                    4个领域，利用城市改造机会，积极捕捉绿色投资机遇，稳步培\n育形成强有力的稳健增长极。\n\n报告期内公司新增重要非主营业务的说明\n□适用     √不适用\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          17
+        ],
+        "source_spans": [
+          {
+            "page": 17,
+            "start": 1272,
+            "end": 2904,
+            "quote": "三、经营情况讨论与分析\n\n    2025  年，公司全年实现营业收入                 239.25  亿元，实现归属于母公司的净利润                     32.06  亿元。\n    （一）路桥运营板块\n    2025  年，公司探索构建“5             公里救援圈”，建立突发事件“5                     分钟到岗指挥”机制，全天候\n通行率达      99.54%。精心打造济青高速、济莱高速两条特色主题路、“三桥一隧”管养标杆，交出\n了国检现场“零扣分”的满意答卷。通过联合各地文旅、走访重点企业，开展特色服务。深入开\n展托管运营外部市场开拓，成功中标滨州                         G228 套尔河特大桥收费站业务外包服务项目，实现市场\n化运营服务输出。\n    2025  年，公司实现通行费收入约                 103.00  亿元（含税），各路段于报告期内的运营数据如下：\n                                                                          单位：万元币种：人民币\n      路段名称               2025 年年度         2024 年年度            变动          变动比例         情况说明\n      济青高速                 323,967.34      316,661.90         7,305.44        2.31%\n 京台高速相关路段                  195,003.77      216,708.99      -21,705.22       -10.02%      （1）\n      济莱高速                  54,746.30       54,951.71          -205.41       -0.37%\n  G104 国道泰曲段                 1,802.55        1,891.07           -88.52       -4.68%\n许昌-禹州高速公路                   12,870.32       13,377.65          -507.33       -3.79%\n威海-乳山高速公路                   16,299.16       14,822.62         1,476.54        9.96%\n   济南黄河二桥                   44,150.97       44,311.65          -160.68       -0.36%\n      潍莱高速                        1.07      34,567.69      -34,566.62     -100.00%       （2）\n   湖南衡邵高速                   26,458.26       27,145.58          -687.32       -2.53%\n 利津黄河公路大桥                    4,532.12        6,234.23       -1,702.11       -27.30%      （3）\n   河南济晋高速                   14,509.15       13,594.92           914.23        6.72%\n                                              17 /417"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          18
+        ],
+        "source_spans": [
+          {
+            "page": 18,
+            "start": 0,
+            "end": 3608,
+            "quote": "                                     山东高速股份有限公司2025                年年度报告\n\n\n    湖北武荆高速                      116,571.52        109,663.21            6,908.31           6.30%\n    四川泸渝高速                       29,911.30          31,297.85          -1,386.55          -4.43%\n    河南菏宝高速                       12,310.78              /              12,310.78                 /\n       济菏高速                     132,769.69          52,543.92          80,225.77        152.68%         （4）\n       德上高速                      40,111.54          49,991.01          -9,879.47        -19.76%         （5）\n       莘南高速                       3,954.05           5,079.05          -1,125.00        -22.15%\n         合计                  1,029,969.88         992,843.06           37,126.83           3.74%\n注：本表通行费收入为含税金额；本表数据为原始数据将元换算为万元并保留两位小数得来，同\n比数据为原始计算保留两位小数得来。\n     （1）京台高速相关路段通行费收入变化主要是由于相交路段封闭施工，造成分流效应；济青\n连接线于       2025   年  1 月   18 日停止收费。\n     （2）潍莱高速通行费收入变化主要是由于                                 2024   年  10  月  18  日停止收费，进行改扩建。报告\n期内收入为前期拆账收入延迟到账。\n     （3）利津黄河大桥通行费收入变化主要由于平行路段分流导致。\n     （4）济菏高速通行费收入变化是由于                             2024  年   12 月   20 日   12 时起全线恢复双向通行，同比时\n期正在进行改扩建。\n     （5）德上高速和莘南高速通行费收入变化主要是由于国道路域环境优化，济菏高速通车小幅\n分流导致。\n     （二）产业投资板块\n     2025  年，公司实现投资收益                   18.63   亿元，同比增长             32.86%。具体如下：\n                                                                                      单位：万元币种：人民币\n               项目                        2025  年度          2024  年度         变动金额            变动比例           情况\n                                                                                                           说明\n权益法核算的长期股权投资收                             63,861.14        89,665.96       -25,804.81         -28.78%      （1）\n益\n其中：威海商行（9677.HK）                          25,974.26        22,786.46          3,187.79         13.99%\n东兴证券（601198.SH）                             6,476.83         5,919.67            557.16          9.41%\n粤高速      A（000429.SZ）                     15,810.53        15,121.34             689.19          4.56%\n福龙马（603686.SH）                                 683.66          685.35             -1.69        -0.25%\n济南畅赢交通基础设施投资基                             16,502.63        26,966.28       -10,463.65         -38.80%\n金合伙企业\n山东省高速养护集团有限公司                               7,693.57         6,684.65         1,008.91         15.09%\n交易性金融资产在持有期间的                               4,178.51         3,158.66         1,019.85         32.29%      （2）\n投资收益\n其中：结构性存款与大额存单                               1,809.40         1,771.73             37.67          2.13%\n外贸信托                                        1,197.00         1,197.00               0.00         0.00%\n债权投资在持有期间取得的利                             39,085.77        43,566.45         -4,480.69        -10.28%      （3）\n息收入\n处置长期股权投资产生的投资                             79,221.09          3,449.21        75,771.88       2196.79%\n收益\n其中：粤高速           A（000429.SZ）             75,350.24          2,000.76        73,349.48       3666.08%\n福龙马（603686.SH）                              4,400.80              0.00        4,400.80                /\n山东旗帜信息有限公司                                       0.00        1,248.66        -1,248.66       -100.00%\n债务重组的投资收益                                        0.00          414.07          -414.07       -100.00%\n投资收益合计                                   186,346.51       140,254.34         46,092.16         32.86%\n注：（1）详见第八节财务报告——七、合并财务报表项目注释——17、长期股权投资\n（2）交易性金融资产在持有期间的投资收益增加，主要是规模增大导致。\n（3）详见第八节财务报告——七、合并财务报表项目注释——14、债权投资\n     1.轨道交通\n                                                      18 / 417"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          19
+        ],
+        "source_spans": [
+          {
+            "page": 19,
+            "start": 0,
+            "end": 1598,
+            "quote": "                            山东高速股份有限公司2025       年年度报告\n\n\n    2025年轨道交通集团实现营业收入               50.56亿元，净利润       3.75 亿元。\n    2025年，轨道交通集团推进“走出去”拓市场与“请进来”强合作双向发力，通过实施阶梯\n运价、推进多式联运、召开货主座谈会等一系列举措，累计开发重点新货源                                   34项，全年完成货物\n运量  1.156 亿吨，同比增长        2.5%。通过实施管内线路提速、试验开行组合列车、站场设施扩容升\n级等方式提升运能，最大限度保障客户运输需求，路用车周转时间同比压缩                                   4.1%，货运服务质量\n持续提升。物流产品供给不断优化，大力推行物流总包、运贸一体化服务，全年新开发业务                                             12\n项、实现收入      9.5 亿元，推动传统货运向现代物流转型升级。与此同时，轨道交通集团深耕高端\n装备制造市场，精准对接省内外铁路建设需求，签订济枣、青诸、潍宿高铁共                                    18万块轨道板供应\n协议，中标南深高铁、贵州水城项目，道口板、双块枕等产品合同额创新高。外加剂产品通过欧\n盟认证，打通国际化市场通道。完成轨枕出口额                      1.13 亿元，中标塞尔维亚铁路改造项目，成功进\n入海外铁路施工市场，实现海外市场“扩面增量”。\n    2.信息集团\n    2025年，信息集团实现收入            40.47亿元，净利润       3.32 亿元。\n    2025年，信息集团在国内市场方面，成功中标京福高速支线路段机电、新疆交投大数据平台、\n基础设施数字化转型等重点项目，全国业务覆盖省份增至                           31个。海外市场方面，成功中标孟加拉\nSBS拉链厂房、海军综合楼机电安装等项目，马达加斯加光伏项目顺利并网投用。全年智慧停车\n创收  1.5 亿元，智慧能源创收          9.15亿元。稳步推进山东省交通运输厅智慧大脑、高速集团数字化\n转型等重点项目；上线“数智山高                AI助手”，打造云收费智能体，交能融合与大模型应用取得阶\n段性成效。组建山高智联（山东）科技有限公司，构建智慧交通、智能驾驶、低空经济、交能融\n合多维协同测试体系，同步搭建低空智能网联管控平台。\n    （三）工程建设板块\n    2025年，京台高速齐济段作为全国首条“六改十二”车道高速公路，攻克“边通车边施工、\n涉铁转体桥建设、超多车道智慧通行”等难题，提前建成通车，打造了超多车道改扩建全国样板。\n潍莱项目抢抓窗口期，聚力攻坚拿下“先行用地、防洪评价”2                             项批复，全年成功完成            3次交通\n转序。东深     G220 项目提前开工建设，全年完成投资                10.87 亿元，超计划       14.8%；疏港涉铁工程历\n经 4 轮施工图优化，节约了成本。\n    （四）绿色低碳板块\n    公司探索打造绿色低碳产业平台，逐步构建“投产一批、储备一批、谋划一批”的梯次发展\n格局。目前已落地邯郸           450MW风电项目，万华余热长输管线项目，莱州第二污水厂等分布式光伏\n项目，中标辛安河污水处理厂、汤阴污泥、通许污泥等，绿色低碳产业布局初显成效。\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ],
+        "physical_pages": [
+          20
+        ],
+        "source_spans": [
+          {
+            "page": 20,
+            "start": 263,
+            "end": 2090,
+            "quote": "五、报告期内主要经营情况\n\n    具体内容详见第三节管理层讨论与分析——三、经营情况讨论与分析。\n\n(一)  主营业务分析\n\n1、  利润表及现金流量表相关科目变动分析表\n                                                                            单位：元币种：人民币\n         科目                         本期数                      上年同期数                 变动比例（%）\n营业收入                             23,925,458,141.04         28,494,275,610.16                 -16.03\n营业成本                             16,031,301,577.70         21,068,266,367.68                 -23.91\n销售费用                                  59,617,052.96             68,341,043.30                -12.77\n管理费用                                 961,835,511.84         1,063,776,335.64                  -9.58\n财务费用                              1,615,830,955.18          1,506,780,339.75                    7.24\n研发费用                                 537,557,479.67           487,087,757.25                  10.36\n经营活动产生的现金流                        6,998,105,989.55          6,840,707,803.62                    2.30\n量净额\n投资活动产生的现金流                       -2,443,499,669.13         -7,763,089,268.69                  68.52\n量净额\n筹资活动产生的现金流                       -4,927,670,054.67           -737,108,965.54                -568.51\n量净额\n营业收入变动原因说明：主要因部分高速公路改扩建项目通车，本期路桥项目建造服务收入下降\n所致。\n营业成本变动原因说明：主要因部分高速公路改扩建项目通车，本期路桥项目建造服务成本下降\n所致。\n销售费用变动原因说明：主要因部分产生销售费用的单位本年不再纳入合并范围，导致销售费用\n同比下降。\n管理费用变动原因说明：主要因内退人员薪酬和折旧摊销费用下降所致。\n财务费用变动原因说明：主要因上期收到资金占用费，利息收入基数较高，本期无此收入，财务\n费用同比增加。\n研发费用变动原因说明：主要因研发投入加大所致。\n投资活动产生的现金流量净额变动原因说明：主要因部分高速公路改扩建项目完工，建设投入减\n少，同时转让联营企业股权收回现金所致。\n筹资活动产生的现金流量净额变动原因说明：主要因银行借款减少所致。\n\n本期公司业务类型、利润构成或利润来源发生重大变动的详细说明\n□适用     √不适用\n\n2、  收入和成本分析\n√适用     □不适用\n    2025  年，公司全年实现营业收入                 239.25 亿元，其中高速公路通行费收入                    100.12  亿元，铁路\n运输收入      27.35 亿元，销售商品收入             22.98 亿元，机电工程施工收入                32.19 亿元。\n\n\n\n                                              20 /417"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况"
+        ],
+        "physical_pages": [
+          21
+        ],
+        "source_spans": [
+          {
+            "page": 21,
+            "start": 0,
+            "end": 283,
+            "quote": "                                           山东高速股份有限公司2025                    年年度报告\n\n\n(1).    主营业务分行业、分产品、分地区、分销售模式情况\n\n                                                                                                      单位：元币种：人民币\n                                                    "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0010",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "主营业务分行业情况"
+        ],
+        "physical_pages": [
+          21
+        ],
+        "source_spans": [
+          {
+            "page": 21,
+            "start": 283,
+            "end": 2907,
+            "quote": "主营业务分行业情况\n                                                                         毛利         营业收入            营业成本             毛利率比上\n  分行业                   营业收入                       营业成本                    率        比上年增            比上年增            年增减（%）\n                                                                        （%）         减（%）            减（%）\n高速公路               10,012,165,366.61           4,433,143,046.41          55.72             3.70           -5.23      增加      4.17  个\n通行费                                                                                                                          百分点\n铁路运输                 2,735,455,363.31          2,291,215,055.16          16.24             9.57           15.47      减少      4.28  个\n收入                                                                                                                           百分点\n销售商品                 2,298,005,538.23          1,759,237,772.70          23.45          -33.31           -38.12      增加      5.96  个\n收入                                                                                                                           百分点\n工程施工                   367,262,242.96            338,480,416.23           7.84             0.37           -3.70      增加      3.90  个\n收入                                                                                                                           百分点\n机电工程                 3,219,046,303.07          2,477,818,019.75          23.03             7.27           10.22      减少      2.06  个\n施工收入                                                                                                                         百分点\n高速公路                   688,252,549.37            666,712,848.26           3.13             5.74            5.67      增加      0.07  个\n托管收入                                                                                                                         百分点\n软件、技术                  347,484,224.67            202,609,951.36          41.69           14.50            13.71      增加      0.41  个\n服务                                                                                                                           百分点\n建造服务                 3,100,006,510.91          3,100,006,510.91                         -58.59           -58.59\n收入\n其他                     265,973,589.13            196,378,088.81          26.17             5.23            4.79      增加      0.31  个\n                                                                                                                             百分点\n                                                    "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0011",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "衍生品投资情况",
+          "(七) 主要控股参股公司分析"
+        ],
+        "physical_pages": [
+          30
+        ],
+        "source_spans": [
+          {
+            "page": 30,
+            "start": 1365,
+            "end": 1563,
+            "quote": "(七)    主要控股参股公司分析\n\n√适用       □不适用\n主要子公司及对公司净利润影响达                               10%以上的参股公司情况\n\n                                                                                                30 / 417"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0012",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "衍生品投资情况",
+          "(七) 主要控股参股公司分析"
+        ],
+        "physical_pages": [
+          31
+        ],
+        "source_spans": [
+          {
+            "page": 31,
+            "start": 0,
+            "end": 2082,
+            "quote": "                                                        山东高速股份有限公司2025         年年度报告\n\n\n\n√适用    □不适用\n                                                                                                                          单位：万元币种：人民币\n  公司名称        公司类型                            主要业务                             注册资本         总资产         净资产        营业收入       营业利润        净利润\n                        许可项目：公路管理与养护,住宿服务,餐饮服务,烟草制\n                        品零售,城市生活垃圾经营性服务,城市建筑垃圾处置（清\n                        运）。（依法须经批准的项目，经相关部门批准后方可\n                        开展经营活动，具体经营项目以相关部门批准文件或许\n湖北武荆高                   可证件为准）一般项目：建筑材料销售,园林绿化工程施\n速公路发展        子公司        工,工程和技术研究和试验发展,劳务服务（不含劳务派遣                              80,800.00  661,380.23  337,956.19  115,878.58 67,230.40  50,506.14\n有限公司                    ）,以自有资金从事投资活动,非居住房地产租赁,广告设\n                        计、代理,广告发布,广告制作,停车场服务,食品销售（仅\n                        销售预包装食品）,机动车修理和维护,汽车拖车、求援、\n                        清障服务,软件开发,水污染治理,水环境污染防治服务,环\n                        境卫生公共设施安装服务。（除许可业务外，可自主依\n                        法经营法律法规非禁止或限制的项目）\n                        一般项目：以自有资金从事投资活动；物业管理；信息\n                        技术咨询服务；住房租赁；技术服务、技术开发、技术\n                        咨询、技术交流、技术转让、技术推广；建筑工程机械\n                        与设备租赁；电子、机械设备维护（不含特种设备）；\n                        普通机械设备安装服务；广告设计、代理；广告发布；\n                        广告制作；建筑材料销售；礼品花卉销售；机械零件、\n山东高速投                   零部件销售；电线、电缆经营；机械设备销售；机械设\n资发展有限        子公司        备租赁；畜牧渔业饲料销售；电子产品销售；建筑用钢                               400,000.00 1,288,475.8  823,827.37    5,411.58 79,103.09  55,900.16\n公司                      筋产品销售；水泥制品销售；交通设施维修；园林绿化                                                    0\n                        工程施工；土石方工程施工。（除依法须经批准的项目\n                        外，凭营业执照依法自主开展经营活动）许可项目：建\n                        设工程监理；林木种子生产经营；建设工程施工；住宅\n                        室内装饰装修；第二类增值电信业务；道路货物运输（\n                        网络货运）；道路货物运输（不含危险货物）；互联网\n                        信息服务。（依法须经批准的项目，经相关部门批准后\n                        方可开展经营活动，具体经营项目以相关部门批准文件\n\n                                                                      31/417"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0013",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "衍生品投资情况",
+          "(七) 主要控股参股公司分析"
+        ],
+        "physical_pages": [
+          32
+        ],
+        "source_spans": [
+          {
+            "page": 32,
+            "start": 0,
+            "end": 2057,
+            "quote": "                                                         山东高速股份有限公司2025          年年度报告\n\n\n\n                        或许可证件为准）\n                        轨道交通设施的投资和运营管理；铁路客货运输；货物\n                        装卸；铁路运输设施的修理；铁路工程施工；铁路运输\n                        设备及配件销售、维护管理；专用铁道及铁路专用线代\n                        营服务；仓储服务（不含易燃易爆化学危险品）；铁路\n                        货运代理；轨道交通技术开发、服务、产品销售；轨道\n山东高速轨                   交通信息服务、业务咨询；专业设备、货物、技术进出\n道交通集团         子公司       口；铁路沿线附属资源的综合开发、经营；建筑材料生                                371,275.50  1,454,471.4  704,172.86  505,603.03  51,611.92 37,531.88\n有限公司                    产与销售；煤炭、石料、焦炭、沙石、建材、普通矿石                                                     7\n                        、铁路运输设备配件、普通电器机械设备、钢材、钢轨\n                        、木材、办公用品、沥青、燃料油、粮食、饲料、农产\n                        品、铁矿砂及其精矿的销售；矿山隧道设备和相关材料\n                        销售；合金、冶金材料销售；轨道交通机械与设备经营\n                        租赁；房地产租赁经营；工程监督技术服务。（依法须\n                        经批准的项目，经相关部门批准后方可开展经营活动）\n                        许可项目：建筑劳务分包；各类工程建设活动；技术进\n                        出口；货物进出口。（依法须经批准的项目，经相关部\n                        门批准后方可开展经营活动，具体经营项目以相关部门\n山东高速铁                   批准文件或许可证件为准）一般项目：土石方工程施工\n建装备有限         子公司       ；劳务服务（不含劳务派遣）；机械设备租赁；通用设                                 11,111.00  221,331.86   110,666.74   87,484.42  17,667.65 15,235.01\n公司                      备制造（不含特种设备制造）；建筑材料生产专用机械\n                        制造；机械设备销售；水泥制品制造；水泥制品销售；\n                        非居住房地产租赁；技术服务、技术开发、技术咨询、\n                        技术交流、技术转让、技术推广。（除依法须经批准的\n                        项目外，凭营业执照依法自主开展经营活动）\n                        公路、桥梁、隧道及配套设施的建设、养护、管理及运\n齐鲁高速公                   营；建筑装饰装修；筑路工程技术咨询及服务；建筑机\n路股份有限         子公司       械的加工、维修；自有设备租赁；道路救援清障服务；                                200,000.00  2,049,765.2  642,759.98  237,459.18  51,170.43 38,419.32\n公司                      对港口、公路、水路运输建设与经营；公路信息网络维                                                     6\n                        护。(依法须经批准的项目，经相关部门批准后方可开展\n                        经营活动)\n\n                                                                       32/417"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0014",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "衍生品投资情况",
+          "(七) 主要控股参股公司分析"
+        ],
+        "physical_pages": [
+          33
+        ],
+        "source_spans": [
+          {
+            "page": 33,
+            "start": 0,
+            "end": 1697,
+            "quote": "                                                       山东高速股份有限公司2025         年年度报告\n\n\n\n                       一般项目：技术服务、技术开发、技术咨询、技术交流\n                       、技术转让、技术推广；水污染治理；固体废物治理；\n                       大气污染治理；土壤污染治理与修复服务；太阳能发电\n                       技术服务；风力发电技术服务；建筑工程机械与设备租\n                       赁；工程管理服务；环保咨询服务；以自有资金从事投\n                       资活动；机械设备研发；软件开发；电子产品销售；环\n                       境保护专用设备销售；机械电气设备销售；家用电器销\n毅康科技有        子公司       售；建筑材料销售；金属材料销售；化工产品销售（不                                25,798.50 1,733,178.7 336,044.14   25,548.32    507.36    207.60\n限公司                    含许可类化工产品）；树木种植经营；信息系统集成服                                                   6\n                       务；木材销售；非居住房地产租赁；物业管理。（除依\n                       法须经批准的项目外，凭营业执照依法自主开展经营活\n                       动）许可项目：建设工程设计；建设工程施工；建筑劳\n                       务分包；发电业务、输电业务、供（配）电业务。（依\n                       法须经批准的项目，经相关部门批准后方可开展经营活\n                       动，具体经营项目以相关部门批准文件或许可证件为准\n                       ）\n                       信息技术咨询服务；软件开发；信息系统集成服务；数\n                       据处理和存储服务；公路、桥梁、隧道的机电工程、公\n                       路交通工程、建筑智能化工程、电子工程的设计、开发\n                       、施工、监理、咨询及系统运行维护；城市轨道工程和\n                       城市及道路的照明工程、机电工程的施工；安防工程的\n山东高速信                  设计、施工；综合布线；计算机及通讯设备、通信设备\n息集团有限        子公司       、电子产品和交通工程产品、照明设备、计量器具的设                                79,000.00 952,288.49  316,650.00  404,694.83 39,920.98  33,168.47\n公司                     计、开发、生产、销售、技术转让、技术服务；进出口\n                       业务；环境与生态监测；太阳能发电；货物运输，仓储\n                       服务（不含危险化学品）、交通运输咨询服务；新材料\n                       的技术开发；计量器具的检定、校准；物业管理；房屋\n                       租赁；建筑劳务分包；施工劳务。（依法须经批准的项\n                       目，经相关部门批准后方可开展经营活动）\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0015",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第八节 财务报告",
+          "主营业务"
+        ],
+        "physical_pages": [
+          272
+        ],
+        "source_spans": [
+          {
+            "page": 272,
+            "start": 563,
+            "end": 1174,
+            "quote": "主营业务              23,033,651,688.         15,465,601,709.5         27,656,705,270.5        20,586,492,545.8\n                  26                      9                        9                       4\n其他业务              891,806,452.78          565,699,868.11           837,570,339.57          481,773,821.84\n     合计           23,925,458,141.         16,031,301,577.7         28,494,275,610.1        21,068,266,367.6\n                  04                      0                        6                       8\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                  272 / 417"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0016",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第八节 财务报告",
+          "主营业务"
+        ],
+        "physical_pages": [
+          273
+        ],
+        "source_spans": [
+          {
+            "page": 273,
+            "start": 0,
+            "end": 4536,
+            "quote": "                                                                                 山东高速股份有限公司2025                       年年度报告\n\n\n\n\n\n(2).营业收入、营业成本的分解信息\n√适用         □不适用\n                                                                                                                                                                                   单位：元币种：人民币\n            合同分类                                                             本期金额                                                                                   上期金额\n                                                       营业收入                                       营业成本                                        营业收入                                         营业成本\n主营业务                                                23,033,651,688.26                          15,465,601,709.59                             27,656,705,270.59                           20,586,492,545.84\n其中：山东省通行费收入                                           7,944,810,189.20                           3,461,932,272.04                             7,746,004,445.58                            3,704,946,163.41\n河南省通行费收入                                                 385,138,524.18                              192,908,043.63                               272,956,585.29                              141,516,424.39\n湖南省通行费收入                                                 256,965,930.60                              175,672,567.57                               263,711,340.05                              185,762,729.50\n湖北省通行费收入                                              1,131,762,293.41                               431,345,545.24                           1,064,691,591.76                                469,252,648.71\n四川省通行费收入                                                 293,488,429.22                              171,284,617.93                               307,516,294.23                              176,135,707.34\n铁路运输收入                                                2,735,455,363.31                           2,291,215,055.16                             2,496,514,331.42                            1,984,277,203.88\n销售商品收入                                                2,298,005,538.23                           1,759,237,772.70                             3,445,788,033.94                            2,843,076,817.29\n工程施工收入                                                   367,262,242.96                              338,480,416.23                               365,904,411.75                              351,500,027.81\n机电工程施工收入                                              3,219,046,303.07                           2,477,818,019.75                             3,001,011,640.40                            2,248,010,593.59\n高速公路托管收入                                                 688,252,549.37                              666,712,848.26                               650,887,019.33                              630,942,661.99\n软件、技术服务                                                  347,484,224.67                              202,609,951.36                               303,468,348.90                              178,183,072.25\n主营业务-其他                                                  265,973,589.13                              196,378,088.81                               252,759,521.00                              187,396,788.74\n建造服务收入                                                3,100,006,510.91                           3,100,006,510.91                             7,485,491,706.94                            7,485,491,706.94\n其他业务                                                     891,806,452.78                              565,699,868.11                               837,570,339.57                              481,773,821.84\n其中：租赁收入                                                  185,065,717.54                               91,281,302.53                               225,645,642.49                              121,292,134.72\n其他                                                       706,740,735.24                              474,418,565.58                               611,924,697.08                              360,481,687.12\n                合计                                  23,925,458,141.04                          16,031,301,577.70                             28,494,275,610.16                           21,068,266,367.68\n\n其他说明：\n□适用         √不适用\n\n\n\n\n\n\n\n\n\n                                                                                                     273  / 417"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0017",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第八节 财务报告",
+          "主营业务"
+        ],
+        "physical_pages": [
+          274
+        ],
+        "source_spans": [
+          {
+            "page": 274,
+            "start": 0,
+            "end": 2563,
+            "quote": "                                       山东高速股份有限公司2025                  年年度报告\n\n\n\n(3).履约义务的说明\n□适用       √不适用\n\n(4).分摊至剩余履约义务的说明\n\n□适用       √不适用\n\n\n(5).重大合同变更或重大交易价格调整\n\n□适用       √不适用\n\n其他说明：\n无\n\n62、         税金及附加\n√适用       □不适用\n                                                                                             单位：元币种：人民币\n                项目                                    本期发生额                                       上期发生额\n城市维护建设税                                                       49,748,226.18                               45,766,877.84\n教育费附加                                                         37,222,969.76                               33,566,454.43\n资源税                                                             4,870,539.80                                2,171,088.01\n房产税                                                           47,491,765.43                               42,885,869.37\n土地使用税                                                         13,904,034.27                               15,467,995.21\n车船使用税                                                              539,814.60                                  548,581.01\n印花税                                                           11,129,899.08                               13,388,097.20\n其他                                                              3,052,541.20                                   630,191.98\n                合计                                           167,959,790.32                              154,425,155.05\n\n其他说明：\n无\n\n63、         销售费用\n√适用       □不适用\n                                                                                             单位：元币种：人民币\n                   项目                                      本期发生额                                   上期发生额\n职工薪酬                                                             30,603,652.51                            29,940,457.09\n包装费                                                                4,644,121.30                             5,633,719.99\n广告费                                                                2,266,084.91                             1,899,147.17\n业务费                                                                   847,075.14                            1,444,137.78\n其他                                                               21,256,119.10                            29,423,581.27\n                   合计                                            59,617,052.96                            68,341,043.30\n\n其他说明：\n\n\n                                                        274  /417"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0018",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第八节 财务报告",
+          "主营业务"
+        ],
+        "physical_pages": [
+          275
+        ],
+        "source_spans": [
+          {
+            "page": 275,
+            "start": 0,
+            "end": 3334,
+            "quote": "                                          山东高速股份有限公司2025                     年年度报告\n\n\n无\n\n64、          管理费用\n√适用        □不适用\n                                                                                                     单位：元币种：人民币\n                          项目                                            本期发生额                                  上期发生额\n职工薪酬                                                                        668,338,669.33                        738,320,778.35\n折旧与摊销费                                                                        91,554,785.56                       127,694,245.96\n中介机构费                                                                         37,930,679.84                        39,505,577.93\n租赁费                                                                            8,233,435.28                        10,936,354.29\n其他                                                                          155,777,941.83                        147,319,379.11\n                          合计                                                961,835,511.84                    1,063,776,335.64\n\n其他说明：\n无\n\n65、          研发费用\n√适用        □不适用\n                                                                                                     单位：元币种：人民币\n                          项目                                            本期发生额                                  上期发生额\n人工费用                                                                          305,538,475.30                        282,688,119.36\n材料消耗                                                                          118,769,340.83                        110,168,469.24\n技术服务费                                                                           54,865,316.57                         61,573,083.99\n折旧费用                                                                              7,378,952.98                        10,173,697.14\n其他                                                                              51,005,393.99                         22,484,387.52\n                          合计                                                  537,557,479.67                        487,087,757.25\n\n其他说明：\n无\n\n66、          财务费用\n\n√适用        □不适用\n                                                                                                     单位：元币种：人民币\n                          项目                                            本期发生额                                  上期发生额\n利息费用                                                                        2,061,033,069.23                      2,157,843,523.91\n减：利息收入                                                                        471,923,677.81                        680,097,515.72\n加：汇兑损失                                                                            1,060,248.74                           -222,601.12\n未确认融资费用                                                                           5,920,894.41                         3,578,998.00\n其他支出                                                                            19,740,420.61                         25,677,934.68\n                          合计                                                1,615,830,955.18                      1,506,780,339.75\n\n其他说明：\n无\n\n\n\n\n\n                                                             275  / 417"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0019",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第八节 财务报告",
+          "主营业务"
+        ],
+        "physical_pages": [
+          276
+        ],
+        "source_spans": [
+          {
+            "page": 276,
+            "start": 0,
+            "end": 2182,
+            "quote": "                                     山东高速股份有限公司2025                年年度报告\n\n\n67、        其他收益\n√适用      □不适用\n                                                                                        单位：元币种：人民币\n           按性质分类                                    本期发生额                                    上期发生额\n政府补助                                                          82,063,286.62                          108,093,218.03\n增值税加计抵减                                                       12,155,488.87                                70,029.73\n个税返还                                                           1,490,156.29                             1,459,016.42\n即征即退                                                             117,901.93                               276,116.29\n稳岗补贴                                                           4,109,305.99                             2,988,539.62\n其他                                                               578,622.56                             1,929,396.16\n                合计                                          100,514,762.26                           114,816,316.25\n\n其他说明：\n无\n\n68、        投资收益\n√适用      □不适用\n                                                                                        单位：元币种：人民币\n                    项目                                    本期发生额                                上期发生额\n权益法核算的长期股权投资收益                                   638,611,439.28                      896,659,577.61\n处置长期股权投资产生的投资收益                                  792,210,900.14                      34,492,070.08\n交易性金融资产在持有期间的投资收                                 41,785,055.88                       31,583,245.25\n益\n其他权益工具投资在持有期间取得的\n股利收入\n债权投资在持有期间取得的利息收入                                 390,857,669.98                      435,667,841.62\n其他债权投资在持有期间取得的利息\n收入\n处置交易性金融资产取得的投资收益\n处置其他权益工具投资取得的投资收\n益\n处置债权投资取得的投资收益\n处置其他债权投资取得的投资收益\n债务重组收益                                                                               4,140,713.50\n                    合计                           1,863,465,065.28                    1,402,543,448.06\n\n其他说明：\n无\n\n69、        净敞口套期收益\n\n□适用      √不适用\n\n\n\n\n\n\n\n\n                                                     276 / 417"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0020",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "section_path": [
+          "第八节 财务报告",
+          "主营业务"
+        ],
+        "physical_pages": [
+          277
+        ],
+        "source_spans": [
+          {
+            "page": 277,
+            "start": 0,
+            "end": 1567,
+            "quote": "                                    山东高速股份有限公司2025               年年度报告\n\n\n70、        公允价值变动收益\n√适用      □不适用\n                                                                                      单位：元币种：人民币\n  产生公允价值变动收益的来源                                       本期发生额                                 上期发生额\n交易性金融资产                                                      32,137,534.59       136,644,541.90\n其中：衍生金融工具产生的公允价\n值变动收益\n交易性金融负债\n按公允价值计量的投资性房地产\n                  合计                                         32,137,534.59       136,644,541.90\n其他说明：\n无\n\n71、        信用减值损失\n√适用      □不适用\n                                                                                      单位：元币种：人民币\n                   项目                                    本期发生额                              上期发生额\n应收票据坏账损失                                        -14,708,683.82                     17,106,739.81\n应收账款坏账损失                                        -41,351,691.27                     -70,518,243.14\n其他应收款坏账损失                                       -42,913,739.79                     -137,124,521.80\n债权投资减值损失                                        -71,681,872.16\n其他流动资产和其他非流动资产减值                                -75,737,833.91                     -2,943,613.88\n损失\n                   合计                           -246,393,820.95                    -193,479,639.01\n\n其他说明：\n无\n\n\n72、        资产减值损失\n√适用      □不适用\n                                                                                      单位：元币种：人民币\n                  项目                                 本期发生额                                上期发生额\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "limitations": [
+      "本底稿仅基于选读章节，未覆盖行业趋势、客户供应商集中度等未读内容。"
+    ],
+    "supply_chain": {
+      "position": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "sc-pos-01",
+            "text": "公司处于交通基础设施投资运营与服务环节，通过收购经营性高速公路资产提供通行服务，并受托管理其他企业路桥资产；工程建设板块提供改扩建项目全周期服务。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0001",
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未展开具体项目层面的上下游合同安排。"
+        ]
+      },
+      "upstream_inputs": {
+        "status": "not_disclosed",
+        "facts": [],
+        "limitations": [
+          "选读段落未明确披露主要原材料或能源采购结构。"
+        ]
+      },
+      "downstream_customers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "sc-down-01",
+            "text": "服务对象或下游包括过往车辆、委托管理路桥资产的其他企业，以及铁路运输、物流、机电工程和绿色低碳项目的客户或项目业主。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0001",
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "未披露具体客户名称或客户集中度。"
+        ]
+      }
+    },
+    "generation": {
+      "prompt_version": "company_profile_workpaper.2026-11-19.independent-assertions.v21",
+      "preprocessing_version": "toc_sections_native_layout.v8.structured-note-markers",
+      "section_guide_version": "company_profile_section_guide.2026-11-15.company-features.v4",
+      "selection": {
+        "purpose": "select_profile_sections",
+        "request_id": "bp-work-f7e0f0a8da3af9c1e51ec585:workpaper:sections",
+        "request_hash": "e96a27e26401611987a86893aadde180b001c29c5f82040823ad664879ca68f2",
+        "response_hash": "bbd2734d40182814500c9884332c01c993428e222904e7cb5d738a0aea22e645",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 25229,
+          "output_tokens": 8177,
+          "total_tokens": 33406
+        },
+        "scope_kind": "report_heading_index",
+        "heading_count": 996,
+        "section_ids": [
+          "section-0001",
+          "section-0002",
+          "section-0003",
+          "section-0004",
+          "section-0005",
+          "section-0006",
+          "section-0007",
+          "section-0008",
+          "section-0009",
+          "section-0010",
+          "section-0011",
+          "section-0012",
+          "section-0013",
+          "section-0014",
+          "section-0015",
+          "section-0016",
+          "section-0017",
+          "section-0018",
+          "section-0019",
+          "section-0020",
+          "section-0021",
+          "section-0022",
+          "section-0023",
+          "section-0024",
+          "section-0025",
+          "section-0026",
+          "section-0027",
+          "section-0028",
+          "section-0029",
+          "section-0030",
+          "section-0031",
+          "section-0032",
+          "section-0033",
+          "section-0034",
+          "section-0035",
+          "section-0036",
+          "section-0037",
+          "section-0038",
+          "section-0039",
+          "section-0040",
+          "section-0041",
+          "section-0042",
+          "section-0043",
+          "section-0044",
+          "section-0045",
+          "section-0046",
+          "section-0047",
+          "section-0048",
+          "section-0054",
+          "section-0057",
+          "section-0058",
+          "section-0059",
+          "section-0060",
+          "section-0061",
+          "section-0062",
+          "section-0063",
+          "section-0064",
+          "section-0065",
+          "section-0066",
+          "section-0067",
+          "section-0068",
+          "section-0069",
+          "section-0071",
+          "section-0072",
+          "section-0076",
+          "section-0080",
+          "section-0081",
+          "section-0082",
+          "section-0086",
+          "section-0087",
+          "section-0088",
+          "section-0089",
+          "section-0090",
+          "section-0091",
+          "section-0093",
+          "section-0094",
+          "section-0095",
+          "section-0096",
+          "section-0097",
+          "section-0100",
+          "section-0101",
+          "section-0102",
+          "section-0103",
+          "section-0104",
+          "section-0105",
+          "section-0106",
+          "section-0107",
+          "section-0108",
+          "section-0109",
+          "section-0110",
+          "section-0111",
+          "section-0112",
+          "section-0113",
+          "section-0114",
+          "section-0115",
+          "section-0116",
+          "section-0117",
+          "section-0118",
+          "section-0119",
+          "section-0120",
+          "section-0121",
+          "section-0122",
+          "section-0123",
+          "section-0124",
+          "section-0125",
+          "section-0126",
+          "section-0127",
+          "section-0128",
+          "section-0129",
+          "section-0130",
+          "section-0131",
+          "section-0132",
+          "section-0133",
+          "section-0134",
+          "section-0135",
+          "section-0136",
+          "section-0137",
+          "section-0138",
+          "section-0139",
+          "section-0140",
+          "section-0141",
+          "section-0142",
+          "section-0143",
+          "section-0144",
+          "section-0145",
+          "section-0146",
+          "section-0147",
+          "section-0148",
+          "section-0149",
+          "section-0150",
+          "section-0151",
+          "section-0152",
+          "section-0153",
+          "section-0154",
+          "section-0155",
+          "section-0156",
+          "section-0157",
+          "section-0158",
+          "section-0159",
+          "section-0160",
+          "section-0161",
+          "section-0162",
+          "section-0163",
+          "section-0164",
+          "section-0165",
+          "section-0166",
+          "section-0167",
+          "section-0168",
+          "section-0169",
+          "section-0170",
+          "section-0171",
+          "section-0172",
+          "section-0173",
+          "section-0174",
+          "section-0175",
+          "section-0176",
+          "section-0177",
+          "section-0178",
+          "section-0179",
+          "section-0180",
+          "section-0181",
+          "section-0182",
+          "section-0183",
+          "section-0184",
+          "section-0185",
+          "section-0186",
+          "section-0187",
+          "section-0188",
+          "section-0189",
+          "section-0190",
+          "section-0191",
+          "section-0192",
+          "section-0193",
+          "section-0194",
+          "section-0195",
+          "section-0196",
+          "section-0197",
+          "section-0198",
+          "section-0199",
+          "section-0200",
+          "section-0201",
+          "section-0202",
+          "section-0203",
+          "section-0204",
+          "section-0205",
+          "section-0206",
+          "section-0207",
+          "section-0208",
+          "section-0209",
+          "section-0210",
+          "section-0211",
+          "section-0212",
+          "section-0213",
+          "section-0214",
+          "section-0215",
+          "section-0216",
+          "section-0217",
+          "section-0218",
+          "section-0219",
+          "section-0220",
+          "section-0221",
+          "section-0222",
+          "section-0223",
+          "section-0224",
+          "section-0225",
+          "section-0227",
+          "section-0228",
+          "section-0229",
+          "section-0230",
+          "section-0231",
+          "section-0232",
+          "section-0233",
+          "section-0234",
+          "section-0235",
+          "section-0236",
+          "section-0237",
+          "section-0238",
+          "section-0239",
+          "section-0240",
+          "section-0241",
+          "section-0242",
+          "section-0243",
+          "section-0244",
+          "section-0245",
+          "section-0246",
+          "section-0247",
+          "section-0248",
+          "section-0249",
+          "section-0250",
+          "section-0253",
+          "section-0254",
+          "section-0255",
+          "section-0256",
+          "section-0257",
+          "section-0258",
+          "section-0259",
+          "section-0260",
+          "section-0261",
+          "section-0262",
+          "section-0263",
+          "section-0264",
+          "section-0265",
+          "section-0266",
+          "section-0267",
+          "section-0268",
+          "section-0269",
+          "section-0270",
+          "section-0271",
+          "section-0272",
+          "section-0273",
+          "section-0274",
+          "section-0275",
+          "section-0276",
+          "section-0277",
+          "section-0278",
+          "section-0279",
+          "section-0280",
+          "section-0281",
+          "section-0282",
+          "section-0283",
+          "section-0284",
+          "section-0285",
+          "section-0286",
+          "section-0287",
+          "section-0288",
+          "section-0289",
+          "section-0292",
+          "section-0293",
+          "section-0294",
+          "section-0295",
+          "section-0296",
+          "section-0297",
+          "section-0298",
+          "section-0299",
+          "section-0300",
+          "section-0301",
+          "section-0302",
+          "section-0303",
+          "section-0304",
+          "section-0305",
+          "section-0306",
+          "section-0307",
+          "section-0308",
+          "section-0309",
+          "section-0318",
+          "section-0319",
+          "section-0321",
+          "section-0323",
+          "section-0325",
+          "section-0327",
+          "section-0329",
+          "section-0331",
+          "section-0332",
+          "section-0333",
+          "section-0334",
+          "section-0335",
+          "section-0336",
+          "section-0337",
+          "section-0338",
+          "section-0339",
+          "section-0340",
+          "section-0341",
+          "section-0342",
+          "section-0343",
+          "section-0344",
+          "section-0345",
+          "section-0346",
+          "section-0347",
+          "section-0348",
+          "section-0349",
+          "section-0350",
+          "section-0351",
+          "section-0352",
+          "section-0353",
+          "section-0354",
+          "section-0355",
+          "section-0356",
+          "section-0357",
+          "section-0358",
+          "section-0359",
+          "section-0360",
+          "section-0361",
+          "section-0362",
+          "section-0363",
+          "section-0364",
+          "section-0365",
+          "section-0366",
+          "section-0367",
+          "section-0368",
+          "section-0369",
+          "section-0370",
+          "section-0371",
+          "section-0372",
+          "section-0373",
+          "section-0374",
+          "section-0375",
+          "section-0376",
+          "section-0377",
+          "section-0378",
+          "section-0379",
+          "section-0380",
+          "section-0381",
+          "section-0382",
+          "section-0383",
+          "section-0384",
+          "section-0385",
+          "section-0386",
+          "section-0387",
+          "section-0388",
+          "section-0389",
+          "section-0390",
+          "section-0391",
+          "section-0392",
+          "section-0393",
+          "section-0394",
+          "section-0395",
+          "section-0396",
+          "section-0397",
+          "section-0398",
+          "section-0399",
+          "section-0400",
+          "section-0401",
+          "section-0402",
+          "section-0403",
+          "section-0404",
+          "section-0405",
+          "section-0406",
+          "section-0407",
+          "section-0409",
+          "section-0410",
+          "section-0411",
+          "section-0412",
+          "section-0413",
+          "section-0414",
+          "section-0415",
+          "section-0416",
+          "section-0417",
+          "section-0418",
+          "section-0419",
+          "section-0420",
+          "section-0421",
+          "section-0422",
+          "section-0423",
+          "section-0424",
+          "section-0425",
+          "section-0426",
+          "section-0427",
+          "section-0428",
+          "section-0429",
+          "section-0430",
+          "section-0431",
+          "section-0432",
+          "section-0433",
+          "section-0434",
+          "section-0435",
+          "section-0436",
+          "section-0437",
+          "section-0438",
+          "section-0439",
+          "section-0440",
+          "section-0441",
+          "section-0442",
+          "section-0443",
+          "section-0444",
+          "section-0445",
+          "section-0446",
+          "section-0447",
+          "section-0448",
+          "section-0449",
+          "section-0450",
+          "section-0451",
+          "section-0452",
+          "section-0453",
+          "section-0454",
+          "section-0455",
+          "section-0456",
+          "section-0457",
+          "section-0458",
+          "section-0459",
+          "section-0460",
+          "section-0461",
+          "section-0462",
+          "section-0463",
+          "section-0464",
+          "section-0465",
+          "section-0466",
+          "section-0467",
+          "section-0468",
+          "section-0469",
+          "section-0470",
+          "section-0471",
+          "section-0472",
+          "section-0473",
+          "section-0474",
+          "section-0475",
+          "section-0476",
+          "section-0477",
+          "section-0478",
+          "section-0479",
+          "section-0480",
+          "section-0481",
+          "section-0482",
+          "section-0483",
+          "section-0484",
+          "section-0485",
+          "section-0486",
+          "section-0487",
+          "section-0488",
+          "section-0489",
+          "section-0490",
+          "section-0491",
+          "section-0492",
+          "section-0497",
+          "section-0505",
+          "section-0506",
+          "section-0507",
+          "section-0508",
+          "section-0509",
+          "section-0510",
+          "section-0511",
+          "section-0512",
+          "section-0513",
+          "section-0514",
+          "section-0515",
+          "section-0516",
+          "section-0517",
+          "section-0518",
+          "section-0519",
+          "section-0520",
+          "section-0521",
+          "section-0522",
+          "section-0523",
+          "section-0524",
+          "section-0525",
+          "section-0526",
+          "section-0527",
+          "section-0528",
+          "section-0529",
+          "section-0530",
+          "section-0531",
+          "section-0532",
+          "section-0533",
+          "section-0534",
+          "section-0535",
+          "section-0536",
+          "section-0537",
+          "section-0538",
+          "section-0539",
+          "section-0540",
+          "section-0541",
+          "section-0542",
+          "section-0543",
+          "section-0544",
+          "section-0545",
+          "section-0546",
+          "section-0547",
+          "section-0548",
+          "section-0549",
+          "section-0550",
+          "section-0551",
+          "section-0552",
+          "section-0553",
+          "section-0554",
+          "section-0555",
+          "section-0556",
+          "section-0557",
+          "section-0558",
+          "section-0559",
+          "section-0560",
+          "section-0561",
+          "section-0562",
+          "section-0563",
+          "section-0564",
+          "section-0565",
+          "section-0566",
+          "section-0567",
+          "section-0568",
+          "section-0569",
+          "section-0570",
+          "section-0571",
+          "section-0572",
+          "section-0573",
+          "section-0574",
+          "section-0575",
+          "section-0576",
+          "section-0577",
+          "section-0578",
+          "section-0579",
+          "section-0580",
+          "section-0581",
+          "section-0582",
+          "section-0583",
+          "section-0584",
+          "section-0585",
+          "section-0586",
+          "section-0587",
+          "section-0588",
+          "section-0589",
+          "section-0590",
+          "section-0591",
+          "section-0592",
+          "section-0593",
+          "section-0594",
+          "section-0595",
+          "section-0596",
+          "section-0597",
+          "section-0598",
+          "section-0599",
+          "section-0600",
+          "section-0601",
+          "section-0602",
+          "section-0603",
+          "section-0604",
+          "section-0605",
+          "section-0606",
+          "section-0607",
+          "section-0608",
+          "section-0609",
+          "section-0610",
+          "section-0616",
+          "section-0617",
+          "section-0620",
+          "section-0621",
+          "section-0622",
+          "section-0623",
+          "section-0624",
+          "section-0625",
+          "section-0628",
+          "section-0633",
+          "section-0636",
+          "section-0637",
+          "section-0641",
+          "section-0642",
+          "section-0643",
+          "section-0644",
+          "section-0645",
+          "section-0646",
+          "section-0647",
+          "section-0648",
+          "section-0652",
+          "section-0653",
+          "section-0657",
+          "section-0658",
+          "section-0659",
+          "section-0662",
+          "section-0663",
+          "section-0665",
+          "section-0668",
+          "section-0669",
+          "section-0670",
+          "section-0671",
+          "section-0675",
+          "section-0676",
+          "section-0677",
+          "section-0678",
+          "section-0683",
+          "section-0685",
+          "section-0686",
+          "section-0687",
+          "section-0692",
+          "section-0693",
+          "section-0694",
+          "section-0695",
+          "section-0698",
+          "section-0699",
+          "section-0703",
+          "section-0704",
+          "section-0706",
+          "section-0707",
+          "section-0708",
+          "section-0710",
+          "section-0716",
+          "section-0717",
+          "section-0718",
+          "section-0719",
+          "section-0722",
+          "section-0723",
+          "section-0724",
+          "section-0727",
+          "section-0728",
+          "section-0729",
+          "section-0730",
+          "section-0731",
+          "section-0732",
+          "section-0737",
+          "section-0738",
+          "section-0739",
+          "section-0740",
+          "section-0741",
+          "section-0742",
+          "section-0743",
+          "section-0744",
+          "section-0745",
+          "section-0746",
+          "section-0747",
+          "section-0748",
+          "section-0749",
+          "section-0750",
+          "section-0751",
+          "section-0752",
+          "section-0753",
+          "section-0754",
+          "section-0755",
+          "section-0756",
+          "section-0757",
+          "section-0758",
+          "section-0759",
+          "section-0760",
+          "section-0767",
+          "section-0772",
+          "section-0774",
+          "section-0780",
+          "section-0781",
+          "section-0788",
+          "section-0791",
+          "section-0794",
+          "section-0801",
+          "section-0808",
+          "section-0815",
+          "section-0821",
+          "section-0822",
+          "section-0827",
+          "section-0829",
+          "section-0833",
+          "section-0836",
+          "section-0837",
+          "section-0839",
+          "section-0843",
+          "section-0844",
+          "section-0846",
+          "section-0850",
+          "section-0851",
+          "section-0857",
+          "section-0858",
+          "section-0860",
+          "section-0861",
+          "section-0863",
+          "section-0864",
+          "section-0867",
+          "section-0868",
+          "section-0870",
+          "section-0871",
+          "section-0872",
+          "section-0875",
+          "section-0879",
+          "section-0880",
+          "section-0881",
+          "section-0882",
+          "section-0885",
+          "section-0889",
+          "section-0890",
+          "section-0891",
+          "section-0892",
+          "section-0894",
+          "section-0897",
+          "section-0898",
+          "section-0899",
+          "section-0900",
+          "section-0903",
+          "section-0905",
+          "section-0906",
+          "section-0907",
+          "section-0908",
+          "section-0909",
+          "section-0910",
+          "section-0911",
+          "section-0912",
+          "section-0913",
+          "section-0914",
+          "section-0915",
+          "section-0916",
+          "section-0917",
+          "section-0918",
+          "section-0919",
+          "section-0920",
+          "section-0921",
+          "section-0922",
+          "section-0927",
+          "section-0933",
+          "section-0937",
+          "section-0940",
+          "section-0942",
+          "section-0943",
+          "section-0944",
+          "section-0947",
+          "section-0950",
+          "section-0951",
+          "section-0952",
+          "section-0953",
+          "section-0956",
+          "section-0959",
+          "section-0960",
+          "section-0961",
+          "section-0962",
+          "section-0964",
+          "section-0966",
+          "section-0967",
+          "section-0968",
+          "section-0969",
+          "section-0971",
+          "section-0973",
+          "section-0974",
+          "section-0975",
+          "section-0981",
+          "section-0984",
+          "section-0985",
+          "section-0986",
+          "section-0987",
+          "section-0990",
+          "section-0993",
+          "section-0994",
+          "section-0995",
+          "section-0996",
+          "section-0998",
+          "section-1000",
+          "section-1001",
+          "section-1002",
+          "section-1003",
+          "section-1005",
+          "section-1006",
+          "section-1007",
+          "section-1008",
+          "section-1009",
+          "section-1010",
+          "section-1011",
+          "section-1012",
+          "section-1013",
+          "section-1014",
+          "section-1015",
+          "section-1016",
+          "section-1017",
+          "section-1018",
+          "section-1019",
+          "section-1020",
+          "section-1021",
+          "section-1022",
+          "section-1025",
+          "section-1031",
+          "section-1032",
+          "section-1038",
+          "section-1039",
+          "section-1040",
+          "section-1041",
+          "section-1044",
+          "section-1045",
+          "section-1046",
+          "section-1048",
+          "section-1051",
+          "section-1055",
+          "section-1059",
+          "section-1061",
+          "section-1062",
+          "section-1063",
+          "section-1064",
+          "section-1065",
+          "section-1067",
+          "section-1068",
+          "section-1069",
+          "section-1070",
+          "section-1071",
+          "section-1072",
+          "section-1073",
+          "section-1074",
+          "section-1076",
+          "section-1077",
+          "section-1078",
+          "section-1079",
+          "section-1080",
+          "section-1085",
+          "section-1086",
+          "section-1087",
+          "section-1088",
+          "section-1089",
+          "section-1091",
+          "section-1096",
+          "section-1097",
+          "section-1098",
+          "section-1101",
+          "section-1104",
+          "section-1105",
+          "section-1106",
+          "section-1107",
+          "section-1108",
+          "section-1109",
+          "section-1114",
+          "section-1115",
+          "section-1116",
+          "section-1117",
+          "section-1118",
+          "section-1119",
+          "section-1120",
+          "section-1121",
+          "section-1122",
+          "section-1123",
+          "section-1124",
+          "section-1125",
+          "section-1126",
+          "section-1127",
+          "section-1128",
+          "section-1129",
+          "section-1130",
+          "section-1131",
+          "section-1133",
+          "section-1138",
+          "section-1139",
+          "section-1140",
+          "section-1141",
+          "section-1142",
+          "section-1143",
+          "section-1144",
+          "section-1145",
+          "section-1146",
+          "section-1147",
+          "section-1148",
+          "section-1149",
+          "section-1150",
+          "section-1151",
+          "section-1152",
+          "section-1153",
+          "section-1154",
+          "section-1155",
+          "section-1156",
+          "section-1157",
+          "section-1158",
+          "section-1159",
+          "section-1160",
+          "section-1161",
+          "section-1162",
+          "section-1163",
+          "section-1164",
+          "section-1165",
+          "section-1166",
+          "section-1169",
+          "section-1170",
+          "section-1174",
+          "section-1177",
+          "section-1179",
+          "section-1180",
+          "section-1181",
+          "section-1185",
+          "section-1186",
+          "section-1187",
+          "section-1190",
+          "section-1191",
+          "section-1194",
+          "section-1198",
+          "section-1205",
+          "section-1206",
+          "section-1207",
+          "section-1208",
+          "section-1209",
+          "section-1210",
+          "section-1211",
+          "section-1218",
+          "section-1222",
+          "section-1223",
+          "section-1224",
+          "section-1225",
+          "section-1226",
+          "section-1227",
+          "section-1233",
+          "section-1236",
+          "section-1245",
+          "section-1246",
+          "section-1247",
+          "section-1248",
+          "section-1249",
+          "section-1250",
+          "section-1251",
+          "section-1252",
+          "section-1253",
+          "section-1254",
+          "section-1255",
+          "section-1256",
+          "section-1259",
+          "section-1263",
+          "section-1267",
+          "section-1268",
+          "section-1269",
+          "section-1270",
+          "section-1271",
+          "section-1275",
+          "section-1278",
+          "section-1279",
+          "section-1280",
+          "section-1281",
+          "section-1282",
+          "section-1283",
+          "section-1284",
+          "section-1285",
+          "section-1286",
+          "section-1287",
+          "section-1288",
+          "section-1289",
+          "section-1290",
+          "section-1291",
+          "section-1292",
+          "section-1293",
+          "section-1294",
+          "section-1295",
+          "section-1296",
+          "section-1297",
+          "section-1298",
+          "section-1299",
+          "section-1300",
+          "section-1301",
+          "section-1302",
+          "section-1303",
+          "section-1304",
+          "section-1305",
+          "section-1306",
+          "section-1315",
+          "section-1319",
+          "section-1320",
+          "section-1321",
+          "section-1322",
+          "section-1325",
+          "section-1326",
+          "section-1327",
+          "section-1328",
+          "section-1329",
+          "section-1330",
+          "section-1331",
+          "section-1332",
+          "section-1337",
+          "section-1338",
+          "section-1339",
+          "section-1340",
+          "section-1341",
+          "section-1342",
+          "section-1343",
+          "section-1344",
+          "section-1345",
+          "section-1346",
+          "section-1349",
+          "section-1350",
+          "section-1351",
+          "section-1356",
+          "section-1399",
+          "section-1400",
+          "section-1401",
+          "section-1406",
+          "section-1408",
+          "section-1415",
+          "section-1422",
+          "section-1430",
+          "section-1433",
+          "section-1434",
+          "section-1436",
+          "section-1442",
+          "section-1443",
+          "section-1444",
+          "section-1445",
+          "section-1446",
+          "section-1447",
+          "section-1448"
+        ],
+        "physical_pages": []
+      },
+      "extraction": {
+        "purpose": "extract_profile_workpaper",
+        "request_id": "bp-work-f7e0f0a8da3af9c1e51ec585:workpaper:extract",
+        "request_hash": "8c7d316df68285f5b3f30fb937158b0282cf4fa338ab0fd2a5c239df7bf15e63",
+        "response_hash": "ead621134fa09080e1e0b1319fa8b1b772abe841ad7d30d65f212d610fa53f21",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 16496,
+          "output_tokens": 22281,
+          "total_tokens": 38777
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0038",
+          "section-0047",
+          "section-0066",
+          "section-0071",
+          "section-0114",
+          "section-1133"
+        ],
+        "physical_pages": [
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          30,
+          31,
+          32,
+          33,
+          272,
+          273,
+          274,
+          275,
+          276,
+          277
+        ]
+      }
+    },
+    "quality_review": {
+      "status": "completed_with_open_findings",
+      "policy_version": "company_profile_workpaper_review.v15",
+      "original_draft_hash": "e551a3ef794576bb6985994c0e1ea5bacc122aee8ae507b90caf816728a89d63",
+      "findings": [
+        {
+          "finding_id": "f-bs-02-m2-scope",
+          "element": "business_structure",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "affected_fact_id": "bs-02",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "原文写明公司运营管理路桥资产总里程约2917公里，其中所辖自有约1601公里，另有受托管理山东高速集团所属路桥资产约1316公里。事实正文已按原文区分自有与受托，期间、叙述和证据可保留，公司作为运营管理主体的事实级口径有原文支持。但原metrics第2项（零基索引2）的对象是山东高速集团所属、由公司受托管理的路产，不是上市合并集团自身路产；其subject_scope标为consolidated_group不能忠实表达该所属关系。里程数字、单位和约数限定本身与原文一致，此处只限制该结构化指标，不提供替代数值或替代标签。",
+          "resolution": "metrics_limited",
+          "original_fact": {
+            "fact_id": "bs-02",
+            "text": "公司运营管理的路桥资产总里程约2,917公里，其中所辖自有路桥资产里程约1,601公里、受托管理山东高速集团所属路桥资产里程约1,316公里。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [
+              {
+                "name": "运营管理的路桥资产总里程",
+                "raw_value": "约2,917",
+                "value": "2917",
+                "unit": "公里",
+                "source_unit": "公里",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "所辖自有路桥资产里程",
+                "raw_value": "约1,601",
+                "value": "1601",
+                "unit": "公里",
+                "source_unit": "公里",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "受托管理山东高速集团所属路桥资产里程",
+                "raw_value": "约1,316",
+                "value": "1316",
+                "unit": "公里",
+                "source_unit": "公里",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "approximate",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "revised_fact": null,
+          "metric_limit": {
+            "fact_sha256": "93c7d09ec8b14fa2cea4f9eb1958d2d862092f0e96f17022236734fa537c2229",
+            "narrative_supported": true,
+            "metric_indices": [
+              2
+            ]
+          }
+        },
+        {
+          "finding_id": "f-revenue-decline-driver",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": "mc-01",
+          "evidence_ids": [
+            "source-0008",
+            "source-0010",
+            "source-0016"
+          ],
+          "explanation": "source-0008对营业收入变动的说明是：主要因部分高速公路改扩建项目通车，本期路桥项目建造服务收入下降；营业成本下降同样主要因建造服务成本下降。source-0016显示建造服务收入由上期7,485,491,706.94元降至本期3,100,006,510.91元，source-0010列示同比-58.59%，减少额约占营业收入减少额的绝大部分；同期高速公路通行费收入同比增加3.70%。草稿虽有营业收入下降16.03%以及建造服务收入下降的定性表述，但未说明营业收入下降主要由此引起，也未给出建造服务收入的同期金额或降幅，容易把核心通行费业务收缩与建造服务确认收入下降混为一谈。现有通行费、建造服务等分类金额可保留，需另行补充这一收入变动原因及建造服务收入对比。",
+          "resolution": "corrected_pending_trust",
+          "original_fact": null,
+          "revised_fact": {
+            "fact_id": "review-add:f-revenue-decline-driver",
+            "text": "2025年度，公司营业收入同比下降16.03%，主要因部分高速公路改扩建项目通车，本期路桥项目建造服务收入下降；营业成本下降亦主要因路桥项目建造服务成本下降。建造服务收入由2024年度的7,485,491,706.94元降至2025年度的3,100,006,510.91元，同比下降58.59%；同期高速公路通行费收入同比增长3.70%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008",
+              "source-0010",
+              "source-0016"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入同比",
+                "raw_value": "-16.03%",
+                "value": "-16.03",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "建造服务收入",
+                "raw_value": "3,100,006,510.91",
+                "value": "3100006510.91",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "建造服务收入",
+                "raw_value": "7,485,491,706.94",
+                "value": "7485491706.94",
+                "unit": "元",
+                "source_unit": "元",
+                "currency": "人民币",
+                "subject_scope": "business_segment",
+                "period": "2024年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "建造服务收入同比",
+                "raw_value": "-58.59%",
+                "value": "-58.59",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "营业收入比上年增减",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "高速公路通行费收入同比",
+                "raw_value": "3.70%",
+                "value": "3.70",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "营业收入比上年增减",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        },
+        {
+          "finding_id": "inherited:f003",
+          "element": "upstream_inputs",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0001",
+            "source-0002",
+            "source-0003"
+          ],
+          "explanation": "继承前稿bp-work-1deffa57365ab12095599a8f的模型意见f003（非本次模型新判断）；已提供的业务章节只说明公司从事交通基础设施投资运营、通行与受托管理、产业链股权投资和工程建设等，没有给出上游投入或供应商数据，也没有“未披露上游”的正面陈述。材料明确仅为选定章节，缺页不能当成公司未披露或上游不存在。upstream_inputs标为not_disclosed属于过度断言，应改为已提供来源未能确认，而不是not_disclosed。",
+          "resolution": "unresolved",
+          "original_fact": null,
+          "revised_fact": null
+        },
+        {
+          "finding_id": "inherited:inherited:f-op-01",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "affected_fact_id": "op-01",
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "explanation": "继承前稿bp-work-1deffa57365ab12095599a8f的模型意见inherited:f-op-01（非本次模型新判断）；继承前稿bp-work-48e5b38db9e2d9737d7a6c78的模型意见f-op-01（非本次模型新判断）；叙述与source-0005一致，全天候通行率99.54%的数字、单位和期间无误。但该表述位于“（一）路桥运营板块”，通行率属于路桥运营口径；局部标题已给出更窄对象，不能因句中使用“公司”就把原metrics[0]标为consolidated_group。仅限制该指标的主体范围，不改写已获支持的叙述，也不替换原数值。",
+          "resolution": "metrics_limited",
+          "original_fact": {
+            "fact_id": "op-01",
+            "text": "2025年公司探索构建“5公里救援圈”和突发事件“5分钟到岗指挥”机制，全天候通行率达99.54%，并中标滨州G228套尔河特大桥收费站业务外包服务项目，实现市场化运营服务输出。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "全天候通行率",
+                "raw_value": "99.54",
+                "value": "99.54",
+                "unit": "%",
+                "source_unit": "%",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          "revised_fact": null,
+          "metric_limit": {
+            "fact_sha256": "fe1bbbc0814e636484dc5bef523b579a11c948187c6697aa21ef45cc2c53a29d",
+            "narrative_supported": true,
+            "metric_indices": [
+              0
+            ]
+          }
+        }
+      ],
+      "checked_fact_ids": [
+        "bs-01",
+        "bs-02",
+        "bs-03",
+        "ps-01",
+        "ps-02",
+        "ps-03",
+        "rm-01",
+        "sm-01",
+        "sm-02",
+        "sm-03",
+        "sm-04",
+        "sm-05",
+        "sm-06",
+        "sm-07",
+        "sm-08",
+        "sm-09",
+        "sm-10",
+        "sm-11",
+        "sm-12",
+        "op-01",
+        "cm-01",
+        "od-01",
+        "mc-01",
+        "sc-pos-01",
+        "sc-down-01"
+      ],
+      "calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-0e01b8dbe366f6c7d181fd7d:workpaper:review",
+          "request_hash": "e310c7c2b126d507bb7ffb35dd65067ccbd0540025d7ac6ce445b4850556b7d5",
+          "response_hash": "a1ef4b06973df5826ea4443b94061ccf815b3074aa42f9017b6e5a84eb7e1674",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 24903,
+            "output_tokens": 674,
+            "total_tokens": 68688
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0038",
+            "section-0047",
+            "section-0066",
+            "section-0071",
+            "section-0114",
+            "section-1133"
+          ],
+          "physical_pages": [
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            30,
+            31,
+            32,
+            33,
+            272,
+            273,
+            274,
+            275,
+            276,
+            277
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-0e01b8dbe366f6c7d181fd7d:workpaper:repair",
+          "request_hash": "a23a6cbac6651b838b9db411435e25eff0ea7f403b9ce898f0afe1934b18e9e4",
+          "response_hash": "4462517ba278f1533dfaebe44fbdd2c055186f937d06e8e3bb106adb2a4dc2fb",
+          "source_label": "deepseek:deepseek-flash",
+          "model": "deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "logical_profile": "semantic_extraction__deepseek",
+          "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 13537,
+            "output_tokens": 3419,
+            "total_tokens": 16956
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0038",
+            "section-0047",
+            "section-0066",
+            "section-0071",
+            "section-0114",
+            "section-1133"
+          ],
+          "physical_pages": [
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            30,
+            31,
+            32,
+            33,
+            272,
+            273,
+            274,
+            275,
+            276,
+            277
+          ]
+        },
+        {
+          "purpose": "verify_profile_workpaper_repair",
+          "request_id": "bp-work-0e01b8dbe366f6c7d181fd7d:workpaper:repair-verify",
+          "request_hash": "92c0875b00873986c8e369aa021a6994a2b8669d68ca9c3f342f88c7aef18bcf",
+          "response_hash": "d0e006e3d41124114e9b47bbac03fadaf9bbc05fa8165a3600e0779a58d6936a",
+          "source_label": "scorpio:grok-4.7",
+          "model": "grok-4.7",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "logical_profile": "semantic_extraction__scorpio_grok",
+          "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": 16309,
+            "output_tokens": 291,
+            "total_tokens": 21737
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0038",
+            "section-0047",
+            "section-0066",
+            "section-0071",
+            "section-0114",
+            "section-1133"
+          ],
+          "physical_pages": [
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            30,
+            31,
+            32,
+            33,
+            272,
+            273,
+            274,
+            275,
+            276,
+            277
+          ]
+        }
+      ],
+      "retained_request_ids": [],
+      "locally_revalidated_request_ids": [],
+      "error": null,
+      "checked_fact_hashes": {
+        "bs-01": "bbe923d126b01f3a5c5dd9a6fbbbe591e587976a94cb72e52772957c7918cf21",
+        "bs-02": "93c7d09ec8b14fa2cea4f9eb1958d2d862092f0e96f17022236734fa537c2229",
+        "bs-03": "e1fe1d72196db39805c0fbc20a71e70079cd6227441bf3208cedf264e23d8455",
+        "ps-01": "6255cb3d5ee39e2e8b17beed414dddfdbfe09c37534585df2193804a19d6eff3",
+        "ps-02": "73d0feffb0973d454b0ed5e59598e36c7b33e7dd8f181889ee9007fd7d2bf79a",
+        "ps-03": "71ea3d4b406d94545212f57de36d148e7e4caffdbb59aa195a9d6ae4d6cf536f",
+        "rm-01": "929fb08024a4714c6974583d962cc5fbdd4886637c2b228494b857daefae7877",
+        "sm-01": "995b56fced041c01e6fc08ab6c7f7dcd99f22ec1119a73349e4683aa0df4c808",
+        "sm-02": "d99c8fc181f6de587e3b51d9e57baf8be807eb3dc5921d3cee39a122437091c0",
+        "sm-03": "7f50004a5001c853b71fccbecdd18db609fdc1dbf1d4cf199b4d4b4f202dbab6",
+        "sm-04": "f58f525d11176b6fc592ce8ef3171fc72b8140a76e2aefe3de55b837daa42e21",
+        "sm-05": "b71685e79e6fa2682a6bc19430f35aa5060135b4f3f7a6820d369869d3d09a96",
+        "sm-06": "a1fe25d0f0e3aa70649efa1c34c138745e0e255088ec795cc038c417ba7c087d",
+        "sm-07": "65cb4acf0ab3741cc0013dc33a1fd07d8f5b7d899f91e2f568ea9a9cad054e02",
+        "sm-08": "c682fb32c8fd9efc0c7e14b00f2ddbea7e88e5bf64964576c6222c07009c13ce",
+        "sm-09": "e2607b1d190842f1b9a8feb3dbdca2214ecd0f9ffe8ab7a4930c8ed4d74e7015",
+        "sm-10": "f2c964c81194b28043152eec0f60ec3364ef463d7a2c7abd68f800828da1e3c5",
+        "sm-11": "1e8c2a162b1fa0e72ca605850035616da36ff62f3019e7f78697bb7ca4ef60ee",
+        "sm-12": "2a896714deae169fc01c1aa2ff0ae5b53948867904561c6d356e500c0d577e08",
+        "op-01": "fe1bbbc0814e636484dc5bef523b579a11c948187c6697aa21ef45cc2c53a29d",
+        "cm-01": "2567cad8afc854140876eaa1b047966d5c064ca0a484ab49220e99c20dc0400d",
+        "od-01": "373ab8d40534027dae2c97986b3f55227444978047621a1fb876080342aed521",
+        "mc-01": "cb05314d7e9cc8f830f650b950d69b8ca8cabfd7fb461b3a9dc90e530c2e72c2",
+        "sc-pos-01": "a4b1a639f4b6f66efb2cee7d55ab3243a33f5022d29e77774ffb126df4a29e52",
+        "sc-down-01": "e1df85aaf7fdc18bb9a904fb7d3864a575b0b56d41a27e8eb1775983fd6458d1"
+      },
+      "metric_limit_policy": "source_review_exact_metric_limits.v1"
+    },
+    "standardization_notes": [
+      "复核目标标准化：f-revenue-decline-driver关联已有事实mc-01的补充遗漏单列；不撤回或替换原事实，重要补充仍须原文再核。"
+    ],
+    "use_review": {
+      "report": {
+        "instrument_id": "600350.SH",
+        "report_id": "asset_d1406b4ccccf9aa1702760cdb778c938",
+        "document_version": "2cac1cada850d326f778dc261f45aee8ce9a8134268ecee19ee3da7586ef8059",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-03T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reviewer": "A independent original-PDF adjudication, 6.FW",
+      "reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-subject-consumption-20261128/a-source-adjudication.json",
+      "reference_sha256": "378d11453e89e73df9432bf8b8d8045428d840e246fe2d3f5723578a1111805e",
+      "decisions": [
+        {
+          "fact_id": "sm-12",
+          "fact_sha256": "2a896714deae169fc01c1aa2ff0ae5b53948867904561c6d356e500c0d577e08",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0016"
+          ],
+          "reason": "原PDF273页租赁收入是其中明确较窄业务行；原指标1却标集团整体。仅限制该指标，正文和其他业务合计原指标0保留。",
+          "limitation": null,
+          "metric_restrictions": [
+            {
+              "metric_index": 1,
+              "reason": "原PDF273页租赁收入是其中明确较窄业务行；原指标1却标集团整体。仅限制该指标，正文和其他业务合计原指标0保留。"
+            }
+          ]
+        },
+        {
+          "fact_id": "op-01",
+          "fact_sha256": "fe1bbbc0814e636484dc5bef523b579a11c948187c6697aa21ef45cc2c53a29d",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "reason": "逐句核对原PDF17页路桥运营板块，救援机制、99.54%及中标外包服务均有原文，2025期间和引用对应；只确认原描述支持，不确认其原事实及指标合并集团标签。",
+          "limitation": null,
+          "subject_scope_restriction": "原文属于路桥运营板块，原事实consolidated_group无法可靠表达该局部口径；保留原文关系并标unclear，不作为全公司合并口径加总或比较。"
+        },
+        {
+          "fact_id": "cm-01",
+          "fact_sha256": "2567cad8afc854140876eaa1b047966d5c064ca0a484ab49220e99c20dc0400d",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001",
+            "source-0007"
+          ],
+          "reason": "A另直接读原PDF14/19：智慧运营为过往车辆通行、受托其他企业路桥，信息集团覆盖31省/海外项目及轨道交通集团运量1.156亿吨/增长2.5%均有源。新增source-0001补足前句引用，事实unclear解释混合主体，三个metric保named_subsidiary。范围澄清和引用补足有用，不将其冒充原4项目标的解决。",
+          "limitation": null
+        },
+        {
+          "fact_id": "review-add:f-revenue-decline-driver",
+          "fact_sha256": "11592ee89dd8c1ec4ea64f42422f518065d703c4f077b03ce414900885e280ca",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0008",
+            "source-0010",
+            "source-0016"
+          ],
+          "reason": "A直接读原PDF20/21并复用同源273行：营业收入同比-16.03%及主要因改扩建通车后建造服务收入下降均有明示；本期3100006510.91元/上期7485491706.94元、分行业建造服务同比-58.59%、通行费同比+3.70%对应。原mc-01已有建造服务下降定性，本条补显式公司收入主因/同期比较与通行费对照；部分数值重复，不算目标纠错或五项全新独立知识。",
+          "limitation": null
+        },
+        {
+          "fact_id": "bs-02",
+          "fact_sha256": "93c7d09ec8b14fa2cea4f9eb1958d2d862092f0e96f17022236734fa537c2229",
+          "disposition": "source_checked",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "reason": "原文明确公司运营管理约2917、自有约1601、受托管理山东高速集团所属约1316公里；原正文和指标名已保自有/受托关系。运营管理主体与资产所属对象是不同口径，模型对位置2限用可保守保留；原文/约数仍可引用。不为恢复单个标准化指标另造override或修改模型原意见。",
+          "limitation": null
+        }
+      ]
+    }
+  },
+  "workpaper_receipts": [
+    {
+      "request_id": "bp-work-f7e0f0a8da3af9c1e51ec585:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "e96a27e26401611987a86893aadde180b001c29c5f82040823ad664879ca68f2",
+      "response_hash": "bbd2734d40182814500c9884332c01c993428e222904e7cb5d738a0aea22e645",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0038\",\"section-0047\",\"section-0066\",\"section-0071\",\"section-0114\",\"section-1133\"],\"rationale\":\"选择覆盖公司业务与经营主线的完整子节：section-0038说明智慧运营、产业投资、工程建设、绿色低碳四大板块的产品/服务与经营方式；section-0047提供报告期各板块经营讨论、经营变化与驱动因素；section-0066及section-0071用于营业收入、成本、利润表变动和分行业收入构成，回答盈利来源与主要业务权重；section-0114补充主要控股参股公司的业务规模与利润贡献；section-1133为收入成本附注中的主营业务明细，用于核对 monetization 与收入构成，避免仅依赖业务介绍或经营亮点。上述组合可共同解释业务结构、产品服务用途、经营角色与资源、收入来源和本期变化。\",\"deferred\":[\"行业格局与趋势（如section-0046、section-0118）主要作为行业背景，当前公司级经营数据已可解释，暂不扩展。\",\"客户及供应商集中度（section-0080）属于可选供应链信息，现有业务与收入分析未显示必须补读的实质缺口，暂缓。\",\"分地区收入（section-0072）与分行业收入及公司路产区域集中的特征部分重叠，暂不单列。\",\"公司治理、董事薪酬、审计委员会、债券、完整财务报表及会计政策等非经营主线章节不选，避免扩大为全报告阅读。\",\"未来经营计划与风险（section-0117、section-0125）用于前瞻判断，当前重点在报告期实际经营与收入构成，故暂缓。\",\"更细的收入附注、分部信息及关联交易明细仅在主营业务收入仍有缺口时定向补读，当前不继续下沉。\"],\"stop_reason\":\"已选章节能完整回答公司做什么、如何经营、主要产品与服务、收入来源与业务权重、经营变化及主要子公司贡献；再扩展行业背景、治理、债券或完整财务报告只会增加重复与低相关细节，故在此停止。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0038",
+          "section-0047",
+          "section-0066",
+          "section-0071",
+          "section-0114",
+          "section-1133"
+        ],
+        "rationale": "选择覆盖公司业务与经营主线的完整子节：section-0038说明智慧运营、产业投资、工程建设、绿色低碳四大板块的产品/服务与经营方式；section-0047提供报告期各板块经营讨论、经营变化与驱动因素；section-0066及section-0071用于营业收入、成本、利润表变动和分行业收入构成，回答盈利来源与主要业务权重；section-0114补充主要控股参股公司的业务规模与利润贡献；section-1133为收入成本附注中的主营业务明细，用于核对 monetization 与收入构成，避免仅依赖业务介绍或经营亮点。上述组合可共同解释业务结构、产品服务用途、经营角色与资源、收入来源和本期变化。",
+        "deferred": [
+          "行业格局与趋势（如section-0046、section-0118）主要作为行业背景，当前公司级经营数据已可解释，暂不扩展。",
+          "客户及供应商集中度（section-0080）属于可选供应链信息，现有业务与收入分析未显示必须补读的实质缺口，暂缓。",
+          "分地区收入（section-0072）与分行业收入及公司路产区域集中的特征部分重叠，暂不单列。",
+          "公司治理、董事薪酬、审计委员会、债券、完整财务报表及会计政策等非经营主线章节不选，避免扩大为全报告阅读。",
+          "未来经营计划与风险（section-0117、section-0125）用于前瞻判断，当前重点在报告期实际经营与收入构成，故暂缓。",
+          "更细的收入附注、分部信息及关联交易明细仅在主营业务收入仍有缺口时定向补读，当前不继续下沉。"
+        ],
+        "stop_reason": "已选章节能完整回答公司做什么、如何经营、主要产品与服务、收入来源与业务权重、经营变化及主要子公司贡献；再扩展行业背景、治理、债券或完整财务报告只会增加重复与低相关细节，故在此停止。"
+      },
+      "usage": {
+        "input_tokens": 25229,
+        "output_tokens": 8177,
+        "total_tokens": 33406
+      },
+      "receipt_origin": "retained_receipt"
+    },
+    {
+      "request_id": "bp-work-f7e0f0a8da3af9c1e51ec585:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "8c7d316df68285f5b3f30fb937158b0282cf4fa338ab0fd2a5c239df7bf15e63",
+      "response_hash": "ead621134fa09080e1e0b1319fa8b1b772abe841ad7d30d65f212d610fa53f21",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"bs-01\",\"text\":\"公司主要从事对交通基础设施的投资运营，以及高速公路产业链上下游相关行业的股权投资；目前经营智慧运营、产业投资、工程建设、绿色低碳四大业务板块，其中智慧运营是核心业务和主要收入来源。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[]},{\"fact_id\":\"bs-02\",\"text\":\"公司运营管理的路桥资产总里程约2,917公里，其中所辖自有路桥资产里程约1,601公里、受托管理山东高速集团所属路桥资产里程约1,316公里。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"运营管理的路桥资产总里程\",\"raw_value\":\"约2,917\",\"value\":\"2917\",\"unit\":\"公里\",\"source_unit\":\"公里\",\"qualifier\":\"approximate\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\"},{\"name\":\"所辖自有路桥资产里程\",\"raw_value\":\"约1,601\",\"value\":\"1601\",\"unit\":\"公里\",\"source_unit\":\"公里\",\"qualifier\":\"approximate\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\"},{\"name\":\"受托管理山东高速集团所属路桥资产里程\",\"raw_value\":\"约1,316\",\"value\":\"1316\",\"unit\":\"公里\",\"source_unit\":\"公里\",\"qualifier\":\"approximate\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\"}]},{\"fact_id\":\"bs-03\",\"text\":\"产业投资板块围绕路桥主业延伸至智慧交通、养护、物流、工程咨询、轨道交通、金融、环保等领域，并依托产业投资基金、保理公司构建供应链金融综合服务体系；工程建设板块提供高速公路改扩建从立项到竣工的全过程、专业化项目全周期服务；绿色低碳板块自2024年起围绕绿色电源、绿色水源、绿色热源、再生资源探索布局。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0002\",\"source-0003\",\"source-0004\",\"source-0007\"],\"metrics\":[]}],\"limitations\":[\"未列示四大板块下全部子公司和路段的完整清单。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"ps-01\",\"text\":\"智慧运营板块通过收购经营性高速公路资产，为过往车辆提供通行服务并按政府收费标准收取车辆通行费；同时凭管理经验受托管理其他企业所属高速公路资产，提供运营管理服务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[]},{\"fact_id\":\"ps-02\",\"text\":\"轨道交通集团提供铁路客货运输、货物装卸、铁路设施修理、铁路工程施工、运输设备及配件销售维护、仓储、货运代理、物流总包和运贸一体化等服务，并供应轨道板、道口板、双块枕等装备产品。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0007\",\"source-0013\"],\"metrics\":[]},{\"fact_id\":\"ps-03\",\"text\":\"信息集团提供智慧交通、软件与信息技术、机电工程、安防、系统集成及运行维护等服务；绿色低碳板块已落地风电、余热长输管线、分布式光伏、污水处理和污泥处理等项目。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0007\",\"source-0014\"],\"metrics\":[]}],\"limitations\":[\"销售商品的具体品类及下游用途未在选读段落展开。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"rm-01\",\"text\":\"高速公路通行费是核心收入来源；2025年公司实现通行费收入约103.00亿元（含税）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0005\",\"source-0006\"],\"metrics\":[{\"name\":\"通行费收入（含税）\",\"raw_value\":\"约103.00\",\"value\":\"103.00\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"CNY\",\"qualifier\":\"approximate\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"含税\"}]}],\"limitations\":[\"通行费收入为含税口径，与利润表营业收入口径不同。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sm-01\",\"text\":\"2025年公司营业收入为23,925,458,141.04元，同比下降16.03%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"23,925,458,141.04\",\"value\":\"23925458141.04\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"},{\"name\":\"营业收入同比变动\",\"raw_value\":\"-16.03\",\"value\":\"-16.03\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"同比\"}]},{\"fact_id\":\"sm-02\",\"text\":\"2025年归属于母公司的净利润为32.06亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"归属于母公司的净利润\",\"raw_value\":\"32.06\",\"value\":\"32.06\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"CNY\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\"}]},{\"fact_id\":\"sm-03\",\"text\":\"2025年高速公路通行费收入为10,012,165,366.61元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[{\"name\":\"高速公路通行费收入\",\"raw_value\":\"10,012,165,366.61\",\"value\":\"10012165366.61\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"comparison_basis\":\"主营业务分行业\"}]},{\"fact_id\":\"sm-04\",\"text\":\"2025年铁路运输收入为2,735,455,363.31元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[{\"name\":\"铁路运输收入\",\"raw_value\":\"2,735,455,363.31\",\"value\":\"2735455363.31\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"comparison_basis\":\"主营业务分行业\"}]},{\"fact_id\":\"sm-05\",\"text\":\"2025年销售商品收入为2,298,005,538.23元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[{\"name\":\"销售商品收入\",\"raw_value\":\"2,298,005,538.23\",\"value\":\"2298005538.23\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"comparison_basis\":\"主营业务分行业\"}]},{\"fact_id\":\"sm-06\",\"text\":\"2025年工程施工收入为367,262,242.96元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[{\"name\":\"工程施工收入\",\"raw_value\":\"367,262,242.96\",\"value\":\"367262242.96\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"comparison_basis\":\"主营业务分行业\"}]},{\"fact_id\":\"sm-07\",\"text\":\"2025年机电工程施工收入为3,219,046,303.07元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[{\"name\":\"机电工程施工收入\",\"raw_value\":\"3,219,046,303.07\",\"value\":\"3219046303.07\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"comparison_basis\":\"主营业务分行业\"}]},{\"fact_id\":\"sm-08\",\"text\":\"2025年高速公路托管收入为688,252,549.37元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[{\"name\":\"高速公路托管收入\",\"raw_value\":\"688,252,549.37\",\"value\":\"688252549.37\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"comparison_basis\":\"主营业务分行业\"}]},{\"fact_id\":\"sm-09\",\"text\":\"2025年软件、技术服务收入为347,484,224.67元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[{\"name\":\"软件、技术服务\",\"raw_value\":\"347,484,224.67\",\"value\":\"347484224.67\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"comparison_basis\":\"主营业务分行业\"}]},{\"fact_id\":\"sm-10\",\"text\":\"2025年建造服务收入为3,100,006,510.91元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[{\"name\":\"建造服务收入\",\"raw_value\":\"3,100,006,510.91\",\"value\":\"3100006510.91\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"comparison_basis\":\"主营业务分行业\"}]},{\"fact_id\":\"sm-11\",\"text\":\"2025年主营业务-其他收入为265,973,589.13元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0016\"],\"metrics\":[{\"name\":\"主营业务-其他\",\"raw_value\":\"265,973,589.13\",\"value\":\"265973589.13\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"comparison_basis\":\"主营业务\"}]},{\"fact_id\":\"sm-12\",\"text\":\"2025年其他业务收入为891,806,452.78元，其中租赁收入为185,065,717.54元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0016\"],\"metrics\":[{\"name\":\"其他业务收入\",\"raw_value\":\"891,806,452.78\",\"value\":\"891806452.78\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"其他业务\"},{\"name\":\"其他业务-租赁收入\",\"raw_value\":\"185,065,717.54\",\"value\":\"185065717.54\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"其中\"}]}],\"limitations\":[\"未计算各业务收入占比；源表未直接给出占比，本底稿保留源表金额。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"op-01\",\"text\":\"2025年公司探索构建“5公里救援圈”和突发事件“5分钟到岗指挥”机制，全天候通行率达99.54%，并中标滨州G228套尔河特大桥收费站业务外包服务项目，实现市场化运营服务输出。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"全天候通行率\",\"raw_value\":\"99.54\",\"value\":\"99.54\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\"}]}],\"limitations\":[\"源文未展开全天候通行率的统计口径与适用范围。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"cm-01\",\"text\":\"公司通行服务面向过往车辆，路桥受托管理服务面向其他企业所属高速公路资产；信息集团全国业务覆盖省份增至31个并拓展海外项目，轨道交通集团全年完成货物运量1.156亿吨、同比增长2.5%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"信息集团全国业务覆盖省份数\",\"raw_value\":\"31\",\"value\":\"31\",\"unit\":\"个\",\"source_unit\":\"个\",\"period\":\"2025年\",\"subject_scope\":\"named_subsidiary\"},{\"name\":\"轨道交通集团全年货物运量\",\"raw_value\":\"1.156\",\"value\":\"1.156\",\"unit\":\"亿吨\",\"source_unit\":\"亿吨\",\"period\":\"2025年\",\"subject_scope\":\"named_subsidiary\"},{\"name\":\"轨道交通集团货物运量同比变动\",\"raw_value\":\"2.5\",\"value\":\"2.5\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"named_subsidiary\",\"comparison_basis\":\"同比\"}]}],\"limitations\":[\"选读段落未披露具体客户名单及客户集中度。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"od-01\",\"text\":\"2025年公司投资收益为1,863,465,065.28元，同比增长32.86%，主要包括权益法核算的长期股权投资收益、处置长期股权投资产生的投资收益、债权投资利息收入和交易性金融资产持有期间收益等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0006\",\"source-0019\"],\"metrics\":[{\"name\":\"投资收益\",\"raw_value\":\"1,863,465,065.28\",\"value\":\"1863465065.28\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\"},{\"name\":\"投资收益同比变动\",\"raw_value\":\"32.86\",\"value\":\"32.86\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"同比\"}]}],\"limitations\":[\"投资收益构成项目的具体金额未在本事实中逐项展开。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"mc-01\",\"text\":\"报告期内部分高速公路改扩建项目通车，使本期路桥项目建造服务收入及成本下降；个别路段受相交路段封闭施工分流、停止收费改扩建或恢复双向通行等影响，通行费收入发生变动。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0006\",\"source-0008\"],\"metrics\":[]}],\"limitations\":[\"未将各路段的量化影响逐一列入本事实；具体原因见源文说明。\"]}},\"company_features\":null,\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sc-pos-01\",\"text\":\"公司处于交通基础设施投资运营与服务环节，通过收购经营性高速公路资产提供通行服务，并受托管理其他企业路桥资产；工程建设板块提供改扩建项目全周期服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0001\",\"source-0003\"],\"metrics\":[]}],\"limitations\":[\"未展开具体项目层面的上下游合同安排。\"]},\"upstream_inputs\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"选读段落未明确披露主要原材料或能源采购结构。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sc-down-01\",\"text\":\"服务对象或下游包括过往车辆、委托管理路桥资产的其他企业，以及铁路运输、物流、机电工程和绿色低碳项目的客户或项目业主。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"evidence_ids\":[\"source-0001\",\"source-0007\"],\"metrics\":[]}],\"limitations\":[\"未披露具体客户名称或客户集中度。\"]}},\"limitations\":[\"本底稿仅基于选读章节，未覆盖行业趋势、客户供应商集中度等未读内容。\"]}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "bs-01",
+                "text": "公司主要从事对交通基础设施的投资运营，以及高速公路产业链上下游相关行业的股权投资；目前经营智慧运营、产业投资、工程建设、绿色低碳四大业务板块，其中智慧运营是核心业务和主要收入来源。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0001"
+                ],
+                "metrics": []
+              },
+              {
+                "fact_id": "bs-02",
+                "text": "公司运营管理的路桥资产总里程约2,917公里，其中所辖自有路桥资产里程约1,601公里、受托管理山东高速集团所属路桥资产里程约1,316公里。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0001"
+                ],
+                "metrics": [
+                  {
+                    "name": "运营管理的路桥资产总里程",
+                    "raw_value": "约2,917",
+                    "value": "2917",
+                    "unit": "公里",
+                    "source_unit": "公里",
+                    "qualifier": "approximate",
+                    "period": "2025年",
+                    "subject_scope": "consolidated_group"
+                  },
+                  {
+                    "name": "所辖自有路桥资产里程",
+                    "raw_value": "约1,601",
+                    "value": "1601",
+                    "unit": "公里",
+                    "source_unit": "公里",
+                    "qualifier": "approximate",
+                    "period": "2025年",
+                    "subject_scope": "consolidated_group"
+                  },
+                  {
+                    "name": "受托管理山东高速集团所属路桥资产里程",
+                    "raw_value": "约1,316",
+                    "value": "1316",
+                    "unit": "公里",
+                    "source_unit": "公里",
+                    "qualifier": "approximate",
+                    "period": "2025年",
+                    "subject_scope": "consolidated_group"
+                  }
+                ]
+              },
+              {
+                "fact_id": "bs-03",
+                "text": "产业投资板块围绕路桥主业延伸至智慧交通、养护、物流、工程咨询、轨道交通、金融、环保等领域，并依托产业投资基金、保理公司构建供应链金融综合服务体系；工程建设板块提供高速公路改扩建从立项到竣工的全过程、专业化项目全周期服务；绿色低碳板块自2024年起围绕绿色电源、绿色水源、绿色热源、再生资源探索布局。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0002",
+                  "source-0003",
+                  "source-0004",
+                  "source-0007"
+                ],
+                "metrics": []
+              }
+            ],
+            "limitations": [
+              "未列示四大板块下全部子公司和路段的完整清单。"
+            ]
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "ps-01",
+                "text": "智慧运营板块通过收购经营性高速公路资产，为过往车辆提供通行服务并按政府收费标准收取车辆通行费；同时凭管理经验受托管理其他企业所属高速公路资产，提供运营管理服务。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0001"
+                ],
+                "metrics": []
+              },
+              {
+                "fact_id": "ps-02",
+                "text": "轨道交通集团提供铁路客货运输、货物装卸、铁路设施修理、铁路工程施工、运输设备及配件销售维护、仓储、货运代理、物流总包和运贸一体化等服务，并供应轨道板、道口板、双块枕等装备产品。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0007",
+                  "source-0013"
+                ],
+                "metrics": []
+              },
+              {
+                "fact_id": "ps-03",
+                "text": "信息集团提供智慧交通、软件与信息技术、机电工程、安防、系统集成及运行维护等服务；绿色低碳板块已落地风电、余热长输管线、分布式光伏、污水处理和污泥处理等项目。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0007",
+                  "source-0014"
+                ],
+                "metrics": []
+              }
+            ],
+            "limitations": [
+              "销售商品的具体品类及下游用途未在选读段落展开。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "rm-01",
+                "text": "高速公路通行费是核心收入来源；2025年公司实现通行费收入约103.00亿元（含税）。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0005",
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "通行费收入（含税）",
+                    "raw_value": "约103.00",
+                    "value": "103.00",
+                    "unit": "亿元",
+                    "source_unit": "亿元",
+                    "currency": "CNY",
+                    "qualifier": "approximate",
+                    "period": "2025年",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "含税"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "通行费收入为含税口径，与利润表营业收入口径不同。"
+            ]
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "sm-01",
+                "text": "2025年公司营业收入为23,925,458,141.04元，同比下降16.03%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "23,925,458,141.04",
+                    "value": "23925458141.04",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "营业收入同比变动",
+                    "raw_value": "-16.03",
+                    "value": "-16.03",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-02",
+                "text": "2025年归属于母公司的净利润为32.06亿元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": [
+                  {
+                    "name": "归属于母公司的净利润",
+                    "raw_value": "32.06",
+                    "value": "32.06",
+                    "unit": "亿元",
+                    "source_unit": "亿元",
+                    "currency": "CNY",
+                    "period": "2025年",
+                    "subject_scope": "consolidated_group"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-03",
+                "text": "2025年高速公路通行费收入为10,012,165,366.61元。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0009",
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "高速公路通行费收入",
+                    "raw_value": "10,012,165,366.61",
+                    "value": "10012165366.61",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年",
+                    "subject_scope": "business_segment",
+                    "comparison_basis": "主营业务分行业"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-04",
+                "text": "2025年铁路运输收入为2,735,455,363.31元。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0009",
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "铁路运输收入",
+                    "raw_value": "2,735,455,363.31",
+                    "value": "2735455363.31",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年",
+                    "subject_scope": "business_segment",
+                    "comparison_basis": "主营业务分行业"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-05",
+                "text": "2025年销售商品收入为2,298,005,538.23元。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0009",
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "销售商品收入",
+                    "raw_value": "2,298,005,538.23",
+                    "value": "2298005538.23",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年",
+                    "subject_scope": "business_segment",
+                    "comparison_basis": "主营业务分行业"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-06",
+                "text": "2025年工程施工收入为367,262,242.96元。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0009",
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "工程施工收入",
+                    "raw_value": "367,262,242.96",
+                    "value": "367262242.96",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年",
+                    "subject_scope": "business_segment",
+                    "comparison_basis": "主营业务分行业"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-07",
+                "text": "2025年机电工程施工收入为3,219,046,303.07元。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0009",
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "机电工程施工收入",
+                    "raw_value": "3,219,046,303.07",
+                    "value": "3219046303.07",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年",
+                    "subject_scope": "business_segment",
+                    "comparison_basis": "主营业务分行业"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-08",
+                "text": "2025年高速公路托管收入为688,252,549.37元。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0009",
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "高速公路托管收入",
+                    "raw_value": "688,252,549.37",
+                    "value": "688252549.37",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年",
+                    "subject_scope": "business_segment",
+                    "comparison_basis": "主营业务分行业"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-09",
+                "text": "2025年软件、技术服务收入为347,484,224.67元。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0009",
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "软件、技术服务",
+                    "raw_value": "347,484,224.67",
+                    "value": "347484224.67",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年",
+                    "subject_scope": "business_segment",
+                    "comparison_basis": "主营业务分行业"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-10",
+                "text": "2025年建造服务收入为3,100,006,510.91元。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0009",
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "建造服务收入",
+                    "raw_value": "3,100,006,510.91",
+                    "value": "3100006510.91",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年",
+                    "subject_scope": "business_segment",
+                    "comparison_basis": "主营业务分行业"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-11",
+                "text": "2025年主营业务-其他收入为265,973,589.13元。",
+                "subject_scope": "business_segment",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0016"
+                ],
+                "metrics": [
+                  {
+                    "name": "主营业务-其他",
+                    "raw_value": "265,973,589.13",
+                    "value": "265973589.13",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年",
+                    "subject_scope": "business_segment",
+                    "comparison_basis": "主营业务"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-12",
+                "text": "2025年其他业务收入为891,806,452.78元，其中租赁收入为185,065,717.54元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0016"
+                ],
+                "metrics": [
+                  {
+                    "name": "其他业务收入",
+                    "raw_value": "891,806,452.78",
+                    "value": "891806452.78",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "其他业务"
+                  },
+                  {
+                    "name": "其他业务-租赁收入",
+                    "raw_value": "185,065,717.54",
+                    "value": "185065717.54",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "其中"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未计算各业务收入占比；源表未直接给出占比，本底稿保留源表金额。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "op-01",
+                "text": "2025年公司探索构建“5公里救援圈”和突发事件“5分钟到岗指挥”机制，全天候通行率达99.54%，并中标滨州G228套尔河特大桥收费站业务外包服务项目，实现市场化运营服务输出。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": [
+                  {
+                    "name": "全天候通行率",
+                    "raw_value": "99.54",
+                    "value": "99.54",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年",
+                    "subject_scope": "consolidated_group"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "源文未展开全天候通行率的统计口径与适用范围。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "cm-01",
+                "text": "公司通行服务面向过往车辆，路桥受托管理服务面向其他企业所属高速公路资产；信息集团全国业务覆盖省份增至31个并拓展海外项目，轨道交通集团全年完成货物运量1.156亿吨、同比增长2.5%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "信息集团全国业务覆盖省份数",
+                    "raw_value": "31",
+                    "value": "31",
+                    "unit": "个",
+                    "source_unit": "个",
+                    "period": "2025年",
+                    "subject_scope": "named_subsidiary"
+                  },
+                  {
+                    "name": "轨道交通集团全年货物运量",
+                    "raw_value": "1.156",
+                    "value": "1.156",
+                    "unit": "亿吨",
+                    "source_unit": "亿吨",
+                    "period": "2025年",
+                    "subject_scope": "named_subsidiary"
+                  },
+                  {
+                    "name": "轨道交通集团货物运量同比变动",
+                    "raw_value": "2.5",
+                    "value": "2.5",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年",
+                    "subject_scope": "named_subsidiary",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "选读段落未披露具体客户名单及客户集中度。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "od-01",
+                "text": "2025年公司投资收益为1,863,465,065.28元，同比增长32.86%，主要包括权益法核算的长期股权投资收益、处置长期股权投资产生的投资收益、债权投资利息收入和交易性金融资产持有期间收益等。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0006",
+                  "source-0019"
+                ],
+                "metrics": [
+                  {
+                    "name": "投资收益",
+                    "raw_value": "1,863,465,065.28",
+                    "value": "1863465065.28",
+                    "unit": "元",
+                    "source_unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年",
+                    "subject_scope": "consolidated_group"
+                  },
+                  {
+                    "name": "投资收益同比变动",
+                    "raw_value": "32.86",
+                    "value": "32.86",
+                    "unit": "%",
+                    "source_unit": "%",
+                    "currency": null,
+                    "period": "2025年",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "同比"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "投资收益构成项目的具体金额未在本事实中逐项展开。"
+            ]
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "mc-01",
+                "text": "报告期内部分高速公路改扩建项目通车，使本期路桥项目建造服务收入及成本下降；个别路段受相交路段封闭施工分流、停止收费改扩建或恢复双向通行等影响，通行费收入发生变动。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0006",
+                  "source-0008"
+                ],
+                "metrics": []
+              }
+            ],
+            "limitations": [
+              "未将各路段的量化影响逐一列入本事实；具体原因见源文说明。"
+            ]
+          }
+        },
+        "company_features": null,
+        "supply_chain": {
+          "position": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "sc-pos-01",
+                "text": "公司处于交通基础设施投资运营与服务环节，通过收购经营性高速公路资产提供通行服务，并受托管理其他企业路桥资产；工程建设板块提供改扩建项目全周期服务。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0003"
+                ],
+                "metrics": []
+              }
+            ],
+            "limitations": [
+              "未展开具体项目层面的上下游合同安排。"
+            ]
+          },
+          "upstream_inputs": {
+            "status": "not_disclosed",
+            "facts": [],
+            "limitations": [
+              "选读段落未明确披露主要原材料或能源采购结构。"
+            ]
+          },
+          "downstream_customers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "sc-down-01",
+                "text": "服务对象或下游包括过往车辆、委托管理路桥资产的其他企业，以及铁路运输、物流、机电工程和绿色低碳项目的客户或项目业主。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0007"
+                ],
+                "metrics": []
+              }
+            ],
+            "limitations": [
+              "未披露具体客户名称或客户集中度。"
+            ]
+          }
+        },
+        "limitations": [
+          "本底稿仅基于选读章节，未覆盖行业趋势、客户供应商集中度等未读内容。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 16496,
+        "output_tokens": 22281,
+        "total_tokens": 38777
+      },
+      "receipt_origin": "retained_receipt"
+    },
+    {
+      "request_id": "bp-work-0e01b8dbe366f6c7d181fd7d:workpaper:review",
+      "purpose": "review_profile_workpaper",
+      "request_hash": "e310c7c2b126d507bb7ffb35dd65067ccbd0540025d7ac6ce445b4850556b7d5",
+      "response_hash": "a1ef4b06973df5826ea4443b94061ccf815b3074aa42f9017b6e5a84eb7e1674",
+      "finish_reason": "stop",
+      "source_label": "scorpio:grok-4.7",
+      "model": "grok-4.7",
+      "selected_profile": "semantic_extraction__scorpio_grok",
+      "logical_profile": "semantic_extraction__scorpio_grok",
+      "reasoning_effort": "high",
+      "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+      "contract_status": "accepted",
+      "raw_content": "{\"reviewed_fact_ids\":[\"bs-01\",\"bs-02\",\"bs-03\",\"ps-01\",\"ps-02\",\"ps-03\",\"rm-01\",\"sm-01\",\"sm-02\",\"sm-03\",\"sm-04\",\"sm-05\",\"sm-06\",\"sm-07\",\"sm-08\",\"sm-09\",\"sm-10\",\"sm-11\",\"sm-12\",\"op-01\",\"cm-01\",\"od-01\",\"mc-01\",\"sc-pos-01\",\"sc-down-01\"],\"findings\":[{\"finding_id\":\"f-bs-02-m2-scope\",\"element\":\"business_structure\",\"affected_fact_id\":\"bs-02\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"limit_metrics\",\"evidence_ids\":[\"source-0001\"],\"explanation\":\"原文写明公司运营管理路桥资产总里程约2917公里，其中所辖自有约1601公里，另有受托管理山东高速集团所属路桥资产约1316公里。事实正文已按原文区分自有与受托，期间、叙述和证据可保留，公司作为运营管理主体的事实级口径有原文支持。但原metrics第2项（零基索引2）的对象是山东高速集团所属、由公司受托管理的路产，不是上市合并集团自身路产；其subject_scope标为consolidated_group不能忠实表达该所属关系。里程数字、单位和约数限定本身与原文一致，此处只限制该结构化指标，不提供替代数值或替代标签。\",\"metric_limit\":{\"fact_sha256\":\"93c7d09ec8b14fa2cea4f9eb1958d2d862092f0e96f17022236734fa537c2229\",\"narrative_supported\":true,\"metric_indices\":[2]}},{\"finding_id\":\"f-revenue-decline-driver\",\"element\":\"material_changes\",\"affected_fact_id\":\"mc-01\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"evidence_ids\":[\"source-0008\",\"source-0010\",\"source-0016\"],\"explanation\":\"source-0008对营业收入变动的说明是：主要因部分高速公路改扩建项目通车，本期路桥项目建造服务收入下降；营业成本下降同样主要因建造服务成本下降。source-0016显示建造服务收入由上期7,485,491,706.94元降至本期3,100,006,510.91元，source-0010列示同比-58.59%，减少额约占营业收入减少额的绝大部分；同期高速公路通行费收入同比增加3.70%。草稿虽有营业收入下降16.03%以及建造服务收入下降的定性表述，但未说明营业收入下降主要由此引起，也未给出建造服务收入的同期金额或降幅，容易把核心通行费业务收缩与建造服务确认收入下降混为一谈。现有通行费、建造服务等分类金额可保留，需另行补充这一收入变动原因及建造服务收入对比。\"}]}",
+      "response_payload": {
+        "reviewed_fact_ids": [
+          "bs-01",
+          "bs-02",
+          "bs-03",
+          "ps-01",
+          "ps-02",
+          "ps-03",
+          "rm-01",
+          "sm-01",
+          "sm-02",
+          "sm-03",
+          "sm-04",
+          "sm-05",
+          "sm-06",
+          "sm-07",
+          "sm-08",
+          "sm-09",
+          "sm-10",
+          "sm-11",
+          "sm-12",
+          "op-01",
+          "cm-01",
+          "od-01",
+          "mc-01",
+          "sc-pos-01",
+          "sc-down-01"
+        ],
+        "findings": [
+          {
+            "finding_id": "f-bs-02-m2-scope",
+            "element": "business_structure",
+            "affected_fact_id": "bs-02",
+            "severity": "material",
+            "issue_type": "wrong_subject",
+            "action": "limit_metrics",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "explanation": "原文写明公司运营管理路桥资产总里程约2917公里，其中所辖自有约1601公里，另有受托管理山东高速集团所属路桥资产约1316公里。事实正文已按原文区分自有与受托，期间、叙述和证据可保留，公司作为运营管理主体的事实级口径有原文支持。但原metrics第2项（零基索引2）的对象是山东高速集团所属、由公司受托管理的路产，不是上市合并集团自身路产；其subject_scope标为consolidated_group不能忠实表达该所属关系。里程数字、单位和约数限定本身与原文一致，此处只限制该结构化指标，不提供替代数值或替代标签。",
+            "metric_limit": {
+              "fact_sha256": "93c7d09ec8b14fa2cea4f9eb1958d2d862092f0e96f17022236734fa537c2229",
+              "narrative_supported": true,
+              "metric_indices": [
+                2
+              ]
+            }
+          },
+          {
+            "finding_id": "f-revenue-decline-driver",
+            "element": "material_changes",
+            "affected_fact_id": "mc-01",
+            "severity": "material",
+            "issue_type": "material_omission",
+            "action": "possible_omission",
+            "evidence_ids": [
+              "source-0008",
+              "source-0010",
+              "source-0016"
+            ],
+            "explanation": "source-0008对营业收入变动的说明是：主要因部分高速公路改扩建项目通车，本期路桥项目建造服务收入下降；营业成本下降同样主要因建造服务成本下降。source-0016显示建造服务收入由上期7,485,491,706.94元降至本期3,100,006,510.91元，source-0010列示同比-58.59%，减少额约占营业收入减少额的绝大部分；同期高速公路通行费收入同比增加3.70%。草稿虽有营业收入下降16.03%以及建造服务收入下降的定性表述，但未说明营业收入下降主要由此引起，也未给出建造服务收入的同期金额或降幅，容易把核心通行费业务收缩与建造服务确认收入下降混为一谈。现有通行费、建造服务等分类金额可保留，需另行补充这一收入变动原因及建造服务收入对比。"
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 24903,
+        "output_tokens": 674,
+        "total_tokens": 68688
+      }
+    },
+    {
+      "request_id": "bp-work-0e01b8dbe366f6c7d181fd7d:workpaper:repair",
+      "purpose": "repair_profile_workpaper",
+      "request_hash": "a23a6cbac6651b838b9db411435e25eff0ea7f403b9ce898f0afe1934b18e9e4",
+      "response_hash": "4462517ba278f1533dfaebe44fbdd2c055186f937d06e8e3bb106adb2a4dc2fb",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "reasoning_effort": "high",
+      "route_fingerprint": "8ead02f6fa64bf453ea7878ca5d02138efb97ee7dcfd553023cbd07a398435ca",
+      "contract_status": "accepted",
+      "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:f-revenue-decline-driver\",\"text\":\"2025年度，公司营业收入同比下降16.03%，主要因部分高速公路改扩建项目通车，本期路桥项目建造服务收入下降；营业成本下降亦主要因路桥项目建造服务成本下降。建造服务收入由2024年度的7,485,491,706.94元降至2025年度的3,100,006,510.91元，同比下降58.59%；同期高速公路通行费收入同比增长3.70%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0010\",\"source-0016\"],\"metrics\":[{\"name\":\"营业收入同比\",\"raw_value\":\"-16.03%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比\",\"currency\":null,\"qualifier\":\"exact\",\"source_unit\":\"%\",\"unit\":\"%\",\"value\":\"-16.03\",\"uncertainty_reason\":null},{\"name\":\"建造服务收入\",\"raw_value\":\"3,100,006,510.91\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"currency\":\"人民币\",\"qualifier\":\"exact\",\"source_unit\":\"元\",\"unit\":\"元\",\"value\":\"3100006510.91\",\"uncertainty_reason\":null},{\"name\":\"建造服务收入\",\"raw_value\":\"7,485,491,706.94\",\"subject_scope\":\"business_segment\",\"period\":\"2024年度\",\"comparison_basis\":null,\"currency\":\"人民币\",\"qualifier\":\"exact\",\"source_unit\":\"元\",\"unit\":\"元\",\"value\":\"7485491706.94\",\"uncertainty_reason\":null},{\"name\":\"建造服务收入同比\",\"raw_value\":\"-58.59%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"营业收入比上年增减\",\"currency\":null,\"qualifier\":\"exact\",\"source_unit\":\"%\",\"unit\":\"%\",\"value\":\"-58.59\",\"uncertainty_reason\":null},{\"name\":\"高速公路通行费收入同比\",\"raw_value\":\"3.70%\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"营业收入比上年增减\",\"currency\":null,\"qualifier\":\"exact\",\"source_unit\":\"%\",\"unit\":\"%\",\"value\":\"3.70\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+      "response_payload": {
+        "repaired_facts": [
+          {
+            "fact_id": "review-add:f-revenue-decline-driver",
+            "text": "2025年度，公司营业收入同比下降16.03%，主要因部分高速公路改扩建项目通车，本期路桥项目建造服务收入下降；营业成本下降亦主要因路桥项目建造服务成本下降。建造服务收入由2024年度的7,485,491,706.94元降至2025年度的3,100,006,510.91元，同比下降58.59%；同期高速公路通行费收入同比增长3.70%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008",
+              "source-0010",
+              "source-0016"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入同比",
+                "raw_value": "-16.03%",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "currency": null,
+                "qualifier": "exact",
+                "source_unit": "%",
+                "unit": "%",
+                "value": "-16.03",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "建造服务收入",
+                "raw_value": "3,100,006,510.91",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "currency": "人民币",
+                "qualifier": "exact",
+                "source_unit": "元",
+                "unit": "元",
+                "value": "3100006510.91",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "建造服务收入",
+                "raw_value": "7,485,491,706.94",
+                "subject_scope": "business_segment",
+                "period": "2024年度",
+                "comparison_basis": null,
+                "currency": "人民币",
+                "qualifier": "exact",
+                "source_unit": "元",
+                "unit": "元",
+                "value": "7485491706.94",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "建造服务收入同比",
+                "raw_value": "-58.59%",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "营业收入比上年增减",
+                "currency": null,
+                "qualifier": "exact",
+                "source_unit": "%",
+                "unit": "%",
+                "value": "-58.59",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "高速公路通行费收入同比",
+                "raw_value": "3.70%",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "营业收入比上年增减",
+                "currency": null,
+                "qualifier": "exact",
+                "source_unit": "%",
+                "unit": "%",
+                "value": "3.70",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 13537,
+        "output_tokens": 3419,
+        "total_tokens": 16956
+      }
+    },
+    {
+      "request_id": "bp-work-0e01b8dbe366f6c7d181fd7d:workpaper:repair-verify",
+      "purpose": "verify_profile_workpaper_repair",
+      "request_hash": "92c0875b00873986c8e369aa021a6994a2b8669d68ca9c3f342f88c7aef18bcf",
+      "response_hash": "d0e006e3d41124114e9b47bbac03fadaf9bbc05fa8165a3600e0779a58d6936a",
+      "finish_reason": "stop",
+      "source_label": "scorpio:grok-4.7",
+      "model": "grok-4.7",
+      "selected_profile": "semantic_extraction__scorpio_grok",
+      "logical_profile": "semantic_extraction__scorpio_grok",
+      "reasoning_effort": "high",
+      "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+      "contract_status": "accepted",
+      "raw_content": "{\"checked_fact_ids\":[\"review-add:f-revenue-decline-driver\"],\"checks\":[{\"fact_id\":\"review-add:f-revenue-decline-driver\",\"accepted\":true,\"evidence_ids\":[\"source-0008\",\"source-0010\",\"source-0016\"],\"explanation\":\"候选事实补上了收入下降主因及建造服务收入对比，主体、期间、栏目、单位和证据均与原文一致。source-0008利润表变动表列示公司营业收入变动比例-16.03%，并明确营业收入下降主要因部分高速公路改扩建项目通车、本期路桥项目建造服务收入下降，营业成本下降同样主要因建造服务成本下降；报告正文中的“公司”属合并口径，事实主体定为consolidated_group正确。source-0016合同分类表列示建造服务收入本期3,100,006,510.91元、上期7,485,491,706.94元；source-0010分行业表对应营业收入比上年增减为-58.59%，高速公路通行费营业收入比上年增减为3.70%。两项行业行指标单独标为business_segment，未误升为合并口径，也未把含税通行费表或其他栏目混入。限定语“主要因”得以保留，未把空白单元格或推算占比写成确定金额。\"}]}",
+      "response_payload": {
+        "checked_fact_ids": [
+          "review-add:f-revenue-decline-driver"
+        ],
+        "checks": [
+          {
+            "fact_id": "review-add:f-revenue-decline-driver",
+            "accepted": true,
+            "evidence_ids": [
+              "source-0008",
+              "source-0010",
+              "source-0016"
+            ],
+            "explanation": "候选事实补上了收入下降主因及建造服务收入对比，主体、期间、栏目、单位和证据均与原文一致。source-0008利润表变动表列示公司营业收入变动比例-16.03%，并明确营业收入下降主要因部分高速公路改扩建项目通车、本期路桥项目建造服务收入下降，营业成本下降同样主要因建造服务成本下降；报告正文中的“公司”属合并口径，事实主体定为consolidated_group正确。source-0016合同分类表列示建造服务收入本期3,100,006,510.91元、上期7,485,491,706.94元；source-0010分行业表对应营业收入比上年增减为-58.59%，高速公路通行费营业收入比上年增减为3.70%。两项行业行指标单独标为business_segment，未误升为合并口径，也未把含税通行费表或其他栏目混入。限定语“主要因”得以保留，未把空白单元格或推算占比写成确定金额。"
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": 16309,
+        "output_tokens": 291,
+        "total_tokens": 21737
+      }
+    }
+  ]
+}
